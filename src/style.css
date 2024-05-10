@@ -1,17 +1,34 @@
 :root {
   --sda-green: #21d46e;
-  --color-secondary: #ffffff;
+  --sda-white: #ffffff;
+  --sda-black: #000000;
+  --sda-red: #e81525;
 
   font-family: Epilogue, sans-serif;
   line-height: 1.5;
   font-weight: 400;
   font-size: 16px;
 
-  color: var(--color-secondary);
+  color: var(--sda-white);
   background-color: var(--sda-green);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  height: 100vh;
+  width: 100%;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
 }
