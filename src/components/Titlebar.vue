@@ -4,7 +4,7 @@
 
 <template>
   <div id="titlebar">
-    <div id="centered">
+    <div class="centered">
       <router-link to="/">
         <img src="../assets/cascade.svg" alt="Logo"/>
       </router-link>
@@ -17,9 +17,10 @@
     background: var(--sda-white);
     display: flex;
     justify-content: center;
+    width: 100%;
   }
 
-  #centered {
+  .centered {
     max-width: calc(100% - 40px);
     width: 1320px;
     margin: 0 20px 0 20px;
@@ -39,7 +40,7 @@
   }
 
   @media screen and (max-width: 850px) {
-    #centered {
+    .centered {
       grid-template-columns: auto 1fr;
     }
   }
