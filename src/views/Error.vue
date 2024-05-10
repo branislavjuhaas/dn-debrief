@@ -1,11 +1,9 @@
 <script setup>
-
+  const props = defineProps(['code']);
 </script>
 
 <template>
-  <div>
-    <router-view />
-  </div>
+  {{props.code}}
 </template>
 
 <style scoped>
