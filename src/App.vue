@@ -6,7 +6,11 @@ import Titlebar from "./components/Titlebar.vue";
 <template>
   <div id="view">
     <Titlebar />
-    <router-view />
+      <div id="content">
+        <div class="centered">
+          <router-view />
+        </div>
+      </div>
     <Titlebar />
   </div>
 </template>
@@ -18,5 +22,12 @@ import Titlebar from "./components/Titlebar.vue";
     grid-template-columns: 100%;
     height: 100%;
     width: 100%;
+  }
+
+  #content {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
   }
 </style>

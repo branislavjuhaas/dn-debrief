@@ -4,7 +4,7 @@
 
 <template>
   <div id="titlebar">
-    <div class="centered">
+    <div id="subheader" class="centered">
       <router-link to="/">
         <img src="../assets/cascade.svg" alt="Logo"/>
       </router-link>
@@ -20,13 +20,9 @@
     width: 100%;
   }
 
-  .centered {
-    max-width: calc(100% - 40px);
-    width: 1320px;
-    margin: 0 20px 0 20px;
-
+  #subheader {
     display: grid;
-    grid-template-columns: 1fr 500px 1fr;
+    grid-template-columns: 1fr 31.25rem 1fr;
     align-items: center;
   }
 
@@ -40,7 +36,7 @@
   }
 
   @media screen and (max-width: 850px) {
-    .centered {
+    #subheader {
       grid-template-columns: auto 1fr;
     }
   }
