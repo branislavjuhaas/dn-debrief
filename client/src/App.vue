@@ -1,17 +1,18 @@
 <script setup>
 
-import Titlebar from "./components/Header.vue";
+import Header from "./components/Header.vue";
+import Footer from "./components/Footer.vue";
 </script>
 
 <template>
   <div id="view">
-    <Titlebar />
+    <Header />
       <div id="content">
         <div class="centered">
           <router-view />
         </div>
       </div>
-    <Titlebar />
+    <Footer />
   </div>
 </template>
 
