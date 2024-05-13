@@ -1,7 +1,10 @@
 {
   "name": "dn-cascade",
   "private": true,
-  "version": "0.0.0",
+  "version": "2024.0.1",
+  "contributors": [ "Branislav Juhás" ],
+  "license": "All rights reserved",
+  "description": "DN Cascade",
   "type": "module",
   "scripts": {
     "dev": "vite",
