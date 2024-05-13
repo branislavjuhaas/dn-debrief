@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <div id="titlebar">
+  <div id="header">
     <div id="subheader" class="centered">
       <router-link to="/">
         <img src="../assets/cascade.svg" alt="Logo"/>
@@ -13,7 +13,7 @@
 </template>
 
 <style scoped>
-  #titlebar {
+  #header {
     background: var(--sda-white);
     display: flex;
     justify-content: center;

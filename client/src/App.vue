@@ -1,6 +1,6 @@
 <script setup>
 
-import Titlebar from "./components/Titlebar.vue";
+import Titlebar from "./components/Header.vue";
 </script>
 
 <template>
