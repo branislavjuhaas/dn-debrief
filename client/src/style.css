@@ -92,6 +92,40 @@ a.one-line:hover:not(.primary) {
   background: var(--sda-red);
   color: var(--sda-white) !important;
 }
+
+.secondary-button {
+  height: 3rem;
+  display: grid;
+  grid-template-columns: 1.25rem 1fr;
+  column-gap: 8px;
+  justify-items: start;
+  align-items: center;
+  background: var(--sda-white);
+  color: var(--sda-black);
+  border: 2px solid var(--sda-black);
+  border-radius: 1.25rem;
+  padding: 0 20px;
+  font-family: "Epilogue", sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.primary-button {
+  min-width: min-content;
+  width: 15vw;
+  align-items: center;
+  background: var(--sda-red);
+  color: var(--sda-white);
+  border: 2px solid var(--sda-black);
+  border-radius: 1.25rem;
+  padding: 0 20px;
+  font-family: "Epilogue", sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 @media screen and (max-width: 850px) {
   :root {
     font-size: 12px;
