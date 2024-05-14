@@ -79,11 +79,14 @@ const data = ref([
     type: "club",
   },
 ]);
+
+// TODO: Implement search functionality
+// TODO: Implement context panel display logic
 </script>
 
 <template>
   <div id="search" @click="focusInput">
-    <img src="./../assets/icons/Search-r.svg" alt="Search" />
+    <img src="./../assets/icons/Search-r.svg" alt="Search" id="search-icon" />
     <input type="text" id="search-input" :placeholder="placeholderText" />
     <div id="context-panel"></div>
   </div>
@@ -95,12 +98,17 @@ const data = ref([
   max-width: 29rem;
   height: 1.25rem;
   border-radius: 1.25rem;
-  border: var(--sda-black) 0.125rem solid;
+  border: var(--sda-black) 2px solid;
   padding: 0.625rem 1.125rem;
   display: grid;
   grid-template-columns: 1.25rem 1fr;
   column-gap: 0.625rem;
   cursor: text;
+}
+
+#search-icon {
+  width: 1.25rem;
+  height: 1.25rem;
 }
 
 input[type="text"] {
@@ -119,7 +127,7 @@ input[type="text"]:focus {
 #context-panel {
   position: absolute;
   width: 31rem;
-  height: 100px;
+  height: 0;
   background: var(--sda-white);
   left: calc(50% - 15.5rem - 2px);
   top: 3.5rem;
@@ -127,11 +135,10 @@ input[type="text"]:focus {
   border: 2px solid var(--sda-black);
   overflow: hidden;
   cursor: default;
-  height: 0;
   opacity: 0;
 }
 
-@media screen and (max-width: 53.125rem) {
+@media screen and (max-width: 600px) {
   #context-panel {
     width: calc(100% - 2.5rem);
     left: 1.25rem;

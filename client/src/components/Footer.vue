@@ -45,7 +45,7 @@
   grid-column: 3;
 }
 
-@media screen and (max-width: 53.125rem) {
+@media screen and (max-width: 630px) {
   #subfooter {
     grid-template-columns: 1fr;
   }

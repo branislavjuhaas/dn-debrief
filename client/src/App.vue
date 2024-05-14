@@ -33,6 +33,8 @@ import Footer from "./components/Footer.vue";
   width: 100%;
   display: flex;
   justify-content: center;
+  overflow: scroll;
+  scrollbar-width: none;
 }
 
 .slide-enter-active,

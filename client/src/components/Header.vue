@@ -36,7 +36,7 @@ img {
   height: 2rem;
 }
 
-@media screen and (max-width: 53.125rem) {
+@media screen and (max-width: 600px) {
   #subheader {
     grid-template-columns: auto 1fr;
     justify-items: end;
