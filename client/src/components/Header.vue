@@ -1,5 +1,5 @@
 <script setup>
-
+import Search from "./Search.vue";
 </script>
 
 <template>
@@ -8,6 +8,7 @@
       <router-link to="/">
         <img src="../assets/cascade.svg" alt="Logo"/>
       </router-link>
+      <Search />
     </div>
   </div>
 </template>
