@@ -2,7 +2,9 @@
   "name": "dn-cascade",
   "private": true,
   "version": "2024.0.1",
-  "contributors": [ "Branislav Juhás" ],
+  "contributors": [
+    "Branislav Juhás"
+  ],
   "license": "All rights reserved",
   "description": "DN Cascade",
   "type": "module",
@@ -18,6 +20,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.4",
+    "prettier": "3.2.5",
     "vite": "^5.2.0"
   }
 }
