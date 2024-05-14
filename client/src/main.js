@@ -1,4 +1,5 @@
 import { createApp } from "vue";
+import { createPinia } from "pinia";
 import "./style.css";
 import App from "./App.vue";
 import router from "./router";
@@ -7,7 +8,8 @@ import { getAnalytics } from "firebase/analytics";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
-createApp(App).use(router).mount("#app");
+const pinia = createPinia();
+createApp(App).use(router).use(pinia).mount("#app");
 
 /**
  * Firebase configuration object.
@@ -35,5 +37,5 @@ const firebaseConfig = {
   measurementId: "G-B8SP329TX6",
 };
 
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+const firebase = initializeApp(firebaseConfig);
+const analytics = getAnalytics(firebase);

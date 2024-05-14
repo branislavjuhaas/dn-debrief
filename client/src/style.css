@@ -124,6 +124,12 @@ a.one-line:hover:not(.primary) {
   font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
+  transition: color 0.21s, background 0.21s;
+}
+
+.primary-button:hover {
+  background: var(--sda-black);
+  color: var(--sda-red)
 }
 
 @media screen and (max-width: 850px) {

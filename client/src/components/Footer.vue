@@ -1,4 +1,11 @@
-<script setup></script>
+<script setup>
+import { computed } from "vue";
+import { useUserStore } from "../stores/user.js";
+
+const userStore = useUserStore();
+const username = computed(() => userStore.fullName || "Prihlásiť sa");
+const link = computed(() => (userStore.fullName ? "/users/me" : "/auth"));
+</script>
 
 <template>
   <div id="footer">
@@ -11,9 +18,9 @@
         <router-link to="/manage" class="one-line footer-link"
           >Organizátor - Správa</router-link
         >
-        <router-link to="/users/me" id="me" class="one-line footer-link primary"
-          >Branislav Juhás</router-link
-        >
+        <router-link :to="link" id="me" class="one-line footer-link primary">{{
+          username
+        }}</router-link>
       </div>
     </div>
   </div>
