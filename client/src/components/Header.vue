@@ -6,7 +6,7 @@ import Search from "./Search.vue";
   <div id="header">
     <div id="subheader" class="centered">
       <router-link to="/">
-        <img src="../assets/cascade.svg" alt="Logo"/>
+        <img src="../assets/cascade.svg" alt="Logo" />
       </router-link>
       <Search />
     </div>
@@ -14,31 +14,33 @@ import Search from "./Search.vue";
 </template>
 
 <style scoped>
-  #header {
-    background: var(--sda-white);
-    display: flex;
-    justify-content: center;
-    width: 100%;
-  }
+#header {
+  background: var(--sda-white);
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
 
+#subheader {
+  display: grid;
+  grid-template-columns: 1fr 31.25rem 1fr;
+  align-items: center;
+}
+
+a {
+  display: flex;
+  width: min-content;
+}
+
+img {
+  height: 2rem;
+}
+
+@media screen and (max-width: 53.125rem) {
   #subheader {
-    display: grid;
-    grid-template-columns: 1fr 31.25rem 1fr;
-    align-items: center;
+    grid-template-columns: auto 1fr;
+    justify-items: end;
+    column-gap: 1.25rem;
   }
-
-  a {
-    display: flex;
-    width: min-content;
-  }
-
-  img {
-    height: 2rem;
-  }
-
-  @media screen and (max-width: 850px) {
-    #subheader {
-      grid-template-columns: auto 1fr;
-    }
-  }
+}
 </style>
