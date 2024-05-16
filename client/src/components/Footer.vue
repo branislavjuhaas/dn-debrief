@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from "vue";
-import { useUserStore } from "../stores/user.js";
+import { useUserStore } from "../stores/stores.js";
 
 const userStore = useUserStore();
 const username = computed(() => userStore.fullName || "Prihlásiť sa");

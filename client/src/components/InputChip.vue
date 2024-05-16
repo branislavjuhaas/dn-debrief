@@ -1,6 +1,5 @@
 <script setup>
 import { ref, watch } from "vue";
-import { defineProps, defineEmits } from "vue";
 import Eye from "../assets/icons/Eye-r.svg";
 import EyeSlash from "../assets/icons/EyeSlash-r.svg";
 const props = defineProps(["type", "icon", "title", "modelValue"]);

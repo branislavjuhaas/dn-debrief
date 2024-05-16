@@ -1,67 +1,43 @@
 <script setup>
 import { ref } from "vue";
-import { useRouter } from "vue-router";
-import { useUserStore } from "../stores/user.js";
+import { useStatesStore } from "../stores/stores.js";
 import InputChip from "../components/InputChip.vue";
 import AtIcon from "../assets/icons/At-f.svg";
 import VaultIcon from "../assets/icons/Vault-f.svg";
+
 import {
   getAuth,
   signInWithRedirect,
-  getRedirectResult,
   GoogleAuthProvider,
   signInWithEmailAndPassword,
+  setPersistence,
+  inMemoryPersistence,
 } from "firebase/auth";
-import * as path from "node:path";
 
-const router = useRouter();
-const userStore = useUserStore();
-
-const provider = new GoogleAuthProvider();
-const auth = getAuth();
-const signInWithGoogle = () => {
-  signInWithRedirect(auth, provider);
-  getRedirectResult(auth);
-};
-
-getRedirectResult(auth)
-  .then((result) => {
-    // This gives you a Google Access Token. You can use it to access Google APIs.
-    const credential = GoogleAuthProvider.credentialFromResult(result);
-    const token = credential.accessToken;
-
-    // The signed-in user info.
-    const user = result.user;
-    userStore.setUser(user.uid, "Branislav", "Kováč");
-  })
-  .catch((error) => {
-    // Handle Errors here.
-    const errorCode = error.code;
-    const errorMessage = error.message;
-    console.log(errorCode + " " + errorMessage);
-    // The email of the user's account used.
-    const email = error.customData.email;
-    // The AuthCredential type that was used.
-    const credential = GoogleAuthProvider.credentialFromError(error);
-  });
+const statesStore = useStatesStore();
 
 const email = ref("");
 const password = ref("");
 
+const provider = new GoogleAuthProvider();
+const auth = getAuth();
+
+const signInWithGoogle = () => {
+  statesStore.startLoading();
+  // Set session persistence to in-memory
+  setPersistence(auth, inMemoryPersistence).then(() => {
+    // Redirect to Google sign in and handle the result
+    signInWithRedirect(auth, provider);
+  });
+};
+
 // Sign in using the input chip.input values for email and password
 const signInWithEmail = () => {
-  signInWithEmailAndPassword(auth, email.value, password.value)
-    .then((userCredential) => {
-      // Signed in
-      const user = userCredential.user;
-      userStore.setUser(user.uid, "Branislav", "Kováč");
-      router.push({ name: "Home" });
-    })
-    .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      console.log(errorCode + " " + errorMessage);
-    });
+  statesStore.startLoading();
+  setPersistence(auth, inMemoryPersistence).then(() => {
+    // Sign in with email and password
+    signInWithEmailAndPassword(auth, email.value, password.value);
+  });
 };
 </script>
 
