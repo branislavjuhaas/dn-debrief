@@ -110,6 +110,7 @@ onMounted(() => {
   justify-content: center;
   overflow: scroll;
   scrollbar-width: none;
+  background: var(--sda-green);
 }
 
 #loader {
