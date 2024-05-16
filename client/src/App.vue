@@ -16,6 +16,9 @@ import Footer from "./components/Footer.vue";
       </div>
     </div>
     <Footer />
+    <transition name="fade">
+      <div v-if="loading" id="loader"></div>
+    </transition>
   </div>
 </template>
 
