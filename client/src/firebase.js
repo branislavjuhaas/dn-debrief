@@ -1,22 +1,6 @@
-import { createPinia } from "pinia";
-import { getFirestore } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 
-/**
- * Firebase configuration object.
- * This object contains all the necessary details to initialize and connect to your Firebase project.
- * Replace these details with your Firebase project's specific details.
- * @type {Object}
- * @property {string} apiKey - Your Firebase API key.
- * @property {string} authDomain - Your Firebase Auth domain.
- * @property {string} databaseURL - The URL to your Firebase database.
- * @property {string} projectId - Your Firebase project ID.
- * @property {string} storageBucket - The name of your Firebase storage bucket.
- * @property {string} messagingSenderId - Your Firebase messaging sender ID.
- * @property {string} appId - Your Firebase app ID.
- * @property {string} measurementId - Your Firebase measurement ID.
- */
 const firebaseConfig = {
   apiKey: "AIzaSyCG1YinvyCiYK2ppM6lNDoO1Jw8PXYToDE",
   authDomain: "dn-cascade.firebaseapp.com",
@@ -32,7 +16,50 @@ const firebaseConfig = {
 const firebase = initializeApp(firebaseConfig);
 const analytics = getAnalytics(firebase);
 
-const pinia = createPinia();
-const db = getFirestore(firebase);
+const getUserData = async (uid) => {
+  const { getFirestore, getDocs, query, collection, where, documentId } =
+    await import("firebase/firestore");
 
-export { db, pinia, analytics };
+  const db = getFirestore(firebase);
+
+  const q = query(collection(db, "users"), where(documentId(), "==", uid));
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs[0].data();
+};
+
+const signInWithGoogle = async () => {
+  const {
+    getAuth,
+    GoogleAuthProvider,
+    setPersistence,
+    inMemoryPersistence,
+    signInWithRedirect,
+  } = await import("firebase/auth");
+
+  const auth = getAuth();
+  const provider = new GoogleAuthProvider();
+  // Set session persistence to in-memory
+  setPersistence(auth, inMemoryPersistence).then(() => {
+    // Redirect to Google sign in and handle the result
+    signInWithRedirect(auth, provider);
+  });
+};
+
+// Sign in using the input chip.input values for email and password
+const signInWithEmail = async (email, password) => {
+  const {
+    getAuth,
+    setPersistence,
+    inMemoryPersistence,
+    signInWithEmailAndPassword,
+  } = await import("firebase/auth");
+
+  const auth = getAuth();
+  // Set session persistence to in-memory
+  setPersistence(auth, inMemoryPersistence).then(() => {
+    // Sign in with email and password
+    signInWithEmailAndPassword(auth, email, password);
+  });
+};
+
+export { getUserData, signInWithGoogle, signInWithEmail };

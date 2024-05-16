@@ -1,43 +1,22 @@
 <script setup>
 import { ref } from "vue";
+import { signInWithGoogle, signInWithEmail } from "../firebase.js";
 import { useStatesStore } from "../stores/stores.js";
 import InputChip from "../components/InputChip.vue";
 import AtIcon from "../assets/icons/At-f.svg";
 import VaultIcon from "../assets/icons/Vault-f.svg";
 
-import {
-  getAuth,
-  signInWithRedirect,
-  GoogleAuthProvider,
-  signInWithEmailAndPassword,
-  setPersistence,
-  inMemoryPersistence,
-} from "firebase/auth";
-
-const statesStore = useStatesStore();
-
 const email = ref("");
 const password = ref("");
 
-const provider = new GoogleAuthProvider();
-const auth = getAuth();
-
-const signInWithGoogle = () => {
-  statesStore.startLoading();
-  // Set session persistence to in-memory
-  setPersistence(auth, inMemoryPersistence).then(() => {
-    // Redirect to Google sign in and handle the result
-    signInWithRedirect(auth, provider);
-  });
+const emailLogin = async () => {
+  useStatesStore().startLoading();
+  signInWithEmail(email.value, password.value);
 };
 
-// Sign in using the input chip.input values for email and password
-const signInWithEmail = () => {
-  statesStore.startLoading();
-  setPersistence(auth, inMemoryPersistence).then(() => {
-    // Sign in with email and password
-    signInWithEmailAndPassword(auth, email.value, password.value);
-  });
+const googleLogin = async () => {
+  useStatesStore().startLoading();
+  signInWithGoogle();
 };
 </script>
 
@@ -80,7 +59,7 @@ const signInWithEmail = () => {
           <p class="one-line">Obnoviť heslo</p></router-link
         >
 
-        <button class="primary-button" @click="signInWithEmail">
+        <button class="primary-button" @click="emailLogin">
           <p class="one-line">Prihlásiť</p>
         </button>
       </div>

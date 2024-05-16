@@ -15,12 +15,12 @@ export const useUserStore = defineStore("user", {
     },
   },
   actions: {
-    setUser(uid, name, surname, email, role) {
+    setUser(uid, email, user) {
       this.uid = uid;
-      this.name = name;
-      this.surname = surname;
       this.email = email;
-      this.role = role;
+      this.name = user.name;
+      this.surname = user.surname;
+      this.role = user.role;
     },
     logOut() {
       this.uid = null;

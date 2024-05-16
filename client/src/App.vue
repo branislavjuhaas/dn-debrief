@@ -1,18 +1,11 @@
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted } from "vue";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import Header from "./components/Header.vue";
 import Footer from "./components/Footer.vue";
-import { useUserStore, useStatesStore } from "./stores/stores.js";
+import { useStatesStore, useUserStore } from "./stores/stores.js";
 import { useRouter } from "vue-router";
-import {
-  getDocs,
-  query,
-  where,
-  collection,
-  documentId,
-} from "firebase/firestore";
-import { db } from "./firebase.js";
+import { getUserData } from "./firebase.js";
 
 const userStore = useUserStore();
 const auth = getAuth();
@@ -23,39 +16,40 @@ const router = useRouter();
 const statesStore = useStatesStore();
 const loading = computed(() => statesStore.loading);
 
+const createSignInRouteWork = () => {
+  // if the current route is the /auth route, redirect to the home route
+  if (router.currentRoute.value.name === "Auth") {
+    router.push({ name: "Home" });
+  }
+
+  // Create a route work that redirects to the home route if the user tries to access the /auth route
+  router.beforeEach((to, from, next) => {
+    if (to.path === "/auth") {
+      next("/users/me");
+    } else {
+      next();
+    }
+  });
+};
+
+const removeSignInRouteWork = () => {
+  router.beforeEach((to, from, next) => {
+    if (to.path === "/auth") {
+      next();
+    } else {
+      next();
+    }
+  });
+};
+
 const login = async (uid) => {
-  // from the firestore database, get the user with the document id equal to the uid
-  const q = query(collection(db, "users"), where(documentId(), "==", uid));
-  await getDocs(q)
-    .then((querySnapshot) => {
-      querySnapshot.forEach((doc) => {
-        console.log(doc.id, " => ", doc.data());
-        userStore.setUser(
-          uid,
-          doc.data().name,
-          doc.data().surname,
-          auth.currentUser.email,
-          doc.data().role,
-        );
+  // Get user data and set it to the user store using current email
+  getUserData(uid).then((data) => {
+    // Set the user data to the user store and create the sign in route work
+    userStore.setUser(uid, auth.currentUser.email, data);
+    createSignInRouteWork();
+  });
 
-        // If the route is /auth, redirect to the home page
-        if (router.currentRoute.value.path === "/auth") {
-          router.push("/");
-        }
-
-        // Set the redirect path from the /auth route to /users/me
-        router.beforeEach((to, from, next) => {
-          if (to.path === "/auth") {
-            next("/users/me");
-          } else {
-            next();
-          }
-        });
-      });
-    })
-    .catch((error) => {
-      console.log("Error getting documents: ", error);
-    });
   statesStore.stopLoading();
 };
 
@@ -67,9 +61,10 @@ onMounted(() => {
       // User is signed in, update the user store.
       login(user.uid);
     } else {
-      // No user is signed in.
+      // No user is signed in, log out the user, stop loading and remove the sign in route work
       userStore.logOut();
       statesStore.stopLoading();
+      removeSignInRouteWork();
     }
   });
 });
