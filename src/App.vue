@@ -1,30 +1,48 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
+import Header from "./components/Header.vue";
+import Footer from "./components/Footer.vue";
+import router from "./router.js";
+import { nextTick } from "vue";
+
+router.afterEach((to, from) => {
+  nextTick(() => {
+    document.title = "DebRIEF - " + to.meta.title;
+  });
+});
 </script>
 
 <template>
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
+  <div class="grid grid-cols-1 grid-rows-[auto_1fr_auto] w-full h-full">
+    <Header />
+    <div class="flex items-center flex-col px-5 bg-green">
+      <router-view
+        v-slot="{ Component }"
+        class="flex flex-col max-w-[1320px] w-full h-full pt-28 text-white">
+        <transition name="slide-fade" mode="out-in">
+          <component :is="Component" />
+        </transition>
+      </router-view>
+    </div>
+    <Footer />
   </div>
-  <HelloWorld msg="Vite + Vue" />
 </template>
 
 <style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+.slide-fade-enter-active,
+.slide-fade-leave-active {
+  transition:
+    transform 0.21s,
+    opacity 0.21s ease;
+  position: relative;
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+.slide-fade-enter,
+.slide-fade-leave-to {
+  opacity: 0;
+  transform: translateY(5%);
 }
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
+.slide-fade-enter-from,
+.slide-fade-leave {
+  opacity: 0;
+  transform: translateY(0%);
 }
 </style>
