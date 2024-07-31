@@ -2,11 +2,30 @@
 import Header from "./components/Header.vue";
 import Footer from "./components/Footer.vue";
 import router from "./router.js";
-import { nextTick } from "vue";
+import { onAuthStateChanged, getAuth } from "firebase/auth";
+import { nextTick, onMounted } from "vue";
+import { useUserStore } from "./stores.js";
+
+const userStore = useUserStore();
 
 router.afterEach((to, from) => {
   nextTick(() => {
     document.title = "DebRIEF - " + to.meta.title;
+  });
+});
+
+const auth = getAuth();
+
+onMounted(() => {
+  onAuthStateChanged(auth, (user) => {
+    // Check if user is signed in
+    if (user) {
+      // User is signed in, update the user store.
+      console.log("User " + user.uid + " is signed in");
+    } else {
+      // No user is signed in, log out the user, stop loading and remove the sign in route work
+      userStore.logOut();
+    }
   });
 });
 </script>

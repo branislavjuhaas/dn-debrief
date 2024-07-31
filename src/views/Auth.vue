@@ -8,6 +8,19 @@ const password = ref("");
 const remember = ref(false);
 
 const message = ref("");
+
+const login = async () => {
+  if (email.value === "" || password.value === "") {
+    message.value = "Vyplňte všetky polia";
+  } else {
+    const { emailLogin } = await import("../firebase/auth.js");
+
+    message.value = "";
+    emailLogin(email.value, password.value, remember.value).catch((error) => {
+      message.value = error.message;
+    });
+  }
+};
 </script>
 
 <template>
