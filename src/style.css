@@ -42,11 +42,15 @@ input[type=password]::-ms-clear
 }
 
 .form-primary {
-  @apply flex text-white font-bold h-12 min-w-60 px-5 rounded-[1.25rem] border-2 border-black bg-red duration-150 items-center justify-center cursor-pointer hover:bg-black;
+  @apply flex font-bold h-12 min-w-60 px-5 rounded-[1.25rem] border-2 border-black duration-150 items-center justify-center;
 }
 
-.form-primary-disabled {
-  @apply flex text-grey font-bold h-12 min-w-60 px-5 rounded-[1.25rem] border-2 border-dashed border-black duration-150 items-center justify-center cursor-default;
+.form-primary:disabled {
+  @apply text-grey border-dashed cursor-default;
+}
+
+.form-primary:not(:disabled) {
+  @apply text-white bg-red cursor-pointer hover:bg-black hover:text-white;
 }
 
 .vertical-center > * {

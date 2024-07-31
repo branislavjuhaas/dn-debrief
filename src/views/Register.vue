@@ -58,15 +58,14 @@ watch([email, name, surname, password, confirm, message], () => {
         class="grid grid-flow-col gap-4 items-center sm:grid-rows-1 sm:grid-cols-[1fr_auto]">
         <p
           v-if="message !== ''"
-          class="form-message row-start-3 sm:row-start-1">
+          class="form-message row-start-2 sm:row-start-1">
           {{ message }}
         </p>
-        s
-        <div
-          :class="canSubmit ? 'form-primary' : 'form-primary-disabled'"
-          class="vertical-center col-start-1 sm:col-start-3">
-          <p>Vytvoriť účet</p>
-        </div>
+        <button
+          :disabled="!canSubmit"
+          class="form-primary vertical-center col-start-1 sm:col-start-2">
+          <span>Vytvoriť účet</span>
+        </button>
       </div>
     </div>
     <router-link to="/auth" class="alternative vertical-center w-full">

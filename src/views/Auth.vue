@@ -35,17 +35,17 @@ const message = ref("");
           v-model="remember"
           class="col-start-1 sm:col-start-2"
           label="Zapamätať" />
-        <div
+        <button
           class="form-primary vertical-center col-start-1 sm:col-start-3"
-          @click="console.log(username, password, remember)">
-          <p>Prihlásiť sa</p>
-        </div>
+          @click="login">
+          <span>Prihlásiť sa</span>
+        </button>
       </div>
     </div>
     <div class="grid grid-cols-1 gap-5 w-full sm:grid-cols-2">
-      <div class="alternative vertical-center">
-        <p>Prihlásiť sa pomocou účtu Google</p>
-      </div>
+      <button class="alternative vertical-center">
+        <span>Prihlásiť sa pomocou účtu Google</span>
+      </button>
       <router-link to="/auth/register" class="alternative vertical-center">
         <p>Vytvoriť nový účet</p>
       </router-link>
