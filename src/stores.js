@@ -20,7 +20,7 @@ export const useUserStore = defineStore("user", {
       this.email = email;
       this.name = name;
       this.surname = surname;
-      this.role = role;
+      this.role = role || "user";
     },
     logOut() {
       this.uid = null;
