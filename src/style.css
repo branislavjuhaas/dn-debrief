@@ -27,6 +27,10 @@ a {
     @apply text-black no-underline hover:text-red duration-150;
 }
 
+input:disabled {
+  @apply cursor-not-allowed bg-transparent;
+}
+
 input[type=password]::-ms-reveal,
 input[type=password]::-ms-clear
 {

@@ -11,6 +11,7 @@ export default {
       white: "#ffffff",
       red: "#e81525",
       grey: "#888888",
+      transparent: "transparent",
     },
   },
 
