@@ -71,10 +71,11 @@ onMounted(async () => {
 <template>
   <div class="grid grid-cols-1 grid-rows-[auto_1fr_auto] w-full h-full">
     <Header />
-    <div class="flex items-center flex-col px-5 bg-green">
+    <div
+      class="flex h-full w-full items-center flex-col px-5 pb-5 bg-green overflow-y-auto scrollbar-hidden">
       <router-view
         v-slot="{ Component }"
-        class="flex flex-col max-w-[1320px] w-full h-full pt-28 text-white">
+        class="flex flex-col max-w-[1320px] w-full pt-28 text-white">
         <transition name="slide-fade" mode="out-in">
           <component :is="Component" />
         </transition>
