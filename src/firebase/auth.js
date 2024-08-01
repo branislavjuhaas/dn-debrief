@@ -10,7 +10,9 @@ import {
 import {
   collection,
   documentId,
+  doc,
   getDocs,
+  setDoc,
   getFirestore,
   query,
   where,
@@ -20,32 +22,22 @@ const auth = getAuth();
 auth.languageCode = "sk";
 
 const emailLogin = async (email, password, remember) => {
-  try {
-    // Set the persistence of the user for the memory of the browser
+  if (remember) {
+    setPersistence(auth, inMemoryPersistence).then(() => {
+      signInWithEmailAndPassword(auth, email, password);
+    });
 
-    if (remember) {
-      setPersistence(auth, inMemoryPersistence).then(() => {
-        signInWithEmailAndPassword(auth, email, password);
-      });
-
-      return;
-    }
-
-    await signInWithEmailAndPassword(auth, email, password);
-  } catch (error) {
-    return error;
+    return;
   }
+
+  await signInWithEmailAndPassword(auth, email, password);
 };
 
 const googleLogin = async () => {
-  try {
-    const provider = new GoogleAuthProvider();
-    setPersistence(auth, inMemoryPersistence).then(() => {
-      signInWithPopup(auth, provider);
-    });
-  } catch (error) {
-    return error;
-  }
+  const provider = new GoogleAuthProvider();
+  setPersistence(auth, inMemoryPersistence).then(() => {
+    signInWithPopup(auth, provider);
+  });
 };
 
 const logout = async () => {
@@ -68,4 +60,18 @@ const getUser = async (uid) => {
   return (await getDocs(q)).docs[0].data();
 };
 
-export { emailLogin, googleLogin, logout, getUser };
+const createUser = async (uid, name, surname) => {
+  const db = getFirestore();
+
+  try {
+    await setDoc(doc(db, "users", uid), {
+      name: name,
+      surname: surname,
+    });
+  } catch (error) {
+    console.error("Error adding document: ", error);
+    return error;
+  }
+};
+
+export { emailLogin, googleLogin, logout, getUser, createUser };

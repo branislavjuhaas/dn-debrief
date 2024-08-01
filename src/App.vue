@@ -21,11 +21,36 @@ onMounted(async () => {
     // Check if user is signed in
     const { getUser } = await import("./firebase/auth.js");
     if (user) {
-      // User is signed in, update the user store.
+      // User is signed in, log the user in and redirect to the home page
       console.log("User " + user.uid + " is signed in");
+
+      // If the user does not exist, create it
       // Redirect the user to the home page
-      getUser(user.uid).then((userData) => {
-        console.log(userData);
+      getUser(user.uid).then(async (userData) => {
+        if (!userData) {
+          const { createUser, logout } = await import("./firebase/auth.js");
+          console.log("Creating user: ", user);
+          createUser(
+            user.uid,
+            user.displayName.substring(0, user.displayName.lastIndexOf(" ")),
+            user.displayName.substring(user.displayName.lastIndexOf(" ") + 1),
+          ).catch((error) => {
+            console.error("Error creating user: ", error);
+            logout();
+            userStore.logOut();
+          });
+
+          userStore.setUser(
+            user.uid,
+            user.email,
+            user.displayName.substring(0, user.displayName.lastIndexOf(" ")),
+            user.displayName.substring(user.displayName.lastIndexOf(" ") + 1),
+            null,
+          );
+
+          return;
+        }
+
         userStore.setUser(
           user.uid,
           user.email,
