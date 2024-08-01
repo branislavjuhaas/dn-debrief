@@ -1,7 +1,8 @@
 <script setup>
+import { ref } from "vue";
+import { translateError } from "../translate.js";
 import Field from "../components/Field.vue";
 import Toggle from "../components/Toggle.vue";
-import { ref } from "vue";
 
 const email = ref("");
 const password = ref("");
@@ -17,7 +18,7 @@ const login = async () => {
 
     message.value = "";
     emailLogin(email.value, password.value, remember.value).catch((error) => {
-      message.value = error.message;
+      message.value = translateError(error.code);
     });
   }
 };
@@ -26,7 +27,7 @@ const googleLogin = async () => {
   const { googleLogin } = await import("../firebase/auth.js");
 
   googleLogin().catch((error) => {
-    message.value = error.message;
+    message.value = translateError(error.code);
   });
 };
 </script>
