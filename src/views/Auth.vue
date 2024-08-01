@@ -21,6 +21,14 @@ const login = async () => {
     });
   }
 };
+
+const googleLogin = async () => {
+  const { googleLogin } = await import("../firebase/auth.js");
+
+  googleLogin().catch((error) => {
+    message.value = error.message;
+  });
+};
 </script>
 
 <template>
@@ -56,7 +64,7 @@ const login = async () => {
       </div>
     </div>
     <div class="grid grid-cols-1 gap-5 w-full sm:grid-cols-2">
-      <button class="alternative vertical-center">
+      <button @click="googleLogin" class="alternative vertical-center">
         <span>Prihlásiť sa pomocou účtu Google</span>
       </button>
       <router-link to="/auth/register" class="alternative vertical-center">

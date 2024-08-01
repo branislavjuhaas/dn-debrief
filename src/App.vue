@@ -16,12 +16,25 @@ router.afterEach((to, from) => {
 
 const auth = getAuth();
 
-onMounted(() => {
-  onAuthStateChanged(auth, (user) => {
+onMounted(async () => {
+  onAuthStateChanged(auth, async (user) => {
     // Check if user is signed in
+    const { getUser } = await import("./firebase/auth.js");
     if (user) {
       // User is signed in, update the user store.
       console.log("User " + user.uid + " is signed in");
+      // Redirect the user to the home page
+      getUser(user.uid).then((userData) => {
+        console.log(userData);
+        userStore.setUser(
+          user.uid,
+          user.email,
+          userData.name,
+          userData.surname,
+          userData.role,
+        );
+      });
+      await router.push("/");
     } else {
       // No user is signed in, log out the user, stop loading and remove the sign in route work
       userStore.logOut();

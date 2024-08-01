@@ -7,6 +7,10 @@ const user = useUserStore();
 // Function that will return Dobrý deň, if the user role is admin or developer and otherwise Ahoj. It can be called any time in the template.
 const greeting = ref("Ahoj");
 
+if (user.role === "admin" || user.role === "developer") {
+  greeting.value = "Dobrý deň";
+}
+
 watch(
   () => user.role,
   () => {
