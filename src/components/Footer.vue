@@ -37,7 +37,7 @@ if (
       <div class="flex flex-row gap-14 items-center w-full sm:w-auto">
         <a href="https://sda.sk" class="hidden mt-1 sm:flex">Viac o SDA</a>
         <router-link
-          :to="user.uid != null ? '/me' : '/auth'"
+          :to="user.uid != null ? '/profile' : '/auth'"
           class="flex min-w-40 px-5 h-10 border-2 border-black rounded-[1.25rem] items-center justify-center duration-150 w-full sm:w-auto hover:bg-red hover:text-white vertical-center">
           <p>
             {{ user.uid != null ? user.fullName : "Prihlásiť" }}

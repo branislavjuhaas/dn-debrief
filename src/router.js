@@ -21,6 +21,12 @@ const routes = [
     meta: { title: "Registrácia" },
   },
   {
+    path: "/profile",
+    name: "Profile",
+    component: () => import("./views/Profile.vue"),
+    meta: { title: "Profil" },
+  },
+  {
     path: "/:pathMatch(.*)*", // 404
     name: "404",
     component: () => import("./views/Error.vue"),
