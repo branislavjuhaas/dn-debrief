@@ -2,6 +2,8 @@
 import Field from "../components/Field.vue";
 import Toggle from "../components/Toggle.vue";
 import { ref, watch } from "vue";
+import { useUserStore } from "../stores.js";
+import { translateError } from "../translate.js";
 
 const email = ref("");
 const name = ref("");
@@ -12,16 +14,43 @@ const confirm = ref("");
 const message = ref("");
 const canSubmit = ref(false);
 
+const userStore = useUserStore();
+
+const register = async () => {
+  if (
+    email.value === "" ||
+    name.value === "" ||
+    surname.value === "" ||
+    password.value === "" ||
+    confirm.value === ""
+  ) {
+    message.value = "Vyplňte všetky polia";
+    return;
+  }
+
+  userStore.setUser(null, email.value, name.value, surname.value, null);
+
+  const { emailRegister, createUser } = await import("../firebase/auth.js");
+
+  // Register the user and ate the user in the database with the uid from the authentication returns uid
+  emailRegister(email.value, password.value).catch((error) => {
+    message.value = translateError(error.code);
+  });
+};
+
 // Watch the password and confirm fields
 watch([password, confirm], ([password, confirm]) => {
-  if (password !== confirm) {
+  // If the length of the password is less than 6 characters, display a message
+  if (password.length < 6) {
+    message.value = "Heslo musí mať aspoň 6 znakov";
+  } else if (password !== confirm) {
     message.value = "Heslá sa nezhodujú";
   } else {
     message.value = "";
   }
 });
 
-// Watch to update the value of the enabled submit button
+// Watch to update the value of the enabled submit button when the fields are filled and the passwords match
 watch([email, name, surname, password, confirm, message], () => {
   canSubmit.value =
     email.value !== "" &&
@@ -29,7 +58,7 @@ watch([email, name, surname, password, confirm, message], () => {
     surname.value !== "" &&
     password.value !== "" &&
     confirm.value !== "" &&
-    message.value === "";
+    password.value === confirm.value;
 });
 </script>
 
@@ -40,19 +69,27 @@ watch([email, name, surname, password, confirm, message], () => {
       class="flex flex-col justify-between w-full bg-white min-h-60 rounded-[1.25rem] p-5 gap-16">
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <field
-          name="username"
+          name="email"
           v-model="email"
           label="Email"
           type="text"
           class="col-span-1 sm:col-span-2" />
-        <field v-model="name" label="Meno" type="text" />
-        <field v-model="surname" label="Priezvisko" type="text" />
+        <field name="firstname" v-model="name" label="Meno" type="text" />
+        <field
+          name="surname"
+          v-model="surname"
+          label="Priezvisko"
+          type="text" />
         <field
           name="password"
           v-model="password"
           label="Heslo"
           type="password" />
-        <field v-model="confirm" label="Potvrdenie hesla" type="password" />
+        <field
+          name="confirm-password"
+          v-model="confirm"
+          label="Potvrdenie hesla"
+          type="password" />
       </div>
       <div
         class="grid grid-flow-col gap-4 items-center sm:grid-rows-1 sm:grid-cols-[1fr_auto]">
@@ -63,6 +100,7 @@ watch([email, name, surname, password, confirm, message], () => {
         </p>
         <button
           :disabled="!canSubmit"
+          @click="register"
           class="form-primary vertical-center col-start-1 sm:col-start-2">
           <span>Vytvoriť účet</span>
         </button>

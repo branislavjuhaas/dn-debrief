@@ -5,6 +5,7 @@ import {
   setPersistence,
   signInWithEmailAndPassword,
   signInWithPopup,
+  createUserWithEmailAndPassword,
 } from "firebase/auth";
 
 import {
@@ -31,6 +32,10 @@ const emailLogin = async (email, password, remember) => {
   }
 
   await signInWithEmailAndPassword(auth, email, password);
+};
+
+const emailRegister = async (email, password) => {
+  return await createUserWithEmailAndPassword(auth, email, password);
 };
 
 const googleLogin = async () => {
@@ -64,7 +69,7 @@ const createUser = async (uid, name, surname) => {
   const db = getFirestore();
 
   try {
-    await setDoc(doc(db, "users", uid), {
+    await setDoc(doc(db, `users/${uid}`), {
       name: name,
       surname: surname,
     });
@@ -74,4 +79,4 @@ const createUser = async (uid, name, surname) => {
   }
 };
 
-export { emailLogin, googleLogin, logout, getUser, createUser };
+export { emailLogin, emailRegister, googleLogin, logout, getUser, createUser };

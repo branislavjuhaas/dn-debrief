@@ -39,8 +39,12 @@ const googleLogin = async () => {
       class="flex flex-col justify-between w-full bg-white min-h-60 rounded-[1.25rem] p-5 gap-16">
       <div class="flex flex-col gap-4">
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <field v-model="email" label="Email" type="text" />
-          <field v-model="password" label="Heslo" type="password" />
+          <field name="email" v-model="email" label="Email" type="text" />
+          <field
+            name="password"
+            v-model="password"
+            label="Heslo"
+            type="password" />
         </div>
         <router-link to="/auth/forgot" class="text-red ml-5 hover:text-black">
           Zabudol si heslo?
