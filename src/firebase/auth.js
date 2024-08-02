@@ -6,6 +6,7 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   createUserWithEmailAndPassword,
+  signInWithCredential,
 } from "firebase/auth";
 
 import {
@@ -45,6 +46,13 @@ const googleLogin = async () => {
   });
 };
 
+const oneTapLogin = async (credential) => {
+  const oAuthCredential = GoogleAuthProvider.credential(credential);
+  setPersistence(auth, inMemoryPersistence).then(() => {
+    signInWithCredential(auth, oAuthCredential);
+  });
+};
+
 const logout = async () => {
   try {
     await auth.signOut();
@@ -79,4 +87,12 @@ const createUser = async (uid, name, surname) => {
   }
 };
 
-export { emailLogin, emailRegister, googleLogin, logout, getUser, createUser };
+export {
+  emailLogin,
+  emailRegister,
+  googleLogin,
+  oneTapLogin,
+  logout,
+  getUser,
+  createUser,
+};

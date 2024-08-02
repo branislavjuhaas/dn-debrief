@@ -5,6 +5,7 @@ import { getAnalytics } from "firebase/analytics";
 import "./style.css";
 import App from "./App.vue";
 import router from "./router.js";
+import vue3GoogleLogin from "vue3-google-login";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -26,4 +27,11 @@ getAnalytics(app);
 
 const pinia = createPinia();
 
-createApp(App).use(router).use(pinia).mount("#app");
+createApp(App)
+  .use(router)
+  .use(pinia)
+  .use(vue3GoogleLogin, {
+    clientId:
+      "302805903197-g4r9lvu6dc7qdhcacgvgm53sgjqarr1d.apps.googleusercontent.com",
+  })
+  .mount("#app");

@@ -5,6 +5,7 @@ import router from "./router.js";
 import { onAuthStateChanged, getAuth } from "firebase/auth";
 import { nextTick, onMounted } from "vue";
 import { useUserStore } from "./stores.js";
+import { googleOneTap } from "vue3-google-login";
 
 const userStore = useUserStore();
 
@@ -17,15 +18,28 @@ router.afterEach((to, from) => {
 const auth = getAuth();
 
 onMounted(async () => {
+  // If user is signed in, return
+  if (auth.currentUser) {
+    return;
+  }
+
+  await googleOneTap({ autoLogin: true }).then(async (response) => {
+    const { oneTapLogin } = await import("./firebase/auth.js");
+    oneTapLogin(response.credential).catch((error) => {
+      console.error("Error logging in with Google One Tap: ", error);
+    });
+  });
+});
+
+onMounted(() => {
   onAuthStateChanged(auth, async (user) => {
     // Check if user is signed in
     const { getUser } = await import("./firebase/auth.js");
     if (user) {
-      // User is signed in, log the user in and redirect to the home page
-      console.log("User " + user.uid + " is signed in");
-
       // If the user does not exist, create it
       // Redirect the user to the home page
+      google.accounts.id.cancel();
+
       getUser(user.uid).then(async (userData) => {
         if (!userData) {
           const { createUser, logout } = await import("./firebase/auth.js");
@@ -44,7 +58,6 @@ onMounted(async () => {
             return;
           }
 
-          console.log("Creating user: ", user);
           createUser(
             user.uid,
             user.displayName.substring(0, user.displayName.lastIndexOf(" ")),
