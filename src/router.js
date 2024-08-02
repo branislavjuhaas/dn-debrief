@@ -12,25 +12,37 @@ const routes = [
     path: "/auth",
     name: "Auth",
     component: () => import("./views/Auth.vue"),
-    meta: { title: "Prihlásenie" },
+    meta: { title: "Prihlásenie", anonymousOnly: true },
   },
   {
     path: "/auth/register",
     name: "Register",
     component: () => import("./views/Register.vue"),
-    meta: { title: "Registrácia" },
+    meta: { title: "Registrácia", anonymousOnly: true },
   },
   {
     path: "/auth/forgot",
     name: "Forgot",
     component: () => import("./views/Forgot.vue"),
-    meta: { title: "Obnovenie hesla" },
+    meta: { title: "Obnovenie hesla", anonymousOnly: true },
   },
   {
     path: "/profile",
     name: "Profile",
     component: () => import("./views/Profile.vue"),
-    meta: { title: "Profil" },
+    meta: { title: "Profil", requiresAuth: true },
+  },
+  {
+    path: "/profile/edit",
+    name: "Edit",
+    component: () => import("./views/Edit.vue"),
+    meta: { title: "Zmena hesla", requiresAuth: true },
+  },
+  {
+    path: "/privacy",
+    name: "Privacy",
+    component: () => import("./views/Privacy.vue"),
+    meta: { title: "Ochrana osobných údajov" },
   },
   {
     path: "/:pathMatch(.*)*", // 404

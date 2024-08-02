@@ -17,4 +17,38 @@ const translateError = (error) => {
   }
 };
 
-export { translateError };
+const translateRole = (role) => {
+  switch (role) {
+    case "developer":
+      return "Vývojár";
+    case "admin":
+      return "Administrátor";
+    case "member":
+      return "Člen";
+    case "user":
+      return "Používateľ";
+    default:
+      return role;
+  }
+};
+
+const translateKey = (key) => {
+  switch (key) {
+    case "uid":
+      return "UID";
+    case "provider":
+      return "Poskytovateľ";
+    case "name":
+      return "Meno";
+    case "surname":
+      return "Priezvisko";
+    case "email":
+      return "Email";
+    case "role":
+      return "Funkcia";
+    default:
+      return key;
+  }
+};
+
+export { translateError, translateRole, translateKey };

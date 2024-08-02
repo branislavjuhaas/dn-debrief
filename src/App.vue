@@ -9,13 +9,23 @@ import { googleOneTap } from "vue3-google-login";
 
 const userStore = useUserStore();
 
+const auth = getAuth();
+
+router.beforeEach((to, from, next) => {
+  if (to.meta.requiresAuth && !userStore.uid) {
+    next("/auth");
+  } else if (to.meta.anonymousOnly && userStore.uid) {
+    next("/profile");
+  } else {
+    next();
+  }
+});
+
 router.afterEach((to, from) => {
   nextTick(() => {
     document.title = "DebRIEF - " + to.meta.title;
   });
 });
-
-const auth = getAuth();
 
 onMounted(async () => {
   // If user is signed in, return
@@ -38,7 +48,10 @@ onMounted(() => {
     if (user) {
       // If the user does not exist, create it
       // Redirect the user to the home page
-      google.accounts.id.cancel();
+      // if google is defined
+      if (google.accounts.id) {
+        google.accounts.id.cancel();
+      }
 
       getUser(user.uid).then(async (userData) => {
         if (!userData) {
@@ -70,6 +83,7 @@ onMounted(() => {
 
           userStore.setUser(
             user.uid,
+            user.providerData[0].providerId,
             user.email,
             user.displayName.substring(0, user.displayName.lastIndexOf(" ")),
             user.displayName.substring(user.displayName.lastIndexOf(" ") + 1),
@@ -81,13 +95,20 @@ onMounted(() => {
 
         userStore.setUser(
           user.uid,
+          user.providerData[0].providerId,
           user.email,
           userData.name,
           userData.surname,
           userData.role,
         );
       });
-      await router.push("/");
+      // If the route is auth, auth/forgot, auth/register, profile or profile/reset, redirect to the home page
+      if (
+        router.currentRoute.value.path.includes("/auth") ||
+        router.currentRoute.value.path.includes("/profile")
+      ) {
+        await router.push("/");
+      }
     } else {
       // No user is signed in, log out the user, stop loading and remove the sign in route work
       userStore.logOut();

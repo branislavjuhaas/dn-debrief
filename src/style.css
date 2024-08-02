@@ -57,6 +57,18 @@ input[type=password]::-ms-clear
   @apply text-white bg-red cursor-pointer hover:bg-black hover:text-white;
 }
 
+.form-secondary {
+  @apply flex font-bold h-12 px-5 rounded-[1.25rem] border-2 border-black border-dashed duration-150 items-center justify-center;
+}
+
+.form-secondary:disabled {
+  @apply text-grey border-dashed cursor-default;
+}
+
+.form-secondary:not(:disabled) {
+  @apply text-black bg-white cursor-pointer hover:border-solid;
+}
+
 .vertical-center > * {
   @apply mt-1;
 }

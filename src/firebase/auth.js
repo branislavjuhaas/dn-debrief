@@ -9,6 +9,7 @@ import {
   signInWithCredential,
   sendPasswordResetEmail,
   confirmPasswordReset,
+  updatePassword,
 } from "firebase/auth";
 
 import {
@@ -55,20 +56,25 @@ const oneTapLogin = async (credential) => {
   });
 };
 
-const logout = async () => {
-  try {
-    await auth.signOut();
-  } catch (error) {
-    return error;
-  }
-};
-
 const sendResetEmail = async (email) => {
   await sendPasswordResetEmail(auth, email);
 };
 
 const resetPassword = async (code, password) => {
   await confirmPasswordReset(auth, code, password);
+};
+
+const changePassword = async (newPassword) => {
+  const user = auth.currentUser;
+  await updatePassword(user, newPassword);
+};
+
+const logout = async () => {
+  try {
+    await auth.signOut();
+  } catch (error) {
+    return error;
+  }
 };
 
 const getUser = async (uid) => {
@@ -104,6 +110,7 @@ export {
   oneTapLogin,
   sendResetEmail,
   resetPassword,
+  changePassword,
   logout,
   getUser,
   createUser,
