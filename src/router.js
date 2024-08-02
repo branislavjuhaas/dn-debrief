@@ -21,6 +21,12 @@ const routes = [
     meta: { title: "Registrácia" },
   },
   {
+    path: "/auth/forgot",
+    name: "Forgot",
+    component: () => import("./views/Forgot.vue"),
+    meta: { title: "Obnovenie hesla" },
+  },
+  {
     path: "/profile",
     name: "Profile",
     component: () => import("./views/Profile.vue"),

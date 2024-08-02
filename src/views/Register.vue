@@ -1,6 +1,5 @@
 <script setup>
 import Field from "../components/Field.vue";
-import Toggle from "../components/Toggle.vue";
 import { ref, watch } from "vue";
 import { useUserStore } from "../stores.js";
 import { translateError } from "../translate.js";
@@ -51,7 +50,7 @@ watch([password, confirm], ([password, confirm]) => {
 });
 
 // Watch to update the value of the enabled submit button when the fields are filled and the passwords match
-watch([email, name, surname, password, confirm, message], () => {
+watch([email, name, surname, password, confirm], () => {
   canSubmit.value =
     email.value !== "" &&
     name.value !== "" &&
@@ -81,12 +80,12 @@ watch([email, name, surname, password, confirm, message], () => {
           label="Priezvisko"
           type="text" />
         <field
-          name="password"
+          name="newPassword"
           v-model="password"
           label="Heslo"
           type="password" />
         <field
-          name="confirm-password"
+          name="confirmPassword"
           v-model="confirm"
           label="Potvrdenie hesla"
           type="password" />

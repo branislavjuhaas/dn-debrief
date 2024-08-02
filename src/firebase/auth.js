@@ -7,6 +7,8 @@ import {
   signInWithPopup,
   createUserWithEmailAndPassword,
   signInWithCredential,
+  sendPasswordResetEmail,
+  confirmPasswordReset,
 } from "firebase/auth";
 
 import {
@@ -61,6 +63,14 @@ const logout = async () => {
   }
 };
 
+const sendResetEmail = async (email) => {
+  await sendPasswordResetEmail(auth, email);
+};
+
+const resetPassword = async (code, password) => {
+  await confirmPasswordReset(auth, code, password);
+};
+
 const getUser = async (uid) => {
   // Fetch the user data from the Firestore database
   const db = getFirestore();
@@ -92,6 +102,8 @@ export {
   emailRegister,
   googleLogin,
   oneTapLogin,
+  sendResetEmail,
+  resetPassword,
   logout,
   getUser,
   createUser,

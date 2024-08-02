@@ -46,7 +46,9 @@ const googleLogin = async () => {
             label="Heslo"
             type="password" />
         </div>
-        <router-link to="/auth/forgot" class="text-red ml-5 hover:text-black">
+        <router-link
+          :to="'/auth/forgot?email=' + email"
+          class="text-red ml-5 hover:text-black">
           Zabudol si heslo?
         </router-link>
       </div>
