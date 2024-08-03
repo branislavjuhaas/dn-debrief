@@ -10,14 +10,16 @@ const date =
   "/" +
   (new Date().getMonth() + 1).toString();
 
+console.log(date);
+
 let isDebrief = true;
 
 if (
   window.location.hostname !== "debrief.sda.sk" ||
-  date !== "23/1" ||
-  date !== "10/3" ||
-  date !== "28/6" ||
-  date !== "17/11"
+  date === "23/1" ||
+  date === "10/3" ||
+  date === "28/6" ||
+  date === "17/11"
 ) {
   isDebrief = false;
 }

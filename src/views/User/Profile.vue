@@ -1,12 +1,12 @@
 <script setup>
-import { useUserStore } from "../stores.js";
-import { translateKey } from "../translate.js";
-import router from "../router.js";
+import { useUserStore } from "../../stores.js";
+import { translateKey } from "../../translate.js";
+import router from "../../router.js";
 
 const userStore = useUserStore();
 
 const logout = async () => {
-  const { logout } = await import("../firebase/auth.js");
+  const { logout } = await import("../../firebase/auth.js");
 
   logout().catch((error) => {
     console.error("Error logging out: ", error);

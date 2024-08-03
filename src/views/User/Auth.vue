@@ -1,9 +1,9 @@
 <script setup>
 import { ref } from "vue";
-import { translateError } from "../translate.js";
-import Field from "../components/Field.vue";
-import Toggle from "../components/Toggle.vue";
-import { useLoadingStore } from "../stores.js";
+import { translateError } from "../../translate.js";
+import Field from "../../components/Field.vue";
+import Toggle from "../../components/Toggle.vue";
+import { useLoadingStore } from "../../stores.js";
 
 const email = ref("");
 const password = ref("");
@@ -17,7 +17,7 @@ const login = async () => {
   } else {
     useLoadingStore().loadingStart();
 
-    const { emailLogin } = await import("../firebase/auth.js");
+    const { emailLogin } = await import("../../firebase/auth.js");
 
     message.value = "";
     emailLogin(email.value, password.value, remember.value).catch((error) => {
@@ -29,7 +29,7 @@ const login = async () => {
 };
 
 const googleLogin = async () => {
-  const { googleLogin } = await import("../firebase/auth.js");
+  const { googleLogin } = await import("../../firebase/auth.js");
 
   googleLogin().catch((error) => {
     message.value = translateError(error.code);

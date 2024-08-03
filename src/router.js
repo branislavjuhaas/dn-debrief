@@ -11,31 +11,31 @@ const routes = [
   {
     path: "/auth",
     name: "Auth",
-    component: () => import("./views/Auth.vue"),
+    component: () => import("./views/User/Auth.vue"),
     meta: { title: "Prihlásenie", anonymousOnly: true },
   },
   {
     path: "/auth/register",
     name: "Register",
-    component: () => import("./views/Register.vue"),
+    component: () => import("./views/User/Register.vue"),
     meta: { title: "Registrácia", anonymousOnly: true },
   },
   {
     path: "/auth/forgot",
     name: "Forgot",
-    component: () => import("./views/Forgot.vue"),
+    component: () => import("./views/User/Forgot.vue"),
     meta: { title: "Obnovenie hesla", anonymousOnly: true },
   },
   {
     path: "/profile",
     name: "Profile",
-    component: () => import("./views/Profile.vue"),
+    component: () => import("./views/User/Profile.vue"),
     meta: { title: "Profil", requiresAuth: true },
   },
   {
     path: "/profile/edit",
     name: "Edit",
-    component: () => import("./views/Edit.vue"),
+    component: () => import("./views/User/Edit.vue"),
     meta: { title: "Zmena hesla", requiresAuth: true },
   },
   {

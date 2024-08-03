@@ -1,8 +1,8 @@
 <script setup>
-import Field from "../components/Field.vue";
+import Field from "../../components/Field.vue";
 import { ref, watch } from "vue";
-import { translateError } from "../translate.js";
-import { useLoadingStore } from "../stores.js";
+import { translateError } from "../../translate.js";
+import { useLoadingStore } from "../../stores.js";
 
 const loadingStore = useLoadingStore();
 
@@ -34,7 +34,7 @@ if (!resetCode && email.value !== "") {
 const resetPassword = async () => {
   loadingStore.loadingStart();
 
-  const { resetPassword } = await import("../firebase/auth.js");
+  const { resetPassword } = await import("../../firebase/auth.js");
 
   resetPassword(resetCode, password.value)
     .catch((error) => {
@@ -55,7 +55,7 @@ const resetPassword = async () => {
 const sendReset = async () => {
   loadingStore.loadingStart();
 
-  const { sendResetEmail } = await import("../firebase/auth.js");
+  const { sendResetEmail } = await import("../../firebase/auth.js");
 
   sendResetEmail(email.value)
     .catch((error) => {
