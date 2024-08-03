@@ -29,6 +29,12 @@ const logout = async () => {
           <p class="font-bold">{{ translateKey(data.name) }}</p>
           <p>{{ data.value }}</p>
         </div>
+        <!--If the users role is user, add a red link to the /join page. this should be all the grid wide-->
+        <router-link
+          to="/join"
+          class="flex h-12 px-5 items-center justify-center text-red font-bold vertical-center col-span-full">
+          <span>Chcem sa stať členom SDA</span>
+        </router-link>
       </div>
       <div
         class="grid grid-flow-col gap-4 items-center sm:grid-rows-1 sm:grid-cols-[1fr_auto_auto]">
