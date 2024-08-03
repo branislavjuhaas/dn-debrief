@@ -1,8 +1,9 @@
 <script setup>
 import { ref } from "vue";
-import { useUserStore } from "../stores.js";
+import { useLoadingStore, useUserStore } from "../stores.js";
 
 const user = useUserStore();
+const loading = useLoadingStore();
 
 const date =
   new Date().getDate().toString() +
@@ -23,7 +24,12 @@ if (
 </script>
 
 <template>
-  <div class="flex flex-col h-[3.75rem] items-center justify-center px-5">
+  <div
+    class="flex flex-col relative overflow-hidden h-[3.75rem] items-center justify-center px-5">
+    <hr
+      v-if="loading.loading"
+      id="loader"
+      class="absolute h-1 w-10 bg-red rounded left-0 top-0" />
     <div
       class="flex flex-row justify-between items-center max-w-[1320px] h-full w-full">
       <p class="hidden mt-1 sm:flex">
@@ -48,4 +54,21 @@ if (
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+#loader {
+  animation: loader 2s infinite ease-in-out;
+}
+
+@keyframes loader {
+  0% {
+    left: -20%;
+    width: 15%;
+  }
+  70% {
+    width: 70%;
+  }
+  100% {
+    left: 120%;
+  }
+}
+</style>

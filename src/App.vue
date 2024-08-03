@@ -3,11 +3,12 @@ import Header from "./components/Header.vue";
 import Footer from "./components/Footer.vue";
 import router from "./router.js";
 import { onAuthStateChanged, getAuth } from "firebase/auth";
-import { nextTick, onMounted } from "vue";
-import { useUserStore } from "./stores.js";
+import { nextTick, onMounted, watchEffect } from "vue";
+import { useLoadingStore, useUserStore } from "./stores.js";
 import { googleOneTap } from "vue3-google-login";
 
 const userStore = useUserStore();
+const loadingStore = useLoadingStore();
 
 const auth = getAuth();
 
@@ -27,23 +28,84 @@ router.afterEach((to, from) => {
   });
 });
 
-onMounted(async () => {
-  // If user is signed in, return
-  if (auth.currentUser) {
+async function handleUserCreation(user, userData) {
+  const { createUser, logout } = await import("./firebase/auth.js");
+
+  if (!userData) {
+    // If the user is email password user, create from store
+    if (user.providerData[0].providerId === "password") {
+      createUser(user.uid, userStore.name, userStore.surname).catch((error) => {
+        console.error("Error creating user: ", error);
+        logout();
+        userStore.logOut();
+      });
+
+      userStore.uid = user.uid;
+      loadingStore.loadingEnd();
+      return;
+    }
+
+    createUser(
+      user.uid,
+      user.displayName.substring(0, user.displayName.lastIndexOf(" ")),
+      user.displayName.substring(user.displayName.lastIndexOf(" ") + 1),
+    ).catch((error) => {
+      console.error("Error creating user: ", error);
+      logout();
+      userStore.logOut();
+    });
+
+    userStore.setUser(
+      user.uid,
+      user.providerData[0].providerId,
+      user.email,
+      user.displayName.substring(0, user.displayName.lastIndexOf(" ")),
+      user.displayName.substring(user.displayName.lastIndexOf(" ") + 1),
+      null,
+    );
+
+    loadingStore.loadingEnd();
     return;
   }
 
-  await googleOneTap({ autoLogin: true }).then(async (response) => {
-    const { oneTapLogin } = await import("./firebase/auth.js");
-    oneTapLogin(response.credential).catch((error) => {
-      console.error("Error logging in with Google One Tap: ", error);
-    });
-  });
-});
+  userStore.setUser(
+    user.uid,
+    user.providerData[0].providerId,
+    user.email,
+    userData.name,
+    userData.surname,
+    userData.role,
+  );
+}
+
+async function handleRedirection() {
+  // If the routes meta is anonymousOnly, redirect the home page
+  if (
+    router.currentRoute.value.meta.anonymousOnly &&
+    router.currentRoute.value.path !== "/"
+  ) {
+    await router.push("/");
+  } else {
+    await router.push(router.currentRoute.value.fullPath);
+  }
+  loadingStore.loadingEnd();
+}
+
+async function handleGoogleOneTapLogin() {
+  googleOneTap({ autoLogin: true, cancelOnTapOutside: true }).then(
+    async (response) => {
+      const { oneTapLogin } = await import("./firebase/auth.js");
+      oneTapLogin(response.credential).catch((error) => {
+        console.error("Error logging in with Google One Tap: ", error);
+      });
+    },
+  );
+}
 
 onMounted(() => {
   onAuthStateChanged(auth, async (user) => {
     // Check if user is signed in
+    loadingStore.loadingStart();
     const { getUser } = await import("./firebase/auth.js");
     if (user) {
       // If the user does not exist, create it
@@ -54,67 +116,31 @@ onMounted(() => {
       }
 
       getUser(user.uid).then(async (userData) => {
-        if (!userData) {
-          const { createUser, logout } = await import("./firebase/auth.js");
-
-          // If the user is email password user, create from store
-          if (user.providerData[0].providerId === "password") {
-            createUser(user.uid, userStore.name, userStore.surname).catch(
-              (error) => {
-                console.error("Error creating user: ", error);
-                logout();
-                userStore.logOut();
-              },
-            );
-
-            userStore.uid = user.uid;
-            return;
-          }
-
-          createUser(
-            user.uid,
-            user.displayName.substring(0, user.displayName.lastIndexOf(" ")),
-            user.displayName.substring(user.displayName.lastIndexOf(" ") + 1),
-          ).catch((error) => {
-            console.error("Error creating user: ", error);
-            logout();
-            userStore.logOut();
-          });
-
-          userStore.setUser(
-            user.uid,
-            user.providerData[0].providerId,
-            user.email,
-            user.displayName.substring(0, user.displayName.lastIndexOf(" ")),
-            user.displayName.substring(user.displayName.lastIndexOf(" ") + 1),
-            null,
-          );
-
-          return;
-        }
-
-        userStore.setUser(
-          user.uid,
-          user.providerData[0].providerId,
-          user.email,
-          userData.name,
-          userData.surname,
-          userData.role,
-        );
+        await handleUserCreation(user, userData);
       });
-      // If the route is auth, auth/forgot, auth/register, profile or profile/reset, redirect to the home page
-      if (
-        router.currentRoute.value.path.includes("/auth") ||
-        router.currentRoute.value.path.includes("/profile")
-      ) {
-        await router.push("/");
-      }
+
+      await handleRedirection();
     } else {
       // No user is signed in, log out the user, stop loading and remove the sign in route work
       userStore.logOut();
+      await handleGoogleOneTapLogin();
+
+      await handleRedirection();
     }
   });
 });
+
+watchEffect(() => {
+  if (loadingStore.loading) {
+    window.addEventListener("keydown", preventKeyboardNavigation, false);
+  } else {
+    window.removeEventListener("keydown", preventKeyboardNavigation, false);
+  }
+});
+
+function preventKeyboardNavigation(e) {
+  e.preventDefault();
+}
 </script>
 
 <template>
@@ -131,6 +157,9 @@ onMounted(() => {
       </router-view>
     </div>
     <Footer />
+    <div
+      v-if="loadingStore.loading"
+      class="absolute inset-0 bg-transparent"></div>
   </div>
 </template>
 

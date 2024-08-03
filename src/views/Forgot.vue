@@ -2,6 +2,9 @@
 import Field from "../components/Field.vue";
 import { ref, watch } from "vue";
 import { translateError } from "../translate.js";
+import { useLoadingStore } from "../stores.js";
+
+const loadingStore = useLoadingStore();
 
 // Code is an argument oobCode if it exists and if mode argument is equal to resetPassword, otherwise null
 let resetCode = null;
@@ -29,23 +32,29 @@ if (!resetCode && email.value !== "") {
 }
 
 const resetPassword = async () => {
+  loadingStore.loadingStart();
+
   const { resetPassword } = await import("../firebase/auth.js");
 
   resetPassword(resetCode, password.value)
     .catch((error) => {
       message.value = translateError(error.code);
+      loadingStore.loadingEnd();
       throw error;
     })
     .then(() => {
       message.value = "Heslo bolo zmenené";
 
       setTimeout(() => {
+        loadingStore.loadingEnd();
         window.location.href = "/auth";
       }, 3000);
     });
 };
 
 const sendReset = async () => {
+  loadingStore.loadingStart();
+
   const { sendResetEmail } = await import("../firebase/auth.js");
 
   sendResetEmail(email.value)
@@ -57,6 +66,7 @@ const sendReset = async () => {
       message.value = "Email bol odoslaný";
 
       setTimeout(() => {
+        loadingStore.loadingEnd();
         window.location.href = "/";
       }, 3000);
     });

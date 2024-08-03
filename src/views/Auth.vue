@@ -3,6 +3,7 @@ import { ref } from "vue";
 import { translateError } from "../translate.js";
 import Field from "../components/Field.vue";
 import Toggle from "../components/Toggle.vue";
+import { useLoadingStore } from "../stores.js";
 
 const email = ref("");
 const password = ref("");
@@ -14,12 +15,16 @@ const login = async () => {
   if (email.value === "" || password.value === "") {
     message.value = "Vyplňte všetky polia";
   } else {
+    useLoadingStore().loadingStart();
+
     const { emailLogin } = await import("../firebase/auth.js");
 
     message.value = "";
     emailLogin(email.value, password.value, remember.value).catch((error) => {
       message.value = translateError(error.code);
     });
+
+    useLoadingStore().loadingEnd();
   }
 };
 

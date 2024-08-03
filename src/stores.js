@@ -45,3 +45,25 @@ export const useUserStore = defineStore("user", {
     },
   },
 });
+
+export const useLoadingStore = defineStore("loading", {
+  state: () => ({
+    loadings: 0,
+  }),
+  getters: {
+    loading() {
+      return this.loadings > 0;
+      //return false;
+    },
+  },
+  actions: {
+    loadingStart() {
+      this.loadings++;
+      console.log("loadingStart");
+    },
+    loadingEnd() {
+      this.loadings--;
+      console.log("loadingEnd");
+    },
+  },
+});
