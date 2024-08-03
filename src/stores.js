@@ -18,10 +18,6 @@ export const useUserStore = defineStore("user", {
     additionalDataArray() {
       return [
         { name: "uid", value: this.uid },
-        { name: "provider", value: this.provider },
-        { name: "name", value: this.name },
-        { name: "surname", value: this.surname },
-        { name: "email", value: this.email },
         { name: "role", value: translateRole(this.role) },
       ].filter((item) => item.value !== null && item.value !== undefined);
     },
