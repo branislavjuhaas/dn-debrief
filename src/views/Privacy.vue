@@ -1,8 +1,8 @@
 <script setup></script>
 
 <template>
-  <div class="text-justify">
-    <h1 class="text-5xl font-bold mb-2">
+  <div class="text-justify print:text-black">
+    <h1 class="text-5xl text-left font-bold mb-2">
       Vyhlásenie Slovenskej debatnej asociácie o ochrane osobných údajov pre
       službu DebRIEF
     </h1>
@@ -10,11 +10,13 @@
     <p>
       Rozsah dát, ktoré spracúvame, závisí od kontextu Vašej interakcie so
       službou DebRIEF. Od používateľov, ktorí službu používajú ako hostia bez
-      účtu, zbierame len adresu IP. Od Používateľov, ktorí službu používajú s
-      bežným účtom bez registrácie v SDA, zbierame adresu IP, emailovú adresu,
-      meno a priezvisko spolu s uživateľským agentom prehliadača. Od
-      Používateľov, ktorí službu používajú s účtom registrovaným v SDA, zbierame
-      adresu IP, emailovú adresu, meno, priezvisko, uživateľského agenta.
+      účtu, zbierame len adresu IP na overenie predošlého prihlásenia v službe.
+      Od Používateľov, ktorí službu používajú s bežným účtom bez registrácie v
+      SDA, zbierame adresu IP, emailovú adresu, meno a priezvisko spolu s
+      uživateľským agentom prehliadača kvôli bezpečnému prihláseniu a zabráneniu
+      krádeži identity. Od Používateľov, ktorí službu používajú s účtom
+      registrovaným v SDA, zbierame adresu IP, emailovú adresu, meno,
+      priezvisko, uživateľského agenta...
       <br />
       <br />
       Osobné údaje získavame priamo od Vás, Vašich zástupcov alebo pri Vašej
