@@ -145,9 +145,9 @@ function preventKeyboardNavigation(e) {
 
 <template>
   <div class="grid grid-cols-1 grid-rows-[auto_1fr_auto] w-full h-full">
-    <Header />
+    <Header class="print:hidden" />
     <div
-      class="flex h-full w-full items-center flex-col px-5 pb-5 bg-green overflow-y-auto scrollbar-hidden">
+      class="flex h-full w-full items-center flex-col px-5 pb-5 bg-green overflow-y-auto scrollbar-hidden print:overflow-visible">
       <router-view
         v-slot="{ Component }"
         class="flex flex-col max-w-[1320px] w-full pt-28 text-white">
@@ -156,7 +156,7 @@ function preventKeyboardNavigation(e) {
         </transition>
       </router-view>
     </div>
-    <Footer />
+    <Footer class="print:hidden" />
     <div
       v-if="loadingStore.loading"
       class="absolute inset-0 bg-transparent"></div>
