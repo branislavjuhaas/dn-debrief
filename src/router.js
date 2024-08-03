@@ -11,32 +11,38 @@ const routes = [
   {
     path: "/auth",
     name: "Auth",
-    component: () => import("./views/User/Auth.vue"),
+    component: () => import("./views/user/Auth.vue"),
     meta: { title: "Prihlásenie", anonymousOnly: true },
   },
   {
     path: "/auth/register",
     name: "Register",
-    component: () => import("./views/User/Register.vue"),
+    component: () => import("./views/user/Register.vue"),
     meta: { title: "Registrácia", anonymousOnly: true },
   },
   {
     path: "/auth/forgot",
     name: "Forgot",
-    component: () => import("./views/User/Forgot.vue"),
+    component: () => import("./views/user/Forgot.vue"),
     meta: { title: "Obnovenie hesla", anonymousOnly: true },
   },
   {
     path: "/profile",
     name: "Profile",
-    component: () => import("./views/User/Profile.vue"),
+    component: () => import("./views/user/Profile.vue"),
     meta: { title: "Profil", requiresAuth: true },
   },
   {
     path: "/profile/edit",
     name: "Edit",
-    component: () => import("./views/User/Edit.vue"),
+    component: () => import("./views/user/Edit.vue"),
     meta: { title: "Zmena hesla", requiresAuth: true },
+  },
+  {
+    path: "/join",
+    name: "Join",
+    component: () => import("./views/user/Join.vue"),
+    meta: { title: "Registrácia do SDA", requiresAuth: true },
   },
   {
     path: "/privacy",
