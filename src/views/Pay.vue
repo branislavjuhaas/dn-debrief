@@ -12,7 +12,7 @@ const subAccusative = route.query.subacc;
 const amount = route.query.amount;
 
 if (!subject || !subAccusative || !amount) {
-  router.push("/");
+  router.push({ name: "Home" });
 }
 
 const userStore = useUserStore();

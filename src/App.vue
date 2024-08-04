@@ -118,9 +118,9 @@ async function handleRedirection() {
     router.currentRoute.value.meta.anonymousOnly &&
     router.currentRoute.value.path !== "/"
   ) {
-    await router.push("/");
+    await router.push({ name: "Home" });
   } else {
-    await router.push(router.currentRoute.value.fullPath);
+    await router.push({ path: router.currentRoute.value.path });
   }
   loadingStore.loadingEnd();
 }

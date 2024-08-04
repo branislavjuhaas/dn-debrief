@@ -12,7 +12,7 @@ const logout = async () => {
     console.error("Error logging out: ", error);
   });
 
-  await router.push("/");
+  await router.push({ name: "Home" });
 };
 </script>
 
