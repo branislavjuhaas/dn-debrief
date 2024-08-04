@@ -53,6 +53,12 @@ const logout = async () => {
         </button>
       </div>
     </div>
+    <router-link
+      v-if="userStore.role !== null && userStore.role !== 'user'"
+      to="/manage"
+      class="alternative vertical-center w-full">
+      <p>Prejsť na panel správy</p>
+    </router-link>
   </div>
 </template>
 

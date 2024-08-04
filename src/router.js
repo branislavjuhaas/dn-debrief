@@ -51,6 +51,12 @@ const routes = [
     meta: { title: "Ochrana osobných údajov" },
   },
   {
+    path: "/pay",
+    name: "Pay",
+    component: () => import("./views/Pay.vue"),
+    meta: { title: "Platba" },
+  },
+  {
     path: "/:pathMatch(.*)*", // 404
     name: "404",
     component: () => import("./views/Error.vue"),
