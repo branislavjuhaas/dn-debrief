@@ -1,25 +1,27 @@
 import {
+  confirmPasswordReset,
+  createUserWithEmailAndPassword,
   getAuth,
   GoogleAuthProvider,
   inMemoryPersistence,
+  sendPasswordResetEmail,
   setPersistence,
+  signInWithCredential,
   signInWithEmailAndPassword,
   signInWithPopup,
-  createUserWithEmailAndPassword,
-  signInWithCredential,
-  sendPasswordResetEmail,
-  confirmPasswordReset,
   updatePassword,
 } from "firebase/auth";
 
 import {
   collection,
-  documentId,
   doc,
+  documentId,
   getDocs,
-  setDoc,
+  getDoc,
   getFirestore,
   query,
+  setDoc,
+  updateDoc,
   where,
 } from "firebase/firestore";
 
@@ -83,10 +85,21 @@ const getUser = async (uid) => {
   const q = query(collection(db, "users"), where(documentId(), "==", uid));
 
   // If the user is not found, return null
-  if ((await getDocs(q)).empty) return null;
+  const querySnapshot = await getDocs(q);
+  if (querySnapshot.empty) return null;
 
   // Otherwise return the user data
-  return (await getDocs(q)).docs[0].data();
+  // In the user data, the club is stored as a reference to the club document, so we need to fetch the club data as well
+  const user = querySnapshot.docs[0].data();
+  const clubSnapshot = await getDoc(user.club);
+  if (!clubSnapshot.exists()) {
+    console.error("Club document does not exist");
+    return null;
+  }
+  // In user, replace the club reference with the club data
+  user.club = clubSnapshot.data().name;
+
+  return user;
 };
 
 const createUser = async (uid, name, surname) => {
@@ -96,6 +109,52 @@ const createUser = async (uid, name, surname) => {
     await setDoc(doc(db, `users/${uid}`), {
       name: name,
       surname: surname,
+    });
+  } catch (error) {
+    console.error("Error adding document: ", error);
+    return error;
+  }
+};
+
+// Join use has also optional parameters for supervisor and supervisorEmail
+const joinAdultUser = async (uid, club, address, phone, birthdate, seasons) => {
+  const db = getFirestore();
+
+  try {
+    await updateDoc(doc(db, `users/${uid}`), {
+      club: doc(db, `clubs/${club.id}`), // Reference to the club document (club ID is stored in the user document
+      address: address,
+      phone: phone,
+      birthdate: birthdate,
+      seasons: seasons,
+    });
+  } catch (error) {
+    console.error("Error adding document: ", error);
+    return error;
+  }
+};
+
+const joinUser = async (
+  uid,
+  club,
+  address,
+  phone,
+  birthdate,
+  seasons,
+  supervisor,
+  supervisorEmail,
+) => {
+  const db = getFirestore();
+
+  try {
+    await updateDoc(doc(db, `users/${uid}`), {
+      club: doc(db, `clubs/${club.id}`), // Reference to the club document (club ID is stored in the user document
+      address: address,
+      phone: phone,
+      birthdate: birthdate,
+      seasons: seasons,
+      supervisor: supervisor,
+      supervisorEmail: supervisorEmail,
     });
   } catch (error) {
     console.error("Error adding document: ", error);
@@ -114,4 +173,6 @@ export {
   logout,
   getUser,
   createUser,
+  joinAdultUser,
+  joinUser,
 };

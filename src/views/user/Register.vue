@@ -27,7 +27,20 @@ const register = async () => {
     return;
   }
 
-  userStore.setUser(null, null, email.value, name.value, surname.value, null);
+  userStore.setUser(
+    null,
+    null,
+    email.value,
+    name.value,
+    surname.value,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+  );
 
   const { emailRegister, createUser } = await import("../../firebase/auth.js");
 

@@ -62,6 +62,12 @@ async function handleUserCreation(user, userData) {
       user.displayName.substring(0, user.displayName.lastIndexOf(" ")),
       user.displayName.substring(user.displayName.lastIndexOf(" ") + 1),
       null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
     );
 
     loadingStore.loadingEnd();
@@ -75,6 +81,12 @@ async function handleUserCreation(user, userData) {
     userData.name,
     userData.surname,
     userData.role,
+    userData.club,
+    userData.address,
+    userData.phone,
+    userData.birthdate,
+    userData.seasons,
+    userData.medals,
   );
 }
 

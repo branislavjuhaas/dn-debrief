@@ -31,6 +31,7 @@ const logout = async () => {
         </div>
         <!--If the users role is user, add a red link to the /join page. this should be all the grid wide-->
         <router-link
+          v-if="!userStore.isJoining"
           to="/join"
           class="flex h-12 px-5 items-center justify-center text-red font-bold vertical-center col-span-full">
           <span>Chcem sa stať členom SDA</span>

@@ -46,6 +46,14 @@ const translateKey = (key) => {
       return "Email";
     case "role":
       return "Funkcia";
+    case "club":
+      return "Debatný klub";
+    case "address":
+      return "Adresa";
+    case "phone":
+      return "Telefónne číslo";
+    case "birthdate":
+      return "Dátum narodenia";
     default:
       return key;
   }

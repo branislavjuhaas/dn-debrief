@@ -9,6 +9,12 @@ export const useUserStore = defineStore("user", {
     surname: null,
     email: null,
     role: null,
+    club: null,
+    address: null,
+    phone: null,
+    birthdate: null,
+    seasons: [],
+    medals: [],
   }),
   getters: {
     fullName() {
@@ -19,17 +25,60 @@ export const useUserStore = defineStore("user", {
       return [
         { name: "uid", value: this.uid },
         { name: "role", value: translateRole(this.role) },
+        { name: "club", value: this.club },
+        { name: "address", value: this.address },
+        { name: "phone", value: this.phone },
+        { name: "birthdate", value: this.birthdate },
       ].filter((item) => item.value !== null && item.value !== undefined);
+    },
+    isMember() {
+      return (
+        // Role cannot be null and the seasons has to contain a map where the year is the current year and the confirmed is true
+        this.role !== null &&
+        this.seasons.some(
+          (season) =>
+            season.year === new Date().getFullYear().toString() &&
+            season.confirmed,
+        )
+      );
+    },
+    isJoining() {
+      return (
+        // Role cannot be null and the seasons has to contain a map where the year is the current year and the confirmed is false
+        this.role !== null &&
+        this.seasons.some(
+          (season) => season.year === new Date().getFullYear().toString(),
+        )
+      );
     },
   },
   actions: {
-    setUser(uid, provider, email, name, surname, role) {
+    setUser(
+      uid,
+      provider,
+      email,
+      name,
+      surname,
+      role,
+      club,
+      address,
+      phone,
+      birthdate,
+      seasons,
+      medals,
+    ) {
       this.uid = uid;
       this.provider = provider;
       this.email = email;
       this.name = name;
       this.surname = surname;
       this.role = role || "user";
+      this.club = club || null;
+      this.address = address || null;
+      this.phone = phone || null;
+      this.birthdate = birthdate || null;
+      this.seasons = seasons || [];
+      this.medals = medals || [];
     },
     logOut() {
       this.uid = null;
@@ -38,6 +87,15 @@ export const useUserStore = defineStore("user", {
       this.surname = null;
       this.email = null;
       this.role = null;
+      this.club = null;
+      this.address = null;
+      this.phone = null;
+      this.birthdate = null;
+      this.seasons = [];
+      this.medals = [];
+    },
+    addSeason(season) {
+      this.seasons.push(season);
     },
   },
 });
