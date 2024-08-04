@@ -23,8 +23,10 @@ const translateRole = (role) => {
       return "Vývojár";
     case "admin":
       return "Administrátor";
-    case "member":
-      return "Člen";
+    case "cap":
+      return "Hlavný rozhodca";
+    case "coach":
+      return "Vedúci klubu";
     case "user":
       return "Používateľ";
     default:

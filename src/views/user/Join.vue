@@ -1,102 +1,71 @@
 <script setup>
+// Importing necessary components and libraries
 import Field from "../../components/Field.vue";
-import { useUserStore } from "../../stores.js";
 import Dropdown from "../../components/Dropdown.vue";
-import router from "../../router.js";
+import { useUserStore } from "../../stores.js";
 import { onMounted, ref, computed, watch } from "vue";
-import { getClubs } from "../../firebase/structure.js";
+import { getClubs, joinAdultUser, joinUser } from "../../firebase/structure.js";
+import router from "../../router.js";
 
-let clubsData = ref([]);
+// Initializing user store
+const userStore = useUserStore();
 
-onMounted(async () => {
-  clubsData.value = await getClubs(false);
-});
+// If the user was registered in previous season
+const wasRegistered = userStore.seasons.some(
+  (season) => season.year === (new Date().getFullYear() - 1).toString(),
+);
 
-const clubNames = computed(() => clubsData.value.map((club) => club.name));
-
-let selectedClub = null;
-
+// State variables
 const club = ref("");
 const birthdate = ref("");
 const address = ref("");
 const phone = ref("");
-
 const adult = ref(true);
 
+// State variables for non-adult users
 const supervisor = ref("");
 const mail = ref("");
 
-const canSubmit = ref(false);
+// Fetch clubs data on component mount
+let clubsData = ref([]);
+onMounted(async () => {
+  clubsData.value = await getClubs(false);
+});
 
-let seasons = [];
+// Compute club names from clubs data
+const clubNames = computed(() => clubsData.value.map((club) => club.name));
 
+// Compute whether the form can be submitted
+const canSubmit = computed(() => {
+  if (!adult.value) {
+    return (
+      club.value &&
+      birthdate.value &&
+      address.value &&
+      supervisor.value &&
+      mail.value &&
+      phone.value
+    );
+  } else {
+    return club.value && birthdate.value && address.value && phone.value;
+  }
+});
+
+// Watch for changes in club selection
+let selectedClub = null;
 watch(club, (newClubName) => {
   selectedClub = clubsData.value.find((club) => club.name === newClubName);
 });
 
-// If the current date is beyond the 1st of September, the current season is this and the next one, otherwise it is only the current one
+// Compute the current and next season
 const now = new Date();
-if (now.getMonth() >= 8) {
-  seasons.push(now.getFullYear().toString());
-  seasons.push((now.getFullYear() + 1).toString());
-} else {
-  seasons.push(now.getFullYear().toString());
-}
+const seasons =
+  now.getMonth() >= 8
+    ? [now.getFullYear().toString(), (now.getFullYear() + 1).toString()]
+    : [now.getFullYear().toString()];
 
-console.log(seasons);
-
-const userStore = useUserStore();
-
-const register = async () => {
-  userStore.club = club;
-  userStore.address = address;
-  userStore.phone = phone;
-  userStore.birthdate = birthdate;
-
-  let seasonsString = [];
-
-  for (let season of userStore.seasons) {
-    seasonsString.push(season);
-  }
-
-  for (let season of seasons) {
-    seasonsString.push({ year: season, confirmed: false });
-  }
-
-  console.log(seasonsString);
-  console.log(adult);
-
-  if (adult.value) {
-    const { joinAdultUser } = await import("../../firebase/auth.js");
-    await joinAdultUser(
-      userStore.uid,
-      selectedClub,
-      address.value,
-      phone.value,
-      birthdate.value,
-      seasonsString,
-    );
-  } else {
-    const { joinUser } = await import("../../firebase/auth.js");
-    await joinUser(
-      userStore.uid,
-      selectedClub,
-      address.value,
-      phone.value,
-      birthdate.value,
-      seasonsString,
-      mail.value,
-      supervisor.value,
-    );
-  }
-
-  // Redirect to the user profile
-  await router.push("/profile");
-};
-
-// Watch changing of the date of birth
+// Watch for changes in birthdate to determine if user is an adult
 watch(birthdate, (birthdate) => {
-  // Check if the user is at least 18 years old, be sure to consider the month and day
   const birthdateDate = new Date(birthdate);
   const now = new Date();
   let age = now.getFullYear() - birthdateDate.getFullYear();
@@ -108,34 +77,65 @@ watch(birthdate, (birthdate) => {
     age--;
   }
   adult.value = age >= 18;
-  console.log(adult.value);
 });
 
-// Watch the club, birthdate, street, postal, and municipality fields, if the adult is checked, and if the supervisor and mail fields are filled
-// If adult is checked, the supervisor and mail fields are required, otherwise they are not
-watch(
-  [club, birthdate, address, adult, supervisor, mail, phone],
-  ([club, birthdate, address, adult, supervisor, mail, phoneNumber]) => {
-    if (
-      !adult &&
-      (club === "" ||
-        birthdate === "" ||
-        address === "" ||
-        supervisor === "" ||
-        mail === "" ||
-        phoneNumber === "")
-    )
-      canSubmit.value = false;
-    else
-      canSubmit.value = !(
-        adult &&
-        (club === "" ||
-          birthdate === "" ||
-          address === "" ||
-          phoneNumber === "")
-      );
-  },
-);
+/**
+ * Function to register a user
+ * @returns {Promise<void>} - Promise to handle user registration
+ */
+const register = async () => {
+  const birthdateDate = new Date(birthdate.value);
+  const birthdateString = `${birthdateDate.getDate()}. ${birthdateDate.getMonth() + 1}. ${birthdateDate.getFullYear()}`;
+
+  // Only add new seasons to the user's seasons array
+  const seasonsString = [
+    ...userStore.seasons,
+    ...seasons.map((season) => ({ year: season, confirmed: false })),
+  ].filter(
+    (season, index, self) =>
+      index ===
+      self.findIndex(
+        (t) => t.year === season.year && t.confirmed === season.confirmed,
+      ),
+  );
+
+  userStore.club = club;
+  userStore.address = address;
+  userStore.phone = phone;
+  userStore.birthdate = ref(birthdateString);
+  userStore.seasons = seasonsString;
+
+  if (adult.value) {
+    await joinAdultUser(
+      userStore.uid,
+      selectedClub,
+      address.value,
+      phone.value,
+      birthdateString,
+      seasonsString,
+    );
+  } else {
+    await joinUser(
+      userStore.uid,
+      selectedClub,
+      address.value,
+      phone.value,
+      birthdateString,
+      seasonsString,
+      supervisor.value,
+      mail.value,
+    );
+  }
+
+  await router.push({
+    name: "Pay",
+    query: {
+      subject: "registracia",
+      subacc: "registráciu do SDA",
+      amount: wasRegistered ? "5" : "8",
+    },
+  });
+};
 </script>
 
 <template>
@@ -146,38 +146,38 @@ watch(
     <div
       class="flex flex-col justify-between w-full bg-white min-h-60 rounded-[1.25rem] p-5 gap-16">
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <dropdown
+        <Dropdown
           name="club"
-          v-model="club"
+          v-model.trim="club"
           label="Debatný klub"
           type="dropdown"
           :options="clubNames" />
-        <field
+        <Field
           name="address"
-          v-model="address"
+          v-model.trim="address"
           label="Celá adresa"
           type="text"
           placeholder="Ventúrska 5, 811 01 Bratislava" />
-        <field
+        <Field
           name="birthdate"
-          v-model="birthdate"
+          v-model.trim="birthdate"
           label="Dátum narodenia"
           type="date" />
-        <field
+        <Field
           name="phoneNumber"
-          v-model="phone"
+          v-model.trim="phone"
           label="Telefónne číslo"
           type="tel" />
-        <field
+        <Field
           v-if="!adult"
           name="supervisor"
-          v-model="supervisor"
+          v-model.trim="supervisor"
           label="Celé meno zákonného zástupcu"
           type="text" />
-        <field
+        <Field
           v-if="!adult"
           name="mail"
-          v-model="mail"
+          v-model.trim="mail"
           label="E-mail zákonného zástupcu"
           type="email" />
       </div>
@@ -194,8 +194,4 @@ watch(
   </div>
 </template>
 
-<style scoped>
-.alternative {
-  @apply flex flex-row items-center h-12 bg-white text-black rounded-[1.25rem] border-2 border-red border-opacity-0 font-bold px-5 duration-150 cursor-pointer hover:border-opacity-100;
-}
-</style>
+<style scoped></style>

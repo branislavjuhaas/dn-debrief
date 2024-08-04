@@ -32,10 +32,7 @@ watch(
       <p
         v-for="option in props.options"
         :key="option"
-        @click="
-          console.log(option);
-          value = option;
-        "
+        @click="value = option"
         class="flex px-5 h-12 items-center cursor-pointer hover:text-red">
         {{ option }}
       </p>

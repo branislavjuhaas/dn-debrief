@@ -113,11 +113,9 @@ export const useLoadingStore = defineStore("loading", {
   actions: {
     loadingStart() {
       this.loadings++;
-      console.log("loadingStart");
     },
     loadingEnd() {
       this.loadings--;
-      console.log("loadingEnd");
     },
   },
 });

@@ -1,17 +1,22 @@
+<!--suppress ALL -->
 <script setup>
+// Importing necessary components and libraries
+import { onAuthStateChanged, getAuth } from "firebase/auth";
+import { useLoadingStore, useUserStore } from "./stores.js";
+import { nextTick, onMounted, watchEffect } from "vue";
+import { googleOneTap } from "vue3-google-login";
 import Header from "./components/Header.vue";
 import Footer from "./components/Footer.vue";
 import router from "./router.js";
-import { onAuthStateChanged, getAuth } from "firebase/auth";
-import { nextTick, onMounted, watchEffect } from "vue";
-import { useLoadingStore, useUserStore } from "./stores.js";
-import { googleOneTap } from "vue3-google-login";
 
+// Initializing user and loading stores
 const userStore = useUserStore();
 const loadingStore = useLoadingStore();
 
+// Initializing Firebase auth
 const auth = getAuth();
 
+// Router guard to protect routes based on authentication status
 router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth && !userStore.uid) {
     next("/auth");
@@ -22,15 +27,25 @@ router.beforeEach((to, from, next) => {
   }
 });
 
+// After each route change, update the document title
 router.afterEach((to, from) => {
   nextTick(() => {
     document.title = "DebRIEF - " + to.meta.title;
   });
 });
 
+/**
+ * Function to handle user creation
+ * @param user - Firebase user object
+ * @param userData - User data object
+ * @returns {Promise<void>} - Promise to handle user creation
+ */
 async function handleUserCreation(user, userData) {
   const { createUser, logout } = await import("./firebase/auth.js");
 
+  console.log(userData);
+
+  // If userData is not provided, create a new user
   if (!userData) {
     // If the user is email password user, create from store
     if (user.providerData[0].providerId === "password") {
@@ -45,6 +60,7 @@ async function handleUserCreation(user, userData) {
       return;
     }
 
+    // If the user is not an email password user, create from displayName
     createUser(
       user.uid,
       user.displayName.substring(0, user.displayName.lastIndexOf(" ")),
@@ -55,6 +71,7 @@ async function handleUserCreation(user, userData) {
       userStore.logOut();
     });
 
+    // Set the user data
     userStore.setUser(
       user.uid,
       user.providerData[0].providerId,
@@ -74,6 +91,7 @@ async function handleUserCreation(user, userData) {
     return;
   }
 
+  // If userData is provided, set the user data
   userStore.setUser(
     user.uid,
     user.providerData[0].providerId,
@@ -90,6 +108,10 @@ async function handleUserCreation(user, userData) {
   );
 }
 
+/**
+ * Function to handle redirection based on route meta
+ * @returns {Promise<void>} - Promise to handle redirection
+ */
 async function handleRedirection() {
   // If the routes meta is anonymousOnly, redirect the home page
   if (
@@ -103,6 +125,10 @@ async function handleRedirection() {
   loadingStore.loadingEnd();
 }
 
+/**
+ * Function to handle Google One Tap login
+ * @returns {Promise<void>} - Promise to handle Google One Tap login
+ */
 async function handleGoogleOneTapLogin() {
   googleOneTap({ autoLogin: true, cancelOnTapOutside: true }).then(
     async (response) => {
@@ -114,6 +140,10 @@ async function handleGoogleOneTapLogin() {
   );
 }
 
+/**
+ * Function to handle Google One Tap login
+ * @returns {Promise<void>} - Promise to handle Google One Tap login
+ */
 onMounted(() => {
   onAuthStateChanged(auth, async (user) => {
     // Check if user is signed in
@@ -142,6 +172,7 @@ onMounted(() => {
   });
 });
 
+// Watch for loading state changes and prevent keyboard navigation when loading
 watchEffect(() => {
   if (loadingStore.loading) {
     window.addEventListener("keydown", preventKeyboardNavigation, false);
@@ -150,25 +181,37 @@ watchEffect(() => {
   }
 });
 
+/**
+ * Function to prevent keyboard navigation when loading
+ * @param e - Event object
+ */
 function preventKeyboardNavigation(e) {
   e.preventDefault();
 }
 </script>
 
 <template>
+  <!-- Main layout of the application -->
   <div class="grid grid-cols-1 grid-rows-[auto_1fr_auto] w-full h-full">
+    <!-- Header component -->
     <Header class="print:hidden" />
+    <!-- Main content area -->
     <div
       class="flex h-full w-full items-center flex-col px-5 pb-5 bg-green overflow-y-auto scrollbar-hidden print:overflow-visible">
+      <!-- Router view for dynamic content -->
       <router-view
         v-slot="{ Component }"
         class="flex flex-col max-w-[1320px] w-full pt-28 text-white">
+        <!-- Transition wrapper for route changes -->
         <transition name="slide-fade" mode="out-in">
+          <!-- Dynamic component based on current route -->
           <component :is="Component" />
         </transition>
       </router-view>
     </div>
+    <!-- Footer component -->
     <Footer class="print:hidden" />
+    <!-- Loading overlay -->
     <div
       v-if="loadingStore.loading"
       class="absolute inset-0 bg-transparent"></div>
@@ -176,6 +219,7 @@ function preventKeyboardNavigation(e) {
 </template>
 
 <style scoped>
+/* CSS transitions for route changes */
 .slide-fade-enter-active,
 .slide-fade-leave-active {
   transition:

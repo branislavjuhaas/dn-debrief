@@ -14,8 +14,6 @@ if (window.location.search.includes("oobCode")) {
   resetCode = urlParams.get("oobCode");
 }
 
-console.log(resetCode);
-
 const email = ref(
   window.location.search.includes("email")
     ? window.location.search.split("email=")[1]
