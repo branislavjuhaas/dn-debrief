@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from "vue";
 import { useLoadingStore, useUserStore } from "../stores.js";
+import { translateRole } from "../translate.js";
 
 const user = useUserStore();
 const loading = useLoadingStore();
@@ -9,8 +10,6 @@ const date =
   new Date().getDate().toString() +
   "/" +
   (new Date().getMonth() + 1).toString();
-
-console.log(date);
 
 let isDebrief = true;
 
@@ -44,6 +43,12 @@ if (
 
       <div class="flex flex-row gap-14 items-center w-full sm:w-auto">
         <a href="https://sda.sk" class="hidden mt-1 sm:flex">Viac o SDA</a>
+        <router-link
+          v-if="(user.role !== null) & (user.role !== 'user')"
+          to="/manage"
+          class="hidden mt-1 sm:flex">
+          {{ translateRole(user.role) + " - Správa" }}
+        </router-link>
         <router-link
           :to="user.uid != null ? '/profile' : '/auth'"
           class="flex min-w-40 px-5 h-10 border-2 border-black rounded-[1.25rem] items-center justify-center duration-150 w-full sm:w-auto hover:bg-red hover:text-white vertical-center">
