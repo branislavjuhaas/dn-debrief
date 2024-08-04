@@ -119,6 +119,12 @@ async function handleRedirection() {
     router.currentRoute.value.path !== "/"
   ) {
     await router.push({ name: "Home" });
+  } else if (
+    router.currentRoute.value.meta.roles &&
+    !router.currentRoute.value.meta.roles.includes(userStore.role)
+  ) {
+    // If the routes meta has roles and the user's role is not included, redirect to error page
+    await router.push({ name: "Unauthorized" });
   } else {
     await router.push({ path: router.currentRoute.value.path });
   }

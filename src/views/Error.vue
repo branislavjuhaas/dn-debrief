@@ -6,6 +6,10 @@ const props = defineProps(["code"]);
 let message;
 let description;
 switch (props.code) {
+  case 401:
+    message = "Neautorizovaný prístup";
+    description = "Nemáte dostatočné oprávnenia na zobrazenie tejto stránky.";
+    break;
   case 404:
     message = "Stránka nenájdená";
     description = "Stránka, ktorú sa snažíte zobraziť, neexistuje.";

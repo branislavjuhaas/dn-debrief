@@ -63,6 +63,12 @@ const routes = [
     meta: { title: "Platba" },
   },
   {
+    path: "/unauthorized",
+    name: "Unauthorized",
+    component: () => import("./views/Error.vue"),
+    props: { code: 401 },
+  },
+  {
     path: "/:pathMatch(.*)*", // 404
     name: "404",
     component: () => import("./views/Error.vue"),
