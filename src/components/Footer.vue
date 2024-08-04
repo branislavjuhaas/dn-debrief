@@ -1,5 +1,4 @@
 <script setup>
-import { ref } from "vue";
 import { useLoadingStore, useUserStore } from "../stores.js";
 import { translateRole } from "../translate.js";
 
