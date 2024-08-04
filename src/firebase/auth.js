@@ -147,7 +147,10 @@ export const getUser = async (uid) => {
   }
 
   // Add the name of the club to the user data and return it.
-  user.club = clubSnapshot.data().name;
+  user.club = {
+    id: clubSnapshot.id,
+    ...clubSnapshot.data(),
+  };
   return user;
 };
 

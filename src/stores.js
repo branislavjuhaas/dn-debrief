@@ -25,7 +25,7 @@ export const useUserStore = defineStore("user", {
       return [
         { name: "uid", value: this.uid },
         { name: "role", value: translateRole(this.role) },
-        { name: "club", value: this.club },
+        { name: "club", value: this.club.name },
         { name: "address", value: this.address },
         { name: "phone", value: this.phone },
         { name: "birthdate", value: this.birthdate },

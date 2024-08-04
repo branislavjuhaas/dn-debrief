@@ -45,6 +45,12 @@ const routes = [
     meta: { title: "Registrácia do SDA", requiresAuth: true },
   },
   {
+    path: "/manage",
+    name: "Manage",
+    component: () => import("./views/management/Manage.vue"),
+    meta: { title: "Panel správy", requiresAuth: true },
+  },
+  {
     path: "/privacy",
     name: "Privacy",
     component: () => import("./views/Privacy.vue"),
