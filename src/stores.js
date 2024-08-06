@@ -14,7 +14,7 @@ export const useUserStore = defineStore("user", {
     phone: null,
     birthdate: null,
     seasons: [],
-    medals: [],
+    awards: [],
   }),
   getters: {
     fullName() {
@@ -25,7 +25,7 @@ export const useUserStore = defineStore("user", {
       return [
         { name: "uid", value: this.uid },
         { name: "role", value: translateRole(this.role) },
-        { name: "club", value: this.club.name },
+        { name: "club", value: this.club ? this.club.name : null },
         { name: "address", value: this.address },
         { name: "phone", value: this.phone },
         { name: "birthdate", value: this.birthdate },
@@ -65,7 +65,7 @@ export const useUserStore = defineStore("user", {
       phone,
       birthdate,
       seasons,
-      medals,
+      awards,
     ) {
       this.uid = uid;
       this.provider = provider;
@@ -78,7 +78,7 @@ export const useUserStore = defineStore("user", {
       this.phone = phone || null;
       this.birthdate = birthdate || null;
       this.seasons = seasons || [];
-      this.medals = medals || [];
+      this.awards = awards || [];
     },
     logOut() {
       this.uid = null;
@@ -92,7 +92,7 @@ export const useUserStore = defineStore("user", {
       this.phone = null;
       this.birthdate = null;
       this.seasons = [];
-      this.medals = [];
+      this.awards = [];
     },
     addSeason(season) {
       this.seasons.push(season);

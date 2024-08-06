@@ -51,6 +51,38 @@ const routes = [
     meta: { title: "Panel správy", requiresAuth: true },
   },
   {
+    path: "/manage/users",
+    name: "Users",
+    component: () => import("./views/management/Users.vue"),
+    props: { filter: false },
+    meta: {
+      title: "Správa používateľov",
+      requiresAuth: true,
+      roles: ["developer", "admin", "cap"],
+    },
+  },
+  {
+    path: "/manage/clubs/:filter",
+    name: "UsersFilter",
+    component: () => import("./views/management/Users.vue"),
+    props: { filter: true },
+    meta: {
+      title: "Správa používateľov",
+      requiresAuth: true,
+      roles: ["developer", "admin", "cap", "coach"],
+    },
+  },
+  {
+    path: "/manage/route",
+    name: "Route",
+    component: () => import("./views/management/RouteManager.vue"),
+    meta: {
+      title: "Presmerovanie na stránku",
+      requiresAuth: true,
+      roles: ["developer"],
+    },
+  },
+  {
     path: "/privacy",
     name: "Privacy",
     component: () => import("./views/Privacy.vue"),
@@ -67,6 +99,13 @@ const routes = [
     name: "Unauthorized",
     component: () => import("./views/Error.vue"),
     props: { code: 401 },
+    meta: { title: "401 Neautorizovaný prístup" },
+  },
+  {
+    path: "/about",
+    name: "About",
+    component: () => import("./views/About.vue"),
+    meta: { title: "O systéme DebRIEF" },
   },
   {
     path: "/:pathMatch(.*)*", // 404
@@ -78,5 +117,10 @@ const routes = [
 ];
 
 const router = createRouter({ history: createWebHistory(), routes });
+
+router.beforeEach((to, from, next) => {
+  console.log(`Navigating from ${from.fullPath} to ${to.fullPath}`);
+  next();
+});
 
 export default router;

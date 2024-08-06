@@ -11,8 +11,6 @@ const logout = async () => {
   logout().catch((error) => {
     console.error("Error logging out: ", error);
   });
-
-  await router.push({ name: "Home" });
 };
 </script>
 
