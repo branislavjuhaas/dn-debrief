@@ -17,8 +17,13 @@ const links = [
   },
   {
     name: `Správa debatného klubu ${userStore.club.name}`,
-    link: `/manage/club/${userStore.club.id}`,
+    link: `/manage/clubs/${userStore.club.id}`,
     roles: ["coach"],
+  },
+  {
+    name: "Presmerovanie na stránku",
+    link: "/manage/route",
+    roles: ["developer"],
   },
 ];
 

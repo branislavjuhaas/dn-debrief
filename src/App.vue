@@ -22,6 +22,8 @@ router.beforeEach((to, from, next) => {
     next("/auth");
   } else if (to.meta.anonymousOnly && userStore.uid) {
     next("/profile");
+  } else if (to.meta.roles && !to.meta.roles.includes(userStore.role)) {
+    next("/unauthorized");
   } else {
     next();
   }
@@ -104,7 +106,7 @@ async function handleUserCreation(user, userData) {
     userData.phone,
     userData.birthdate,
     userData.seasons,
-    userData.medals,
+    userData.awards,
   );
 }
 
@@ -115,16 +117,11 @@ async function handleUserCreation(user, userData) {
 async function handleRedirection() {
   // If the routes meta is anonymousOnly, redirect the home page
   if (
-    router.currentRoute.value.meta.anonymousOnly &&
+    (router.currentRoute.value.meta.anonymousOnly ||
+      router.currentRoute.value.meta.requiresAuth) &&
     router.currentRoute.value.path !== "/"
   ) {
     await router.push({ name: "Home" });
-  } else if (
-    router.currentRoute.value.meta.roles &&
-    !router.currentRoute.value.meta.roles.includes(userStore.role)
-  ) {
-    // If the routes meta has roles and the user's role is not included, redirect to error page
-    await router.push({ name: "Unauthorized" });
   } else {
     await router.push({ path: router.currentRoute.value.path });
   }
