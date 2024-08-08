@@ -96,3 +96,33 @@ export const joinUser = async (
     return error;
   }
 };
+
+/**
+ * Fetches user data from Firestore.
+ *
+ * This function fetches user data from Firestore based on the club parameter.
+ * If the club parameter is provided, it fetches only users where the club is the specified club.
+ * If the club parameter is null, it fetches all users.
+ *
+ * @async
+ * @param {Object|null} club - The club object. If null, all users are fetched.
+ * @returns {Array} An array of user objects. Each object contains the user's ID and data.
+ * @throws Will throw an error if the Firestore query fails.
+ */
+export const getUsers = async (club) => {
+  // If the club is null, fetch all users. Otherwise, fetch only users where the club is the specified club.
+  console.log("club", club);
+  let users = [];
+  const userCollection = collection(db, "users");
+  const querySnapshot = club
+    ? await getDocs(
+        query(userCollection, where("club", "==", doc(db, `clubs/${club}`))),
+      )
+    : await getDocs(userCollection);
+
+  querySnapshot.forEach((doc) => {
+    users.push({ id: doc.id, ...doc.data() });
+  });
+
+  return users;
+};
