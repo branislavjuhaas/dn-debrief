@@ -19,6 +19,15 @@ watch(
     }
   },
 );
+
+let system = "Cascade";
+
+// If the domain is debrief.sda.sk, change the system name to DebRIEF
+if (window.location.hostname === "debrief.sda.sk") {
+  system = "DebRIEF";
+} else if (window.location.hostname === "barca.juhaas.eu") {
+  system = "Barca";
+}
 </script>
 
 <template>
@@ -27,7 +36,7 @@ watch(
       {{
         user.uid != null
           ? greeting + ", " + user.name + "!"
-          : "Vitaj v systéme DebRIEF!"
+          : "Vitaj v systéme " + system + "!"
       }}
     </h1>
   </div>
