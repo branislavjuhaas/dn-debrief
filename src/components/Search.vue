@@ -90,7 +90,8 @@ const user = useUserStore();
       class="w-full outline-none bg-transparent placeholder-black mt-1 h-auto disabled:placeholder-grey" />
     <div
       v-if="active && searchResults.length > 0"
-      class="absolute max-h-52 overflow-y-auto scrollbar-hidden flex flex-col w-[calc(100dvw-40px)] sm:w-full left-[20px] sm:left-0 bg-white top-14 sm:top-10 border-black border-2 rounded-[1.25rem] gap-2 py-2 px-4">
+      id="searchResults"
+      class="absolute max-h-52 overflow-y-auto scrollbar-hidden flex flex-col w-[calc(100dvw-2.5rem)] sm:w-full left-5 sm:left-0 bg-white top-14 sm:top-10 border-black border-2 rounded-[1.25rem] gap-2 py-2 px-4">
       <router-link
         v-for="result in searchResults"
         :key="result.objectID"
@@ -109,4 +110,22 @@ const user = useUserStore();
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+#searchResults {
+  z-index: 100;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+  /* Animation, transition from opacity 0 to 100 and from vertical -10% to 0 */
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+</style>
