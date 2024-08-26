@@ -1,5 +1,12 @@
 {
   "projects": {
     "default": "dn-cascade"
-  }
+  },
+  "targets": {},
+  "etags": {
+    "dn-cascade": {
+      "extensionInstances": {}
+    }
+  },
+  "dataconnectEmulatorConfig": {}
 }

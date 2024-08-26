@@ -2,6 +2,7 @@ import { createApp } from "vue";
 import { createPinia } from "pinia";
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
+import { getFunctions } from "firebase/functions";
 import "./style.css";
 import App from "./App.vue";
 import router from "./router.js";
@@ -35,3 +36,5 @@ createApp(App)
       "302805903197-g4r9lvu6dc7qdhcacgvgm53sgjqarr1d.apps.googleusercontent.com",
   })
   .mount("#app");
+
+export const functions = getFunctions(app);
