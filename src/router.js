@@ -39,6 +39,12 @@ const routes = [
     meta: { title: "Zmena hesla", requiresAuth: true },
   },
   {
+    path: "/profile/:uid",
+    name: "User",
+    component: () => import("./views/management/User.vue"),
+    meta: { title: "Profil používateľa", requiresAuth: true },
+  },
+  {
     path: "/join",
     name: "Join",
     component: () => import("./views/user/Join.vue"),

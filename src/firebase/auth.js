@@ -157,12 +157,14 @@ export const getUser = async (uid) => {
 /**
  * Create a new user.
  * @param {string} uid - The user's ID.
+ * @param {string} email - The user's email
  * @param {any} name - The user's name.
  * @param {string} surname - The user's surname.
  */
-export const createUser = async (uid, name, surname) => {
+export const createUser = async (uid, email, name, surname) => {
   try {
     await setDoc(doc(db, `users/${uid}`), {
+      email: email,
       name: name,
       surname: surname,
     });

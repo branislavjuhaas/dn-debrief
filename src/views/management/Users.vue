@@ -186,7 +186,6 @@ const exportAll = async () => {
         <div
           v-if="props.filter"
           v-for="user in filteredUsers"
-          :to="'/users/' + user.id"
           :key="user.id"
           class="grid items-center gap-4 rounded-[1.25rem]"
           :class="props.filter ? 'grid-cols-3' : 'grid-cols-4'">
@@ -204,7 +203,7 @@ const exportAll = async () => {
         <router-link
           v-else
           v-for="user in filteredUsers"
-          :to="'/users/' + user.id"
+          :to="'/profile/' + user.id"
           :key="`${user.id}-a`"
           class="grid items-center cursor-pointer gap-4 rounded-[1.25rem] duration-150 transition-all delay-300 hover:py-5 hover:text-red"
           :class="props.filter ? 'grid-cols-3' : 'grid-cols-4'">

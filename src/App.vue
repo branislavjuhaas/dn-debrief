@@ -38,11 +38,13 @@ async function handleUserCreation(user, userData) {
   if (!userData) {
     // If the user is email password user, create from store
     if (user.providerData[0].providerId === "password") {
-      createUser(user.uid, userStore.name, userStore.surname).catch((error) => {
-        console.error("Error creating user: ", error);
-        logout();
-        userStore.logOut();
-      });
+      createUser(user.uid, user.email, userStore.name, userStore.surname).catch(
+        (error) => {
+          console.error("Error creating user: ", error);
+          logout();
+          userStore.logOut();
+        },
+      );
 
       userStore.uid = user.uid;
       loadingStore.loadingEnd();
