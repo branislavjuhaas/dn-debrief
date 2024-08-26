@@ -16,19 +16,6 @@ const loadingStore = useLoadingStore();
 // Initializing Firebase auth
 const auth = getAuth();
 
-// Router guard to protect routes based on authentication status
-router.beforeEach((to, from, next) => {
-  if (to.meta.requiresAuth && !userStore.uid) {
-    next("/auth");
-  } else if (to.meta.anonymousOnly && userStore.uid) {
-    next("/profile");
-  } else if (to.meta.roles && !to.meta.roles.includes(userStore.role)) {
-    next("/unauthorized");
-  } else {
-    next();
-  }
-});
-
 // After each route change, update the document title
 router.afterEach((to, from) => {
   nextTick(() => {
@@ -114,18 +101,34 @@ async function handleUserCreation(user, userData) {
  * Function to handle redirection based on route meta
  * @returns {Promise<void>} - Promise to handle redirection
  */
-async function handleRedirection() {
-  // If the routes meta is anonymousOnly, redirect the home page
-  if (
-    (router.currentRoute.value.meta.anonymousOnly ||
-      router.currentRoute.value.meta.requiresAuth) &&
-    router.currentRoute.value.path !== "/"
-  ) {
-    await router.push({ name: "Home" });
-  } else {
-    await router.push({ path: router.currentRoute.value.path });
+async function handleRedirection(authenticated) {
+  try {
+    // If the user is already on the home page, do nothing
+    if (router.currentRoute.value.name === "Home") {
+      return;
+    }
+
+    // If the route's meta is anonymousOnly and user is logged in, redirect to home
+    if (router.currentRoute.value.meta.anonymousOnly && authenticated) {
+      console.log("Redirecting to home");
+      await router.push({ name: "Home" });
+    }
+    // If the route's meta requiresAuth and user is not logged in, redirect to home
+    else if (router.currentRoute.value.meta.requiresAuth && !authenticated) {
+      await router.push({ name: "Auth" });
+    }
+    // Otherwise, refresh the current page
+    else {
+      await router.push({
+        name: router.currentRoute.value.name,
+        params: router.currentRoute.value.params,
+      });
+    }
+  } catch (error) {
+    console.error("Error during redirection: ", error);
+  } finally {
+    loadingStore.loadingEnd();
   }
-  loadingStore.loadingEnd();
 }
 
 /**
@@ -164,14 +167,27 @@ onMounted(() => {
         await handleUserCreation(user, userData);
       });
 
-      await handleRedirection();
+      await handleRedirection(true);
     } else {
       // No user is signed in, log out the user, stop loading and remove the sign in route work
       userStore.logOut();
       await handleGoogleOneTapLogin();
 
-      await handleRedirection();
+      await handleRedirection(false);
     }
+
+    // Router guard to protect routes based on authentication status
+    router.beforeEach((to, from, next) => {
+      if (to.meta.requiresAuth && !userStore.uid) {
+        next("/auth");
+      } else if (to.meta.anonymousOnly && userStore.uid) {
+        next("/profile");
+      } else if (to.meta.roles && !to.meta.roles.includes(userStore.role)) {
+        next("/unauthorized");
+      } else {
+        next();
+      }
+    });
   });
 });
 

@@ -3,7 +3,7 @@ import {
   createUserWithEmailAndPassword,
   getAuth,
   GoogleAuthProvider,
-  inMemoryPersistence,
+  browserLocalPersistence,
   sendPasswordResetEmail,
   setPersistence,
   signInWithCredential,
@@ -37,7 +37,7 @@ const db = getFirestore();
  */
 export const emailLogin = async (email, password, remember) => {
   if (remember) {
-    await setPersistence(auth, inMemoryPersistence);
+    await setPersistence(auth, browserLocalPersistence);
   }
   await signInWithEmailAndPassword(auth, email, password);
 };
@@ -56,7 +56,7 @@ export const emailRegister = async (email, password) => {
  */
 export const googleLogin = async () => {
   const provider = new GoogleAuthProvider();
-  await setPersistence(auth, inMemoryPersistence);
+  await setPersistence(auth, browserLocalPersistence);
   await signInWithPopup(auth, provider);
 };
 
@@ -66,7 +66,7 @@ export const googleLogin = async () => {
  */
 export const oneTapLogin = async (credential) => {
   const oAuthCredential = GoogleAuthProvider.credential(credential);
-  await setPersistence(auth, inMemoryPersistence);
+  await setPersistence(auth, browserLocalPersistence);
   await signInWithCredential(auth, oAuthCredential);
 };
 
