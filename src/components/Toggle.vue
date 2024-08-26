@@ -5,7 +5,7 @@ import squareChecked from "../assets/icons/square-checked.svg";
 
 const props = defineProps(["checked", "label", "modelValue"]);
 
-const checked = ref(props.checked);
+const checked = ref(props.modelValue);
 
 const emit = defineEmits(["update:modelValue"]);
 

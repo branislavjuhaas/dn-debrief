@@ -28,7 +28,7 @@ watch(
       class="cursor-pointer w-5" />
     <div
       v-if="expand"
-      class="flex flex-col absolute bg-white border-2 border-black text-black rounded-[1.25rem] top-12 left-0 w-full z-10">
+      class="flex flex-col max-h-96 overflow-y-auto scrollbar-hidden absolute bg-white border-2 border-black text-black rounded-[1.25rem] top-12 left-0 w-full z-10">
       <p
         v-for="option in props.options"
         :key="option"

@@ -73,6 +73,16 @@ const routes = [
     },
   },
   {
+    path: "/manage/clubs",
+    name: "Clubs",
+    component: () => import("./views/management/Clubs.vue"),
+    meta: {
+      title: "Správa klubov",
+      requiresAuth: true,
+      roles: ["developer", "admin", "cap"],
+    },
+  },
+  {
     path: "/manage/route",
     name: "Route",
     component: () => import("./views/management/RouteManager.vue"),

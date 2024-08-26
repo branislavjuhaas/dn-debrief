@@ -4,6 +4,7 @@ import {
   getDocs,
   getFirestore,
   query,
+  addDoc,
   updateDoc,
   where,
 } from "firebase/firestore";
@@ -125,4 +126,93 @@ export const getUsers = async (club) => {
   });
 
   return users;
+};
+
+/**
+ * Fetches the count of members in a specific club from Firestore.
+ *
+ * This function fetches the count of users associated with a specific club from Firestore.
+ * The club is specified by the clubId parameter. If the clubId parameter is not provided,
+ * the function returns 0.
+ *
+ * @async
+ * @param {string|null} clubId - The ID of the club. If null, the function returns 0.
+ * @returns {number} The count of users associated with the specified club.
+ * @throws Will throw an error if the Firestore query fails.
+ */
+const getClubMembersCount = async (clubId) => {
+  if (!clubId) {
+    return 0;
+  }
+
+  const usersRef = collection(db, "users");
+  const clubRef = doc(db, "clubs", clubId);
+  const q = query(usersRef, where("club", "==", clubRef));
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.size;
+};
+
+/**
+ * Fetches all clubs from Firestore and adds a 'membersCount' property to each club.
+ * The 'membersCount' property represents the number of users associated with each club.
+ *
+ * @async
+ * @returns {Array} An array of club objects. Each object contains the club's ID, data, and members count.
+ * @throws Will throw an error if the Firestore query fails.
+ */
+export const getClubsWithMembersCount = async () => {
+  // Reference to the 'clubs' collection in Firestore
+  const clubsRef = collection(db, "clubs");
+
+  // Fetch all documents from the 'clubs' collection
+  const clubsSnapshot = await getDocs(clubsRef);
+
+  // Map each document to an object containing the document's ID and data
+  const clubs = clubsSnapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  }));
+
+  // For each club, fetch the number of users associated with the club and add it as a 'membersCount' property
+  for (let club of clubs) {
+    club.membersCount = await getClubMembersCount(club.id);
+  }
+
+  // Return the array of club objects
+  return clubs;
+};
+
+/**
+ * Updates the 'active' property of a club in Firestore.
+ * @param {string} clubId - The ID of the club.
+ * @param {boolean} isActive - The new value for the 'active' property.
+ */
+export const updateClubStatus = async (clubId, isActive) => {
+  try {
+    await updateDoc(doc(db, `clubs/${clubId}`), {
+      active: isActive,
+    });
+  } catch (error) {
+    console.error("Error updating document: ", error);
+    return error;
+  }
+};
+
+/**
+ * Creates a new debate club in Firestore.
+ * @param {string} clubName - The name of the club.
+ * @param {boolean} isActive - The active status of the club.
+ */
+export const createClub = async (clubName, isActive) => {
+  try {
+    const clubCollection = collection(db, "clubs");
+    const clubDoc = {
+      name: clubName,
+      active: isActive,
+    };
+    const docRef = await addDoc(clubCollection, clubDoc);
+    return docRef.id;
+  } catch (error) {
+    console.error("Error adding document: ", error);
+  }
 };
