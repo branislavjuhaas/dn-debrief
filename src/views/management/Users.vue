@@ -1,5 +1,5 @@
 <script setup>
-import { useLoadingStore, useUserStore } from "../../stores.js";
+import { useLoadingStore } from "../../stores.js";
 import Dropdown from "../../components/Dropdown.vue";
 import { computed, onMounted, ref } from "vue";
 import { getClubs } from "../../firebase/structure.js";
