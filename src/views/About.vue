@@ -27,7 +27,7 @@ const version = "2024.0.1";
 <template>
   <div class="gap-4">
     <h1 class="text-5xl font-bold mb-2">O systéme {{ system }}</h1>
-    <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
       <div
         class="flex flex-row justify-between bg-white rounded-[1.25rem] p-5 gap-4 text-black vertical-center items-center">
         <p class="font-bold">Verzia</p>
@@ -36,12 +36,12 @@ const version = "2024.0.1";
       <div
         class="flex flex-row justify-between bg-white rounded-[1.25rem] p-5 gap-4 text-black vertical-center items-center">
         <p class="font-bold">UI/UX</p>
-        <p>DN July24</p>
+        <p>DN July24 - mSDA</p>
       </div>
       <div
         class="flex flex-row justify-between bg-white rounded-[1.25rem] p-5 gap-4 text-black vertical-center items-center col-span-1 sm:col-span-2">
-        <p class="font-bold">© 2024 Branislav Juhás</p>
-        <p>všetky práva vyhradené</p>
+        <p class="font-bold">Autor</p>
+        <p>© 2024 Branislav Juhás, všetky práva vyhradené</p>
       </div>
     </div>
 
