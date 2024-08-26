@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "algoliasearch": "^5.1.1",
     "firebase": "^10.12.4",
     "pinia": "^2.2.0",
     "vue": "^3.4.31",

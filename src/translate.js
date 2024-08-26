@@ -35,6 +35,7 @@ const translateRole = (role) => {
 };
 
 const translateKey = (key) => {
+  console.log(key);
   switch (key) {
     case "uid":
       return "UID";
@@ -56,6 +57,12 @@ const translateKey = (key) => {
       return "Telefónne číslo";
     case "birthdate":
       return "Dátum narodenia";
+    case "member":
+      return "Registrovaný člen";
+    case "supervisor":
+      return "Zákonný zástupca";
+    case "supervisorEmail":
+      return "Email zákonného zástupcu";
     default:
       return key;
   }
