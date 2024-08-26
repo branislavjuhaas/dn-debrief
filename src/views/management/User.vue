@@ -2,17 +2,31 @@
 import { ref, onMounted, watch } from "vue";
 import { useRoute } from "vue-router";
 import { getUser } from "../../firebase/auth.js";
-import { translateKey, translateRole } from "../../translate.js";
+import {
+  reverseTranslateRole,
+  translateKey,
+  translateRole,
+} from "../../translate.js";
+import router from "../../router.js";
+import Dropdown from "../../components/Dropdown.vue";
+import { useUserStore } from "../../stores.js";
 
 const route = useRoute();
 
+// If the user is self, redirect to the profile page
+const userStore = useUserStore();
+if (userStore.uid === route.params.uid) {
+  router.push("/profile");
+}
+
 const userData = ref([]);
 const userFullName = ref("");
+const userRole = ref("");
+let actualRole = "";
 
 function formatUserData(uid, user) {
   return [
     { name: "uid", value: uid },
-    { name: "role", value: translateRole(user.role ?? "user") },
     { name: "club", value: user.club ? user.club.name : null },
     {
       name: "member",
@@ -33,14 +47,34 @@ function formatUserData(uid, user) {
 
 const updateUserData = async () => {
   const userId = route.params.uid;
-  const user = await getUser(userId);
-  userData.value = formatUserData(userId, user);
-  userFullName.value = `${user.name} ${user.surname}`;
+  try {
+    const user = await getUser(userId);
+    userData.value = formatUserData(userId, user);
+    actualRole = translateRole(user.role) || "Používateľ";
+    userRole.value = actualRole;
+    userFullName.value = `${user.name} ${user.surname}`;
+  } catch (error) {
+    if (error.code === "permission-denied") {
+      await router.push("/unauthorized");
+    } else {
+      console.error(error);
+    }
+  }
 };
 
 onMounted(updateUserData);
 
 watch(() => route.params.uid, updateUserData);
+
+watch(userRole, async (newRole, oldRole) => {
+  if (newRole === oldRole) return;
+  if (newRole === actualRole) return;
+
+  const { updateUserRole } = await import("../../firebase/structure.js");
+  await updateUserRole(route.params.uid, reverseTranslateRole(newRole));
+
+  actualRole = newRole;
+});
 </script>
 
 <template>
@@ -58,6 +92,21 @@ watch(() => route.params.uid, updateUserData);
           <p class="font-bold">{{ translateKey(data.name) }}</p>
           <p>{{ data.value }}</p>
         </div>
+      </div>
+      <div
+        class="grid grid-flow-col items-center sm:grid-rows-1 sm:grid-cols-2">
+        <dropdown
+          v-if="userRole && ['admin', 'developer'].includes(userStore.role)"
+          class="col-start-1 sm:col-start-2"
+          label="Funkcia"
+          v-model="userRole"
+          :disabled="userRole === 'Vývojár' && useUserStore().role === 'admin'"
+          :options="[
+            'Administrátor',
+            'Hlavný rozhodca',
+            'Vedúci klubu',
+            'Používateľ',
+          ]" />
       </div>
     </div>
   </div>

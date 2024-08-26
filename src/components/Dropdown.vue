@@ -1,17 +1,27 @@
 <script setup>
 import { ref, watch } from "vue";
 
-const props = defineProps(["name", "label", "options", "modelValue"]);
+const props = defineProps([
+  "name",
+  "label",
+  "options",
+  "disabled",
+  "modelValue",
+]);
 
 const expand = ref(false);
 const value = ref(props.modelValue);
+console.log(value.value);
 
 const emit = defineEmits(["update:modelValue"]);
 
 watch(
   () => value.value,
   () => {
-    emit("update:modelValue", value.value);
+    // If not disabled, emit the value
+    if (!props.disabled) {
+      emit("update:modelValue", value.value);
+    }
   },
 );
 </script>
@@ -19,9 +29,12 @@ watch(
 <template>
   <div
     class="grid grid-cols-[auto_1fr_auto] text-black relative border-2 border-black h-12 rounded-[1.25rem] items-center px-5 pt-1 gap-4"
-    @click="expand = !expand">
-    <p class="font-bold">{{ props.label }}</p>
-    <p>{{ value }}</p>
+    :class="props.disabled ? 'border-dashed' : 'cursor-pointer'"
+    @click="!props.disabled && (expand = !expand)">
+    <p class="font-bold" :class="props.disabled ? 'text-grey' : ''">
+      {{ props.label }}
+    </p>
+    <p :class="props.disabled ? 'text-grey' : ''">{{ value }}</p>
     <img
       src="./../assets/icons/down.svg"
       alt="expand"

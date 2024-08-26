@@ -99,6 +99,22 @@ export const joinUser = async (
 };
 
 /**
+ * Updates a user's role in Firestore.
+ * @param {string} uid - The user's ID.
+ * @param {string} newRole - The new role for the user.
+ */
+export const updateUserRole = async (uid, newRole) => {
+  try {
+    await updateDoc(doc(db, `users/${uid}`), {
+      role: newRole,
+    });
+  } catch (error) {
+    console.error("Error updating document: ", error);
+    return error;
+  }
+};
+
+/**
  * Fetches user data from Firestore.
  *
  * This function fetches user data from Firestore based on the club parameter.

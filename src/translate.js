@@ -1,4 +1,4 @@
-const translateError = (error) => {
+export const translateError = (error) => {
   switch (error) {
     case "auth/invalid-email":
       return "Neplatný email";
@@ -17,7 +17,7 @@ const translateError = (error) => {
   }
 };
 
-const translateRole = (role) => {
+export const translateRole = (role) => {
   switch (role) {
     case "developer":
       return "Vývojár";
@@ -34,8 +34,24 @@ const translateRole = (role) => {
   }
 };
 
-const translateKey = (key) => {
-  console.log(key);
+export const reverseTranslateRole = (translatedRole) => {
+  switch (translatedRole) {
+    case "Vývojár":
+      return "developer";
+    case "Administrátor":
+      return "admin";
+    case "Hlavný rozhodca":
+      return "cap";
+    case "Vedúci klubu":
+      return "coach";
+    case "Používateľ":
+      return "user";
+    default:
+      return translatedRole;
+  }
+};
+
+export const translateKey = (key) => {
   switch (key) {
     case "uid":
       return "UID";
@@ -67,5 +83,3 @@ const translateKey = (key) => {
       return key;
   }
 };
-
-export { translateError, translateRole, translateKey };
