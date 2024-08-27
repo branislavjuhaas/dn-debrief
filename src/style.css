@@ -10,6 +10,8 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
+  --delay: 0s;
+
   font-size: 12px;
 
   @apply bg-white font-black font-epilogue font-normal;
