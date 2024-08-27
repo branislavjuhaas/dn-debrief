@@ -51,6 +51,12 @@ const routes = [
     meta: { title: "Registrácia do SDA", requiresAuth: true },
   },
   {
+    path: "/join/verify",
+    name: "Verify",
+    component: () => import("./views/user/Verify.vue"),
+    meta: { title: "Overenie účtu" },
+  },
+  {
     path: "/manage",
     name: "Manage",
     component: () => import("./views/management/Manage.vue"),

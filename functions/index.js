@@ -10,6 +10,9 @@ const functions = require("firebase-functions/v2");
 const { onCall } = functions.https;
 const admin = require("firebase-admin");
 const ExcelJS = require("exceljs");
+const Recipient = require("mailersend").Recipient;
+const EmailParams = require("mailersend").EmailParams;
+const MailerSend = require("mailersend").MailerSend;
 
 // All available logging functions
 const { logger } = require("firebase-functions/v2");
@@ -129,6 +132,142 @@ exports.exportUsers = onCall(async (request) => {
     }
   } catch (error) {
     logger.error("Error exporting users:", error);
+    throw new functions.https.HttpsError(
+      "internal",
+      "Internal server error",
+      error,
+    );
+  }
+});
+
+/**
+ * This function sends an email to a user.
+ * It is triggered by an HTTPS call and returns an object indicating success.
+ * The function uses the MailerSend API to send the email.
+ * The email is personalized with data provided in the request.
+ * If an error occurs during the execution of the function, it throws an 'internal' error.
+ *
+ * @name sendEmail
+ * @function
+ * @async
+ * @param {Object} data - The HTTPS request object. It should contain the following properties:
+ * @param {string} data.email - The email address of the recipient.
+ * @param {string} data.fullName - The full name of the recipient.
+ * @param {string} data.token - The token to be included in the email.
+ * @param {boolean} data.personalized - A flag indicating whether the email should be personalized.
+ * @param {Object} context - The context object.
+ * @returns {Object} The response object indicating success.
+ * @throws {functions.https.HttpsError} If an error occurs during the execution of the function.
+ */
+exports.sendEmail = onCall(async (data, context) => {
+  try {
+    const mailerSend = new MailerSend({
+      apiKey:
+        "mlsn.6ec3427e51bcb074615c91ce41eb8678c3a8c6ce11e5b0999eb9520f133445f4",
+    });
+
+    const recipients = [new Recipient(data.data.email, data.data.fullName)];
+
+    logger.info("DATA:", data.data);
+
+    const personalization = [
+      {
+        email: data.data.email,
+        data: {
+          token: data.data.token,
+          personalized: data.data.personalized,
+        },
+      },
+    ];
+
+    const emailParams = new EmailParams()
+      .setFrom(new Recipient("debrief@sda.sk", "Systém DebRIEF"))
+      .setTo(recipients)
+      .setSubject("Potvrdenie registrácie do SDA")
+      .setTemplateId("351ndgwn5zdgzqx8")
+      .setPersonalization(personalization);
+
+    logger.info("Email params:", emailParams);
+
+    await mailerSend.email.send(emailParams);
+
+    return { success: true };
+  } catch (error) {
+    logger.error("Error sending email:", error);
+    throw new functions.https.HttpsError(
+      "internal",
+      "Internal server error",
+      error,
+    );
+  }
+});
+
+/**
+ * This function updates the 'seasons' property of a user document in the Firestore 'users' collection.
+ * It is triggered by an HTTPS call and returns an object indicating success.
+ * The function checks if the current date is before or after September 1st and updates the 'confirmed' property of the relevant seasons.
+ * If the current date is before September 1st, it updates the 'confirmed' property of the season of the current year.
+ * If the current date is on or after September 1st, it updates the 'confirmed' property of the seasons of the current year and the next year.
+ * If any of the required seasons are missing, it throws an 'internal' error.
+ *
+ * @name updateUserSeasons
+ * @function
+ * @async
+ * @param {Object} data - The HTTPS request object. It should contain the following properties:
+ * @param {string} data.data.userId - The ID of the user whose seasons should be updated.
+ * @param {Object} context - The context object.
+ * @returns {Object} The response object indicating success.
+ * @throws {functions.https.HttpsError} If the user does not exist or if any of the required seasons are missing or if an error occurs during the execution of the function.
+ */
+exports.updateUserSeasons = onCall(async (data, context) => {
+  const userId = data.data.userId;
+
+  const userRef = admin.firestore().collection("users").doc(userId);
+
+  try {
+    const userSnapshot = await userRef.get();
+    const userData = userSnapshot.data();
+
+    if (!userData) {
+      throw new Error("User not found");
+    }
+
+    const seasons = userData.seasons || [];
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const nextYear = currentYear + 1;
+    const isAfterSeptember = currentDate.getMonth() >= 8; // Months are 0-indexed
+
+    logger.info("SEASONS:", seasons);
+
+    const yearsToUpdate = isAfterSeptember
+      ? [currentYear, nextYear]
+      : [currentYear];
+
+    logger.info("Updating seasons for user:", userId, "Years:", yearsToUpdate);
+
+    const updatedSeasons = seasons.map((season) => {
+      if (yearsToUpdate.includes(Number(season.year))) {
+        return { ...season, confirmed: true };
+      }
+      return season;
+    });
+
+    const missingYears = yearsToUpdate.filter(
+      (year) => !updatedSeasons.some((season) => Number(season.year) === year),
+    );
+
+    if (missingYears.length > 0) {
+      throw new Error(`Missing seasons for years: ${missingYears.join(", ")}`);
+    }
+
+    logger.info("Updated seasons, executing update:", updatedSeasons);
+
+    await userRef.update({ seasons: updatedSeasons });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating user seasons:", error);
     throw new functions.https.HttpsError(
       "internal",
       "Internal server error",

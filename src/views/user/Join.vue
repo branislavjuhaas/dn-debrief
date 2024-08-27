@@ -80,6 +80,83 @@ watch(birthdate, (birthdate) => {
 });
 
 /**
+ * Creates a token based on the user's ID.
+ * This function reverses the user ID, converts each character to its ASCII value,
+ * increments it by 1, and then joins them together to form the token.
+ *
+ * @param {string} userId - The user's ID.
+ * @returns {string} The generated token.
+ */
+function createToken(userId) {
+  return (userId + new Date().getFullYear().toString())
+    .split("") // Split the userId into an array of characters
+    .reverse() // Reverse the array
+    .map((char) => {
+      let nextChar;
+      if (char === "Z") {
+        nextChar = "a".charCodeAt(0);
+      } else if (char === "z") {
+        nextChar = "0".charCodeAt(0);
+      } else if (char === "9") {
+        nextChar = "A".charCodeAt(0);
+      } else {
+        nextChar = char.charCodeAt(0) + 1;
+      }
+      return String.fromCharCode(nextChar);
+    }) // Convert each character to its ASCII value, increment by 1, and convert back to character
+    .join(""); // Join the array back into a string
+}
+
+/**
+ * Asynchronously sends a verification email to the user.
+ * This function is triggered when the user requests a verification email.
+ * It uses Firebase's callable HTTPS functions to send the email.
+ * The email is personalized based on whether the user is an adult or not.
+ * If an error occurs during the execution of the function, it logs the error details.
+ *
+ * @async
+ * @function sendVerificationEmail
+ * @throws {Error} If an error occurs during the execution of the function.
+ */
+const sendVerificationEmail = async () => {
+  // Dynamically import the necessary Firebase functions
+  const { httpsCallable } = await import("firebase/functions");
+  const { functions } = await import("../../main.js");
+
+  // If the user is an adult, personalized is "tvoju registráciu" otherwise "registráciu tvojho dieťaťa"
+  const personalized = adult.value
+    ? `tvoju registráciu`
+    : `registráciu tvojho dieťaťa`;
+
+  // Prepare the data
+  const data = {
+    email: adult.value ? userStore.email : mail.value,
+    fullName: userStore.fullName,
+    token: createToken(userStore.uid),
+    personalized: personalized,
+  };
+
+  // Get a reference to the sendEmail function
+  const sendEmailFunction = httpsCallable(functions, "sendEmail");
+
+  // Call the function and handle the response
+  sendEmailFunction(data)
+    .then((result) => {
+      // Read result of the Cloud Function.
+      console.log(result.data);
+    })
+    .catch((error) => {
+      // Getting the error details
+      const code = error.code;
+      const message = error.message;
+      const details = error.details;
+      console.log(
+        `Error Code: ${code}, Message: ${message}, Details: ${details}`,
+      );
+    });
+};
+
+/**
  * Function to register a user
  * @returns {Promise<void>} - Promise to handle user registration
  */
@@ -126,6 +203,8 @@ const register = async () => {
       mail.value,
     );
   }
+
+  await sendVerificationEmail();
 
   await router.push({
     name: "Pay",
