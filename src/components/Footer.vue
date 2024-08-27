@@ -41,7 +41,7 @@ if (
       </p>
 
       <div class="flex flex-row gap-14 items-center w-full sm:w-auto">
-        <a href="https://sda.sk" class="hidden mt-1 sm:flex">Viac o SDA</a>
+        <router-link to="privacy" class="hidden mt-1 sm:flex">GDPR</router-link>
         <router-link
           v-if="(user.role !== null) & (user.role !== 'user')"
           to="/manage"
