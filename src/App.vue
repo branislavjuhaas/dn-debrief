@@ -51,9 +51,14 @@ async function handleUserCreation(user, userData) {
       return;
     }
 
+    console.log(
+      user.displayName.substring(user.displayName.lastIndexOf(" ") + 1),
+    );
+
     // If the user is not an email password user, create from displayName
     createUser(
       user.uid,
+      user.email,
       user.displayName.substring(0, user.displayName.lastIndexOf(" ")),
       user.displayName.substring(user.displayName.lastIndexOf(" ") + 1),
     ).catch((error) => {
