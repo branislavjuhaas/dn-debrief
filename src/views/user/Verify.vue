@@ -62,13 +62,8 @@ function userIdFromToken(token) {
  */
 const sendTokenVerification = async (token) => {
   // Dynamically import the necessary Firebase functions
-  const { httpsCallable, connectFunctionsEmulator } = await import(
-    "firebase/functions"
-  );
+  const { httpsCallable } = await import("firebase/functions");
   const { functions } = await import("../../main.js");
-
-  // Connect to the local Firebase emulator
-  connectFunctionsEmulator(functions, "localhost", 5001);
 
   // Get a reference to the updateUserSeasons function
   const updateUserSeasons = httpsCallable(functions, "updateUserSeasons");
