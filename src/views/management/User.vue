@@ -31,7 +31,9 @@ function formatUserData(uid, user) {
     {
       name: "member",
       value: user.seasons.some(
-        (season) => season.year === new Date().getFullYear().toString(),
+        (season) =>
+          season.year === new Date().getFullYear().toString() &&
+          season.confirmed === true,
       )
         ? "Áno"
         : "Nie",
