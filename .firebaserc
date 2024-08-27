@@ -5,7 +5,10 @@
   "targets": {},
   "etags": {
     "dn-cascade": {
-      "extensionInstances": {}
+      "extensionInstances": {
+        "firestore-algolia-search-clubs": "154b5f501ee7c8ffd15edc67b113afa8aaf4e56386538bf9ccbcdb8ba2ea9278",
+        "firestore-algolia-search": "86293a6d9bbf46c76e1591f49e89d913a62a076960d4210af2c1f790a3c9bca3"
+      }
     }
   },
   "dataconnectEmulatorConfig": {}
