@@ -1,15 +1,17 @@
-import { createApp } from "vue";
-import { createPinia } from "pinia";
-import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getFunctions } from "firebase/functions";
-import "./style.css";
-import App from "./App.vue";
-import router from "./router.js";
 import vue3GoogleLogin from "vue3-google-login";
+import { initializeApp } from "firebase/app";
+import { createPinia } from "pinia";
+import router from "./router.js";
+import { createApp } from "vue";
+import App from "./App.vue";
+import "./style.css";
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+/**
+ * Firebase configuration object.
+ * @type {Object}
+ */
 const firebaseConfig = {
   apiKey: "AIzaSyCG1YinvyCiYK2ppM6lNDoO1Jw8PXYToDE",
   authDomain: "dn-cascade.firebaseapp.com",
@@ -22,12 +24,19 @@ const firebaseConfig = {
   measurementId: "G-8WDZKR0VPT",
 };
 
-// Initialize Firebase
+/**
+ * Initialize Firebase with the provided configuration.
+ * @type {Object}
+ */
 const app = initializeApp(firebaseConfig);
+
+// Get Firebase Analytics instance
 getAnalytics(app);
 
+// Create a new Pinia store
 const pinia = createPinia();
 
+// Create a new Vue app with the router, Pinia store, and Google Login plugin
 createApp(App)
   .use(router)
   .use(pinia)
@@ -37,4 +46,8 @@ createApp(App)
   })
   .mount("#app");
 
+/**
+ * Get Firebase Functions instance and export it.
+ * @type {Object}
+ */
 export const functions = getFunctions(app);

@@ -1,14 +1,19 @@
 <script setup>
+// Import necessary modules and functions
 import { ref, watch } from "vue";
 import square from "../assets/icons/square.svg";
 import squareChecked from "../assets/icons/square-checked.svg";
 
+// Define component props
 const props = defineProps(["checked", "label", "modelValue"]);
 
+// Create a reactive reference for the checked state
 const checked = ref(props.modelValue);
 
+// Define the event that this component emits
 const emit = defineEmits(["update:modelValue"]);
 
+// Watch for changes in the checked state and emit an event when it changes
 watch(
   () => checked.value,
   () => {

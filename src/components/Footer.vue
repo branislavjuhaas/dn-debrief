@@ -1,17 +1,22 @@
 <script setup>
+// Import necessary functions and assets from local files
 import { useLoadingStore, useUserStore } from "../stores.js";
 import { translateRole } from "../translate.js";
 
+// Initialize user and loading stores
 const user = useUserStore();
 const loading = useLoadingStore();
 
+// Get the current date in the format of "day/month"
 const date =
   new Date().getDate().toString() +
   "/" +
   (new Date().getMonth() + 1).toString();
 
+// By default, set isDebrief to true
 let isDebrief = true;
 
+// Check the hostname and specific dates to determine the value of isDebrief
 if (
   window.location.hostname !== "debrief.sda.sk" ||
   date === "23/1" ||

@@ -1,17 +1,28 @@
 <script setup>
+// Import necessary components and functions
 import Field from "../../components/Field.vue";
 import { useUserStore } from "../../stores.js";
 import { translateError } from "../../translate.js";
 import { ref, watch } from "vue";
 
+// Get the user store
 const userStore = useUserStore();
 
+// Define reactive variables for password, confirmation, message, and submit status
 const password = ref("");
 const confirm = ref("");
-
 const message = ref("");
 const canSubmit = ref(false);
 
+/**
+ * This asynchronous function handles password change.
+ * It imports the `changePassword` function from the firebase auth module, and attempts to change the password.
+ * If an error occurs during the process, it translates the error message and sets it to the message variable.
+ *
+ * @async
+ * @function change
+ * @returns {Promise<void>} - A Promise that resolves when the password change attempt has been made.
+ */
 const change = async () => {
   const { changePassword } = await import("../../firebase/auth.js");
 

@@ -29,7 +29,7 @@ router.afterEach((to, from) => {
  * @param userData - User data object
  * @returns {Promise<void>} - Promise to handle user creation
  */
-async function handleUserCreation(user, userData) {
+const handleUserCreation = async (user, userData) => {
   const { createUser, logout } = await import("./firebase/auth.js");
 
   console.log(userData);
@@ -102,13 +102,13 @@ async function handleUserCreation(user, userData) {
     userData.seasons,
     userData.awards,
   );
-}
+};
 
 /**
  * Function to handle redirection based on route meta
  * @returns {Promise<void>} - Promise to handle redirection
  */
-async function handleRedirection(authenticated) {
+const handleRedirection = async (authenticated) => {
   try {
     // If the user is already on the home page, do nothing
     if (router.currentRoute.value.name === "Home") {
@@ -136,13 +136,13 @@ async function handleRedirection(authenticated) {
   } finally {
     loadingStore.loadingEnd();
   }
-}
+};
 
 /**
  * Function to handle Google One Tap login
  * @returns {Promise<void>} - Promise to handle Google One Tap login
  */
-async function handleGoogleOneTapLogin() {
+const handleGoogleOneTapLogin = async () => {
   googleOneTap({ autoLogin: true, cancelOnTapOutside: true }).then(
     async (response) => {
       const { oneTapLogin } = await import("./firebase/auth.js");
@@ -151,7 +151,15 @@ async function handleGoogleOneTapLogin() {
       });
     },
   );
-}
+};
+
+/**
+ * Function to prevent keyboard navigation when loading
+ * @param e - Event object
+ */
+const preventKeyboardNavigation = (e) => {
+  e.preventDefault();
+};
 
 /**
  * Function to handle Google One Tap login
@@ -206,14 +214,6 @@ watchEffect(() => {
     window.removeEventListener("keydown", preventKeyboardNavigation, false);
   }
 });
-
-/**
- * Function to prevent keyboard navigation when loading
- * @param e - Event object
- */
-function preventKeyboardNavigation(e) {
-  e.preventDefault();
-}
 </script>
 
 <template>

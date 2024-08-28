@@ -1,12 +1,14 @@
 <script setup>
+// Import necessary components and functions
 import Field from "../../components/Field.vue";
 import { ref, watch } from "vue";
 import { translateError } from "../../translate.js";
 import { useLoadingStore } from "../../stores.js";
 
+// Get the loading store
 const loadingStore = useLoadingStore();
 
-// Code is an argument oobCode if it exists and if mode argument is equal to resetPassword, otherwise null
+// Define resetCode as an argument oobCode if it exists and if mode argument is equal to resetPassword, otherwise null
 let resetCode = null;
 
 if (window.location.search.includes("oobCode")) {
@@ -14,6 +16,7 @@ if (window.location.search.includes("oobCode")) {
   resetCode = urlParams.get("oobCode");
 }
 
+// Define reactive variables for email, password, confirmation, message, and submit status
 const email = ref(
   window.location.search.includes("email")
     ? window.location.search.split("email=")[1]
@@ -21,14 +24,24 @@ const email = ref(
 );
 const password = ref("");
 const confirm = ref("");
-
 const message = ref("");
 const canSubmit = ref(false);
 
+// If resetCode is not present and email value is not empty, enable submit
 if (!resetCode && email.value !== "") {
   canSubmit.value = true;
 }
 
+/**
+ * This asynchronous function resets the user's password.
+ * It starts the loading indicator, imports the `resetPassword` function from the firebase auth module, and attempts to reset the password.
+ * If an error occurs during the process, it translates the error message and sets it to the message variable.
+ * Finally, it stops the loading indicator and redirects the user to the auth page.
+ *
+ * @async
+ * @function resetPassword
+ * @returns {Promise<void>} - A Promise that resolves when the password reset attempt has been made.
+ */
 const resetPassword = async () => {
   loadingStore.loadingStart();
 
@@ -50,6 +63,16 @@ const resetPassword = async () => {
     });
 };
 
+/**
+ * This asynchronous function sends a password reset email.
+ * It starts the loading indicator, imports the `sendResetEmail` function from the firebase auth module, and attempts to send the reset email.
+ * If an error occurs during the process, it translates the error message and sets it to the message variable.
+ * Finally, it stops the loading indicator and redirects the user to the home page.
+ *
+ * @async
+ * @function sendReset
+ * @returns {Promise<void>} - A Promise that resolves when the reset email has been sent.
+ */
 const sendReset = async () => {
   loadingStore.loadingStart();
 
@@ -70,6 +93,15 @@ const sendReset = async () => {
     });
 };
 
+/**
+ * This asynchronous function handles the reset process.
+ * If resetCode is present, it calls the resetPassword function.
+ * Otherwise, it calls the sendReset function.
+ *
+ * @async
+ * @function handleReset
+ * @returns {Promise<void>} - A Promise that resolves when the reset process has been handled.
+ */
 const handleReset = async () => {
   if (resetCode) {
     await resetPassword();
@@ -79,6 +111,7 @@ const handleReset = async () => {
   await sendReset();
 };
 
+// If resetCode is present, watch the password and confirm fields
 if (resetCode !== null) {
   // Watch the password and confirm fields
   watch([password, confirm], ([password, confirm]) => {
@@ -100,6 +133,7 @@ if (resetCode !== null) {
       password.value === confirm.value;
   });
 } else {
+  // If resetCode is not present, watch the email field
   watch([email], () => {
     canSubmit.value = email.value !== "";
   });

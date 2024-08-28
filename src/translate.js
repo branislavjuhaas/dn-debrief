@@ -1,3 +1,8 @@
+/**
+ * Translates the given error code into a human-readable message.
+ * @param {string} error - The error code to translate.
+ * @returns {string} The translated error message.
+ */
 export const translateError = (error) => {
   switch (error) {
     case "auth/invalid-email":
@@ -17,6 +22,11 @@ export const translateError = (error) => {
   }
 };
 
+/**
+ * Translates the given role into a human-readable role name.
+ * @param {string} role - The role to translate.
+ * @returns {string} The translated role name.
+ */
 export const translateRole = (role) => {
   switch (role) {
     case "developer":
@@ -34,6 +44,11 @@ export const translateRole = (role) => {
   }
 };
 
+/**
+ * Translates the given human-readable role name back into a role.
+ * @param {string} translatedRole - The translated role name to reverse translate.
+ * @returns {string} The reverse translated role.
+ */
 export const reverseTranslateRole = (translatedRole) => {
   switch (translatedRole) {
     case "Vývojár":
@@ -51,6 +66,11 @@ export const reverseTranslateRole = (translatedRole) => {
   }
 };
 
+/**
+ * Translates the given key into a human-readable key name.
+ * @param {string} key - The key to translate.
+ * @returns {string} The translated key name.
+ */
 export const translateKey = (key) => {
   switch (key) {
     case "uid":

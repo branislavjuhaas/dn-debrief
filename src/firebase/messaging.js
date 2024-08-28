@@ -1,99 +1,97 @@
-//#region Messages
-
-const welcomeMessage = {
-  id: "welcome",
-  title: "Predstavujeme systém DebRIEF",
-  message:
-    "Vitaj v systéme DebRIEF vyvinutom našimi vývojármi pre pohodlnú správu dát v SDA.",
-  link: null,
-  local: true,
+// Define the messages
+const messages = {
+  welcome: {
+    id: "welcome",
+    title: "Introducing the DebRIEF system",
+    message:
+      "Welcome to the DebRIEF system developed by our developers for convenient data management in SDA.",
+    link: null,
+    local: true,
+  },
+  auth: {
+    id: "auth",
+    title: "Log into the system",
+    message: "Please log in to the system to access all features.",
+    link: "/auth",
+    local: true,
+  },
+  join: {
+    id: "join",
+    title: "Don't forget to register",
+    message: "If you want to participate in our events, register with SDA.",
+    link: "/join",
+    local: true,
+  },
+  pending: {
+    id: "pending",
+    title: "Waiting for confirmation",
+    message:
+      "Registration has not been confirmed. A confirmation link has been sent to your email.",
+    link: null,
+    local: false,
+  },
+  createClubs: {
+    id: "createClubs",
+    title: "Register all clubs",
+    message:
+      "Don't forget to register all clubs so their members can register.",
+    link: "/manage/clubs",
+    local: true,
+  },
+  manageClub: {
+    id: "manageClub",
+    title: "Manage your club",
+    message: "Check out new members of your club and watch your club grow.",
+    link: "/manage/clubs/{{Id}}",
+    local: true,
+  },
+  learnMore: {
+    id: "learnMore",
+    title: "Want to know more about SDA?",
+    message:
+      "Click for more information about the Slovak Debate Association and its mission.",
+    link: "https://sda.sk",
+    local: false,
+  },
 };
 
-const authMessage = {
-  id: "auth",
-  title: "Prihlás sa do systému",
-  message: "Pre prístup ku všetkým funkciám sa, prosím, prihlás do systému.",
-  link: "/auth",
-  local: true,
-};
-
-const joinMessage = {
-  id: "join",
-  title: "Nezabudni na registráciu",
-  message: "Ak sa chceš zúčastniť našich podujatí, registruj sa do SDA.",
-  link: "/join",
-  local: true,
-};
-
-const pendingMessage = {
-  id: "pending",
-  title: "Čakáme na potvrdenie",
-  message:
-    "Registrácia nebola potvrdená. Link na potvrdenie ti bol zaslaný na email.",
-  link: null,
-  local: false,
-};
-
-const createClubsMessage = {
-  id: "createClubs",
-  title: "Registruj všetky kluby",
-  message:
-    "Nezabudni zaregistrovať všetky kluby, aby sa ich členovia mohli registrovať.",
-  link: "/manage/clubs",
-  local: true,
-};
-
-const manageClubMessage = {
-  id: "manageClub",
-  title: "Spravuj svoj klub",
-  message: "Pozri si nových členov svojho klubu a sleduj ako tvoj klub rastie.",
-  link: "/manage/clubs/{{Id}}",
-  local: true,
-};
-
-const learnMoreMessage = {
-  id: "learnMore",
-  title: "Chceš vedieť viac o SDA?",
-  message:
-    "Klikni pre viac informácií o Slovenskej debatnej asociácii a jej misii.",
-  link: "https://sda.sk",
-  local: false,
-};
-
-//#endregion
-
+/**
+ * Generate a list of messages for the user.
+ * @param {Object} user - The user object.
+ * @returns {Array} - The list of messages.
+ */
 export const feed = async (user) => {
-  let messages = [];
+  let feedMessages = [];
 
-  messages.push(welcomeMessage);
+  feedMessages.push(messages.welcome);
 
   if (!user || !user.uid) {
-    messages.push(authMessage);
-    return messages;
+    feedMessages.push(messages.auth);
+    return feedMessages;
   }
 
   if (!user.isJoining) {
-    messages.push(joinMessage);
-    return messages;
+    feedMessages.push(messages.join);
+    return feedMessages;
   }
 
   if (user.isJoining && !user.isMember) {
-    messages.push(pendingMessage);
+    feedMessages.push(messages.pending);
   }
 
   if (user.role === "admin" || user.role === "developer") {
-    messages.push(createClubsMessage);
+    feedMessages.push(messages.createClubs);
   }
 
   if (user.role === "coach") {
-    let clubMessage = { ...manageClubMessage };
+    let clubMessage = { ...messages.manageClub };
     clubMessage.link = clubMessage.link.replace("{{Id}}", user.club.id);
-    messages.push(clubMessage);
+    feedMessages.push(clubMessage);
   }
 
-  if (messages.length <= 2) {
-    messages.push(learnMoreMessage);
+  if (feedMessages.length <= 2) {
+    feedMessages.push(messages.learnMore);
   }
 
-  return messages;
+  return feedMessages;
 };

@@ -1,6 +1,8 @@
 <script setup>
+// Import necessary functions from Vue
 import { ref, watch } from "vue";
 
+// Define the props that this component accepts
 const props = defineProps([
   "name",
   "label",
@@ -9,16 +11,20 @@ const props = defineProps([
   "modelValue",
 ]);
 
+// Define a ref to control the dropdown expansion
 const expand = ref(false);
-const value = ref(props.modelValue);
-console.log(value.value);
 
+// Define a ref to hold the current value of the dropdown
+const value = ref(props.modelValue);
+
+// Define the events that this component emits
 const emit = defineEmits(["update:modelValue"]);
 
+// Watch for changes in the value ref
 watch(
   () => value.value,
   () => {
-    // If not disabled, emit the value
+    // If the dropdown is not disabled, emit the new value
     if (!props.disabled) {
       emit("update:modelValue", value.value);
     }

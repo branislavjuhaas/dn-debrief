@@ -1,11 +1,18 @@
 <script setup>
+// Import necessary components and functions
 import Field from "../../components/Field.vue";
 import { ref } from "vue";
 import router from "../../router.js";
-import * as path from "node:path";
 
+// Define a reactive variable for the route
 const route = ref("");
 
+/**
+ * This function navigates to the specified route.
+ * It first logs the route to the console, then uses the router to navigate to the route.
+ *
+ * @function navigate
+ */
 const navigate = () => {
   console.log("Navigating to: ", route.value);
   router.push({ path: "/" + route.value });

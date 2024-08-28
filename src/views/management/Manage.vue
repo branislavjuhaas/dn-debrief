@@ -1,9 +1,12 @@
 <script setup>
+// Import necessary functions
 import { useUserStore } from "../../stores.js";
 import { translateRole } from "../../translate.js";
 
+// Get the user store
 const userStore = useUserStore();
 
+// Define a list of links with their respective roles
 const links = [
   {
     name: "Správa používateľov",
@@ -27,6 +30,7 @@ const links = [
   },
 ];
 
+// Filter the links based on the user's role
 const relevantLinks = links.filter((link) =>
   link.roles.includes(userStore.role),
 );

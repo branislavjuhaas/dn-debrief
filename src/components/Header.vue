@@ -1,15 +1,20 @@
 <script setup>
+// Import necessary components and assets
 import Search from "./Search.vue";
 import debrief from "./../assets/debrief.svg";
 import cascade from "./../assets/cascade.svg";
 import barca from "./../assets/barca.svg";
 
+// Set the default logo to cascade
 let logo = cascade;
 
-// If the domain is debrief.sda.sk, change the system name to DebRIEF
+// Check the hostname to determine the logo
+// If the domain is debrief.sda.sk, change the logo to debrief
 if (window.location.hostname === "debrief.sda.sk") {
   logo = debrief;
-} else if (window.location.hostname === "barca.juhaas.eu") {
+}
+// If the domain is barca.juhaas.eu, change the logo to barca
+else if (window.location.hostname === "barca.juhaas.eu") {
   logo = barca;
 }
 </script>

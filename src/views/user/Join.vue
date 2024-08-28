@@ -87,7 +87,7 @@ watch(birthdate, (birthdate) => {
  * @param {string} userId - The user's ID.
  * @returns {string} The generated token.
  */
-function createToken(userId) {
+const createToken = (userId) => {
   return (userId + new Date().getFullYear().toString())
     .split("") // Split the userId into an array of characters
     .reverse() // Reverse the array
@@ -105,7 +105,7 @@ function createToken(userId) {
       return String.fromCharCode(nextChar);
     }) // Convert each character to its ASCII value, increment by 1, and convert back to character
     .join(""); // Join the array back into a string
-}
+};
 
 /**
  * Asynchronously sends a verification email to the user.

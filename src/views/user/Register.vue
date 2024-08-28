@@ -1,20 +1,33 @@
 <script setup>
+// Import necessary components and functions
 import Field from "../../components/Field.vue";
 import { ref, watch } from "vue";
 import { useUserStore } from "../../stores.js";
 import { translateError } from "../../translate.js";
 
+// Define reactive variables
 const email = ref("");
 const name = ref("");
 const surname = ref("");
 const password = ref("");
 const confirm = ref("");
-
 const message = ref("");
 const canSubmit = ref(false);
 
+// Get the user store
 const userStore = useUserStore();
 
+/**
+ * This asynchronous function handles user registration.
+ * It first checks if all required fields are provided, if not it sets the message to "Vyplňte všetky polia" and returns.
+ * Then, it sets the user data in the user store.
+ * It imports the `emailRegister` function from the firebase auth module, and attempts to register the user.
+ * If an error occurs during registration, it translates the error message and sets it to the message variable.
+ *
+ * @async
+ * @function register
+ * @returns {Promise<void>} - A Promise that resolves when the registration attempt has been made.
+ */
 const register = async () => {
   if (
     email.value === "" ||
@@ -42,17 +55,20 @@ const register = async () => {
     null,
   );
 
-  const { emailRegister, createUser } = await import("../../firebase/auth.js");
+  const { emailRegister } = await import("../../firebase/auth.js");
 
-  // Register the user and ate the user in the database with the uid from the authentication returns uid
   emailRegister(email.value, password.value).catch((error) => {
     message.value = translateError(error.code);
   });
 };
 
-// Watch the password and confirm fields
+/**
+ * This function watches the password and confirm fields.
+ * If the length of the password is less than 6 characters, it sets the message to "Heslo musí mať aspoň 6 znakov".
+ * If the password and confirm fields do not match, it sets the message to "Heslá sa nezhodujú".
+ * Otherwise, it clears the message.
+ */
 watch([password, confirm], ([password, confirm]) => {
-  // If the length of the password is less than 6 characters, display a message
   if (password.length < 6) {
     message.value = "Heslo musí mať aspoň 6 znakov";
   } else if (password !== confirm) {
@@ -62,7 +78,10 @@ watch([password, confirm], ([password, confirm]) => {
   }
 });
 
-// Watch to update the value of the enabled submit button when the fields are filled and the passwords match
+/**
+ * This function watches the email, name, surname, password, and confirm fields.
+ * It updates the value of the enabled submit button when the fields are filled and the passwords match.
+ */
 watch([email, name, surname, password, confirm], () => {
   canSubmit.value =
     email.value !== "" &&

@@ -1,33 +1,55 @@
 <script setup>
+// Import necessary components and functions
 import { ref } from "vue";
 import { translateError } from "../../translate.js";
 import Field from "../../components/Field.vue";
 import Toggle from "../../components/Toggle.vue";
 import { useLoadingStore } from "../../stores.js";
 
+// Define reactive variables
 const email = ref("");
 const password = ref("");
 const remember = ref(false);
-
 const message = ref("");
 
+/**
+ * This asynchronous function handles user login.
+ * It first checks if email and password are provided, if not it sets the message to "Vyplňte všetky polia" and returns.
+ * Then, it starts the loading indicator, imports the `emailLogin` function from the firebase auth module, and attempts to log in with the provided email and password.
+ * If an error occurs during login, it translates the error message and sets it to the message variable.
+ * Finally, it stops the loading indicator.
+ *
+ * @async
+ * @function login
+ * @returns {Promise<void>} - A Promise that resolves when the login attempt has been made.
+ */
 const login = async () => {
   if (email.value === "" || password.value === "") {
     message.value = "Vyplňte všetky polia";
-  } else {
-    useLoadingStore().loadingStart();
-
-    const { emailLogin } = await import("../../firebase/auth.js");
-
-    message.value = "";
-    emailLogin(email.value, password.value, remember.value).catch((error) => {
-      message.value = translateError(error.code);
-    });
-
-    useLoadingStore().loadingEnd();
+    return;
   }
+
+  useLoadingStore().loadingStart();
+
+  const { emailLogin } = await import("../../firebase/auth.js");
+
+  message.value = "";
+  emailLogin(email.value, password.value, remember.value).catch((error) => {
+    message.value = translateError(error.code);
+  });
+
+  useLoadingStore().loadingEnd();
 };
 
+/**
+ * This asynchronous function handles user login via Google.
+ * It imports the `googleLogin` function from the firebase auth module, and attempts to log in via Google.
+ * If an error occurs during login, it translates the error message and sets it to the message variable.
+ *
+ * @async
+ * @function googleLogin
+ * @returns {Promise<void>} - A Promise that resolves when the login attempt has been made.
+ */
 const googleLogin = async () => {
   const { googleLogin } = await import("../../firebase/auth.js");
 

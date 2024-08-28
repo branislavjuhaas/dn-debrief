@@ -1,30 +1,37 @@
 <script setup>
+// Import necessary components and functions
 import { ref, onMounted, watch } from "vue";
 import { useRoute } from "vue-router";
 import { getUser } from "../../firebase/auth.js";
+import router from "../../router.js";
+import Dropdown from "../../components/Dropdown.vue";
+import { useUserStore } from "../../stores.js";
 import {
   reverseTranslateRole,
   translateKey,
   translateRole,
 } from "../../translate.js";
-import router from "../../router.js";
-import Dropdown from "../../components/Dropdown.vue";
-import { useUserStore } from "../../stores.js";
 
+// Get the current route
 const route = useRoute();
 
-// If the user is self, redirect to the profile page
+// Get the user store
 const userStore = useUserStore();
+
+// If the user is self, redirect to the profile page
 if (userStore.uid === route.params.uid) {
   router.push("/profile");
 }
 
+// Define reactive variables for user data, user full name, and user role
 const userData = ref([]);
 const userFullName = ref("");
 const userRole = ref("");
 let actualRole = "";
 
+// Function to format user data
 function formatUserData(uid, user) {
+  // Return an array of user data objects
   return [
     { name: "uid", value: uid },
     { name: "club", value: user.club ? user.club.name : null },
@@ -47,6 +54,7 @@ function formatUserData(uid, user) {
   ].filter((item) => item.value !== null && item.value !== undefined);
 }
 
+// Function to update user data
 const updateUserData = async () => {
   const userId = route.params.uid;
   try {
@@ -64,10 +72,13 @@ const updateUserData = async () => {
   }
 };
 
+// Fetch user data on component mount
 onMounted(updateUserData);
 
+// Watch for changes in the route params uid and update user data
 watch(() => route.params.uid, updateUserData);
 
+// Watch for changes in the user role and update it in the database
 watch(userRole, async (newRole, oldRole) => {
   if (newRole === oldRole) return;
   if (newRole === actualRole) return;

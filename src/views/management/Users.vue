@@ -1,66 +1,33 @@
 <script setup>
+// Import necessary components and functions
 import { useLoadingStore } from "../../stores.js";
 import Dropdown from "../../components/Dropdown.vue";
 import { computed, onMounted, ref } from "vue";
-import { getClubs } from "../../firebase/structure.js";
+import { getClubs, getUsers } from "../../firebase/structure.js";
 import { useRoute } from "vue-router";
-import { getUsers } from "../../firebase/structure.js";
 import { translateRole } from "../../translate.js";
 import Field from "../../components/Field.vue";
+import { httpsCallable } from "firebase/functions";
+import { functions } from "../../main.js";
 
+// Define properties
 const props = defineProps(["filter"]);
 
+// Start loading
 useLoadingStore().loadingStart();
 
+// Define reactive variables
 const route = useRoute();
-
 const clubFilter = ref("");
 const quickFilter = ref("");
-
 const currentClub = ref("...");
 const clubsNames = ref([]);
 let clubs = [];
 const users = ref([]);
+const exported = ref(false);
 
-onMounted(async () => {
-  clubs = (await Promise.all([getClubs(false)]))[0];
-  // If filtered, get the club with params filter. filter param is a clubs id
-  if (props.filter) {
-    currentClub.value = clubs.find((club) => club.id === route.params.filter);
-  }
-
-  clubsNames.value = clubs.map((club) => club.name);
-
-  const [usersData] = await Promise.all([getUsers(currentClub.value.id)]);
-  users.value = usersData;
-
-  console.log("Stop");
-  useLoadingStore().loadingEnd();
-});
-
-const getClubNameById = (id) => {
-  return clubs.find((club) => club.id === id).name;
-};
-
-const filteredUsers = computed(() => {
-  return users.value.filter((user) => {
-    const isClubMatch = clubFilter.value
-      ? user.club && getClubNameById(user.club.id) === clubFilter.value
-      : true;
-
-    const isQuickMatch = quickFilter.value
-      ? (user.name.toLowerCase() + " " + user.surname.toLowerCase()).includes(
-          quickFilter.value.toLowerCase(),
-        ) ||
-        user.id.toLowerCase().includes(quickFilter.value.toLowerCase()) ||
-        (user.role
-          ? user.role.toLowerCase().includes(quickFilter.value.toLowerCase())
-          : false)
-      : true;
-
-    return isClubMatch && isQuickMatch;
-  });
-});
+// Function to get club name by id
+const getClubNameById = (id) => clubs.find((club) => club.id === id).name;
 
 /**
  * Handles the response from the Firebase Cloud Function.
@@ -103,10 +70,7 @@ const handleResponse = (result) => {
   // Clean up
   URL.revokeObjectURL(url);
   document.body.removeChild(a);
-  console.log(result.data);
 };
-
-const exported = ref(false);
 
 /**
  * Asynchronously exports all users.
@@ -119,10 +83,6 @@ const exported = ref(false);
 const exportAll = async () => {
   // Start the loading indicator
   useLoadingStore().loadingStart();
-
-  // Dynamically import the necessary Firebase functions
-  const { httpsCallable } = await import("firebase/functions");
-  const { functions } = await import("../../main.js");
 
   // Call the `exportUsers` Firebase Cloud Function
   const exportUsers = httpsCallable(functions, "exportUsers");
@@ -139,6 +99,43 @@ const exportAll = async () => {
       useLoadingStore().loadingEnd();
     });
 };
+
+// On component mount
+onMounted(async () => {
+  clubs = (await Promise.all([getClubs(false)]))[0];
+  // If filtered, get the club with params filter. filter param is a clubs id
+  if (props.filter) {
+    currentClub.value = clubs.find((club) => club.id === route.params.filter);
+  }
+
+  clubsNames.value = clubs.map((club) => club.name);
+
+  const [usersData] = await Promise.all([getUsers(currentClub.value.id)]);
+  users.value = usersData;
+
+  useLoadingStore().loadingEnd();
+});
+
+// Computed property for filtered users
+const filteredUsers = computed(() => {
+  return users.value.filter((user) => {
+    const isClubMatch = clubFilter.value
+      ? user.club && getClubNameById(user.club.id) === clubFilter.value
+      : true;
+
+    const isQuickMatch = quickFilter.value
+      ? (user.name.toLowerCase() + " " + user.surname.toLowerCase()).includes(
+          quickFilter.value.toLowerCase(),
+        ) ||
+        user.id.toLowerCase().includes(quickFilter.value.toLowerCase()) ||
+        (user.role
+          ? user.role.toLowerCase().includes(quickFilter.value.toLowerCase())
+          : false)
+      : true;
+
+    return isClubMatch && isQuickMatch;
+  });
+});
 </script>
 
 <template>

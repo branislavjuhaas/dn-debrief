@@ -1,11 +1,14 @@
 <script setup>
+// Import necessary components and functions
 import { ref } from "vue";
 import router from "../../router.js";
 
+// Define a reactive variable for the message
 const message = ref(
   "Tvoju registráciu práve potvrdzujeme. Ďakujeme za trpezlivosť.",
 );
 
+// Get the token from the URL parameters
 const urlParams = new URLSearchParams(window.location.search);
 const token = urlParams.get("token");
 
@@ -18,7 +21,7 @@ const token = urlParams.get("token");
  * @returns {Object} An object containing the userId and year extracted from the token.
  * @remarks This function is designed to work until the year 10000. Beyond that, the year extraction logic may not work as expected.
  */
-function userIdFromToken(token) {
+const userIdFromToken = (token) => {
   // Split the token into an array of characters
   const reverted = token
     .split("")
@@ -49,7 +52,7 @@ function userIdFromToken(token) {
 
   // Return an object with userId and year as properties
   return { userId, year };
-}
+};
 
 /**
  * This function sends a token for verification to the Firebase function 'updateUserSeasons'.
@@ -89,7 +92,7 @@ const sendTokenVerification = async (token) => {
  * @param {Object} router - The Vue router instance.
  * @param {Object} message - A Vue ref object to hold the message to be displayed.
  */
-async function handleTokenVerification(token, router, message) {
+const handleTokenVerification = async (token, router, message) => {
   // If no token is provided, set an error message and redirect to the home page
   if (!token) {
     message.value = "Chyba: Neplatný token.";
@@ -129,7 +132,7 @@ async function handleTokenVerification(token, router, message) {
       router.push("/");
     }, 3000);
   }
-}
+};
 
 // Call the function with the token, router, and message
 handleTokenVerification(token, router, message);

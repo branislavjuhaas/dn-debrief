@@ -1,43 +1,73 @@
 <script setup>
+// Import necessary Vue functions and custom hooks
 import { onMounted, ref, watch, watchEffect } from "vue";
 import { useUserStore } from "../stores.js";
 import { feed } from "../firebase/messaging.js";
 
+// Get the user store
 const user = useUserStore();
 
-// Function that will return Dobrý deň, if the user role is admin or developer and otherwise Ahoj. It can be called any time in the template.
+/**
+ * Function that will return "Dobrý deň", if the user role is admin or developer and otherwise "Ahoj".
+ * It can be called any time in the template.
+ * @type {import('vue').Ref<string>}
+ */
 const greeting = ref("Ahoj");
 
-if (user.role === "admin" || user.role === "developer") {
-  greeting.value = "Dobrý deň";
-}
+/**
+ * The name of the system. It can be "Cascade", "DebRIEF", or "Barca" depending on the hostname.
+ * @type {string}
+ */
+let system = "Cascade";
 
+/**
+ * Function to set the system name based on the hostname.
+ * If the hostname is "debrief.sda.sk", the system name is set to "DebRIEF".
+ * If the hostname is "barca.juhaas.eu", the system name is set to "Barca".
+ * Otherwise, the system name remains "Cascade".
+ */
+const setSystemName = () => {
+  if (window.location.hostname === "debrief.sda.sk") {
+    system = "DebRIEF";
+  } else if (window.location.hostname === "barca.juhaas.eu") {
+    system = "Barca";
+  }
+};
+
+// Call the function to set the system name
+setSystemName();
+
+/**
+ * Watch the user role and update the greeting accordingly.
+ */
 watch(
   () => user.role,
   () => {
     if (user.role === "admin" || user.role === "developer") {
       greeting.value = "Dobrý deň";
+    } else {
+      greeting.value = "Ahoj";
     }
   },
 );
 
-let system = "Cascade";
-
-// If the domain is debrief.sda.sk, change the system name to DebRIEF
-if (window.location.hostname === "debrief.sda.sk") {
-  system = "DebRIEF";
-} else if (window.location.hostname === "barca.juhaas.eu") {
-  system = "Barca";
-}
-
 // Get the feed from firebase/messaging.js,
+/**
+ * @type {import('vue').Ref<any[]>}
+ */
 const userFeed = ref([]);
 
+/**
+ * On component mount, fetch the user feed and log it.
+ */
 onMounted(async () => {
   userFeed.value = await feed(user);
   console.log(userFeed.value);
 });
 
+/**
+ * Watch the user UID and update the user feed when it changes.
+ */
 watchEffect(async () => {
   if (user.uid != null) {
     userFeed.value = await feed(user);

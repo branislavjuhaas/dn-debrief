@@ -1,8 +1,10 @@
 <script setup>
+// Import necessary functions and assets from Vue and local files
 import { ref, watch } from "vue";
 import eye from "../assets/icons/eye.svg";
 import eyeCrossed from "../assets/icons/eye-crossed.svg";
 
+// Define the props that this component accepts
 const props = defineProps([
   "name",
   "label",
@@ -11,14 +13,16 @@ const props = defineProps([
   "modelValue",
 ]);
 
-// Reactive variable to keep track of whether the password is shown or not
+// Define a ref to control the visibility of the password
 const showPassword = ref(false);
 
+// Define a ref to hold the current value of the field
 const value = ref(props.modelValue);
 
+// Define the events that this component emits
 const emit = defineEmits(["update:modelValue"]);
 
-// Function to toggle the value of showPassword
+// Function to toggle the visibility of the password
 const togglePassword = (event) => {
   event.stopPropagation();
   showPassword.value = !showPassword.value;
@@ -32,10 +36,11 @@ const focusInput = () => {
   inputRef.value.focus();
 };
 
-// Watcher to emit the updated value to the parent component
+// Watch for changes in the value ref
 watch(
   () => value.value,
   () => {
+    // Emit the new value
     emit("update:modelValue", value.value);
   },
 );

@@ -1,44 +1,84 @@
 <script setup>
+// Import necessary components and functions
 import Field from "../../components/Field.vue";
 import Toggle from "../../components/Toggle.vue";
 import { onMounted, ref } from "vue";
 import { getClubsWithMembersCount } from "../../firebase/structure.js";
 import { useLoadingStore } from "../../stores.js";
-import { translateRole } from "../../translate.js";
 
+// Start loading state
 useLoadingStore().loadingStart();
 
+// Define reactive variables for new club name and active status
 const newClub = ref("");
 const newActive = ref(true);
 
+// Define reactive variable for clubs data
 const clubs = ref([]);
 
+// Fetch clubs data on component mount
 onMounted(async () => {
   const clubsData = await getClubsWithMembersCount();
   clubs.value = clubsData;
 
-  console.log(clubs.value);
-
+  // End loading state
   useLoadingStore().loadingEnd();
 });
 
+/**
+ * This function updates the active status of a club in the database.
+ * It first prevents the default event propagation, then imports the `updateClubStatus` function from the firebase structure.
+ * Finally, it calls the imported `updateClubStatus` function with the provided club ID and active status.
+ *
+ * @async
+ * @function updateClubStatus
+ * @param {string} clubId - The ID of the club whose status is to be updated.
+ * @param {boolean} active - The new active status for the club.
+ * @param {Event} event - The event object from the event listener.
+ * @returns {Promise<void>} - A Promise that resolves when the club's active status has been updated in the database.
+ */
 const updateClubStatus = async (clubId, active, event) => {
+  // Prevent event propagation
   event.stopPropagation();
+
+  // Import updateClubStatus function from firebase structure
   const { updateClubStatus } = await import("../../firebase/structure.js");
+
+  // Update club status
   await updateClubStatus(clubId, active);
 };
 
+/**
+ * This asynchronous function creates a new club.
+ * It first checks if a new club name is provided, if not it returns immediately.
+ * Then, it imports the `createClub` function from the firebase structure.
+ * It calls the imported `createClub` function with the new club name and active status, and gets the id of the created club.
+ * The new club is then added to the clubs data with its id, name, members count (initially 0), and active status.
+ * Finally, it resets the new club name and active status to their initial states.
+ *
+ * @async
+ * @function createClub
+ * @returns {Promise<void>} - A Promise that resolves when the new club has been created and added to the clubs data.
+ */
 const createClub = async () => {
+  // Return if new club name is not provided
   if (!newClub.value) return;
 
+  // Import createClub function from firebase structure
   const { createClub } = await import("../../firebase/structure.js");
+
+  // Create new club and get its id
   const cid = await createClub(newClub.value, newActive.value);
+
+  // Add new club to clubs data
   clubs.value.push({
     id: cid,
     name: newClub.value,
     membersCount: 0,
     active: newActive.value,
   });
+
+  // Reset new club name and active status
   newClub.value = "";
   newActive.value = true;
 };

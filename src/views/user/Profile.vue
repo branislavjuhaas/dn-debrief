@@ -1,14 +1,27 @@
 <script setup>
+// Import necessary components and functions
 import { useUserStore } from "../../stores.js";
-import { translateKey } from "../../translate.js";
 import router from "../../router.js";
 
+// Get the user store
 const userStore = useUserStore();
 
+/**
+ * This asynchronous function handles user logout.
+ * It imports the `logout` function from the firebase auth module, and attempts to log out the user.
+ * If an error occurs during logout, it logs the error to the console.
+ *
+ * @async
+ * @function logout
+ * @returns {Promise<void>} - A Promise that resolves when the logout attempt has been made.
+ */
 const logout = async () => {
+  // Dynamically import the `logout` function from the firebase auth module
   const { logout } = await import("../../firebase/auth.js");
 
+  // Attempt to log out the user
   logout().catch((error) => {
+    // If an error occurs, log it to the console
     console.error("Error logging out: ", error);
   });
 };

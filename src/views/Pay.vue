@@ -1,41 +1,65 @@
-<!--suppress ALL -->
 <script setup>
+// Import necessary Vue functions and router
 import { useRoute } from "vue-router";
 import { useUserStore } from "../stores.js";
 import { onMounted, ref } from "vue";
 import router from "../router.js";
 
+// Get the route details
 const route = useRoute();
 
+// Extract query parameters from the route
 const subject = route.query.subject;
 const subAccusative = route.query.subacc;
 const amount = route.query.amount;
 
-if (!subject || !subAccusative || !amount) {
-  router.push({ name: "Home" });
+/**
+ * This function checks if the necessary query parameters are present.
+ * If not, it redirects the user to the home page.
+ */
+function checkQueryParameters() {
+  if (!subject || !subAccusative || !amount) {
+    router.push({ name: "Home" });
+  }
 }
 
+// Call the function to check the query parameters
+checkQueryParameters();
+
+// Get the user store
 const userStore = useUserStore();
 
+// Get the current date and format it
 const now = new Date();
 const year = now.getFullYear();
 const month = String(now.getMonth() + 1).padStart(2, "0");
 const day = String(now.getDate()).padStart(2, "0");
 const formattedDate = `${year}${month}${day}`;
 
+// Construct the payment link
 const link = `https://payme.sk/?V=1&IBAN=SK4011000000002665455121&AM=${amount}&CC=EUR&DT=${formattedDate}&PI=/VS/SS/KS&MSG=${encodeURI((userStore.uid || "guest") + " " + (subject || ""))}&CN=Slovensk%C3%A1%20debatn%C3%A1%20asoci%C3%A1cia`;
 
+// Define refs for the QR code and loading state
 const qr = ref(null);
 const isLoading = ref(true);
 
-onMounted(async () => {
+/**
+ * This asynchronous function fetches a QR code for the payment link.
+ * It sets the loading state to true, fetches the QR code, and sets the QR code and loading state.
+ *
+ * @async
+ */
+const fetchQrCode = async () => {
   const response = await fetch(
     `https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(link)}`,
   );
   const blob = await response.blob();
   qr.value = URL.createObjectURL(blob);
   isLoading.value = false;
-});
+};
+
+// Call the function to fetch the QR code when the component is mounted
+onMounted(fetchQrCode);
 </script>
 
 <template>

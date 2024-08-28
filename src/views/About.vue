@@ -1,4 +1,11 @@
 <script setup>
+// Import necessary Vue functions and custom hooks
+import { version } from "../../package.json";
+
+/**
+ * Array of names dedicated to the system.
+ * @type {string[]}
+ */
 const dedicatedTo = [
   "Barbore Svitkovej",
   "Natálii Michalcovej",
@@ -12,16 +19,28 @@ const dedicatedTo = [
   "Branislavovi Faktorovi",
 ];
 
+/**
+ * The name of the system. It can be "Cascade", "DebRIEF", or "Barca" depending on the hostname.
+ * @type {string}
+ */
 let system = "Cascade";
 
-// If the domain is debrief.sda.sk, change the system name to DebRIEF
-if (window.location.hostname === "debrief.sda.sk") {
-  system = "DebRIEF";
-} else if (window.location.hostname === "barca.juhaas.eu") {
-  system = "Barca";
+/**
+ * Function to set the system name based on the hostname.
+ * If the hostname is "debrief.sda.sk", the system name is set to "DebRIEF".
+ * If the hostname is "barca.juhaas.eu", the system name is set to "Barca".
+ * Otherwise, the system name remains "Cascade".
+ */
+function setSystemName() {
+  if (window.location.hostname === "debrief.sda.sk") {
+    system = "DebRIEF";
+  } else if (window.location.hostname === "barca.juhaas.eu") {
+    system = "Barca";
+  }
 }
 
-const version = "2024.0.1";
+// Call the function to set the system name
+setSystemName();
 </script>
 
 <template>
@@ -73,9 +92,11 @@ const version = "2024.0.1";
         <img src="./../assets/icons/dn.svg" alt="DN" class="w-5 h-5" />
         <p class="font-bold">Člen softwareovej rodiny DN</p>
       </div>
-      <button class="form-primary vertical-center mb-1">
+      <a
+        href="https://firebasestorage.googleapis.com/v0/b/dn-cascade.appspot.com/o/DN%20Family%2FCertificate%20of%20DN%20membership%20-%20Copyright.pdf?alt=media&token=68568477-390d-48e2-ae5d-5f3dce147bbe"
+        class="form-primary vertical-center mb-1">
         <span>Stiahnuť certifikát</span>
-      </button>
+      </a>
     </div>
   </div>
 </template>
