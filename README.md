@@ -7,6 +7,14 @@
 
 **DN Cascade | Barca | DebRIEF** is a comprehensive solution designed to cater to the needs of the SDA for data centralization. It is built with a focus on efficiency, scalability, and user experience. The project includes a wide range of features such as user authentication and data management, all tailored to provide a seamless experience for the users. The platform is robust, versatile, and built using the latest technologies to ensure its scalability and efficiency.
 
+## Access Points
+
+The DN Cascade | Barca | DebRIEF system can be accessed through the following URLs:
+
+- [Cascade - Firebase Default](https://dn-cascade.web.app)
+- [DebRIEF - Official Access Point](https://debrief.sda.sk)
+- [Barca - Preferred by Developer](https://barca.juhaas.eu)
+
 ## Setup Instructions
 
 1. Clone the repository to your local machine or download the source code form one of the releases.
