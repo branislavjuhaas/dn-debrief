@@ -253,6 +253,8 @@ exports.updateUserSeasons = onCall(async (data, context) => {
       return season;
     });
 
+    // TODO: REASSURE THAT THE REGISTRATIONS FOR NEXT SEASONS WON'T CAUSE MISHMASH, WHEN THERE IS ALREADY REGISTRATION
+
     const missingYears = yearsToUpdate.filter(
       (year) => !updatedSeasons.some((season) => Number(season.year) === year),
     );

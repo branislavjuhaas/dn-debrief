@@ -22,13 +22,13 @@ export const translateRole = (role) => {
     case "developer":
       return "Vývojár";
     case "admin":
-      return "Administrátor";
+      return "Administrátor/-ka";
     case "cap":
-      return "Hlavný rozhodca";
+      return "Hlavný/-á rozhodca/-kyňa";
     case "coach":
-      return "Vedúci klubu";
+      return "Vedúci/-a klubu";
     case "user":
-      return "Používateľ";
+      return "Používateľ/-ka";
     default:
       return role;
   }
@@ -38,13 +38,13 @@ export const reverseTranslateRole = (translatedRole) => {
   switch (translatedRole) {
     case "Vývojár":
       return "developer";
-    case "Administrátor":
+    case "Administrátor/-ka":
       return "admin";
-    case "Hlavný rozhodca":
+    case "Hlavný/-á rozhodca/-kyňa":
       return "cap";
-    case "Vedúci klubu":
+    case "Vedúci/-a klubu":
       return "coach";
-    case "Používateľ":
+    case "Používateľ/-ka":
       return "user";
     default:
       return translatedRole;

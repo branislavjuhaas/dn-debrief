@@ -104,10 +104,10 @@ watch(userRole, async (newRole, oldRole) => {
           v-model="userRole"
           :disabled="userRole === 'Vývojár' && useUserStore().role === 'admin'"
           :options="[
-            'Administrátor',
-            'Hlavný rozhodca',
-            'Vedúci klubu',
-            'Používateľ',
+            'Administrátor/-ka',
+            'Hlavný/-á rozhodca/-kyňa',
+            'Vedúci/-a klubu',
+            'Používateľ/-ka',
           ]" />
       </div>
     </div>
