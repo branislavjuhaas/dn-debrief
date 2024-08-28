@@ -29,7 +29,7 @@ This project is a work in progress and is subject to changes. Feedback and contr
 
 ## Licensing Declaration
 
-The author originally intended to transfer the ownership of this software to the SDA. However, due to concerns regarding the direction and value shift of the organization, the author decided to maintain all rights to the software to prevent potential misuse of his work. The author has no intention of using his ownership to gain profit. Once the SDA is back on the right track, a transfer of ownership is planned. This decision was made to ensure that the software continues to serve its intended purpose and to protect the integrity of the project.
+The original intent of the author was to convey ownership of the software to the SDA. Nevertheless, given the perceived deviation from the organization's original mission and the potential for the software to be utilized in a manner contrary to its intended purpose, the author has elected to retain all rights to the software. It is expressly clarified that this decision is not motivated by a desire for financial gain. Should the SDA return to its established trajectory, a transfer of ownership will be considered. This course of action is undertaken to safeguard the software's alignment with its intended function and to preserve the integrity of the project.
 
 ---
 
