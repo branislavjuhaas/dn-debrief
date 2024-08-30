@@ -133,7 +133,7 @@ const routes = [
     path: "/about",
     name: "About",
     component: () => import("./views/About.vue"),
-    meta: { title: "O systéme DebRIEF" },
+    meta: { title: "O systéme" },
   },
   {
     path: "/:pathMatch(.*)*", // 404

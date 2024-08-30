@@ -9,6 +9,15 @@ import Header from "./components/Header.vue";
 import Footer from "./components/Footer.vue";
 import router from "./router.js";
 
+const host = window.location.hostname;
+let title = "DN Cascade";
+
+if (host === "debrief.sda.sk") {
+  title = "DebRIEF";
+} else if (host === "barca.juhaas.eu") {
+  title = "Barca";
+}
+
 // Initializing user and loading stores
 const userStore = useUserStore();
 const loadingStore = useLoadingStore();
@@ -19,7 +28,7 @@ const auth = getAuth();
 // After each route change, update the document title
 router.afterEach((to, from) => {
   nextTick(() => {
-    document.title = "DebRIEF - " + to.meta.title;
+    document.title = title + " - " + to.meta.title;
   });
 });
 

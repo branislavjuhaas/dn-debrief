@@ -15,16 +15,16 @@ const user = useUserStore();
 const greeting = ref("Ahoj");
 
 /**
- * The name of the system. It can be "Cascade", "DebRIEF", or "Barca" depending on the hostname.
+ * The name of the system. It can be "DN Cascade", "DebRIEF", or "Barca" depending on the hostname.
  * @type {string}
  */
-let system = "Cascade";
+let system = "DN Cascade";
 
 /**
  * Function to set the system name based on the hostname.
  * If the hostname is "debrief.sda.sk", the system name is set to "DebRIEF".
  * If the hostname is "barca.juhaas.eu", the system name is set to "Barca".
- * Otherwise, the system name remains "Cascade".
+ * Otherwise, the system name remains "DN Cascade".
  */
 const setSystemName = () => {
   if (window.location.hostname === "debrief.sda.sk") {
