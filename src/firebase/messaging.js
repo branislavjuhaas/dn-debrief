@@ -1,55 +1,57 @@
-// Define the messages
+// Definujte správy
 const messages = {
   welcome: {
     id: "welcome",
-    title: "Introducing the DebRIEF system",
+    title: "Predstavujeme systém DebRIEF",
     message:
-      "Welcome to the DebRIEF system developed by our developers for convenient data management in SDA.",
-    link: null,
-    local: true,
+      "Vitaj v novom systéme DebRIEF, všetky chyby a návrhy funkcií ohlás, prosím, na juhas@sda.sk.",
+    link: "mailto:juhas@sda.sk?subject=[DebRIEF] Chyba alebo návrh funkcie",
+    local: false,
   },
   auth: {
     id: "auth",
-    title: "Log into the system",
-    message: "Please log in to the system to access all features.",
+    title: "Prihláste sa do systému",
+    message:
+      "Pre prístup ku všetkým funkciám sa, prosím, prihláste do systému.",
     link: "/auth",
     local: true,
   },
   join: {
     id: "join",
-    title: "Don't forget to register",
-    message: "If you want to participate in our events, register with SDA.",
+    title: "Nezabudnite sa zaregistrovať",
+    message:
+      "Ak sa chceš zúčastniť našich podujatí, staň sa členom alebo členkou SDA.",
     link: "/join",
     local: true,
   },
   pending: {
     id: "pending",
-    title: "Waiting for confirmation",
+    title: "Čaká sa na potvrdenie",
     message:
-      "Registration has not been confirmed. A confirmation link has been sent to your email.",
+      "Registrácia nebola potvrdená. Na tvoj e-mail bol odoslaný odkaz na potvrdenie.",
     link: null,
     local: false,
   },
   createClubs: {
     id: "createClubs",
-    title: "Register all clubs",
+    title: "Pridaj všetky kluby",
     message:
-      "Don't forget to register all clubs so their members can register.",
+      "Nezabudni pridať všetky kluby, aby sa mohli zaregistrovať ich členovia.",
     link: "/manage/clubs",
     local: true,
   },
   manageClub: {
     id: "manageClub",
-    title: "Manage your club",
-    message: "Check out new members of your club and watch your club grow.",
+    title: "Spravuj svoj klub",
+    message: "Pozri sa na nových členov tvojho klubu a sleduj, ako rastie.",
     link: "/manage/clubs/{{Id}}",
     local: true,
   },
   learnMore: {
     id: "learnMore",
-    title: "Want to know more about SDA?",
+    title: "Chceš vedieť viac o SDA?",
     message:
-      "Click for more information about the Slovak Debate Association and its mission.",
+      "Klikni pre viac informácií o Slovenskej debatej asociácii a jej poslaní.",
     link: "https://sda.sk",
     local: false,
   },
