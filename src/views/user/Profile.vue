@@ -51,7 +51,52 @@ const logout = async () => {
       </div>
       <div
         class="grid grid-flow-col gap-4 items-center sm:grid-rows-1 sm:grid-cols-[1fr_auto_auto]">
-        <div class="col-start-1"></div>
+        <div class="col-start-1 w-full">
+          <div
+            v-if="
+              userStore.awards.legend &&
+              userStore.awards.legend.length +
+                userStore.awards.ordinary.length >
+                0
+            "
+            class="col-start-1 w-full justify-between sm:w-min h-12 border-black border-2 rounded-[1.25rem] flex flex-row items-center bg-blue overflow-hidden">
+            <div
+              v-if="userStore.awards.legend.length > 0"
+              id="legends"
+              class="flex flex-row h-full items-center border-r-2 border-black">
+              <div
+                v-for="(award, index) in userStore.awards.legend"
+                :key="index"
+                :title="award.legendary.title"
+                class="flex flex-row relative items-center justify-center w-20">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-8 w-8 text-white"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  v-html="award.symbol"></svg>
+                <div
+                  v-if="index < userStore.awards.legend.length - 1"
+                  class="absolute right-0 w-[2px] h-8 bg-black rounded-full"></div>
+              </div>
+            </div>
+            <div
+              v-for="(award, index) in userStore.awards.ordinary"
+              :key="index"
+              :title="award.regular.title"
+              class="flex flex-row relative items-center justify-center w-20">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-8 w-8 text-white"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                v-html="award.symbol"></svg>
+              <div
+                v-if="index < userStore.awards.ordinary.length - 1"
+                class="absolute hidden sm:flex right-0 w-[2px] h-8 bg-black rounded-full"></div>
+            </div>
+          </div>
+        </div>
         <button
           v-if="userStore.provider === 'password'"
           @click="router.push('/profile/edit')"
@@ -77,5 +122,9 @@ const logout = async () => {
 <style scoped>
 .alternative {
   @apply flex flex-row items-center h-12 bg-white text-black rounded-[1.25rem] border-2 border-red border-opacity-0 font-bold px-5 duration-150 cursor-pointer hover:border-opacity-100;
+}
+
+#legends {
+  background: linear-gradient(180deg, #ffd900 0%, #c3a601 100%);
 }
 </style>

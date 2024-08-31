@@ -118,39 +118,60 @@ export const logout = async () => {
  * an error is logged to the console and the club property is not added to the user object.
  */
 export const getUser = async (uid) => {
-  // Query the 'users' collection in the Firestore database for a document with the provided uid.
   const q = query(collection(db, "users"), where(documentId(), "==", uid));
-
-  // Execute the query and get the results.
   const querySnapshot = await getDocs(q);
 
-  // If the query did not return any results, return null.
   if (querySnapshot.empty) return null;
 
-  // Get the data of the first (and only) document in the results.
   const user = querySnapshot.docs[0].data();
-
-  // Log the user data to the console.
   console.log("User data: ", user);
 
-  // If the user is not part of a club, return the user data.
-  if (!user.club) return user;
-
-  // Get the document of the club the user is part of.
-  const clubSnapshot = await getDoc(user.club);
-
-  // If the club document does not exist, log an error to the console and return the user data.
-  if (!clubSnapshot.exists()) {
-    console.error("Club document does not exist");
-    user.club = null;
-    return user;
+  if (user.club) {
+    const clubSnapshot = await getDoc(user.club);
+    if (clubSnapshot.exists()) {
+      user.club = {
+        id: clubSnapshot.id,
+        ...clubSnapshot.data(),
+      };
+    } else {
+      console.error("Club document does not exist");
+      user.club = null;
+    }
   }
 
-  // Add the name of the club to the user data and return it.
-  user.club = {
-    id: clubSnapshot.id,
-    ...clubSnapshot.data(),
-  };
+  if (user.awards && Array.isArray(user.awards)) {
+    const awardsPromises = user.awards.map(async (awardRef) => {
+      const awardSnapshot = await getDoc(awardRef.award);
+      if (awardSnapshot.exists()) {
+        return {
+          id: awardSnapshot.id,
+          legend: awardRef.legend,
+          ...awardSnapshot.data(),
+        };
+      } else {
+        console.error("Award document does not exist");
+        return null;
+      }
+    });
+
+    const awards = await Promise.all(awardsPromises);
+
+    const legendTrueAwards = awards.filter((award) => award && award.legend);
+    const legendFalseAwards = awards.filter((award) => award && !award.legend);
+
+    const categoryOrder = ["system", "organization", "program"];
+    const sortByCategory = (a, b) =>
+      categoryOrder.indexOf(a.category) - categoryOrder.indexOf(b.category);
+
+    legendTrueAwards.sort(sortByCategory);
+    legendFalseAwards.sort(sortByCategory);
+
+    user.awards = {
+      legend: legendTrueAwards,
+      ordinary: legendFalseAwards,
+    };
+  }
+
   return user;
 };
 
