@@ -9,6 +9,7 @@ import { translateRole } from "../../translate.js";
 import Field from "../../components/Field.vue";
 import { httpsCallable } from "firebase/functions";
 import { functions } from "../../main.js";
+import router from "../../router.js";
 
 // Define properties
 const props = defineProps(["filter"]);
@@ -106,6 +107,12 @@ onMounted(async () => {
   // If filtered, get the club with params filter. filter param is a clubs id
   if (props.filter) {
     currentClub.value = clubs.find((club) => club.id === route.params.filter);
+    // If no club is found, redirect to homepage
+    if (!currentClub.value) {
+      useLoadingStore().loadingEnd();
+      router.push("/");
+      return;
+    }
   }
 
   clubsNames.value = clubs.map((club) => club.name);
@@ -144,7 +151,7 @@ const filteredUsers = computed(() => {
       {{
         !props.filter
           ? "Zoznam používateľov"
-          : "Debatný klub " + currentClub.name
+          : "Debatný klub " + (currentClub ? currentClub.name : "")
       }}
     </h1>
     <div
