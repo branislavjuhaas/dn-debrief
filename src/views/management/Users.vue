@@ -1,6 +1,6 @@
 <script setup>
 // Import necessary components and functions
-import { useLoadingStore } from "../../stores.js";
+import { useLoadingStore, useUserStore } from "../../stores.js";
 import Dropdown from "../../components/Dropdown.vue";
 import { computed, onMounted, ref } from "vue";
 import { getClubs, getUsers } from "../../firebase/structure.js";
@@ -13,6 +13,9 @@ import router from "../../router.js";
 
 // Define properties
 const props = defineProps(["filter"]);
+
+// Define user store
+const userStore = useUserStore();
 
 // Start loading
 useLoadingStore().loadingStart();
@@ -188,7 +191,10 @@ const filteredUsers = computed(() => {
           <p v-if="!props.filter">Debatný klub</p>
         </div>
         <div
-          v-if="props.filter"
+          v-if="
+            useUserStore().role !== 'admin' &&
+            useUserStore().role !== 'developer'
+          "
           v-for="user in filteredUsers"
           :key="user.id"
           class="grid items-center gap-4 rounded-[1.25rem]"
