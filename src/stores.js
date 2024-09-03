@@ -171,3 +171,28 @@ export const useLoadingStore = defineStore("loading", {
     },
   },
 });
+
+export const useFeedStore = defineStore("feed", {
+  state: () => ({
+    initialized: false,
+    messages: [],
+  }),
+  getters: {
+    /**
+     * Get the feed messages.
+     * @returns {Array} The feed messages.
+     */
+    feedMessages() {
+      return this.messages;
+    },
+  },
+  actions: {
+    /**
+     * Initialize the feed messages.
+     */
+    initialize(messages) {
+      this.messages = messages;
+      this.initialized = true;
+    },
+  },
+});
