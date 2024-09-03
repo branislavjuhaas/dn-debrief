@@ -62,7 +62,7 @@ const userFeed = ref([]);
 onMounted(async () => {
   const { feed } = await import("../firebase/messaging.js");
 
-  userFeed.value = feed(user);
+  userFeed.value = await feed(user);
   console.log(userFeed.value);
 });
 
@@ -73,7 +73,7 @@ watchEffect(async () => {
   if (user.uid != null) {
     const { feed } = await import("../firebase/messaging.js");
 
-    userFeed.value = feed(user);
+    userFeed.value = await feed(user);
     console.log(userFeed.value);
   }
 });
