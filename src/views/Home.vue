@@ -2,7 +2,6 @@
 // Import necessary Vue functions and custom hooks
 import { onMounted, ref, watch, watchEffect } from "vue";
 import { useUserStore } from "../stores.js";
-import { feed } from "../firebase/messaging.js";
 
 // Get the user store
 const user = useUserStore();
@@ -61,7 +60,9 @@ const userFeed = ref([]);
  * On component mount, fetch the user feed and log it.
  */
 onMounted(async () => {
-  userFeed.value = await feed(user);
+  const { feed } = await import("../firebase/messaging.js");
+
+  userFeed.value = feed(user);
   console.log(userFeed.value);
 });
 
@@ -70,7 +71,9 @@ onMounted(async () => {
  */
 watchEffect(async () => {
   if (user.uid != null) {
-    userFeed.value = await feed(user);
+    const { feed } = await import("../firebase/messaging.js");
+
+    userFeed.value = feed(user);
     console.log(userFeed.value);
   }
 });

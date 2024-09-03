@@ -1,3 +1,16 @@
+import {
+  collection,
+  doc,
+  getDocs,
+  getFirestore,
+  query,
+  where,
+  and,
+  or,
+} from "firebase/firestore";
+
+import { useFeedStore, useUserStore } from "../stores.js";
+
 // Definujte správy
 const messages = {
   welcome: {
@@ -58,6 +71,65 @@ const messages = {
 };
 
 /**
+ * Fetches cloud messages from Firestore based on user filters and updates the feed store.
+ *
+ * @returns {Promise<Array>} - A promise that resolves to an array of messages.
+ */
+const getCloudMessages = async () => {
+  // Check if the feed store is already initialized and return the existing messages if true
+  if (useFeedStore().initialized) {
+    console.log("Feed store already initialized");
+    return useFeedStore().feedMessages;
+  }
+
+  console.log("Fetching cloud messages");
+
+  // Initialize the user store
+  const userStore = useUserStore();
+
+  // Get Firestore database instance
+  const db = getFirestore();
+  let messages = [];
+
+  // Reference to the messages collection in Firestore
+  const messageCollection = collection(db, "messages");
+
+  // Convert userStore.club.id to a Firestore document reference
+  const clubRef = doc(db, "clubs", userStore.club.id);
+
+  // Create a Firestore query with multiple filters
+  const q = query(
+    messageCollection,
+    and(
+      where("filters.member", "==", userStore.isMember),
+      or(
+        where("filters.role", "array-contains", userStore.role),
+        where("filters.role", "==", null),
+      ),
+      where("filters.club", "in", ["", clubRef]),
+    ),
+  );
+
+  // Execute the query and get the documents
+  const querySnapshot = await getDocs(q);
+
+  // Iterate through the query results and construct message objects
+  querySnapshot.forEach((doc) => {
+    const data = doc.data();
+    const message = {
+      id: doc.id,
+      ...data,
+    };
+    delete message.filters; // Remove the filters property from the message object
+    messages.push(message); // Add the message to the messages array
+  });
+
+  // Update the feed store with the fetched messages
+  useFeedStore().initialize(messages);
+  return messages; // Return the fetched messages
+};
+
+/**
  * Generate a list of messages for the user.
  * @param {Object} user - The user object.
  * @returns {Array} - The list of messages.
@@ -90,6 +162,9 @@ export const feed = async (user) => {
     clubMessage.link = clubMessage.link.replace("{{Id}}", user.club.id);
     feedMessages.push(clubMessage);
   }
+
+  const cloudMessages = await getCloudMessages();
+  feedMessages = feedMessages.concat(cloudMessages);
 
   if (feedMessages.length <= 2) {
     feedMessages.push(messages.learnMore);
