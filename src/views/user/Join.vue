@@ -29,7 +29,7 @@ const mail = ref("");
 // Fetch clubs data on component mount
 let clubsData = ref([]);
 onMounted(async () => {
-  clubsData.value = await getClubs(false);
+  clubsData.value = await getClubs(true);
 });
 
 // Compute club names from clubs data
