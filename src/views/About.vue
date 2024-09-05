@@ -78,8 +78,8 @@ setSystemName();
       <br />
       <p class="text-justify">
         Existencia systému je možná len vďaka veľkému množstvu obetovaného
-        voľného času a množstva hodín na pokraji technologického vyhorenia. Toto
-        dielo je venované
+        posledného autorovho voľného času na pokraji technologického vyhorenia.
+        Toto dielo je venované
         {{ dedicatedTo.join(", ") }} a všetkým, ktorí prispeli k existencii SDA,
         o akej som vždy sníval: organizácia profesionálna, pokojná, bez
         zbytočných drám, naozaj inkluzívna pre všetkých, nesúdiaca a
