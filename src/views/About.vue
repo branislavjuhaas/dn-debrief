@@ -66,21 +66,22 @@ setSystemName();
 
     <div class="p-5">
       <p class="text-justify">
-        Systém {{ system }} (Codename: DN Cascade) vznikol ako stret cieľov
-        dvoch strán. Vedenie SDA sa snažilo o centralizáciu používateľských dát
-        v na to určenom systéme, ktorý by umožňoval jednoduchý prístup a správu
-        pre používateľov rovnako ako pre vedenie SDA. Autorov zámer bol splatiť
-        pomyselný dlh voči organizáciu, ktorá mu otvorila oči nielen v oblasti
-        kritického, ale čiastočne aj logického myslenia. Po niekoľkých mesiacoch
-        rokovaní bolo dielo predstavené na valnom zhromaždení SDA na začiatku
-        sezóny 2024/2025.
+        Systém {{ system }} (Codename: DN Cascade) je komplexný nástroj
+        navrhnutý primárne pre potreby SDA na centralizáciu dát. Je vyvinutý s
+        dôrazom na efektívnosť, škálovateľnosť a používateľský zážitok. Projekt
+        zahŕňa širokú škálu funkcií ako napríklad overovanie používateľov a
+        správu dát, všetko prispôsobené pre poskytnutie bezproblémového
+        ovládania pre používateľov. Platforma je robustná, a postavená pomocou
+        najnovších technológií pre zabezpečenie jej škálovateľnosti a
+        efektívnosti.
       </p>
       <br />
       <p class="text-justify">
-        Existencia systému {{ system }} je možná len vďaka veľkému množstvu
-        dobrovoľníckej práce v SDA. Toto dielo je venované
+        Existencia systému je možná len vďaka veľkému množstvu obetovaného
+        voľného času a množstva hodín na pokraji technologického vyhorenia. Toto
+        dielo je venované
         {{ dedicatedTo.join(", ") }} a všetkým, ktorí prispeli k existencii SDA,
-        akú som si vždy predstavoval: organizácia profesionálna, pokojná, bez
+        o akej som vždy sníval: organizácia profesionálna, pokojná, bez
         zbytočných drám, naozaj inkluzívna pre všetkých, nesúdiaca a
         neodsudzujúca.
       </p>
