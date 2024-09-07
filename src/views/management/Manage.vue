@@ -6,6 +6,8 @@ import { translateRole } from "../../translate.js";
 // Get the user store
 const userStore = useUserStore();
 
+const club = userStore.club || { name: "neznámy", id: "unknown" };
+
 // Define a list of links with their respective roles
 const links = [
   {
@@ -19,8 +21,8 @@ const links = [
     roles: ["developer", "admin"],
   },
   {
-    name: `Správa debatného klubu ${userStore.club.name}`,
-    link: `/manage/clubs/${userStore.club.id}`,
+    name: `Správa debatného klubu ${club.name}`,
+    link: `/manage/clubs/${club.id}`,
     roles: ["coach"],
   },
   {
