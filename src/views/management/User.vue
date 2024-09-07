@@ -37,13 +37,15 @@ function formatUserData(uid, user) {
     { name: "club", value: user.club ? user.club.name : null },
     {
       name: "member",
-      value: user.seasons.some(
-        (season) =>
-          season.year === new Date().getFullYear().toString() &&
-          season.confirmed === true,
-      )
-        ? "Áno"
-        : "Nie",
+      value:
+        user.seasons &&
+        user.seasons.some(
+          (season) =>
+            season.year === new Date().getFullYear().toString() &&
+            season.confirmed === true,
+        )
+          ? "Áno"
+          : "Nie",
     },
     { name: "phone", value: user.phone },
     { name: "email", value: user.email },
