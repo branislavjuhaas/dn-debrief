@@ -4,9 +4,6 @@ import { useUserStore } from "../stores.js";
 import { algoliasearch } from "algoliasearch";
 import { computed, ref } from "vue";
 
-// Initialize Algolia client
-const client = algoliasearch("U5G7D0PYJI", "fb0fca02a68ac3af713e1695b6b7888e");
-
 // Define reactive variables
 const searchResults = ref([]);
 const active = ref(false);
