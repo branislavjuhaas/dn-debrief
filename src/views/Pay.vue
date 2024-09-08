@@ -2,7 +2,7 @@
 // Import necessary Vue functions and router
 import { useRoute } from "vue-router";
 import { useUserStore } from "../stores.js";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watchEffect } from "vue";
 import router from "../router.js";
 
 // Get the route details
@@ -36,12 +36,10 @@ const month = String(now.getMonth() + 1).padStart(2, "0");
 const day = String(now.getDate()).padStart(2, "0");
 const formattedDate = `${year}${month}${day}`;
 
-// Construct the payment link
-const link = `https://payme.sk/?V=1&IBAN=SK4011000000002665455121&AM=${amount}&CC=EUR&DT=${formattedDate}&PI=/VS/SS/KS&MSG=${encodeURI((userStore.uid || "guest") + " " + (subject || ""))}&CN=Slovensk%C3%A1%20debatn%C3%A1%20asoci%C3%A1cia`;
-
-// Define refs for the QR code and loading state
+// Define refs for the QR code, loading state, and payment link
 const qr = ref(null);
 const isLoading = ref(true);
+const link = ref("");
 
 /**
  * This asynchronous function fetches a QR code for the payment link.
@@ -51,15 +49,20 @@ const isLoading = ref(true);
  */
 const fetchQrCode = async () => {
   const response = await fetch(
-    `https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(link)}`,
+    `https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(link.value)}`,
   );
   const blob = await response.blob();
   qr.value = URL.createObjectURL(blob);
   isLoading.value = false;
 };
 
-// Call the function to fetch the QR code when the component is mounted
-onMounted(fetchQrCode);
+// Watch for changes in the user store and generate the payment link when the user is loaded
+watchEffect(() => {
+  if (userStore.fullName) {
+    link.value = `https://payme.sk/?V=1&IBAN=SK4011000000002665455121&AM=${amount}&CC=EUR&DT=${formattedDate}&PI=/VS/SS/KS&MSG=${encodeURI((userStore.fullName || "guest") + " " + (subject || ""))}&CN=Slovensk%C3%A1%20debatn%C3%A1%20asoci%C3%A1cia`;
+    fetchQrCode();
+  }
+});
 </script>
 
 <template>
@@ -87,7 +90,7 @@ onMounted(fetchQrCode);
           </div>
           <div class="information vertical-center">
             <p class="font-bold">Poznámka</p>
-            <p>{{ (userStore.uid || "guest") + " " + subject }}</p>
+            <p>{{ (userStore.fullName || "guest") + " " + subject }}</p>
           </div>
         </div>
         <a :href="link" class="form-primary vertical-center">

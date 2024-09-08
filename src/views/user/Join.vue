@@ -209,7 +209,7 @@ const register = async () => {
   await router.push({
     name: "Pay",
     query: {
-      subject: "registracia",
+      subject: "Registracia",
       subacc: "registráciu do SDA",
       amount: wasRegistered ? "5" : "8",
     },
