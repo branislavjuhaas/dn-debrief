@@ -10,6 +10,7 @@ import Field from "../../components/Field.vue";
 import { httpsCallable } from "firebase/functions";
 import { functions } from "../../main.js";
 import router from "../../router.js";
+import Toggle from "../../components/Toggle.vue";
 
 // Define properties
 const props = defineProps(["filter"]);
@@ -29,6 +30,7 @@ const clubsNames = ref([]);
 let clubs = [];
 const users = ref([]);
 const exported = ref(false);
+const showMembersOnly = ref(false);
 
 // Function to get club name by id
 const getClubNameById = (id) => clubs.find((club) => club.id === id).name;
@@ -116,6 +118,7 @@ onMounted(async () => {
       router.push("/");
       return;
     }
+    showMembersOnly.value = true; // Show only members if filtered by club
   }
 
   clubsNames.value = clubs.map((club) => club.name);
@@ -128,6 +131,7 @@ onMounted(async () => {
 
 // Computed property for filtered users
 const filteredUsers = computed(() => {
+  const currentYear = new Date().getFullYear().toString();
   return users.value.filter((user) => {
     const isClubMatch = clubFilter.value
       ? user.club && getClubNameById(user.club.id) === clubFilter.value
@@ -143,7 +147,13 @@ const filteredUsers = computed(() => {
           : false)
       : true;
 
-    return isClubMatch && isQuickMatch;
+    const isMemberMatch = showMembersOnly.value
+      ? user.seasons?.some(
+          (season) => season.year === currentYear && season.confirmed,
+        )
+      : true;
+
+    return isClubMatch && isQuickMatch && isMemberMatch;
   });
 });
 </script>
@@ -162,12 +172,13 @@ const filteredUsers = computed(() => {
       <div v-if="props.filter" class="grid grid-cols-1">
         <field label="Filter" v-model="quickFilter" />
       </div>
-      <div v-else class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div v-else class="grid grid-cols-1 gap-4 sm:grid-cols-4">
         <dropdown
           label="Debatný klub"
           :options="clubsNames"
           v-model="clubFilter" />
         <field label="Filter" v-model="quickFilter" />
+        <toggle v-model="showMembersOnly" label="Členovia/-ky SDA" />
         <button
           @click="exportAll"
           :disabled="exported"
