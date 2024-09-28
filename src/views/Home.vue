@@ -108,7 +108,7 @@ watchEffect(async () => {
         v-for="(message, index) in userFeed"
         :key="message.id"
         :style="{ '--delay': index / 10 + 's' }"
-        class="chip-container mb-2">
+        class="chip-container mb-2 rounded-[1.25rem] duration-500 hover:drop-shadow-2xl">
         <div v-if="!message.link" class="chip">
           <h6>{{ message.title }}</h6>
           <p>{{ message.message }}</p>

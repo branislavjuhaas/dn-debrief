@@ -12,6 +12,7 @@ const route = useRoute();
 const subject = route.query.subject;
 const subAccusative = route.query.subacc;
 const amount = route.query.amount;
+const info = route.query.info;
 
 /**
  * This function checks if the necessary query parameters are present.
@@ -80,6 +81,9 @@ watchEffect(() => {
       </transition>
       <div class="flex flex-col gap-4 justify-between">
         <div class="flex flex-col gap-4">
+          <div v-if="info" class="information vertical-center">
+            <p class="font-bold">{{ info }}</p>
+          </div>
           <div class="information vertical-center">
             <p class="font-bold">Príjemca</p>
             <p>SK40 1100 0000 0026 6545 5121</p>

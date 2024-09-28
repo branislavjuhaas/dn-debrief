@@ -30,8 +30,8 @@ const mail = ref("");
 let clubsData = ref([]);
 onMounted(async () => {
   clubsData.value = await getClubs(true);
+  clubsData.value.sort((a, b) => a.name.localeCompare(b.name));
 });
-
 // Compute club names from clubs data
 const clubNames = computed(() => clubsData.value.map((club) => club.name));
 
@@ -209,6 +209,7 @@ const register = async () => {
   await router.push({
     name: "Pay",
     query: {
+      info: "AK SI BOL/-A REGISTROVANÝ/-A V MINULEJ SEZÓNE, ZMEŇ SUMU V PLATBE NA 5€!!!",
       subject: "Registracia",
       subacc: "registráciu do SDA",
       amount: wasRegistered ? "5" : "8",
