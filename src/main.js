@@ -30,9 +30,6 @@ const firebaseConfig = {
  */
 const app = initializeApp(firebaseConfig);
 
-// Get Firebase Analytics instance
-getAnalytics(app);
-
 // Create a new Pinia store
 const pinia = createPinia();
 
@@ -51,3 +48,6 @@ createApp(App)
  * @type {Object}
  */
 export const functions = getFunctions(app);
+
+// Get Firebase Analytics instance
+export const analytics = getAnalytics(app);
