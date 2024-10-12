@@ -206,15 +206,17 @@ const register = async () => {
 
   await sendVerificationEmail();
 
-  await router.push({
-    name: "Pay",
-    query: {
-      info: "AK SI BOL/-A REGISTROVANÝ/-A V MINULEJ SEZÓNE, ZMEŇ SUMU V PLATBE NA 5€!!!",
-      subject: "Registracia",
-      subacc: "registráciu do SDA",
-      amount: wasRegistered ? "5" : "8",
-    },
-  });
+  // await router.push({
+  //   name: "Pay",
+  //   query: {
+  //     info: "AK SI BOL/-A REGISTROVANÝ/-A V MINULEJ SEZÓNE, ZMEŇ SUMU V PLATBE NA 5€!!!",
+  //     subject: "Registracia",
+  //     subacc: "registráciu do SDA",
+  //     amount: wasRegistered ? "5" : "8",
+  //   },
+  // });
+
+  await router.push({ name: "JoinMessage" });
 };
 </script>
 

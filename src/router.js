@@ -117,6 +117,38 @@ const routes = [
     meta: { title: "Ochrana osobných údajov" },
   },
   {
+    path: "/message",
+    name: "Message",
+    component: () => import("./views/Message.vue"),
+    meta: { title: "Správa" },
+  },
+  {
+    path: "/message/join",
+    name: "JoinMessage",
+    component: () => import("./views/Message.vue"),
+    props: {
+      title: "Potvrdenie registrácie do SDA",
+      message:
+        "Ďakujeme za registráciu do SDA. Prosím, over svoju registráciu použitím odkazu, ktorý sme poslali na tvoj e-mail alebo e-mail tvojho zákonného zástupcu. Ak si tento e-mail neobdržal, skontroluj priečinok s nevyžiadanou poštou. Pre pokračovanie zvoľ pre teba relevantnú možnosť platby!",
+      buttons: [
+        {
+          text: "Som člen ZDP SDA",
+          path: "/pay?subject=Registracia&subacc=registráciu%20do%20SDA&amount=20",
+        },
+        {
+          text: "Som nový člen SDA",
+          path: "/pay?subject=Registracia&subacc=registráciu%20do%20SDA&amount=8",
+        },
+        {
+          text: "Predlžujem svoje členstvo v SDA",
+          path: "/pay?subject=Registracia&subacc=registráciu%20do%20SDA&amount=5",
+        },
+        { text: "Platbu riešim na klube", path: "/" },
+      ],
+    },
+    meta: { title: "Správa" },
+  },
+  {
     path: "/pay",
     name: "Pay",
     component: () => import("./views/Pay.vue"),
@@ -134,6 +166,13 @@ const routes = [
     name: "About",
     component: () => import("./views/About.vue"),
     meta: { title: "O systéme" },
+  },
+  {
+    path: "/juhaas",
+    redirect: (to) => {
+      window.location.href = "https://juhaas.eu";
+      return { name: "Home" };
+    },
   },
   {
     path: "/:pathMatch(.*)*", // 404
