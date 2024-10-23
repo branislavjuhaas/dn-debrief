@@ -2,6 +2,7 @@ import {
   collection,
   doc,
   getDocs,
+  getDoc,
   getFirestore,
   query,
   addDoc,
@@ -230,5 +231,56 @@ export const createClub = async (clubName, isActive) => {
     return docRef.id;
   } catch (error) {
     console.error("Error adding document: ", error);
+  }
+};
+
+/**
+ * Updates the user's seasons in Firestore.
+ * @param {string} userId - The user's ID.
+ * @returns {Object} The result of the update operation.
+ * @throws Will throw an error if the user does not exist or if any of the required seasons are missing.
+ */
+export const updateUserSeasons = async (userId) => {
+  const userRef = doc(db, "users", userId);
+
+  try {
+    const userSnapshot = await getDoc(userRef);
+    const userData = userSnapshot.data();
+
+    if (!userData) {
+      throw new Error("User not found");
+    }
+
+    const seasons = userData.seasons || [];
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const nextYear = currentYear + 1;
+    const isAfterSeptember = currentDate.getMonth() >= 8; // Months are 0-indexed
+
+    const yearsToUpdate = isAfterSeptember
+      ? [currentYear, nextYear]
+      : [currentYear];
+
+    const updatedSeasons = seasons.map((season) => {
+      if (yearsToUpdate.includes(Number(season.year))) {
+        return { ...season, confirmed: true };
+      }
+      return season;
+    });
+
+    const missingYears = yearsToUpdate.filter(
+      (year) => !updatedSeasons.some((season) => Number(season.year) === year),
+    );
+
+    if (missingYears.length > 0) {
+      throw new Error(`Missing seasons for years: ${missingYears.join(", ")}`);
+    }
+
+    await updateDoc(userRef, { seasons: updatedSeasons });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating user seasons:", error);
+    throw error;
   }
 };
