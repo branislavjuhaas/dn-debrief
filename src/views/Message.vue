@@ -30,7 +30,7 @@ if (!props.message) {
     <h1 class="text-5xl font-bold mb-2">{{ title }}</h1>
     <div
       class="flex flex-col justify-between w-full bg-white min-h-60 rounded-[1.25rem] p-5 gap-16">
-      <div class="flex flex-col gap-4 text-black font-bold text-center">
+      <div class="flex flex-col gap-4 text-black font-bold text-custom">
         <p>{{ message }}</p>
       </div>
       <div
@@ -46,4 +46,9 @@ if (!props.message) {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.text-custom {
+  text-align: justify;
+  text-align-last: center;
+}
+</style>
