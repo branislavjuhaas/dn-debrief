@@ -35,7 +35,7 @@ admin.initializeApp();
  * @returns {Object} The response object containing the base64-encoded buffer of the Excel file.
  * @throws {functions.https.HttpsError} If the authenticated user does not have the required role or if an error occurs during the execution of the function.
  */
-exports.exportUsers = onCall(async (request) => {
+exports.exportUsers = onCall({ enforceAppCheck: true }, async (request) => {
   logger.info(request);
   try {
     logger.info(
@@ -159,7 +159,7 @@ exports.exportUsers = onCall(async (request) => {
  * @returns {Object} The response object indicating success.
  * @throws {functions.https.HttpsError} If an error occurs during the execution of the function.
  */
-exports.sendEmail = onCall(async (data, context) => {
+exports.sendEmail = onCall({ enforceAppCheck: true }, async (data, context) => {
   try {
     const mailerSend = new MailerSend({
       apiKey:
@@ -219,61 +219,72 @@ exports.sendEmail = onCall(async (data, context) => {
  * @returns {Object} The response object indicating success.
  * @throws {functions.https.HttpsError} If the user does not exist or if any of the required seasons are missing or if an error occurs during the execution of the function.
  */
-exports.updateUserSeasons = onCall(async (data, context) => {
-  const userId = data.data.userId;
+exports.updateUserSeasons = onCall(
+  { enforceAppCheck: true },
+  async (data, context) => {
+    const userId = data.data.userId;
 
-  const userRef = admin.firestore().collection("users").doc(userId);
+    const userRef = admin.firestore().collection("users").doc(userId);
 
-  try {
-    const userSnapshot = await userRef.get();
-    const userData = userSnapshot.data();
+    try {
+      const userSnapshot = await userRef.get();
+      const userData = userSnapshot.data();
 
-    if (!userData) {
-      throw new Error("User not found");
-    }
-
-    const seasons = userData.seasons || [];
-    const currentDate = new Date();
-    const currentYear = currentDate.getFullYear();
-    const nextYear = currentYear + 1;
-    const isAfterSeptember = currentDate.getMonth() >= 8; // Months are 0-indexed
-
-    logger.info("SEASONS:", seasons);
-
-    const yearsToUpdate = isAfterSeptember
-      ? [currentYear, nextYear]
-      : [currentYear];
-
-    logger.info("Updating seasons for user:", userId, "Years:", yearsToUpdate);
-
-    const updatedSeasons = seasons.map((season) => {
-      if (yearsToUpdate.includes(Number(season.year))) {
-        return { ...season, confirmed: true };
+      if (!userData) {
+        throw new Error("User not found");
       }
-      return season;
-    });
 
-    // TODO: REASSURE THAT THE REGISTRATIONS FOR NEXT SEASONS WON'T CAUSE MISHMASH, WHEN THERE IS ALREADY REGISTRATION
+      const seasons = userData.seasons || [];
+      const currentDate = new Date();
+      const currentYear = currentDate.getFullYear();
+      const nextYear = currentYear + 1;
+      const isAfterSeptember = currentDate.getMonth() >= 8; // Months are 0-indexed
 
-    const missingYears = yearsToUpdate.filter(
-      (year) => !updatedSeasons.some((season) => Number(season.year) === year),
-    );
+      logger.info("SEASONS:", seasons);
 
-    if (missingYears.length > 0) {
-      throw new Error(`Missing seasons for years: ${missingYears.join(", ")}`);
+      const yearsToUpdate = isAfterSeptember
+        ? [currentYear, nextYear]
+        : [currentYear];
+
+      logger.info(
+        "Updating seasons for user:",
+        userId,
+        "Years:",
+        yearsToUpdate,
+      );
+
+      const updatedSeasons = seasons.map((season) => {
+        if (yearsToUpdate.includes(Number(season.year))) {
+          return { ...season, confirmed: true };
+        }
+        return season;
+      });
+
+      // TODO: REASSURE THAT THE REGISTRATIONS FOR NEXT SEASONS WON'T CAUSE MISHMASH, WHEN THERE IS ALREADY REGISTRATION
+
+      const missingYears = yearsToUpdate.filter(
+        (year) =>
+          !updatedSeasons.some((season) => Number(season.year) === year),
+      );
+
+      if (missingYears.length > 0) {
+        throw new Error(
+          `Missing seasons for years: ${missingYears.join(", ")}`,
+        );
+      }
+
+      logger.info("Updated seasons, executing update:", updatedSeasons);
+
+      await userRef.update({ seasons: updatedSeasons });
+
+      return { success: true };
+    } catch (error) {
+      console.error("Error updating user seasons:", error);
+      throw new functions.https.HttpsError(
+        "internal",
+        "Internal server error",
+        error,
+      );
     }
-
-    logger.info("Updated seasons, executing update:", updatedSeasons);
-
-    await userRef.update({ seasons: updatedSeasons });
-
-    return { success: true };
-  } catch (error) {
-    console.error("Error updating user seasons:", error);
-    throw new functions.https.HttpsError(
-      "internal",
-      "Internal server error",
-      error,
-    );
-  }
-});
+  },
+);
