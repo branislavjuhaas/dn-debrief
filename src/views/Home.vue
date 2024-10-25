@@ -11,7 +11,7 @@ const user = useUserStore();
  * It can be called any time in the template.
  * @type {import('vue').Ref<string>}
  */
-const greeting = ref("Ahoj");
+const greeting = ref(user.role === "developer" ? "Dobrý deň" : "Ahoj");
 
 /**
  * The name of the system. It can be "DN Cascade", "DebRIEF", or "Barca" depending on the hostname.
@@ -42,7 +42,7 @@ setSystemName();
 watch(
   () => user.role,
   () => {
-    if (user.role === "admin" || user.role === "developer") {
+    if (user.role === "developer") {
       greeting.value = "Dobrý deň";
     } else {
       greeting.value = "Ahoj";
