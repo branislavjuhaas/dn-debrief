@@ -277,6 +277,23 @@ exports.updateUserSeasons = onCall(
 
       await userRef.update({ seasons: updatedSeasons });
 
+      // Increment the membersCount property in the clubs collection
+      if (userData.club) {
+        const clubRef = userData.club;
+        await admin.firestore().runTransaction(async (transaction) => {
+          const clubSnapshot = await transaction.get(clubRef);
+          if (!clubSnapshot.exists) {
+            throw new Error("Club not found");
+          }
+
+          const clubData = clubSnapshot.data();
+          const currentMembersCount = clubData.membersCount || 0;
+          const newMembersCount = currentMembersCount + 1;
+
+          transaction.update(clubRef, { membersCount: newMembersCount });
+        });
+      }
+
       return { success: true };
     } catch (error) {
       console.error("Error updating user seasons:", error);
