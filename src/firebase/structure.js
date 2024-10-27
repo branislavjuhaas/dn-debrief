@@ -8,6 +8,7 @@ import {
   addDoc,
   updateDoc,
   where,
+  runTransaction,
 } from "firebase/firestore";
 
 const db = getFirestore();
@@ -49,12 +50,28 @@ export const joinAdultUser = async (
   seasons,
 ) => {
   try {
-    await updateDoc(doc(db, `users/${uid}`), {
-      club: doc(db, `clubs/${club.id}`),
-      address: address,
-      phone: phone,
-      birthdate: birthdate,
-      seasons: seasons,
+    await runTransaction(db, async (transaction) => {
+      const clubRef = doc(db, `clubs/${club.id}`);
+      const clubSnapshot = await transaction.get(clubRef);
+
+      if (!clubSnapshot.exists) {
+        throw new Error("Club not found");
+      }
+
+      const clubData = clubSnapshot.data();
+      const currentMembersCount = clubData.membersCount || 0;
+      const newMembersCount = currentMembersCount + 1;
+
+      transaction.update(clubRef, { membersCount: newMembersCount });
+
+      const userRef = doc(db, `users/${uid}`);
+      transaction.update(userRef, {
+        club: clubRef,
+        address: address,
+        phone: phone,
+        birthdate: birthdate,
+        seasons: seasons,
+      });
     });
   } catch (error) {
     console.error("Error updating document: ", error);
@@ -84,14 +101,30 @@ export const joinUser = async (
   supervisorEmail,
 ) => {
   try {
-    await updateDoc(doc(db, `users/${uid}`), {
-      club: doc(db, `clubs/${club.id}`),
-      address: address,
-      phone: phone,
-      birthdate: birthdate,
-      seasons: seasons,
-      supervisor: supervisor,
-      supervisorEmail: supervisorEmail,
+    await runTransaction(db, async (transaction) => {
+      const clubRef = doc(db, `clubs/${club.id}`);
+      const clubSnapshot = await transaction.get(clubRef);
+
+      if (!clubSnapshot.exists) {
+        throw new Error("Club not found");
+      }
+
+      const clubData = clubSnapshot.data();
+      const currentMembersCount = clubData.membersCount || 0;
+      const newMembersCount = currentMembersCount + 1;
+
+      transaction.update(clubRef, { membersCount: newMembersCount });
+
+      const userRef = doc(db, `users/${uid}`);
+      transaction.update(userRef, {
+        club: clubRef,
+        address: address,
+        phone: phone,
+        birthdate: birthdate,
+        seasons: seasons,
+        supervisor: supervisor,
+        supervisorEmail: supervisorEmail,
+      });
     });
   } catch (error) {
     console.error("Error updating document: ", error);
@@ -192,7 +225,7 @@ export const getClubsWithMembersCount = async () => {
 
   // For each club, fetch the number of users associated with the club and add it as a 'membersCount' property
   for (let club of clubs) {
-    club.membersCount = await getClubMembersCount(club.id);
+    club.membersCount = club.membersCount || 0;
   }
 
   // Return the array of club objects
@@ -226,6 +259,7 @@ export const createClub = async (clubName, isActive) => {
     const clubDoc = {
       name: clubName,
       active: isActive,
+      membersCount: 0,
     };
     const docRef = await addDoc(clubCollection, clubDoc);
     return docRef.id;
@@ -277,6 +311,23 @@ export const updateUserSeasons = async (userId) => {
     }
 
     await updateDoc(userRef, { seasons: updatedSeasons });
+
+    // Increment the membersCount property in the clubs collection
+    if (userData.club) {
+      const clubRef = userData.club;
+      await runTransaction(db, async (transaction) => {
+        const clubSnapshot = await transaction.get(clubRef);
+        if (!clubSnapshot.exists) {
+          throw new Error("Club not found");
+        }
+
+        const clubData = clubSnapshot.data();
+        const currentMembersCount = clubData.membersCount || 0;
+        const newMembersCount = currentMembersCount + 1;
+
+        transaction.update(clubRef, { membersCount: newMembersCount });
+      });
+    }
 
     return { success: true };
   } catch (error) {
