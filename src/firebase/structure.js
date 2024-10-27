@@ -9,6 +9,7 @@ import {
   updateDoc,
   where,
   runTransaction,
+  writeBatch,
 } from "firebase/firestore";
 
 const db = getFirestore();
@@ -333,5 +334,51 @@ export const updateUserSeasons = async (userId) => {
   } catch (error) {
     console.error("Error updating user seasons:", error);
     throw error;
+  }
+};
+
+/**
+ * Reevaluate the members count for each club in Firestore.
+ * This function fetches all clubs and users from Firestore, calculates the members count for each club,
+ * and updates the 'membersCount' property of each club document.
+ * A user is considered a member if they have a season in the current year with 'confirmed' set to true.
+ *
+ * @async
+ * @returns {void}
+ */
+export const reevaluateMembersCount = async () => {
+  try {
+    const clubsSnapshot = await getDocs(collection(db, "clubs"));
+    const usersSnapshot = await getDocs(collection(db, "users"));
+    const currentYear = new Date().getFullYear().toString();
+
+    const clubs = {};
+    clubsSnapshot.forEach((doc) => {
+      clubs[doc.id] = doc.data();
+      clubs[doc.id].membersCount = 0;
+    });
+
+    usersSnapshot.forEach((doc) => {
+      const userData = doc.data();
+      if (
+        userData.club &&
+        userData.seasons &&
+        userData.seasons.some(
+          (season) => season.year === currentYear && season.confirmed,
+        )
+      ) {
+        clubs[userData.club.id].membersCount++;
+      }
+    });
+    const batch = writeBatch(db);
+    for (const clubId in clubs) {
+      const clubRef = doc(db, "clubs", clubId);
+      batch.update(clubRef, { membersCount: clubs[clubId].membersCount });
+    }
+
+    await batch.commit();
+    console.log("Successfully reevaluated members count for all clubs.");
+  } catch (error) {
+    console.error("Error reevaluating members count:", error);
   }
 };
