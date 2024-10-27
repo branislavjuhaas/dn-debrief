@@ -13,6 +13,7 @@ const ExcelJS = require("exceljs");
 const Recipient = require("mailersend").Recipient;
 const EmailParams = require("mailersend").EmailParams;
 const MailerSend = require("mailersend").MailerSend;
+const { onSchedule } = require("firebase-functions/v2/scheduler");
 
 // All available logging functions
 const { logger } = require("firebase-functions/v2");
@@ -302,6 +303,61 @@ exports.updateUserSeasons = onCall(
         "Internal server error",
         error,
       );
+    }
+  },
+);
+
+/**
+ * This function reevaluates the members count for each club in the Firestore 'clubs' collection.
+ * It is triggered by a scheduled event to run once a quarter of the year.
+ * The function fetches all clubs and users from the Firestore collections, calculates the members count for each club,
+ * and updates the 'membersCount' property of each club document.
+ * A user is considered a member if they have a season in the current year with 'confirmed' set to true.
+ * If an error occurs during the execution of the function, it logs the error.
+ *
+ * @name reevaluateMembersCount
+ * @function
+ * @async
+ * @param {Object} context - The context object.
+ * @returns {void}
+ */
+exports.reevaluateMembersCount = onSchedule(
+  { schedule: "0 0 1 1,4,7,10 *" },
+  async (context) => {
+    try {
+      const clubsSnapshot = await admin.firestore().collection("clubs").get();
+      const usersSnapshot = await admin.firestore().collection("users").get();
+      const currentYear = new Date().getFullYear().toString();
+
+      const clubs = {};
+      clubsSnapshot.forEach((doc) => {
+        clubs[doc.id] = doc.data();
+        clubs[doc.id].membersCount = 0;
+      });
+
+      usersSnapshot.forEach((doc) => {
+        const userData = doc.data();
+        if (
+          userData.club &&
+          userData.seasons &&
+          userData.seasons.some(
+            (season) => season.year === currentYear && season.confirmed,
+          )
+        ) {
+          clubs[userData.club.id].membersCount++;
+        }
+      });
+
+      const batch = admin.firestore().batch();
+      for (const clubId in clubs) {
+        const clubRef = admin.firestore().collection("clubs").doc(clubId);
+        batch.update(clubRef, { membersCount: clubs[clubId].membersCount });
+      }
+
+      await batch.commit();
+      logger.info("Successfully reevaluated members count for all clubs.");
+    } catch (error) {
+      logger.error("Error reevaluating members count:", error);
     }
   },
 );

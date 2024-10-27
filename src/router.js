@@ -1,12 +1,6 @@
-// Import the necessary functions from Vue Router.
 import { createRouter, createWebHistory } from "vue-router";
 import Home from "./views/Home.vue";
 
-/**
- * Define the routes for the application.
- * Each route is an object with a path, name, component, and optional meta properties.
- * @type {Array}
- */
 const routes = [
   {
     path: "/",
@@ -179,6 +173,16 @@ const routes = [
     },
   },
   {
+    path: "/manage/terminal",
+    name: "Terminal",
+    component: () => import("./views/management/Terminal.vue"),
+    meta: {
+      title: "Console",
+      requiresAuth: true,
+      roles: ["developer"],
+    },
+  },
+  {
     path: "/:pathMatch(.*)*", // 404
     name: "404",
     component: () => import("./views/Error.vue"),
@@ -187,11 +191,6 @@ const routes = [
   },
 ];
 
-/**
- * Create a new Vue Router instance with the defined routes.
- * The router uses the HTML5 History API for clean URLs.
- * @type {Object}
- */
 const router = createRouter({ history: createWebHistory(), routes });
 
 export default router;

@@ -30,6 +30,11 @@ const links = [
     link: "/manage/route",
     roles: ["developer"],
   },
+  {
+    name: "Prepočítanie počtu členov",
+    link: "/manage/terminal?command=reevaluate --members",
+    roles: ["developer"],
+  }
 ];
 
 // Filter the links based on the user's role
