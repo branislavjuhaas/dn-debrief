@@ -7,6 +7,9 @@ import {
   where,
   and,
   or,
+  addDoc,
+  updateDoc,
+  deleteDoc,
 } from "firebase/firestore";
 
 import { useFeedStore, useUserStore } from "../stores.js";
@@ -101,13 +104,16 @@ const getCloudMessages = async () => {
   const q = query(
     messageCollection,
     and(
-      where("filters.member", "==", userStore.isMember),
+      or(
+        where("filters.member", "==", userStore.isMember),
+        where("filters.member", "==", false)
+      ),
       or(
         where("filters.role", "array-contains", userStore.role),
-        where("filters.role", "==", null),
+        where("filters.role", "==", null)
       ),
-      where("filters.club", "in", ["", clubRef]),
-    ),
+      where("filters.club", "in", ["", clubRef])
+    )
   );
 
   // Execute the query and get the documents
@@ -171,4 +177,81 @@ export const feed = async (user) => {
   }
 
   return feedMessages;
+};
+
+/**
+ * Fetches all messages from the Firestore messages collection.
+ *
+ * @returns {Promise<Array>} - A promise that resolves to an array of messages.
+ */
+export const getAllMessages = async () => {
+  const db = getFirestore();
+  const messageCollection = collection(db, "messages");
+  const querySnapshot = await getDocs(messageCollection);
+  const messages = [];
+
+  querySnapshot.forEach((doc) => {
+    const data = doc.data();
+    const message = {
+      id: doc.id,
+      ...data,
+    };
+    messages.push(message);
+  });
+
+  return messages;
+};
+
+/**
+ * Creates a new message in the Firestore messages collection.
+ *
+ * @param {Object} message - The message object to be created.
+ * @returns {Promise<Object>} - A promise that resolves with the created message object including its ID.
+ */
+export const createMessage = async (message) => {
+  const db = getFirestore();
+  const messageCollection = collection(db, "messages");
+  const { id, filters, ...messageWithoutId } = message; // Exclude the id property
+  const messageWithDocRef = {
+    ...messageWithoutId,
+    filters: {
+      ...filters,
+      club: filters.club ? doc(db, "clubs", filters.club.id) : "", // Ensure filters.club is an object with an id property
+    },
+  };
+  const docRef = await addDoc(messageCollection, messageWithDocRef);
+  return { id: docRef.id, ...messageWithoutId, filters }; // Return the created message with its ID
+};
+
+/**
+ * Edits an existing message in the Firestore messages collection.
+ *
+ * @param {string} id - The ID of the message to be edited.
+ * @param {Object} message - The updated message object.
+ * @returns {Promise<void>} - A promise that resolves when the message is updated.
+ */
+export const editMessage = async (id, message) => {
+  const db = getFirestore();
+  const messageDoc = doc(db, "messages", id);
+  const { id: messageId, filters, ...messageWithoutId } = message; // Exclude the id property
+  const messageWithDocRef = {
+    ...messageWithoutId,
+    filters: {
+      ...filters,
+      club: filters.club ? doc(db, "clubs", filters.club.id) : "", // Convert string to document reference if not empty
+    },
+  };
+  await updateDoc(messageDoc, messageWithDocRef);
+};
+
+/**
+ * Deletes a message from the Firestore messages collection.
+ *
+ * @param {string} id - The ID of the message to be deleted.
+ * @returns {Promise<void>} - A promise that resolves when the message is deleted.
+ */
+export const deleteMessage = async (id) => {
+  const db = getFirestore();
+  const messageDoc = doc(db, "messages", id);
+  await deleteDoc(messageDoc);
 };

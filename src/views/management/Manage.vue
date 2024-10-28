@@ -34,6 +34,11 @@ const links = [
     name: "Prepočítanie počtu členov",
     link: "/manage/terminal?command=reevaluate --members",
     roles: ["developer"],
+  },
+  {
+    name: "Správa obsahu",
+    link: "/manage/messages",
+    roles: ["developer", "admin"],
   }
 ];
 
