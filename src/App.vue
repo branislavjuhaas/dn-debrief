@@ -124,14 +124,20 @@ const handleRedirection = async (authenticated) => {
       return;
     }
 
+    const routeMeta = router.currentRoute.value.meta;
+
     // If the route's meta is anonymousOnly and user is logged in, redirect to home
-    if (router.currentRoute.value.meta.anonymousOnly && authenticated) {
+    if (routeMeta.anonymousOnly && authenticated) {
       console.log("Redirecting to home");
       await router.push({ name: "Home" });
     }
-    // If the route's meta requiresAuth and user is not logged in, redirect to home
-    else if (router.currentRoute.value.meta.requiresAuth && !authenticated) {
+    // If the route's meta requiresAuth and user is not logged in, redirect to auth
+    else if (routeMeta.requiresAuth && !authenticated) {
       await router.push({ name: "Auth" });
+    }
+    // If the route's meta requires a specific role and user does not have it, redirect to unauthorized
+    else if (routeMeta.roles && !routeMeta.roles.includes(userStore.role)) {
+      await router.push({ name: "Unauthorized" });
     }
     // Otherwise, refresh the current page
     else {
