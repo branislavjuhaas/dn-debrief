@@ -183,6 +183,16 @@ const routes = [
     },
   },
   {
+    path: "/manage/messages",
+    name: "Messages",
+    component: () => import("./views/management/Messages.vue"),
+    meta: {
+      title: "Správa obsahu",
+      requiresAuth: true,
+      roles: ["developer", "admin"],
+    },
+  },
+  {
     path: "/:pathMatch(.*)*", // 404
     name: "404",
     component: () => import("./views/Error.vue"),
