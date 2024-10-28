@@ -382,3 +382,53 @@ export const reevaluateMembersCount = async () => {
     console.error("Error reevaluating members count:", error);
   }
 };
+
+/**
+ * Creates a new message in Firestore.
+ * @param {string} content - The content of the message.
+ */
+export const createMessage = async (content) => {
+  try {
+    const messageCollection = collection(db, "messages");
+    const messageDoc = {
+      content: content,
+      timestamp: new Date(),
+    };
+    const docRef = await addDoc(messageCollection, messageDoc);
+    return docRef.id;
+  } catch (error) {
+    console.error("Error adding document: ", error);
+  }
+};
+
+/**
+ * Edits a club in Firestore.
+ * @param {string} clubId - The ID of the club.
+ * @param {string} clubName - The new name of the club.
+ */
+export const editClub = async (clubId, clubName) => {
+  try {
+    await updateDoc(doc(db, `clubs/${clubId}`), {
+      name: clubName,
+    });
+  } catch (error) {
+    console.error("Error updating document: ", error);
+    return error;
+  }
+};
+
+/**
+ * Edits a message in Firestore.
+ * @param {string} messageId - The ID of the message.
+ * @param {string} content - The new content of the message.
+ */
+export const editMessage = async (messageId, content) => {
+  try {
+    await updateDoc(doc(db, `messages/${messageId}`), {
+      content: content,
+    });
+  } catch (error) {
+    console.error("Error updating document: ", error);
+    return error;
+  }
+};
