@@ -40,7 +40,7 @@ watch(
     <p class="font-bold" :class="props.disabled ? 'text-grey' : ''">
       {{ props.label }}
     </p>
-    <p :class="props.disabled ? 'text-grey' : ''">{{ value }}</p>
+    <p class="truncate" :class="props.disabled ? 'text-grey' : ''">{{ value }}</p>
     <img
       src="./../assets/icons/down.svg"
       alt="expand"
