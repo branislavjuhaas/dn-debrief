@@ -20,8 +20,8 @@ const messages = {
     id: "welcome",
     title: "Predstavujeme systém DebRIEF",
     message:
-      "Vitaj v novom systéme DebRIEF, všetky chyby a návrhy funkcií ohlás, prosím, na juhas@sda.sk.",
-    link: "mailto:juhas@sda.sk?subject=[DebRIEF] Chyba alebo návrh funkcie",
+      "Vitaj v novom systéme DebRIEF, všetky chyby a návrhy funkcií ohlás, prosím, na debrief@sda.sk.",
+    link: "mailto:debrief@sda.sk?subject=[DebRIEF] Chyba alebo návrh funkcie",
     local: false,
   },
   auth: {
