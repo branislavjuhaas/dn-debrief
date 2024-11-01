@@ -1,5 +1,5 @@
 import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
-import { getAnalytics } from "firebase/analytics";
+import { getAnalytics, logEvent } from "firebase/analytics";
 import { getFunctions } from "firebase/functions";
 import vue3GoogleLogin from "vue3-google-login";
 import { initializeApp } from "firebase/app";

@@ -11,6 +11,8 @@ import {
   translateKey,
   translateRole,
 } from "../../translate.js";
+import { logEvent } from "firebase/analytics";
+import { analytics } from "../../main.js";
 
 // Get the current route
 const route = useRoute();
@@ -187,6 +189,7 @@ const resendConfirmationEmail = async () => {
     });
 
   userPending.value = false;
+  logEvent(analytics, 'button_click', { button_name: 'Poslať overenie' });
 };
 
 /**
