@@ -33,5 +33,38 @@ The original intent of the author was to convey ownership of the software to the
 
 ---
 
-| Since its official integration into the [DN Family](https://dn.juhaas.eu) on May 9, 2024, the DN Cascade project has proudly embraced the organization's core values of openness, innovation, and philanthropy. This alignment signifies a shared commitment to fostering transparency, driving technological advancements, and contributing to the betterment of society. By becoming a part of the DN Family, the DN Cascade project gains access to a wealth of resources, expertise, and support, enabling it to further its mission of making data more accessible and valuable within SDA. | ![](readme/certificate-of-dn-membership.png) |
-|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------|
+<style>
+  .responsive-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .responsive-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+  }
+
+  @media (min-width: 768px) {
+    .responsive-table td:first-child {
+      width: 66.66%;
+    }
+
+    .responsive-table td:last-child {
+      width: 33.33%;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .responsive-table td {
+      display: block;
+      width: 100%;
+    }
+  }
+</style>
+
+<table class="responsive-table">
+  <tr>
+    <td>Since its official integration into the [DN Family](https://dn.juhaas.eu) on May 9, 2024, the DN Cascade project has proudly embraced the organization's core values of openness, innovation, and philanthropy. This alignment signifies a shared commitment to fostering transparency, driving technological advancements, and contributing to the betterment of society. By becoming a part of the DN Family, the DN Cascade project gains access to a wealth of resources, expertise, and support, enabling it to further its mission of making data more accessible and valuable within SDA.</td>
+    <td><img src="readme/certificate-of-dn-membership.png" alt="Certificate of DN Membership"></td>
+  </tr>
+</table>
