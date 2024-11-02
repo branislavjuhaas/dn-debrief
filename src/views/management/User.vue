@@ -189,7 +189,7 @@ const resendConfirmationEmail = async () => {
     });
 
   userPending.value = false;
-  logEvent(analytics, 'button_click', { button_name: 'Poslať overenie' });
+  logEvent(analytics, 'resend_confiramtion', { method: 'Poslať overenie' });
 };
 
 /**
