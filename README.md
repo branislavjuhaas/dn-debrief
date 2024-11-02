@@ -23,6 +23,10 @@ The DN Cascade | Barca | DebRIEF system can be accessed through the following UR
 4. Start the project by running `npm dev`.
 5. The application should now be running on your local machine.
 
+## Firebase Deployment Instructions
+
+For detailed steps on deploying Firebase hosting, Firestore rules, and functions, including instructions for disabling Firebase hosting and login instructions, please refer to the [FIREBASE.md](FIREBASE.md) file.
+
 ## Remarks
 
 This project is a work in progress and is subject to changes. Feedback and contributions are welcome. Please ensure to follow the contribution guidelines when making any changes to the codebase.
