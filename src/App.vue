@@ -160,14 +160,16 @@ const handleRedirection = async (authenticated) => {
  * @returns {Promise<void>} - Promise to handle Google One Tap login
  */
 const handleGoogleOneTapLogin = async () => {
-  logEvent(analytics, 'one_tap_login_attempt', { method: 'Google One Tap Attempt' });
+  logEvent(analytics, "one_tap_login_attempt", {
+    method: "Google One Tap Attempt",
+  });
   googleOneTap({ autoLogin: true, cancelOnTapOutside: true }).then(
     async (response) => {
       const { oneTapLogin } = await import("./firebase/auth.js");
       oneTapLogin(response.credential).catch((error) => {
         console.error("Error logging in with Google One Tap: ", error);
       });
-      logEvent(analytics, 'one_tap_login', { method: 'Google One Tap' });
+      logEvent(analytics, "one_tap_login", { method: "Google One Tap" });
     },
   );
 };
@@ -199,9 +201,8 @@ onMounted(() => {
 
       getUser(user.uid).then(async (userData) => {
         await handleUserCreation(user, userData);
+        await handleRedirection(true);
       });
-
-      await handleRedirection(true);
     } else {
       // No user is signed in, log out the user, stop loading and remove the sign in route work
       userStore.logOut();
