@@ -132,29 +132,36 @@ onMounted(async () => {
 // Computed property for filtered users
 const filteredUsers = computed(() => {
   const currentYear = new Date().getFullYear().toString();
-  return users.value.filter((user) => {
-    const isClubMatch = clubFilter.value
-      ? user.club && getClubNameById(user.club.id) === clubFilter.value
-      : true;
+  return users.value
+    .filter((user) => {
+      const isClubMatch = clubFilter.value
+        ? user.club && getClubNameById(user.club.id) === clubFilter.value
+        : true;
 
-    const isQuickMatch = quickFilter.value
-      ? (user.name.toLowerCase() + " " + user.surname.toLowerCase()).includes(
-          quickFilter.value.toLowerCase(),
-        ) ||
-        user.id.toLowerCase().includes(quickFilter.value.toLowerCase()) ||
-        (user.role
-          ? user.role.toLowerCase().includes(quickFilter.value.toLowerCase())
-          : false)
-      : true;
+      const isQuickMatch = quickFilter.value
+        ? (user.name.toLowerCase() + " " + user.surname.toLowerCase()).includes(
+            quickFilter.value.toLowerCase(),
+          ) ||
+          user.id.toLowerCase().includes(quickFilter.value.toLowerCase()) ||
+          (user.role
+            ? user.role.toLowerCase().includes(quickFilter.value.toLowerCase())
+            : false)
+        : true;
 
-    const isMemberMatch = showMembersOnly.value
-      ? user.seasons?.some(
-          (season) => season.year === currentYear && season.confirmed,
-        )
-      : true;
+      return isClubMatch && isQuickMatch;
+    })
+    .sort((a, b) => {
+      const aConfirmed = a.seasons?.some(
+        (season) => season.year === currentYear && season.confirmed,
+      );
+      const bConfirmed = b.seasons?.some(
+        (season) => season.year === currentYear && season.confirmed,
+      );
 
-    return isClubMatch && isQuickMatch && isMemberMatch;
-  });
+      if (aConfirmed && !bConfirmed) return -1;
+      if (!aConfirmed && bConfirmed) return 1;
+      return 0;
+    });
 });
 </script>
 
@@ -209,7 +216,16 @@ const filteredUsers = computed(() => {
           v-for="user in filteredUsers"
           :key="user.id"
           class="grid items-center gap-4 rounded-[1.25rem]"
-          :class="props.filter ? 'grid-cols-3' : 'grid-cols-4'">
+          :class="[
+            props.filter ? 'grid-cols-3' : 'grid-cols-4',
+            user.seasons?.some(
+              (season) =>
+                season.year === new Date().getFullYear().toString() &&
+                !season.confirmed,
+            )
+              ? 'text-gray'
+              : '',
+          ]">
           <p class="truncate">{{ user.id }}</p>
           <p class="overflow-hidden sm:truncate">
             {{ user.name + " " + user.surname }}
@@ -227,7 +243,16 @@ const filteredUsers = computed(() => {
           :to="'/profile/' + user.id"
           :key="`${user.id}-a`"
           class="grid items-center cursor-pointer gap-4 rounded-[1.25rem] duration-150 transition-all delay-300 hover:py-5 hover:text-red"
-          :class="props.filter ? 'grid-cols-3' : 'grid-cols-4'">
+          :class="[
+            props.filter ? 'grid-cols-3' : 'grid-cols-4',
+            user.seasons?.some(
+              (season) =>
+                season.year === new Date().getFullYear().toString() &&
+                !season.confirmed,
+            )
+              ? 'text-gray'
+              : '',
+          ]">
           <p class="truncate">{{ user.id }}</p>
           <p class="overflow-hidden sm:truncate">
             {{ user.name + " " + user.surname }}
@@ -244,4 +269,8 @@ const filteredUsers = computed(() => {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.text-gray {
+  @apply text-grey;
+}
+</style>
