@@ -13,14 +13,15 @@ import {
 } from "firebase/firestore";
 
 import { useFeedStore, useUserStore } from "../stores.js";
+import { version } from "../../package.json";
 
 // Definujte správy
 const messages = {
   welcome: {
     id: "welcome",
-    title: "Predstavujeme systém DebRIEF",
+    title: "Predstavujeme DebRIEF {{Version}}",
     message:
-      "Vitaj v novom systéme DebRIEF, všetky chyby a návrhy funkcií ohlás, prosím, na debrief@sda.sk.",
+      "Vitaj v novej verzii systému DebRIEF, všetky chyby a návrhy funkcií ohlás, prosím, na debrief@sda.sk.",
     link: "mailto:debrief@sda.sk?subject=[DebRIEF] Chyba alebo návrh funkcie",
     local: false,
   },
@@ -143,7 +144,9 @@ const getCloudMessages = async () => {
 export const feed = async (user) => {
   let feedMessages = [];
 
-  feedMessages.push(messages.welcome);
+  let welcomeMessage = { ...messages.welcome };
+  welcomeMessage.title = welcomeMessage.title.replace("{{Version}}", version);
+  feedMessages.push(welcomeMessage);
 
   if (!user || !user.uid) {
     feedMessages.push(messages.auth);
