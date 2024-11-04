@@ -193,6 +193,12 @@ const routes = [
     },
   },
   {
+    path: "/awards",
+    name: "Awards",
+    component: () => import("./views/Awards.vue"),
+    meta: { title: "Awards Exploration" },
+  },
+  {
     path: "/:pathMatch(.*)*", // 404
     name: "404",
     component: () => import("./views/Error.vue"),
