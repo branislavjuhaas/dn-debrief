@@ -196,7 +196,13 @@ const routes = [
     path: "/awards",
     name: "Awards",
     component: () => import("./views/Awards.vue"),
-    meta: { title: "Awards Exploration" },
+    meta: { title: "Prehľad ocenení", requiresAuth: true },
+  },
+  {
+    path: "/awards/:id",
+    name: "Award",
+    component: () => import("./views/Award.vue"),
+    meta: { title: "Detail ocenenia", requiresAuth: true },
   },
   {
     path: "/:pathMatch(.*)*", // 404

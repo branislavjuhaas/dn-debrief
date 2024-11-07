@@ -103,3 +103,16 @@ export const translateKey = (key) => {
       return key;
   }
 };
+
+export const translateAwardCategory = (category) => {
+  switch (category) {
+    case "system":
+      return "Systémové ocenenie";
+    case "organization":
+      return "Ocenenie organizáciou";
+    case "program":
+      return "Programové ocenenie";
+    default:
+      return category;
+  }
+}
