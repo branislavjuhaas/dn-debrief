@@ -64,10 +64,11 @@ const logout = async () => {
               v-if="userStore.awards.legend.length > 0"
               id="legends"
               class="flex flex-row h-full items-center border-r-2 border-black">
-              <div
+              <router-link
                 v-for="(award, index) in userStore.awards.legend"
                 :key="index"
                 :title="award.legendary.title"
+                :to="'/awards/' + award.id"
                 class="flex flex-row relative items-center justify-center w-20">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -78,12 +79,13 @@ const logout = async () => {
                 <div
                   v-if="index < userStore.awards.legend.length - 1"
                   class="absolute right-0 w-[2px] h-8 bg-black rounded-full"></div>
-              </div>
+              </router-link>
             </div>
-            <div
+            <router-link
               v-for="(award, index) in userStore.awards.ordinary"
               :key="index"
               :title="award.regular.title"
+              :to="'/awards/' + award.id"
               class="flex flex-row relative items-center justify-center w-20">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -94,7 +96,7 @@ const logout = async () => {
               <div
                 v-if="index < userStore.awards.ordinary.length - 1"
                 class="absolute hidden sm:flex right-0 w-[2px] h-8 bg-black rounded-full"></div>
-            </div>
+            </router-link>
           </div>
         </div>
         <button

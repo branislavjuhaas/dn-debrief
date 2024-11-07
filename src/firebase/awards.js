@@ -1,4 +1,4 @@
-import { collection, getDocs, getFirestore } from "firebase/firestore";
+import { collection, getDocs, getFirestore, doc, getDoc } from "firebase/firestore";
 
 const db = getFirestore();
 
@@ -22,4 +22,25 @@ export const getAllAwards = async () => {
   });
 
   return awards;
+};
+
+/**
+ * Fetches a single award by ID from the Firestore awards collection.
+ *
+ * @param {string} id - The ID of the award to fetch.
+ * @returns {Promise<Object|null>} - A promise that resolves to the award object, or null if not found.
+ */
+export const getAwardById = async (id) => {
+  const awardDoc = doc(db, "awards", id);
+  const awardSnapshot = await getDoc(awardDoc);
+
+  if (awardSnapshot.exists()) {
+    return {
+      id: awardSnapshot.id,
+      ...awardSnapshot.data(),
+    };
+  } else {
+    console.error("Award document does not exist");
+    return null;
+  }
 };

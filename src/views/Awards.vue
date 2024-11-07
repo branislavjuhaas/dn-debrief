@@ -46,7 +46,7 @@ const fetchAwards = async () => {
 
 // Fetch awards on component mount or when user role is set
 onMounted(() => {
-  if (userStore.role) {
+  if (userStore.uid) {
     fetchAwards();
   } else {
     const unwatch = watch(
