@@ -1,8 +1,12 @@
 <script setup>
-// Import necessary components and functions
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, computed } from "vue";
 import { useRoute } from "vue-router";
-import { getUser } from "../../firebase/auth.js";
+import {
+  getUser,
+  assignAwardToUser,
+  updateAwardLegendStatus,
+  removeAwardFromUser,
+} from "../../firebase/structure.js";
 import router from "../../router.js";
 import Dropdown from "../../components/Dropdown.vue";
 import { useUserStore } from "../../stores.js";
@@ -14,27 +18,33 @@ import {
 import { logEvent } from "firebase/analytics";
 import { analytics } from "../../main.js";
 
-// Get the current route
 const route = useRoute();
-
-// Get the user store
 const userStore = useUserStore();
 
-// If the user is self, redirect to the profile page
+// Redirect to profile if the user is viewing their own profile
 if (userStore.uid === route.params.uid) {
   router.push("/profile");
 }
 
-// Define reactive variables for user data, user full name, and user role
 const userData = ref([]);
+const userAwards = ref([]);
+const availableAwards = ref([]);
 const userFullName = ref("");
 const userRole = ref("");
 const userPending = ref(false);
+const showAwardDropdown = ref(false);
+const contextMenuVisible = ref(false);
+const contextMenuPosition = ref({ x: 0, y: 0 });
+const selectedAward = ref(null);
 let actualRole = "";
 
-// Function to format user data
+/**
+ * Formats user data for display.
+ * @param {string} uid - The user ID.
+ * @param {Object} user - The user data.
+ * @returns {Array} - The formatted user data.
+ */
 function formatUserData(uid, user) {
-  // Return an array of user data objects
   return [
     { name: "uid", value: uid },
     { name: "club", value: user.club ? user.club.name : null },
@@ -59,7 +69,9 @@ function formatUserData(uid, user) {
   ].filter((item) => item.value !== null && item.value !== undefined);
 }
 
-// Function to update user data
+/**
+ * Updates the user data.
+ */
 const updateUserData = async () => {
   const userId = route.params.uid;
   try {
@@ -76,6 +88,13 @@ const updateUserData = async () => {
           season.confirmed === false,
       )
     );
+
+    userAwards.value = user.awards.map((award) => {
+      const awardData = availableAwards.value.find(
+        (availableAward) => availableAward.id === award.award.id,
+      );
+      return { ...awardData, legend: !!award.legend };
+    });
   } catch (error) {
     if (error.code === "permission-denied") {
       await router.push("/unauthorized");
@@ -83,39 +102,118 @@ const updateUserData = async () => {
       console.error(error);
     }
   }
-
-  console.log(userData.value);
 };
 
-// Fetch user data on component mount
-onMounted(updateUserData);
+/**
+ * Fetches available awards.
+ */
+const getAwards = async () => {
+  const { getAllAwards } = await import("../../firebase/awards.js");
+  availableAwards.value = await getAllAwards();
+};
 
-// Watch for changes in the route params uid and update user data
-watch(() => route.params.uid, updateUserData);
+/**
+ * Assigns an award to the user.
+ * @param {string} awardId - The award ID.
+ */
+const assignAward = async (awardId) => {
+  try {
+    await assignAwardToUser(route.params.uid, awardId);
+    await updateUserData();
+  } catch (error) {
+    console.error("Error assigning award:", error);
+  }
+};
 
-// Watch for changes in the user role and update it in the database
-watch(userRole, async (newRole, oldRole) => {
-  if (newRole === oldRole) return;
-  if (newRole === actualRole) return;
-
-  const { updateUserRole } = await import("../../firebase/structure.js");
-  await updateUserRole(route.params.uid, reverseTranslateRole(newRole));
-
-  actualRole = newRole;
+/**
+ * Filters awards based on user role.
+ */
+const filteredAwards = computed(() => {
+  if (userStore.role === "developer") {
+    return availableAwards.value;
+  } else if (userStore.role === "admin") {
+    return availableAwards.value.filter(
+      (award) =>
+        award.category === "program" || award.category === "organization",
+    );
+  } else if (userStore.role === "cap") {
+    return availableAwards.value.filter(
+      (award) => award.category === "program",
+    );
+  }
+  return [];
 });
 
 /**
- * Creates a token based on the user's ID.
- * This function reverses the user ID, converts each character to its ASCII value,
- * increments it by 1, and then joins them together to form the token.
- *
- * @param {string} userId - The user's ID.
- * @returns {string} The generated token.
+ * Handles right-click on an award.
+ * @param {Event} event - The event object.
+ * @param {Object} award - The award object.
+ */
+const handleRightClick = (event, award) => {
+  if (
+    userStore.role !== "developer" &&
+    userStore.role !== "admin" &&
+    userStore.role !== "cap"
+  ) {
+    return;
+  }
+  event.preventDefault();
+  selectedAward.value = award;
+  contextMenuPosition.value = { x: event.clientX, y: event.clientY };
+  contextMenuVisible.value = true;
+};
+
+/**
+ * Marks an award as a legend.
+ * @param {Object} award - The award object.
+ */
+const makeLegend = async (award) => {
+  try {
+    await updateAwardLegendStatus(route.params.uid, award.id, true);
+    await updateUserData();
+  } catch (error) {
+    console.error("Error making legend:", error);
+  }
+  contextMenuVisible.value = false;
+};
+
+/**
+ * Unmarks an award as a legend.
+ * @param {Object} award - The award object.
+ */
+const unmakeLegend = async (award) => {
+  try {
+    await updateAwardLegendStatus(route.params.uid, award.id, false);
+    await updateUserData();
+  } catch (error) {
+    console.error("Error unmaking legend:", error);
+  }
+  contextMenuVisible.value = false;
+};
+
+/**
+ * Removes an award from the user.
+ * @param {Object} award - The award object.
+ */
+const removeAward = async (award) => {
+  try {
+    await removeAwardFromUser(route.params.uid, award.id);
+    await updateUserData();
+  } catch (error) {
+    console.error("Error removing award:", error);
+  }
+  contextMenuVisible.value = false;
+};
+
+/**
+ * Creates a token for the user.
+ * @param {string} userId - The user ID.
+ * @returns {string} - The generated token.
  */
 const createToken = (userId) => {
   return (userId + new Date().getFullYear().toString())
-    .split("") // Split the userId into an array of characters
-    .reverse() // Reverse the array
+    .split("")
+    .reverse()
     .map((char) => {
       let nextChar;
       if (char === "Z") {
@@ -128,35 +226,23 @@ const createToken = (userId) => {
         nextChar = char.charCodeAt(0) + 1;
       }
       return String.fromCharCode(nextChar);
-    }) // Convert each character to its ASCII value, increment by 1, and convert back to character
-    .join(""); // Join the array back into a string
+    })
+    .join("");
 };
 
 /**
- * Resends a confirmation email to the user.
- *
- * This function dynamically imports the necessary Firebase functions and prepares the data
- * required to send a confirmation email. It checks if the user has a supervisor defined to
- * personalize the email content accordingly. The function then calls the `sendEmail` Cloud
- * Function with the prepared data and handles the response.
- *
- * @async
- * @function resendConfirmationEmail
- * @returns {Promise<void>}
+ * Resends the confirmation email.
  */
 const resendConfirmationEmail = async () => {
-  // Dynamically import the necessary Firebase functions
   const { httpsCallable } = await import("firebase/functions");
   const { functions } = await import("../../main.js");
 
-  // If the user has supervisor defined, personalized is "registráciu tvojho dieťaťa" otherwise "tvoju registráciu"
   const personalized = !userData.value.find(
     (item) => item.name === "supervisor",
   )
     ? `tvoju registráciu`
     : `registráciu tvojho dieťaťa`;
 
-  // Prepare the data
   const emailItem =
     userData.value.find((item) => item.name === "supervisorEmail") ||
     userData.value.find((item) => item.name === "email");
@@ -169,17 +255,13 @@ const resendConfirmationEmail = async () => {
     personalized: personalized,
   };
 
-  // Get a reference to the sendEmail function
   const sendEmailFunction = httpsCallable(functions, "sendEmail");
 
-  // Call the function and handle the response
   sendEmailFunction(data)
     .then((result) => {
-      // Read result of the Cloud Function.
       console.log(result.data);
     })
     .catch((error) => {
-      // Getting the error details
       const code = error.code;
       const message = error.message;
       const details = error.details;
@@ -189,37 +271,23 @@ const resendConfirmationEmail = async () => {
     });
 
   userPending.value = false;
-  logEvent(analytics, 'resend_confiramtion', { method: 'Poslať overenie' });
+  logEvent(analytics, "resend_confiramtion", { method: "Poslať overenie" });
 };
 
 /**
- * Confirms the registration of a user by updating their seasons in Firestore.
- *
- * This function imports the `updateUserSeasons` function from `structure.js` and
- * calls it with the user's ID from the route parameters. If the update is successful,
- * it sets the `userPending` ref to `false` and updates the `userData` ref to mark the user
- * as a member.
- *
- * @async
- * @function confirmRegistration
- * @returns {Promise<void>}
+ * Confirms the user's registration.
  */
 const confirmRegistration = async () => {
-  // Dynamically import the updateUserSeasons function from structure.js
   const { updateUserSeasons } = await import("../../firebase/structure.js");
 
   try {
-    // Call the updateUserSeasons function with the user's ID from the route parameters
     await updateUserSeasons(route.params.uid);
   } catch (error) {
-    // Log any errors that occur during the update
     console.error("Error confirming registration:", error);
   }
 
-  // Set the userPending ref to false
   userPending.value = false;
 
-  // Update the userData ref to mark the user as a member
   userData.value = userData.value.map((item) => {
     if (item.name === "member") {
       item.value = "Áno";
@@ -227,10 +295,28 @@ const confirmRegistration = async () => {
     return item;
   });
 };
+
+// Lifecycle hooks
+onMounted(() => {
+  getAwards();
+  updateUserData();
+});
+
+watch(() => route.params.uid, updateUserData);
+
+watch(userRole, async (newRole, oldRole) => {
+  if (newRole === oldRole) return;
+  if (newRole === actualRole) return;
+
+  const { updateUserRole } = await import("../../firebase/structure.js");
+  await updateUserRole(route.params.uid, reverseTranslateRole(newRole));
+
+  actualRole = newRole;
+});
 </script>
 
 <template>
-  <div class="gap-4">
+  <div class="gap-4" @click="contextMenuVisible = false">
     <h1 class="text-5xl font-bold mb-2">
       {{ userFullName }}
     </h1>
@@ -245,33 +331,121 @@ const confirmRegistration = async () => {
           <p>{{ data.value }}</p>
         </div>
       </div>
-      <div
-        class="grid grid-flow-col items-center sm:grid-rows-1 gap-4 sm:grid-cols-4">
-        <button
-          v-if="userPending"
-          @click="resendConfirmationEmail"
-          class="form-secondary vertical-center col-start-1">
-          <span>Poslať overenie</span>
-        </button>
-        <button
-          v-if="userPending"
-          @click="confirmRegistration"
-          class="form-secondary vertical-center col-start-1 sm:col-start-2">
-          <span>Potvrdiť registráciu</span>
-        </button>
-        <dropdown
-          v-if="userRole && ['admin', 'developer'].includes(userStore.role)"
-          class="col-start-1 col-span-1 sm:col-start-3 sm:col-span-2"
-          label="Funkcia"
-          v-model="userRole"
-          :disabled="userRole === 'Vývojár' && useUserStore().role === 'admin'"
-          :options="[
-            'Administrátor/-ka',
-            'Hlavný/-á rozhodca/-kyňa',
-            'Vedúci/-a klubu',
-            'Používateľ/-ka',
-          ]" />
+      <div class="flex flex-col gap-4">
+        <div
+          v-if="
+            userData.length > 0 &&
+            userData.find(
+              (data) => data.name === 'member' && data.value === 'Áno',
+            )
+          "
+          class="grid grid-cols-[1fr_auto] gap-4 h-12 px-4 border-2 border-black rounded-[1.25rem] text-black items-center">
+          <div
+            v-if="userAwards.length > 0"
+            class="flex flex-row gap-8 overflow-x-auto scrollbar-hidden">
+            <router-link
+              v-for="(award, index) in userAwards"
+              :to="'/awards/' + award.id"
+              :key="award.id"
+              class="relative"
+              @contextmenu="handleRightClick($event, award)">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-8 w-8"
+                :class="{ legend: award.legend }"
+                viewBox="0 0 20 20"
+                v-html="award.symbol" />
+              <div v-if="index < userAwards.length - 1" class="separator" />
+            </router-link>
+          </div>
+          <div v-else class="vertical-center"><p>Žiadne ocenenia</p></div>
+          <div class="relative">
+            <img
+              src="./../../assets/icons/plus.svg"
+              alt="Add award"
+              class="w-5 h-5 relative cursor-pointer"
+              @click="showAwardDropdown = !showAwardDropdown" />
+            <div
+              v-if="showAwardDropdown"
+              class="absolute right-4 top-4 w-auto bg-white z-10 rounded-[1.25rem_0.5rem_1.25rem_1.25rem] border-black border-2 gap-4 p-4 overflow-auto scrollbar-hidden max-h-52 shadow-2xl">
+              <div
+                v-for="award in filteredAwards.filter(
+                  (award) =>
+                    !userAwards.find((userAward) => userAward.id === award.id),
+                )"
+                :key="award.id"
+                @click="
+                  assignAward(award.id);
+                  showAwardDropdown = false;
+                ">
+                <div
+                  class="grid grid-cols-[auto_1fr] w-40 items-center gap-4 cursor-pointer hover:text-red">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    v-html="award.symbol" />
+                  <p class="truncate">{{ award.regular.title }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="grid grid-flow-col items-center sm:grid-rows-1 gap-4 sm:grid-cols-4">
+          <button
+            v-if="userPending"
+            @click="resendConfirmationEmail"
+            class="form-secondary vertical-center col-start-1">
+            <span>Poslať overenie</span>
+          </button>
+          <button
+            v-if="userPending"
+            @click="confirmRegistration"
+            class="form-secondary vertical-center col-start-1 sm:col-start-2">
+            <span>Potvrdiť registráciu</span>
+          </button>
+          <dropdown
+            v-if="userRole && ['admin', 'developer'].includes(userStore.role)"
+            class="col-start-1 col-span-1 sm:col-start-3 sm:col-span-2"
+            label="Funkcia"
+            v-model="userRole"
+            :disabled="
+              userRole === 'Vývojár' && useUserStore().role === 'admin'
+            "
+            :options="[
+              'Administrátor/-ka',
+              'Hlavný/-á rozhodca/-kyňa',
+              'Vedúci/-a klubu',
+              'Používateľ/-ka',
+            ]" />
+        </div>
       </div>
+    </div>
+    <div
+      v-if="contextMenuVisible"
+      :style="{
+        top: `${contextMenuPosition.y}px`,
+        left: `${contextMenuPosition.x}px`,
+      }"
+      class="absolute flex flex-col bg-white shadow-2xl border-2 border-black text-black rounded-[0.5rem_1.25rem_1.25rem_1.25rem] px-4 gap-1 py-2 z-20">
+      <p
+        v-if="!selectedAward.legend"
+        class="cursor-pointer hover:text-red"
+        @click="makeLegend(selectedAward)">
+        Povýšiť
+      </p>
+      <p
+        v-else
+        class="cursor-pointer hover:text-red"
+        @click="unmakeLegend(selectedAward)">
+        Degradovať
+      </p>
+      <p
+        class="cursor-pointer hover:text-red"
+        @click="removeAward(selectedAward)">
+        Odstaniť
+      </p>
     </div>
   </div>
 </template>
@@ -279,5 +453,20 @@ const confirmRegistration = async () => {
 <style scoped>
 .alternative {
   @apply flex flex-row items-center h-12 bg-white text-black rounded-[1.25rem] border-2 border-red border-opacity-0 font-bold px-5 duration-150 cursor-pointer hover:border-opacity-100;
+}
+
+.separator {
+  position: absolute;
+  right: -1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2px;
+  height: 1.5rem;
+  background-color: black;
+  border-radius: 1px;
+}
+
+.legend {
+  filter: drop-shadow(0 0 5px #ffd900);
 }
 </style>

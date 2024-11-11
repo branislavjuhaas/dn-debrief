@@ -10,6 +10,8 @@ import {
   where,
   runTransaction,
   writeBatch,
+  documentId,
+  arrayUnion,
 } from "firebase/firestore";
 
 const db = getFirestore();
@@ -353,6 +355,31 @@ export const editMessage = async (messageId, content) => {
   }
 };
 
+export const getUser = async (uid) => {
+  const q = query(collection(db, "users"), where(documentId(), "==", uid));
+  const querySnapshot = await getDocs(q);
+
+  if (querySnapshot.empty) return null;
+
+  const user = querySnapshot.docs[0].data();
+  console.log("User data: ", user);
+
+  if (user.club) {
+    const clubSnapshot = await getDoc(user.club);
+    if (clubSnapshot.exists()) {
+      user.club = {
+        id: clubSnapshot.id,
+        ...clubSnapshot.data(),
+      };
+    } else {
+      console.error("Club document does not exist");
+      user.club = null;
+    }
+  }
+
+  return user;
+};
+
 export const updateUserSeasons = async (userId) => {
   const userRef = doc(db, "users", userId);
 
@@ -412,5 +439,80 @@ export const updateUserSeasons = async (userId) => {
   } catch (error) {
     console.error("Error updating user seasons:", error);
     throw error;
+  }
+};
+
+/**
+ * Assigns an award to a user in Firestore.
+ * @param {string} userId - The user's ID.
+ * @param {string} awardId - The award's ID.
+ */
+export const assignAwardToUser = async (userId, awardId) => {
+  try {
+    const userRef = doc(db, "users", userId);
+    await updateDoc(userRef, {
+      awards: arrayUnion({ award: doc(db, "awards", awardId), legend: false }),
+    });
+    console.log(`Award ${awardId} assigned to user ${userId}`);
+  } catch (error) {
+    console.error("Error assigning award to user:", error);
+  }
+};
+
+/**
+ * Updates the legend status of an award for a user in Firestore.
+ * @param {string} userId - The user's ID.
+ * @param {string} awardId - The award's ID.
+ * @param {boolean} isLegend - The new legend status.
+ */
+export const updateAwardLegendStatus = async (userId, awardId, isLegend) => {
+  try {
+    const userRef = doc(db, "users", userId);
+    await runTransaction(db, async (transaction) => {
+      const userDoc = await transaction.get(userRef);
+      if (!userDoc.exists) {
+        throw new Error("User not found");
+      }
+
+      const awards = userDoc.data().awards || [];
+      const updatedAwards = awards.map((award) => {
+        if (award.award.id === awardId) {
+          return { ...award, legend: isLegend };
+        }
+        return award;
+      });
+
+      transaction.update(userRef, { awards: updatedAwards });
+    });
+    console.log(`Award ${awardId} legend status updated for user ${userId}`);
+  } catch (error) {
+    console.error("Error updating award legend status:", error);
+  }
+};
+
+/**
+ * Removes an award from a user in Firestore.
+ * @param {string} userId - The user's ID.
+ * @param {string} awardId - The award's ID.
+ */
+export const removeAwardFromUser = async (userId, awardId) => {
+  try {
+    const userRef = doc(db, "users", userId);
+    await runTransaction(db, async (transaction) => {
+      const userDoc = await transaction.get(userRef);
+      if (!userDoc.exists) {
+        throw new Error("User not found");
+      }
+
+      const awards = userDoc.data().awards || [];
+      const updatedAwards = awards.filter(
+        (award) => award.award.id !== awardId,
+      );
+
+      transaction.update(userRef, { awards: updatedAwards });
+    });
+    console.log(`Award ${awardId} removed from user ${userId}`);
+  } catch (error) {
+    console.error("Error removing award from user:", error);
   }
 };
