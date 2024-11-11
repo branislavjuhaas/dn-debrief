@@ -21,7 +21,7 @@ const messages = {
     id: "welcome",
     title: "Predstavujeme DebRIEF {{Version}}",
     message:
-      "Vitaj v novej verzii systému DebRIEF, všetky chyby a návrhy funkcií ohlás, prosím, na debrief@sda.sk.",
+      "Vitaj v novej verzii autonónmneho systému DebRIEF, všetky chyby a návrhy funkcií ohlás, prosím, na debrief@sda.sk.",
     link: "mailto:debrief@sda.sk?subject=[DebRIEF] Chyba alebo návrh funkcie",
     local: false,
   },
@@ -107,14 +107,14 @@ const getCloudMessages = async () => {
     and(
       or(
         where("filters.member", "==", userStore.isMember),
-        where("filters.member", "==", false)
+        where("filters.member", "==", false),
       ),
       or(
         where("filters.role", "array-contains", userStore.role),
-        where("filters.role", "==", null)
+        where("filters.role", "==", null),
       ),
-      where("filters.club", "in", ["", clubRef])
-    )
+      where("filters.club", "in", ["", clubRef]),
+    ),
   );
 
   // Execute the query and get the documents
