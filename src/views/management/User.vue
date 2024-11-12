@@ -150,10 +150,12 @@ const filteredAwards = computed(() => {
  * @param {Object} award - The award object.
  */
 const handleRightClick = (event, award) => {
-  if (
-    userStore.role !== "developer" &&
-    userStore.role !== "admin" &&
-    userStore.role !== "cap"
+  if (userStore.role === "cap" && award.category !== "program") {
+    return;
+  } else if (
+    userStore.role === "admin" &&
+    award.category !== "organization" &&
+    award.category !== "program"
   ) {
     return;
   }
