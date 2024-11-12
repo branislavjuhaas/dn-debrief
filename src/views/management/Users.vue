@@ -10,7 +10,6 @@ import Field from "../../components/Field.vue";
 import { httpsCallable } from "firebase/functions";
 import { functions } from "../../main.js";
 import router from "../../router.js";
-import Toggle from "../../components/Toggle.vue";
 
 // Define properties
 const props = defineProps(["filter"]);
@@ -30,7 +29,11 @@ const clubsNames = ref([]);
 let clubs = [];
 const users = ref([]);
 const exported = ref(false);
-const showMembersOnly = ref(false);
+const registrationYearFilter = ref("");
+const years = Array.from(
+  { length: new Date().getFullYear() - 2023 },
+  (_, i) => (2024 + i).toString(),
+);
 
 // Function to get club name by id
 const getClubNameById = (id) => clubs.find((club) => club.id === id).name;
@@ -118,7 +121,6 @@ onMounted(async () => {
       router.push("/");
       return;
     }
-    showMembersOnly.value = true; // Show only members if filtered by club
   }
 
   clubsNames.value = clubs.map((club) => club.name);
@@ -148,7 +150,13 @@ const filteredUsers = computed(() => {
             : false)
         : true;
 
-      return isClubMatch && isQuickMatch;
+      const isRegistrationYearMatch = registrationYearFilter.value
+        ? Array.isArray(user.seasons) && user.seasons.some(
+            (season) => season.year === registrationYearFilter.value && season.confirmed,
+          )
+        : true;
+
+      return isClubMatch && isQuickMatch && isRegistrationYearMatch;
     })
     .sort((a, b) => {
       const aConfirmed = a.seasons?.some(
@@ -185,7 +193,10 @@ const filteredUsers = computed(() => {
           :options="clubsNames"
           v-model="clubFilter" />
         <field label="Filter" v-model="quickFilter" />
-        <toggle v-model="showMembersOnly" label="Členovia/-ky SDA" />
+        <dropdown
+          label="Rok registrácie"
+          :options="years"
+          v-model="registrationYearFilter" />
         <button
           @click="exportAll"
           :disabled="exported"
