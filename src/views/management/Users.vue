@@ -205,7 +205,7 @@ const filteredUsers = computed(() => {
           :class="props.filter ? 'grid-cols-3' : 'grid-cols-4'">
           <p>UID</p>
           <p>Meno a priezvisko</p>
-          <p>Role</p>
+          <p>Rola</p>
           <p v-if="!props.filter">Debatný klub</p>
         </div>
         <div
