@@ -79,6 +79,15 @@ exports.exportUsers = onCall({ enforceAppCheck: true }, async (request) => {
           userData.club = userData.club || null; // Set club to null if it's undefined
         }
 
+        // Format the seasons data as a comma-separated list of years
+        if (userData.seasons && Array.isArray(userData.seasons)) {
+          userData.seasons = userData.seasons
+            .map((season) => season.year)
+            .join(", ");
+        } else {
+          userData.seasons = null;
+        }
+
         users.push(userData);
       }
 
