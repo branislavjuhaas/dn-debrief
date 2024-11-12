@@ -231,7 +231,7 @@ const filteredUsers = computed(() => {
             {{ user.name + " " + user.surname }}
           </p>
           <p class="overflow-hidden sm:truncate">
-            {{ translateRole(user.role) || "Člen" }}
+            {{ translateRole(user.role) || "Používateľ/-ka" }}
           </p>
           <p class="overflow-hidden sm:truncate" v-if="!props.filter">
             {{ user.club ? getClubNameById(user.club.id) : "Žiadny" }}
@@ -258,7 +258,7 @@ const filteredUsers = computed(() => {
             {{ user.name + " " + user.surname }}
           </p>
           <p class="overflow-hidden sm:truncate">
-            {{ translateRole(user.role) || "Člen" }}
+            {{ translateRole(user.role) || "Používateľ/-ka" }}
           </p>
           <p class="overflow-hidden sm:truncate" v-if="!props.filter">
             {{ user.club ? getClubNameById(user.club.id) : "Žiadny" }}
