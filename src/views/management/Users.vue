@@ -3,12 +3,15 @@
 import { useLoadingStore, useUserStore } from "../../stores.js";
 import Dropdown from "../../components/Dropdown.vue";
 import { computed, onMounted, ref } from "vue";
-import { getClubs, getUsers } from "../../firebase/structure.js";
+import {
+  getClubs,
+  getUsers,
+  fetchAllUsers,
+  fetchAllClubs,
+} from "../../firebase/structure.js";
 import { useRoute } from "vue-router";
 import { translateRole } from "../../translate.js";
 import Field from "../../components/Field.vue";
-import { httpsCallable } from "firebase/functions";
-import { functions } from "../../main.js";
 import router from "../../router.js";
 
 // Define properties
@@ -30,83 +33,124 @@ let clubs = [];
 const users = ref([]);
 const exported = ref(false);
 const registrationYearFilter = ref("");
-const years = Array.from(
-  { length: new Date().getFullYear() - 2023 },
-  (_, i) => (2024 + i).toString(),
+const years = Array.from({ length: new Date().getFullYear() - 2023 }, (_, i) =>
+  (2024 + i).toString(),
 );
 
 // Function to get club name by id
 const getClubNameById = (id) => clubs.find((club) => club.id === id).name;
 
 /**
- * Handles the response from the Firebase Cloud Function.
+ * Asynchronously exports all users.
  *
- * This function is responsible for processing the response from the Firebase Cloud Function.
- * It extracts the base64 encoded string from the response, converts it into a Blob, creates a Blob URL,
- * and then creates a hidden <a> element and programmatically clicks it to start the download of an Excel file.
- * After the download starts, it cleans up by revoking the Blob URL and removing the <a> element from the document.
- *
- * @param {Object} result - The result object from the Firebase Cloud Function.
- * @param {Object} result.data - The data object from the result.
- * @param {string} result.data.buffer - The base64 encoded string representing the Excel file.
+ * This function fetches all users and clubs from Firestore, swaps references with their names,
+ * resolves dependencies, removes text to save resources, and exports the data to an Excel file.
  */
-const handleResponse = (result) => {
-  // Extract the base64 encoded string from the response
-  const base64String = result.data.buffer;
+const exportAll = async () => {
+  const ExcelJS = await import("exceljs");
 
-  // Convert the base64 string into a Blob
-  const binaryString = atob(base64String);
-  const len = binaryString.length;
-  const bytes = new Uint8Array(len);
-  for (let i = 0; i < len; i++) {
-    bytes[i] = binaryString.charCodeAt(i);
-  }
-  const blob = new Blob([bytes.buffer], {
-    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  useLoadingStore().loadingStart();
+
+  // Fetch all users and clubs
+  const [usersData, clubsData] = await Promise.all([
+    fetchAllUsers(),
+    fetchAllClubs(),
+  ]);
+
+  // Create a map of club references to club names
+  const clubMap = new Map();
+  clubsData.forEach((club) => {
+    clubMap.set(club.ref.id, club.name);
   });
 
-  // Create a Blob URL
-  const url = URL.createObjectURL(blob);
+  // Create a new workbook and worksheet
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet("Členovia");
 
-  // Create a hidden <a> element and programmatically click it to start the download
+  // Define columns and rows for the table
+  const columns = [
+    { name: "UID", filterButton: true },
+    { name: "Meno", filterButton: true },
+    { name: "Priezvisko", filterButton: true },
+    { name: "Funkcia", filterButton: true },
+    { name: "Debatný klub", filterButton: true },
+    { name: "Email", filterButton: true },
+    { name: "Telefónne číslo", filterButton: true },
+    { name: "Dátum narodenia", filterButton: true },
+    { name: "Adresa", filterButton: true },
+    { name: "Registrácie", filterButton: true },
+    { name: "Registrovaný člen", filterButton: true },
+    { name: "Meno a priezvisko zákonného zástupcu", filterButton: true },
+    { name: "Email zákonného zástupcu", filterButton: true },
+  ];
+
+  const rows = usersData.map((user) => [
+    user.uid,
+    user.name,
+    user.surname,
+    translateRole(user.role) || "Používateľ/-ka",
+    user.club ? clubMap.get(user.club.id) || "Žiadny" : "Žiadny",
+    user.email,
+    user.phone,
+    user.birthdate,
+    user.address,
+    (user.seasons || [])
+      .filter((season) => season.confirmed)
+      .map((season) => season.year)
+      .join(", "),
+    {
+      formula: `IF(ISNUMBER(SEARCH(TEXT(YEAR(TODAY()), "0"), INDIRECT("RC[-1]", 0))), "Áno", "Nie")`,
+    },
+    user.supervisor,
+    user.supervisorEmail,
+  ]);
+
+  // Add table to the worksheet
+  worksheet.addTable({
+    name: "UsersTable",
+    ref: "A1",
+    headerRow: true,
+    totalsRow: false,
+    style: {
+      theme: "TableStyleMedium9",
+      showRowStripes: true,
+    },
+    columns: columns.map((col) => ({
+      name: col.name,
+      filterButton: col.filterButton,
+    })),
+    rows: rows,
+  });
+
+  // Set the width of the columns to match the content
+  worksheet.columns.forEach((column, index) => {
+    let maxLength = 0;
+    column.eachCell({ includeEmpty: true }, (cell) => {
+      const columnLength = cell.value ? cell.value.toString().length : 10;
+      if (columnLength > maxLength) {
+        maxLength = columnLength;
+      }
+    });
+    column.width = maxLength + 2; // Add some padding to the width
+  });
+
+  // Create a Blob from the workbook and download it
+  const buffer = await workbook.xlsx.writeBuffer();
+  const blob = new Blob([buffer], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+  const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.style.display = "none";
   a.href = url;
   a.download = "Export-DN-U-" + new Date().toISOString() + ".xlsx";
   document.body.appendChild(a);
   a.click();
-
-  // Clean up
   URL.revokeObjectURL(url);
   document.body.removeChild(a);
-};
 
-/**
- * Asynchronously exports all users.
- *
- * This function starts a loading indicator, then dynamically imports the necessary Firebase functions.
- * It then calls the `exportUsers` Firebase Cloud Function and handles the response using the `handleResponse` function.
- * If an error occurs during the execution of the Cloud Function, it logs the error to the console.
- * After the Cloud Function has finished executing (whether it was successful or not), it stops the loading indicator.
- */
-const exportAll = async () => {
-  // Start the loading indicator
-  useLoadingStore().loadingStart();
-
-  // Call the `exportUsers` Firebase Cloud Function
-  const exportUsers = httpsCallable(functions, "exportUsers");
   exported.value = true;
-
-  exportUsers()
-    .then(handleResponse) // Handle the response using the `handleResponse` function
-    .catch((error) => {
-      // If an error occurs, log it to the console
-      console.log(error);
-    })
-    .finally(() => {
-      // Stop the loading indicator
-      useLoadingStore().loadingEnd();
-    });
+  useLoadingStore().loadingEnd();
 };
 
 // On component mount
@@ -151,8 +195,10 @@ const filteredUsers = computed(() => {
         : true;
 
       const isRegistrationYearMatch = registrationYearFilter.value
-        ? Array.isArray(user.seasons) && user.seasons.some(
-            (season) => season.year === registrationYearFilter.value && season.confirmed,
+        ? Array.isArray(user.seasons) &&
+          user.seasons.some(
+            (season) =>
+              season.year === registrationYearFilter.value && season.confirmed,
           )
         : true;
 
@@ -204,12 +250,6 @@ const filteredUsers = computed(() => {
           <span>Exportovať všetko</span>
         </button>
       </div>
-      <p
-        v-if="exported"
-        class="flex flex-row font-bold text-red self-center gap-4 items-center">
-        ČASTÉ POUŽÍVANIE FUNKCIE 'EXPORTOVAŤ VŠETKO' MÔŽE SPÔSOBIŤ NAVÝŠENIE
-        NÁKLADOV!!
-      </p>
       <div class="flex flex-col gap-4">
         <div
           class="grid grid-rows-1 font-bold gap-4 items-center"
