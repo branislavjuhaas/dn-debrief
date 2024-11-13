@@ -516,3 +516,35 @@ export const removeAwardFromUser = async (userId, awardId) => {
     console.error("Error removing award from user:", error);
   }
 };
+
+/**
+ * Fetches all users from Firestore.
+ * @returns {Array} An array of user objects.
+ */
+export const fetchAllUsers = async () => {
+  const users = [];
+  const userCollection = collection(db, "users");
+  const querySnapshot = await getDocs(userCollection);
+
+  querySnapshot.forEach((doc) => {
+    users.push({ uid: doc.id, ...doc.data() });
+  });
+
+  return users;
+};
+
+/**
+ * Fetches all clubs from Firestore.
+ * @returns {Array} An array of club objects.
+ */
+export const fetchAllClubs = async () => {
+  const clubs = [];
+  const clubCollection = collection(db, "clubs");
+  const querySnapshot = await getDocs(clubCollection);
+
+  querySnapshot.forEach((doc) => {
+    clubs.push({ ref: doc.ref, ...doc.data() });
+  });
+
+  return clubs;
+};
