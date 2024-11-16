@@ -92,7 +92,9 @@ setSystemName();
       class="flex flex-row justify-between bg-white rounded-[1.25rem] px-5 py-1.5 gap-4 text-black vertical-center items-center">
       <div class="grid grid-cols-[auto_auto] gap-4 place-items-center">
         <img src="./../assets/icons/dn.svg" alt="DN" class="w-5 h-5" />
-        <p class="font-bold">Člen softwareovej rodiny DN</p>
+        <a href="https://dn.juhaas.eu" class="font-bold">
+          Člen softwareovej rodiny DN
+        </a>
       </div>
       <a
         href="https://firebasestorage.googleapis.com/v0/b/dn-cascade.appspot.com/o/DN%20Family%2FCertificate%20of%20DN%20membership%20-%20Copyright.pdf?alt=media&token=68568477-390d-48e2-ae5d-5f3dce147bbe"
