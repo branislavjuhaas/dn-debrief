@@ -13,9 +13,10 @@ const dedicatedTo = [
   "Tatiane Migovej",
   "Jakubovi Koprdovi",
   "Nine Melicherovej",
+  "Viere Kampošovej",
   "Branislavovi Erkenovi",
   "Terézii Brišovej",
-  "TK",
+  "Tíkeji",
   "Branislavovi Faktorovi",
 ];
 
