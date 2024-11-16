@@ -237,7 +237,7 @@ const register = async () => {
         <Field
           name="address"
           v-model.trim="address"
-          label="Celá adresa"
+          label="Adresa bydliska"
           type="text"
           placeholder="Ventúrska 5, 811 01 Bratislava" />
         <Field
