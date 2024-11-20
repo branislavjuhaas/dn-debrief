@@ -27,7 +27,7 @@ const fetchAwards = async () => {
   // Update the symbol's background color based on award ownership
   awards.value.forEach((award) => {
     if (
-      userStore.awards.legend.some((userAward) => userAward.id === award.id)
+      userStore.awards.legend?.some((userAward) => userAward.id === award.id)
     ) {
       award.symbol = `
         <defs>
@@ -81,16 +81,16 @@ onMounted(() => {
           class="font-bold text-center text-pretty"
           :class="{
             'selected-award': !(
-              userStore.awards.ordinary.some(
+              userStore.awards?.ordinary?.some(
                 (userAward) => userAward.id === award.id,
               ) ||
-              userStore.awards.legend.some(
+              userStore.awards?.legend?.some(
                 (userAward) => userAward.id === award.id,
               )
             ),
           }">
           {{
-            userStore.awards.legend.some(
+            userStore.awards?.legend?.some(
               (userAward) => userAward.id === award.id,
             )
               ? award.legendary.title
