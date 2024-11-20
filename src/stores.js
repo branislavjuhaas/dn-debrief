@@ -17,6 +17,8 @@ export const useUserStore = defineStore("user", {
     address: null,
     phone: null,
     birthdate: null,
+    supervisor: null,
+    supervisorEmail: null,
     seasons: [],
     awards: [],
   }),
@@ -82,6 +84,8 @@ export const useUserStore = defineStore("user", {
      * @param {string} address - The address.
      * @param {string} phone - The phone number.
      * @param {string} birthdate - The birthdate.
+     * @param {string} supervisor - The supervisor.
+     * @param {string} supervisorEmail - The supervisor email.
      * @param {Array} seasons - The seasons.
      * @param {Array} awards - The awards.
      */
@@ -96,6 +100,8 @@ export const useUserStore = defineStore("user", {
       address,
       phone,
       birthdate,
+      supervisor,
+      supervisorEmail,
       seasons,
       awards,
     ) {
@@ -109,6 +115,8 @@ export const useUserStore = defineStore("user", {
       this.address = address || null;
       this.phone = phone || null;
       this.birthdate = birthdate || null;
+      this.supervisor = supervisor || null;
+      this.supervisorEmail = supervisorEmail || null;
       this.seasons = seasons || [];
       this.awards = awards || [];
     },

@@ -16,15 +16,37 @@ const wasRegistered = userStore.seasons.some(
 );
 
 // State variables
-const club = ref("");
-const birthdate = ref("");
-const address = ref("");
-const phone = ref("");
+const club = ref(userStore.club ? userStore.club.name : "");
+console.log(userStore.birthdate);
+const birthdate = ref(
+  userStore.birthdate
+    ? new Date(
+        userStore.birthdate.split(". ").reverse().join("-")
+      ).toLocaleDateString("en-CA")
+    : ""
+);
+console.log("Assigned birthdate:", birthdate.value);
+const address = ref(userStore.address || "");
+const phone = ref(userStore.phone || "");
 const adult = ref(true);
+const now = new Date();
+const birthdateDate = new Date(birthdate.value);
+let age = now.getFullYear() - birthdateDate.getFullYear();
+if (
+  now.getMonth() < birthdateDate.getMonth() ||
+  (now.getMonth() === birthdateDate.getMonth() &&
+    now.getDate() < birthdateDate.getDate())
+) {
+  age--;
+}
+adult.value = age >= 18;
 
 // State variables for non-adult users
-const supervisor = ref("");
-const mail = ref("");
+const supervisor = ref(userStore.supervisor || "");
+console.log(supervisor.value);
+console.log(userStore.supervisor);
+console.log(userStore);
+const mail = ref(userStore.supervisorEmail || "");
 
 // Fetch clubs data on component mount
 let clubsData = ref([]);
@@ -57,8 +79,6 @@ watch(club, (newClubName) => {
   selectedClub = clubsData.value.find((club) => club.name === newClubName);
 });
 
-// Compute the current and next season
-const now = new Date();
 const seasons =
   now.getMonth() >= 8
     ? [now.getFullYear().toString(), (now.getFullYear() + 1).toString()]
