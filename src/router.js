@@ -130,7 +130,7 @@ const routes = [
         "Ďakujeme za registráciu do SDA. Prosím, over svoju registráciu použitím odkazu, ktorý sme poslali na tvoj e-mail alebo e-mail tvojho zákonného zástupcu. Ak si tento e-mail neobdržal, skontroluj priečinok s nevyžiadanou poštou. Pre pokračovanie zvoľ pre teba relevantnú možnosť platby!",
       buttons: [
         {
-          text: "Som člen ZDP SDA",
+          text: "Som člen JDL SDA",
           path: "/pay?subject=Registracia&subacc=registráciu%20do%20SDA&amount=20",
         },
         {
