@@ -97,6 +97,10 @@ const handleUserCreation = async (user, userData) => {
     );
 
     loadingStore.loadingEnd();
+
+    // Redirect to the Join page with a query parameter
+    await router.push({ name: "Join", query: { message: "Ak sa chceš zúčastniť našich podujatí, staň sa členom alebo členkou SDA!" } });
+
     return;
   }
 
