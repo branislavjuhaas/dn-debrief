@@ -416,7 +416,7 @@ export const updateUserSeasons = async (userId) => {
       throw new Error(`Missing seasons for years: ${missingYears.join(", ")}`);
     }
 
-    await updateDoc(userRef, { seasons: updatedSeasons });
+    await updateDoc(userRef, { seasons: updatedSeasons, reminded: false });
 
     // Increment the membersCount property in the clubs collection
     if (userData.club) {
