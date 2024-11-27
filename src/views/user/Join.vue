@@ -21,9 +21,9 @@ console.log(userStore.birthdate);
 const birthdate = ref(
   userStore.birthdate
     ? new Date(
-        userStore.birthdate.split(". ").reverse().join("-")
+        userStore.birthdate.split(". ").reverse().join("-"),
       ).toLocaleDateString("en-CA")
-    : ""
+    : "",
 );
 console.log("Assigned birthdate:", birthdate.value);
 const address = ref(userStore.address || "");
@@ -238,6 +238,10 @@ const register = async () => {
 
   await router.push({ name: "JoinMessage" });
 };
+
+// Handle the `message` query parameter
+const route = router.currentRoute.value;
+const message = route.query.message || "";
 </script>
 
 <template>
@@ -284,11 +288,14 @@ const register = async () => {
           type="email" />
       </div>
       <div
-        class="grid grid-flow-col gap-4 items-center sm:grid-rows-1 sm:grid-cols-[1fr_auto]">
+        class="grid grid-flow-col gap-4 items-center grid-rows-2 sm:grid-rows-1 sm:grid-cols-[1fr_auto]">
+        <div v-if="message" class="text-center sm:text-left form-message">
+          <p>{{ message }}</p>
+        </div>
         <button
           :disabled="!canSubmit"
           @click="register"
-          class="form-primary vertical-center col-start-1 sm:col-start-2">
+          class="form-primary vertical-center col-start-1 sm:col-start-2 row-start-2 sm:row-start-1">
           <span>Registrovať</span>
         </button>
       </div>

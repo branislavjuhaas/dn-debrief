@@ -4,6 +4,7 @@ import Field from "../../components/Field.vue";
 import { ref, watch } from "vue";
 import { useUserStore } from "../../stores.js";
 import { translateError } from "../../translate.js";
+import router from "../../router.js";
 
 // Define reactive variables
 const email = ref("");
@@ -57,9 +58,13 @@ const register = async () => {
 
   const { emailRegister } = await import("../../firebase/auth.js");
 
-  emailRegister(email.value, password.value).catch((error) => {
-    message.value = translateError(error.code);
-  });
+  emailRegister(email.value, password.value)
+    .then(() => {
+      router.push({ name: "Join", query: { message: "Ak sa chceš zúčastniť našich podujatí, staň sa členom alebo členkou SDA!" } });
+    })
+    .catch((error) => {
+      message.value = translateError(error.code);
+    });
 };
 
 /**
