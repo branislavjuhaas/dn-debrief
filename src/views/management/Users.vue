@@ -33,7 +33,7 @@ let clubs = [];
 const users = ref([]);
 const exported = ref(false);
 const registrationYearFilter = ref("");
-const years = Array.from({ length: new Date().getFullYear() - 2023 }, (_, i) =>
+const years = Array.from({ length: new Date().getFullYear() - 2023 + (new Date().getMonth() >= 8 ? 1 : 0) }, (_, i) =>
   (2024 + i).toString(),
 );
 
