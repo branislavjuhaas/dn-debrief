@@ -154,7 +154,7 @@ exports.updateUserSeasons = onCall(
 
       logger.info("Updated seasons, executing update:", updatedSeasons);
 
-      await userRef.update({ seasons: updatedSeasons });
+      await userRef.update({ seasons: updatedSeasons, reminded: false });
 
       // Increment the membersCount property in the clubs collection
       if (userData.club) {
@@ -236,6 +236,81 @@ exports.reevaluateMembersCount = onSchedule(
       logger.info("Successfully reevaluated members count for all clubs.");
     } catch (error) {
       logger.error("Error reevaluating members count:", error);
+    }
+  },
+);
+
+/**
+ * This function sends reminder emails to users who joined the current season but haven't confirmed.
+ * It is triggered by a scheduled event to run weekly.
+ * The function fetches all users from the Firestore 'users' collection, filters out users who have confirmed their registration for the current season,
+ * and sends reminder emails to the remaining users.
+ * It also sets a 'reminded' field in the Firestore 'users' collection to avoid duplicate reminders.
+ * If an error occurs during the execution of the function, it logs the error.
+ *
+ * @name sendRegistrationReminders
+ * @function
+ * @async
+ * @param {Object} context - The context object.
+ * @returns {void}
+ */
+exports.sendRegistrationReminders = onSchedule(
+  { schedule: "0 0 * * 0" },
+  async (context) => {
+    try {
+      const usersSnapshot = await admin.firestore().collection("users").get();
+      const currentYear = new Date().getFullYear().toString();
+
+      const usersToRemind = usersSnapshot.docs.filter((doc) => {
+        const userData = doc.data();
+        const hasCurrentYearSeason = userData.seasons?.some(
+          (season) => season.year === currentYear
+        );
+        const hasUnconfirmedCurrentYearSeason = userData.seasons?.some(
+          (season) => season.year === currentYear && !season.confirmed
+        );
+        return hasCurrentYearSeason && hasUnconfirmedCurrentYearSeason && !userData.reminded;
+      });
+
+      for (const userDoc of usersToRemind) {
+        const userData = userDoc.data();
+        const email = userData.email;
+        const fullName = `${userData.name} ${userData.surname}`;
+        const token = createToken(userDoc.id);
+
+        const mailerSend = new MailerSend({
+          apiKey:
+            "mlsn.6ec3427e51bcb074615c91ce41eb8678c3a8c6ce11e5b0999eb9520f133445f4",
+        });
+
+        const recipients = [new Recipient(email, fullName)];
+
+        const personalization = [
+          {
+            email: email,
+            data: {
+              token: token,
+            },
+          },
+        ];
+
+        const emailParams = new EmailParams()
+          .setFrom(new Recipient("debrief@sda.sk", "Systém DebRIEF"))
+          .setTo(recipients)
+          .setSubject("Pripomienka registrácie do SDA")
+          .setTemplateId("jpzkmgqvm6vl059v")
+          .setPersonalization(personalization);
+
+        await mailerSend.email.send(emailParams);
+
+        await admin.firestore().collection("users").doc(userDoc.id).update({
+          reminded: true,
+        });
+      }
+
+      logger.info("Successfully sent registration reminders.");
+    } catch (error) {
+      logger.error("Error sending registration reminders:", error);
     }
   },
 );
