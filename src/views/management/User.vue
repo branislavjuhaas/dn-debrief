@@ -475,6 +475,9 @@ const saveUserData = async (data) => {
               'Hlavný/-á rozhodca/-kyňa',
               'Vedúci/-a klubu',
               'Používateľ/-ka',
+              'Organizátor/-ka',
+              'Junior organizátor/-ka',
+              'Tézový výbor',
             ]" />
         </div>
       </div>
