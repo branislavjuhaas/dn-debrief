@@ -380,6 +380,10 @@ export const getUser = async (uid) => {
   return user;
 };
 
+/**
+ * Updates a user's seasons in Firestore.
+ * @param {string} userId - The user's ID.
+ */
 export const updateUserSeasons = async (userId) => {
   const userRef = doc(db, "users", userId);
 
@@ -547,4 +551,18 @@ export const fetchAllClubs = async () => {
   });
 
   return clubs;
+};
+
+/**
+ * Updates a user's data in Firestore.
+ * @param {string} uid - The user's ID.
+ * @param {Object} updatedData - The updated user data.
+ */
+export const updateUserData = async (uid, updatedData) => {
+  try {
+    await updateDoc(doc(db, `users/${uid}`), updatedData);
+  } catch (error) {
+    console.error("Error updating user data: ", error);
+    return error;
+  }
 };

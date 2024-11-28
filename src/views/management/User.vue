@@ -6,6 +6,8 @@ import {
   assignAwardToUser,
   updateAwardLegendStatus,
   removeAwardFromUser,
+  updateUserData as updateUserDataInFirebase,
+  getClubs,
 } from "../../firebase/structure.js";
 import router from "../../router.js";
 import Dropdown from "../../components/Dropdown.vue";
@@ -37,6 +39,7 @@ const contextMenuVisible = ref(false);
 const contextMenuPosition = ref({ x: 0, y: 0 });
 const selectedAward = ref(null);
 let actualRole = "";
+const clubs = ref([]);
 
 /**
  * Formats user data for display.
@@ -302,6 +305,9 @@ const confirmRegistration = async () => {
 onMounted(() => {
   getAwards();
   updateUserData();
+  getClubs(false).then((data) => {
+    clubs.value = data;
+  });
 });
 
 watch(() => route.params.uid, updateUserData);
@@ -315,6 +321,46 @@ watch(userRole, async (newRole, oldRole) => {
 
   actualRole = newRole;
 });
+
+/**
+ * Handles left-click on a user data field.
+ * @param {Event} event - The event object.
+ * @param {Object} data - The user data object.
+ */
+const handleLeftClickUserData = (event, data) => {
+  if (
+    (userStore.role !== "admin" && userStore.role !== "developer") ||
+    data.name === "uid" ||
+    data.name === "email" ||
+    data.name === "member" ||
+    data.name === "club" ||
+    (userStore.role === "admin" && actualRole === "developer")
+  ) {
+    return;
+  }
+  event.preventDefault();
+  data.editing = true;
+  data.originalValue = data.value;
+  contextMenuVisible.value = false;
+};
+
+/**
+ * Saves the edited user data and updates Firebase.
+ * @param {Object} data - The user data object.
+ */
+const saveUserData = async (data) => {
+  if (data.value !== data.originalValue) {
+    try {
+      await updateUserDataInFirebase(route.params.uid, {
+        [data.name]: data.value,
+      });
+    } catch (error) {
+      console.error("Error updating user data:", error);
+      data.value = data.originalValue;
+    }
+  }
+  data.editing = false;
+};
 </script>
 
 <template>
@@ -328,9 +374,18 @@ watch(userRole, async (newRole, oldRole) => {
         <div
           v-for="data in userData"
           :key="data.name"
-          class="flex flex-row justify-between h-12 px-5 items-center text-black vertical-center">
-          <p class="font-bold">{{ translateKey(data.name) }}</p>
-          <p>{{ data.value }}</p>
+          class="flex flex-row justify-between h-12 px-5 items-center text-black vertical-center"
+          @click="handleLeftClickUserData($event, data)">
+          <p class="font-bold whitespace-nowrap">
+            {{ translateKey(data.name) }}
+          </p>
+          <input
+            v-if="data.editing && data.name !== 'club'"
+            v-model="data.value"
+            @blur="saveUserData(data)"
+            @keyup.enter="saveUserData(data)"
+            class="bg-transparent outline-none text-right w-full overflow-hidden" />
+          <p v-if="!data.editing" class="text-right">{{ data.value }}</p>
         </div>
       </div>
       <div class="flex flex-col gap-4">
