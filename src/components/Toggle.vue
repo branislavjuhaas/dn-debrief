@@ -15,6 +15,13 @@ const emit = defineEmits(["update:modelValue"]);
 
 // Watch for changes in the checked state and emit an event when it changes
 watch(
+  () => props.modelValue,
+  (newValue) => {
+    checked.value = newValue;
+  },
+);
+
+watch(
   () => checked.value,
   () => {
     emit("update:modelValue", checked.value);

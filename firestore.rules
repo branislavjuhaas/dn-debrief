@@ -6,7 +6,8 @@ service cloud.firestore {
       allow read: if request.auth != null && (
         request.auth.uid == userId ||
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'developer', 'cap'] ||
-        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'coach' && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.club == resource.data.club)
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'coach' && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.club == resource.data.club) ||
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.clubManager == true && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.club == resource.data.club)
       );
       allow write: if (request.auth.uid == userId
                      && (!('role' in resource.data) || !('role' in request.resource.data) || request.resource.data.role == resource.data.role)

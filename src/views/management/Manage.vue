@@ -2,11 +2,13 @@
 // Import necessary functions
 import { useUserStore } from "../../stores.js";
 import { translateRole } from "../../translate.js";
+import { watch, ref } from "vue";
 
 // Get the user store
 const userStore = useUserStore();
+const relevantLinks = ref([]);
 
-const club = userStore.club || { name: "neznámy", id: "unknown" };
+const club = userStore.club || { name: "", id: "" };
 
 // Define a list of links with their respective roles
 const links = [
@@ -39,19 +41,53 @@ const links = [
     name: "Správa obsahu",
     link: "/manage/messages",
     roles: ["developer", "admin"],
-  }
+  },
 ];
 
-// Filter the links based on the user's role
-const relevantLinks = links.filter((link) =>
-  link.roles.includes(userStore.role),
-);
+// Function to update relevant links
+const updateRelevantLinks = () => {
+  const club = userStore.club;
+
+  relevantLinks.value = links.filter((link) =>
+    link.roles.includes(userStore.role),
+  );
+
+  if (userStore.clubManager) {
+    relevantLinks.value.push({
+      name: `Správa debatného klubu ${club.name}`,
+      link: `/manage/clubs/${club.id}`,
+      roles: ["coach"],
+    });
+
+    if (
+      relevantLinks.value.filter(
+        (link) => link.link === `/manage/clubs/${club.id}`,
+      ).length > 1
+    ) {
+      relevantLinks.value.splice(
+        relevantLinks.value.findIndex(
+          (link) => link.link === `/manage/clubs/${club.id}`,
+        ),
+        1,
+      );
+    }
+  }
+};
+
+// Watch for changes in userStore and update relevant links
+watch(() => userStore.role, updateRelevantLinks);
+watch(() => userStore.clubManager, updateRelevantLinks);
+
+// Initialize relevant links
+updateRelevantLinks();
 </script>
 
 <template>
   <div class="gap-4">
     <h1 class="text-5xl font-bold mb-2">
-      Panel správy - {{ translateRole(userStore.role) }}
+      Panel správy{{
+        userStore.role ? " - " + translateRole(userStore.role) : ""
+      }}
     </h1>
     <div
       class="flex flex-col justify-between w-full bg-white min-h-60 rounded-[1.25rem] p-5 gap-16">
