@@ -8,9 +8,11 @@ import {
   removeAwardFromUser,
   updateUserData as updateUserDataInFirebase,
   getClubs,
+  updateUserClubManagerStatus,
 } from "../../firebase/structure.js";
 import router from "../../router.js";
 import Dropdown from "../../components/Dropdown.vue";
+import Toggle from "../../components/Toggle.vue";
 import { useUserStore } from "../../stores.js";
 import {
   reverseTranslateRole,
@@ -38,6 +40,7 @@ const showAwardDropdown = ref(false);
 const contextMenuVisible = ref(false);
 const contextMenuPosition = ref({ x: 0, y: 0 });
 const selectedAward = ref(null);
+const isClubManager = ref(false);
 let actualRole = "";
 const clubs = ref([]);
 
@@ -98,6 +101,8 @@ const updateUserData = async () => {
       );
       return { ...awardData, legend: !!award.legend };
     });
+
+    isClubManager.value = user.clubManager || false;
   } catch (error) {
     if (error.code === "permission-denied") {
       await router.push("/unauthorized");
@@ -361,6 +366,18 @@ const saveUserData = async (data) => {
   }
   data.editing = false;
 };
+
+/**
+ * Updates the club manager status for the user.
+ */
+const updateClubManagerStatus = async () => {
+  console.log("MANAGING CLUB");
+  try {
+    await updateUserClubManagerStatus(route.params.uid, isClubManager.value);
+  } catch (error) {
+    console.error("Error updating club manager status:", error);
+  }
+};
 </script>
 
 <template>
@@ -451,17 +468,32 @@ const saveUserData = async (data) => {
         <div
           class="grid grid-flow-col items-center sm:grid-rows-1 gap-4 sm:grid-cols-4">
           <button
-            v-if="userPending"
+            v-if="
+              userPending && ['admin', 'developer'].includes(userStore.role)
+            "
             @click="resendConfirmationEmail"
             class="form-secondary vertical-center col-start-1">
             <span>Poslať overenie</span>
           </button>
           <button
-            v-if="userPending"
+            v-if="
+              userPending && ['admin', 'developer'].includes(userStore.role)
+            "
             @click="confirmRegistration"
             class="form-secondary vertical-center col-start-1 sm:col-start-2">
             <span>Potvrdiť registráciu</span>
           </button>
+          <toggle
+            v-if="
+              userRole &&
+              !['Vedúci/-a klubu', 'Používateľ/-ka'].includes(userRole) &&
+              !userPending &&
+              ['admin', 'developer'].includes(userStore.role)
+            "
+            class="col-span-1 sm:col-start-2"
+            label="Správca klubu"
+            v-model="isClubManager"
+            @update:modelValue="updateClubManagerStatus" />
           <dropdown
             v-if="userRole && ['admin', 'developer'].includes(userStore.role)"
             class="col-start-1 col-span-1 sm:col-start-3 sm:col-span-2"

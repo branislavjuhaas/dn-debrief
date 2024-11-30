@@ -42,11 +42,7 @@ const routes = [
     path: "/profile/:uid",
     name: "User",
     component: () => import("./views/management/User.vue"),
-    meta: {
-      title: "Profil používateľa",
-      requiresAuth: true,
-      roles: ["developer", "admin"],
-    },
+    meta: { title: "Profil používateľa", requiresAuth: true },
   },
   {
     path: "/join",

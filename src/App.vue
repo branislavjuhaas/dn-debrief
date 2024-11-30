@@ -94,12 +94,19 @@ const handleUserCreation = async (user, userData) => {
       null,
       null,
       null,
+      null,
     );
 
     loadingStore.loadingEnd();
 
     // Redirect to the Join page with a query parameter
-    await router.push({ name: "Join", query: { message: "Ak sa chceš zúčastniť našich podujatí, staň sa členom alebo členkou SDA!" } });
+    await router.push({
+      name: "Join",
+      query: {
+        message:
+          "Ak sa chceš zúčastniť našich podujatí, staň sa členom alebo členkou SDA!",
+      },
+    });
 
     return;
   }
@@ -120,6 +127,7 @@ const handleUserCreation = async (user, userData) => {
     userData.supervisorEmail,
     userData.seasons,
     userData.awards,
+    userData.clubManager,
   );
 };
 

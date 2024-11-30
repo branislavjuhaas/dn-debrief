@@ -21,6 +21,7 @@ export const useUserStore = defineStore("user", {
     supervisorEmail: null,
     seasons: [],
     awards: [],
+    clubManager: false,
   }),
   getters: {
     /**
@@ -88,6 +89,7 @@ export const useUserStore = defineStore("user", {
      * @param {string} supervisorEmail - The supervisor email.
      * @param {Array} seasons - The seasons.
      * @param {Array} awards - The awards.
+     * @param {boolean} clubManager - The club manager status.
      */
     setUser(
       uid,
@@ -104,6 +106,7 @@ export const useUserStore = defineStore("user", {
       supervisorEmail,
       seasons,
       awards,
+      clubManager,
     ) {
       this.uid = uid;
       this.provider = provider;
@@ -119,6 +122,7 @@ export const useUserStore = defineStore("user", {
       this.supervisorEmail = supervisorEmail || null;
       this.seasons = seasons || [];
       this.awards = awards || [];
+      this.clubManager = clubManager || false;
     },
     /**
      * Log out the user.
@@ -136,6 +140,7 @@ export const useUserStore = defineStore("user", {
       this.birthdate = null;
       this.seasons = [];
       this.awards = [];
+      this.clubManager = false;
     },
     /**
      * Add a season to the user's seasons.

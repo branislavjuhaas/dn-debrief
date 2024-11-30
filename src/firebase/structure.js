@@ -566,3 +566,19 @@ export const updateUserData = async (uid, updatedData) => {
     return error;
   }
 };
+
+/**
+ * Updates the club manager status of a user in Firestore.
+ * @param {string} uid - The user's ID.
+ * @param {boolean} clubManagerStatus - The new club manager status.
+ */
+export const updateUserClubManagerStatus = async (uid, clubManagerStatus) => {
+  try {
+    await updateDoc(doc(db, `users/${uid}`), {
+      clubManager: clubManagerStatus,
+    });
+  } catch (error) {
+    console.error("Error updating club manager status: ", error);
+    return error;
+  }
+};
