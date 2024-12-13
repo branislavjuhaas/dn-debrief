@@ -3,6 +3,7 @@
 import debrief from "./../assets/debrief.svg";
 import cascade from "../assets/dn-cascade.svg";
 import barca from "./../assets/barca.svg";
+import Search from "./Search.vue";
 
 // Set the default logo to cascade
 let logo = cascade;
@@ -28,6 +29,7 @@ else if (window.location.hostname === "barca.juhaas.eu") {
       <router-link to="/" class="flex items-center">
         <img :src="logo" :alt="system" class="h-8" />
       </router-link>
+      <Search />
     </div>
   </div>
 </template>

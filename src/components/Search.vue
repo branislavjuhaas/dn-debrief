@@ -7,9 +7,12 @@ import { computed, ref } from "vue";
 // Define reactive variables
 const searchResults = ref([]);
 const active = ref(false);
+const query = ref("");
 
 // Get user data from store
 const user = useUserStore();
+
+const client = algoliasearch("O3UGZ9QDEJ", "02455aca81a71f0a4e00b53fb3812175");
 
 // Array of SVG paths for icons
 const icons = [
@@ -25,20 +28,24 @@ const hideResults = () => {
 };
 
 // Function to perform search using Algolia
-const search = async (query) => {
+const search = async () => {
+  if (query.value.trim() === "") {
+    searchResults.value = [];
+    return;
+  }
   await client
     .search([
       {
         indexName: "users",
         params: {
-          query: query,
+          query: query.value,
           hitsPerPage: 10, // Limit to 10 results
         },
       },
       {
         indexName: "clubs",
         params: {
-          query: query,
+          query: query.value,
           hitsPerPage: 10, // Limit to 10 results
         },
       },
@@ -76,6 +83,14 @@ const placeholder = computed(() => {
     return "Hľadať používateľov a kluby";
   }
 });
+
+// Add handleClick function
+const handleClick = (result) => {
+  console.log("Clicked on", result);
+  query.value = '';
+  active.value = false;
+  // Optionally navigate can be handled here if needed
+};
 </script>
 
 <template>
@@ -83,7 +98,8 @@ const placeholder = computed(() => {
     class="grid grid-cols-[auto_1fr] gap-3 w-full h-10 border-2 rounded-[1.25rem] px-4 items-center sm:relative">
     <img src="../assets/icons/search.svg" alt="search" class="h-5" />
     <input
-      @input="search($event.target.value)"
+      v-model="query"
+      @input="search"
       @focusout="hideResults"
       @focus="active = true"
       :disabled="user.uid == null || !user.role || user.role === 'user'"
@@ -98,6 +114,7 @@ const placeholder = computed(() => {
         v-for="result in searchResults"
         :key="result.objectID"
         :to="result.link"
+        @click="handleClick(result)"
         class="grid grid-cols-[auto_1fr] gap-3">
         <svg
           xmlns="http://www.w3.org/2000/svg"
