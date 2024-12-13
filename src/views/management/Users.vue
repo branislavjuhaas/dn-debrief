@@ -250,7 +250,7 @@ const fetchUsers = async () => {
 // On component mount
 onMounted(async () => {
   clubs = (await Promise.all([getClubs(false)]))[0];
-  // If filtered, get the club with params filter. filter param is a clubs id  
+  // If filtered, get the club with params filter. filter param is a clubs id
   if (props.filter) {
     currentClub.value = clubs.find((club) => club.id === route.params.filter);
     if (!currentClub.value) {
@@ -414,13 +414,13 @@ const filteredUsers = computed(() => {
         </router-link>
       </div>
     </div>
-      <button
-        v-if="hasMoreUsers"
-        @click="fetchUsers"
-        class="alternative vertical-center w-full sm:w-auto">
-        <span>Načítať ďalších</span>
-      </button>
-      <p v-else class="text-center">Všetci používatelia sú načítaní</p>
+    <button
+      v-if="hasMoreUsers"
+      @click="fetchUsers"
+      class="alternative vertical-center w-full sm:w-auto">
+      <span>Načítať ďalších</span>
+    </button>
+    <p v-else class="text-center">Všetci používatelia sú načítaní</p>
   </div>
 </template>
 
