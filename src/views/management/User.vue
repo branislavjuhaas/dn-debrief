@@ -79,11 +79,12 @@ function formatUserData(uid, user) {
  * Updates the user data.
  */
 const updateUserData = async () => {
+  console.log("UPDATING USER DATA");
   const userId = route.params.uid;
   try {
     const user = await getUser(userId);
     userData.value = formatUserData(userId, user);
-    actualRole = translateRole(user.role) || "Používateľ";
+    actualRole = translateRole(user.role) || "Používateľ/-ka";
     userRole.value = actualRole;
     userFullName.value = `${user.name} ${user.surname}`;
     userPending.value = !!(
@@ -95,7 +96,7 @@ const updateUserData = async () => {
       )
     );
 
-    userAwards.value = user.awards.map((award) => {
+    userAwards.value = (user.awards || []).map((award) => {
       const awardData = availableAwards.value.find(
         (availableAward) => availableAward.id === award.award.id,
       );
@@ -127,7 +128,11 @@ const getAwards = async () => {
 const assignAward = async (awardId) => {
   try {
     await assignAwardToUser(route.params.uid, awardId);
-    await updateUserData();
+    // Update local state
+    const awardData = availableAwards.value.find(a => a.id === awardId);
+    if (awardData) {
+      userAwards.value.push({ ...awardData, legend: false });
+    }
   } catch (error) {
     console.error("Error assigning award:", error);
   }
@@ -180,7 +185,11 @@ const handleRightClick = (event, award) => {
 const makeLegend = async (award) => {
   try {
     await updateAwardLegendStatus(route.params.uid, award.id, true);
-    await updateUserData();
+    // Update local state
+    const localAward = userAwards.value.find(a => a.id === award.id);
+    if (localAward) {
+      localAward.legend = true;
+    }
   } catch (error) {
     console.error("Error making legend:", error);
   }
@@ -194,7 +203,11 @@ const makeLegend = async (award) => {
 const unmakeLegend = async (award) => {
   try {
     await updateAwardLegendStatus(route.params.uid, award.id, false);
-    await updateUserData();
+    // Update local state
+    const localAward = userAwards.value.find(a => a.id === award.id);
+    if (localAward) {
+      localAward.legend = false;
+    }
   } catch (error) {
     console.error("Error unmaking legend:", error);
   }
@@ -208,7 +221,8 @@ const unmakeLegend = async (award) => {
 const removeAward = async (award) => {
   try {
     await removeAwardFromUser(route.params.uid, award.id);
-    await updateUserData();
+    // Update local state
+    userAwards.value = userAwards.value.filter(a => a.id !== award.id);
   } catch (error) {
     console.error("Error removing award:", error);
   }
@@ -359,6 +373,11 @@ const saveUserData = async (data) => {
       await updateUserDataInFirebase(route.params.uid, {
         [data.name]: data.value,
       });
+      // Update local state without re-fetching
+      const localData = userData.value.find(item => item.name === data.name);
+      if (localData) {
+        localData.value = data.value;
+      }
     } catch (error) {
       console.error("Error updating user data:", error);
       data.value = data.originalValue;
