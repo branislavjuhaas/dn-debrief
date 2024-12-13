@@ -590,23 +590,23 @@ export const updateUserClubManagerStatus = async (uid, clubManagerStatus) => {
  * Fetches a paginated list of users from Firestore.
  * @param {Object|null} club - The club object. If null, fetches all users.
  * @param {number} pageSize - Number of users per page.
- * @param {Object} lastDoc - The last document from the previous page for cursor pagination.
- * @returns {Object} An object containing the users array and the new lastDoc.
+ * @param {Object} lastDocCursor - The last document's cursor data for pagination.
+ * @returns {Object} An object containing the users array and the new cursor.
  */
-export const getUsersPaginated = async (club, pageSize, lastDoc = null) => {
+export const getUsersPaginated = async (club, pageSize, lastDocCursor = null) => {
   let usersQuery = collection(db, "users");
 
   if (club) {
     usersQuery = query(
       usersQuery,
-      where("club", "==", doc(db, `clubs/${club.id}`))
+      where("clubId", "==", club.id)
     );
   }
 
-  usersQuery = query(usersQuery, orderBy("name"), limit(pageSize));
+  usersQuery = query(usersQuery, orderBy("name"), orderBy("__name__"), limit(pageSize));
 
-  if (lastDoc) {
-    usersQuery = query(usersQuery, startAfter(lastDoc));
+  if (lastDocCursor) {
+    usersQuery = query(usersQuery, startAfter(lastDocCursor.name, lastDocCursor.id));
   }
 
   const querySnapshot = await getDocs(usersQuery);
@@ -615,7 +615,14 @@ export const getUsersPaginated = async (club, pageSize, lastDoc = null) => {
     users.push({ id: doc.id, ...doc.data() });
   });
 
-  const newLastDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
+  const lastVisibleDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
+  let newLastDocCursor = null;
+  if (lastVisibleDoc) {
+    newLastDocCursor = {
+      name: lastVisibleDoc.data().name,
+      id: lastVisibleDoc.id
+    };
+  }
 
-  return { users, lastDoc: newLastDoc };
+  return { users, lastDoc: newLastDocCursor };
 };

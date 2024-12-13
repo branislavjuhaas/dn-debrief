@@ -2,7 +2,7 @@
 // Import necessary components and functions
 import { useLoadingStore, useUserStore } from "../../stores.js";
 import Dropdown from "../../components/Dropdown.vue";
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch, reactive } from "vue";
 import {
   getClubs,
   getUsers,
@@ -43,22 +43,16 @@ const years = Array.from(
 );
 
 // Define reactive variables for pagination
-const currentPage = ref(1);
-const pageSize = 20;
 const lastDoc = ref(null);
-const hasNextPage = ref(false);
-
-// Watch for route changes to handle pagination
-watch(
-  () => route.query.page,
-  (newPage) => {
-    currentPage.value = Number(newPage) || 1;
-    fetchUsers();
-  },
-);
+const hasMoreUsers = ref(true);
 
 // Function to get club name by id
-const getClubNameById = (id) => clubs.find((club) => club.id === id).name;
+const getClubNameById = (clubData) => {
+  const clubId = clubData?.id || clubData; // Handle both object and direct ID cases
+  if (!clubId) return "Žiadny";
+  const club = clubs.find((club) => club.id === clubId);
+  return club ? club.name : "Žiadny";
+};
 
 /**
  * Asynchronously exports all users.
@@ -127,7 +121,7 @@ const exportAll = async () => {
 
   // Add table to the worksheet
   worksheet.addTable({
-    name: "UsersTable",
+    name: "Users",
     ref: "A1",
     headerRow: true,
     totalsRow: false,
@@ -154,6 +148,49 @@ const exportAll = async () => {
     column.width = maxLength + 2; // Add some padding to the width
   });
 
+  const clubsSheet = workbook.addWorksheet("Debatné kluby"); // Renamed from 'clubs'
+
+  const clubColumns = [
+    { header: "Názov", filterButton: true },
+    { header: "Aktívny", filterButton: true },
+    { header: "Počet členov", filterButton: true },
+  ];
+
+  const clubRows = clubsData.map((club) => [
+    club.name,
+    club.active ? "Áno" : "Nie",
+    {
+      formula: `COUNTIF(Users[Debatný klub], "${club.name}")`,
+    },
+  ]);
+
+  clubsSheet.addTable({
+    name: "Clubs",
+    ref: "A1",
+    headerRow: true,
+    totalsRow: false,
+    style: {
+      theme: "TableStyleMedium9",
+      showRowStripes: true,
+    },
+    columns: clubColumns.map((col) => ({
+      name: col.header,
+      filterButton: col.filterButton,
+    })),
+    rows: clubRows,
+  });
+
+  clubsSheet.columns.forEach((column, index) => {
+    let maxLength = 0;
+    column.eachCell({ includeEmpty: true }, (cell) => {
+      const columnLength = cell.value ? cell.value.toString().length : 10;
+      if (columnLength > maxLength) {
+        maxLength = columnLength;
+      }
+    });
+    column.width = maxLength + 2;
+  });
+
   // Create a Blob from the workbook and download it
   const buffer = await workbook.xlsx.writeBuffer();
   const blob = new Blob([buffer], {
@@ -175,49 +212,47 @@ const exportAll = async () => {
 
 /**
  * Fetches users with pagination when no club filter is applied.
+ * Utilizes a stack to manage lastDoc snapshots for navigating between pages.
  */
 const fetchUsers = async () => {
   useLoadingStore().loadingStart();
 
   if (clubFilter.value) {
-    // Fetch all users without pagination
-    const usersData = await getUsers(clubFilter.value);
+    // Get club ID by name
+    const selectedClub = clubs.find((club) => club.name === clubFilter.value);
+    const clubId = selectedClub ? selectedClub.id : null;
+    const usersData = getUsers(clubId);
     users.value = usersData;
-    hasNextPage.value = false;
+    hasMoreUsers.value = false;
   } else {
-    // Fetch paginated users
-    const { users: paginatedUsers, lastDoc: newLastDoc } =
-      await getUsersPaginated(null, pageSize, lastDoc.value);
-    console.log("Fetched users - PAGED", paginatedUsers);
-    users.value = paginatedUsers;
+    // Fetch users starting after 'lastDoc', or from the beginning if 'lastDoc' is null
+    const { users: newUsers, lastDoc: newLastDoc } = await getUsersPaginated(
+      null,
+      20,
+      lastDoc.value,
+    );
+
+    // Append new users to the existing users list
+    users.value = users.value.concat(newUsers);
+
+    // Update 'lastDoc' with the last document snapshot
     lastDoc.value = newLastDoc;
-    hasNextPage.value = paginatedUsers.length === pageSize;
+
+    // If fewer than 20 users were fetched, we've reached the end
+    if (newUsers.length < 20) {
+      hasMoreUsers.value = false;
+    }
   }
 
   useLoadingStore().loadingEnd();
 };
 
-// Function to navigate to the next page
-const nextPage = () => {
-  if (hasNextPage.value) {
-    router.push({ query: { ...route.query, page: currentPage.value + 1 } });
-  }
-};
-
-// Function to navigate to the previous page
-const previousPage = () => {
-  if (currentPage.value > 1) {
-    router.push({ query: { ...route.query, page: currentPage.value - 1 } });
-  }
-};
-
 // On component mount
 onMounted(async () => {
   clubs = (await Promise.all([getClubs(false)]))[0];
-  // If filtered, get the club with params filter. filter param is a clubs id
+  // If filtered, get the club with params filter. filter param is a clubs id  
   if (props.filter) {
     currentClub.value = clubs.find((club) => club.id === route.params.filter);
-    // If no club is found, redirect to homepage
     if (!currentClub.value) {
       useLoadingStore().loadingEnd();
       router.push("/");
@@ -227,10 +262,11 @@ onMounted(async () => {
 
   clubsNames.value = clubs.map((club) => club.name);
 
-  const [usersData] = await Promise.all([getUsers(currentClub.value.id)]);
-  users.value = usersData;
+  // Initialize users
+  users.value = [];
+  lastDoc.value = null;
+  hasMoreUsers.value = true;
 
-  currentPage.value = Number(route.query.page) || 1;
   await fetchUsers();
 
   useLoadingStore().loadingEnd();
@@ -242,7 +278,7 @@ const filteredUsers = computed(() => {
   return users.value
     .filter((user) => {
       const isClubMatch = clubFilter.value
-        ? user.club && getClubNameById(user.club.id) === clubFilter.value
+        ? getClubNameById(user.club) === clubFilter.value
         : true;
 
       const isQuickMatch = quickFilter.value
@@ -346,7 +382,7 @@ const filteredUsers = computed(() => {
             {{ translateRole(user.role) || "Používateľ/-ka" }}
           </p>
           <p class="overflow-hidden sm:truncate" v-if="!props.filter">
-            {{ user.club ? getClubNameById(user.club.id) : "Žiadny" }}
+            {{ user.club ? getClubNameById(user.club) : "Žiadny" }}
           </p>
         </div>
         <router-link
@@ -373,25 +409,18 @@ const filteredUsers = computed(() => {
             {{ translateRole(user.role) || "Používateľ/-ka" }}
           </p>
           <p class="overflow-hidden sm:truncate" v-if="!props.filter">
-            {{ user.club ? getClubNameById(user.club.id) : "Žiadny" }}
+            {{ user.club ? getClubNameById(user.club) : "Žiadny" }}
           </p>
         </router-link>
       </div>
     </div>
-    <div class="grid grid-cols-2 gap-4">
       <button
-        @click="previousPage"
-        :disabled="currentPage === 1"
-        class="alternative vertical-center w-full">
-        <span>Predchádzajúce</span>
+        v-if="hasMoreUsers"
+        @click="fetchUsers"
+        class="alternative vertical-center w-full sm:w-auto">
+        <span>Načítať ďalších</span>
       </button>
-      <button
-        @click="nextPage"
-        :disabled="!hasNextPage"
-        class="alternative vertical-center w-full">
-        <span>Nasledujúce</span>
-      </button>
-    </div>
+      <p v-else class="text-center">Všetci používatelia sú načítaní</p>
   </div>
 </template>
 
