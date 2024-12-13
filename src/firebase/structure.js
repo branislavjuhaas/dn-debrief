@@ -12,6 +12,9 @@ import {
   writeBatch,
   documentId,
   arrayUnion,
+  orderBy,
+  startAfter,
+  limit,
 } from "firebase/firestore";
 
 const db = getFirestore();
@@ -581,4 +584,38 @@ export const updateUserClubManagerStatus = async (uid, clubManagerStatus) => {
     console.error("Error updating club manager status: ", error);
     return error;
   }
+};
+
+/**
+ * Fetches a paginated list of users from Firestore.
+ * @param {Object|null} club - The club object. If null, fetches all users.
+ * @param {number} pageSize - Number of users per page.
+ * @param {Object} lastDoc - The last document from the previous page for cursor pagination.
+ * @returns {Object} An object containing the users array and the new lastDoc.
+ */
+export const getUsersPaginated = async (club, pageSize, lastDoc = null) => {
+  let usersQuery = collection(db, "users");
+
+  if (club) {
+    usersQuery = query(
+      usersQuery,
+      where("club", "==", doc(db, `clubs/${club.id}`))
+    );
+  }
+
+  usersQuery = query(usersQuery, orderBy("name"), limit(pageSize));
+
+  if (lastDoc) {
+    usersQuery = query(usersQuery, startAfter(lastDoc));
+  }
+
+  const querySnapshot = await getDocs(usersQuery);
+  const users = [];
+  querySnapshot.forEach((doc) => {
+    users.push({ id: doc.id, ...doc.data() });
+  });
+
+  const newLastDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
+
+  return { users, lastDoc: newLastDoc };
 };

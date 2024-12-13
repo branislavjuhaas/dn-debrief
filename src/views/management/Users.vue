@@ -2,14 +2,15 @@
 // Import necessary components and functions
 import { useLoadingStore, useUserStore } from "../../stores.js";
 import Dropdown from "../../components/Dropdown.vue";
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import {
   getClubs,
   getUsers,
   fetchAllUsers,
   fetchAllClubs,
+  getUsersPaginated,
 } from "../../firebase/structure.js";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { translateRole } from "../../translate.js";
 import Field from "../../components/Field.vue";
 import router from "../../router.js";
@@ -33,8 +34,27 @@ let clubs = [];
 const users = ref([]);
 const exported = ref(false);
 const registrationYearFilter = ref("");
-const years = Array.from({ length: new Date().getFullYear() - 2023 + (new Date().getMonth() >= 8 ? 1 : 0) }, (_, i) =>
-  (2024 + i).toString(),
+const years = Array.from(
+  {
+    length:
+      new Date().getFullYear() - 2023 + (new Date().getMonth() >= 8 ? 1 : 0),
+  },
+  (_, i) => (2024 + i).toString(),
+);
+
+// Define reactive variables for pagination
+const currentPage = ref(1);
+const pageSize = 20;
+const lastDoc = ref(null);
+const hasNextPage = ref(false);
+
+// Watch for route changes to handle pagination
+watch(
+  () => route.query.page,
+  (newPage) => {
+    currentPage.value = Number(newPage) || 1;
+    fetchUsers();
+  },
 );
 
 // Function to get club name by id
@@ -153,6 +173,44 @@ const exportAll = async () => {
   useLoadingStore().loadingEnd();
 };
 
+/**
+ * Fetches users with pagination when no club filter is applied.
+ */
+const fetchUsers = async () => {
+  useLoadingStore().loadingStart();
+
+  if (clubFilter.value) {
+    // Fetch all users without pagination
+    const usersData = await getUsers(clubFilter.value);
+    users.value = usersData;
+    hasNextPage.value = false;
+  } else {
+    // Fetch paginated users
+    const { users: paginatedUsers, lastDoc: newLastDoc } =
+      await getUsersPaginated(null, pageSize, lastDoc.value);
+    console.log("Fetched users - PAGED", paginatedUsers);
+    users.value = paginatedUsers;
+    lastDoc.value = newLastDoc;
+    hasNextPage.value = paginatedUsers.length === pageSize;
+  }
+
+  useLoadingStore().loadingEnd();
+};
+
+// Function to navigate to the next page
+const nextPage = () => {
+  if (hasNextPage.value) {
+    router.push({ query: { ...route.query, page: currentPage.value + 1 } });
+  }
+};
+
+// Function to navigate to the previous page
+const previousPage = () => {
+  if (currentPage.value > 1) {
+    router.push({ query: { ...route.query, page: currentPage.value - 1 } });
+  }
+};
+
 // On component mount
 onMounted(async () => {
   clubs = (await Promise.all([getClubs(false)]))[0];
@@ -171,6 +229,9 @@ onMounted(async () => {
 
   const [usersData] = await Promise.all([getUsers(currentClub.value.id)]);
   users.value = usersData;
+
+  currentPage.value = Number(route.query.page) || 1;
+  await fetchUsers();
 
   useLoadingStore().loadingEnd();
 });
@@ -317,11 +378,29 @@ const filteredUsers = computed(() => {
         </router-link>
       </div>
     </div>
+    <div class="grid grid-cols-2 gap-4">
+      <button
+        @click="previousPage"
+        :disabled="currentPage === 1"
+        class="alternative vertical-center w-full">
+        <span>Predchádzajúce</span>
+      </button>
+      <button
+        @click="nextPage"
+        :disabled="!hasNextPage"
+        class="alternative vertical-center w-full">
+        <span>Nasledujúce</span>
+      </button>
+    </div>
   </div>
 </template>
 
 <style scoped>
 .text-gray {
   @apply text-grey;
+}
+
+.alternative {
+  @apply flex flex-row items-center h-12 bg-white text-black justify-center rounded-[1.25rem] border-2 border-red border-opacity-0 font-bold px-5 duration-150 cursor-pointer hover:border-opacity-100 disabled:bg-transparent disabled:cursor-default disabled:border-dashed disabled:border-black;
 }
 </style>
