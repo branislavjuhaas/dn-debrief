@@ -1,7 +1,8 @@
 <script setup>
 // Import necessary Vue functions and custom hooks
-import { onMounted, ref, watch, watchEffect } from "vue";
+import { onMounted, ref, watch, watchEffect, onUnmounted } from "vue";
 import { useUserStore } from "../stores.js";
+import Tournament from "../components/Tournament.vue";
 
 // Get the user store
 const user = useUserStore();
@@ -56,6 +57,8 @@ watch(
  */
 const userFeed = ref([]);
 
+const tournaments = ref([]);
+
 /**
  * On component mount, fetch the user feed and log it.
  */
@@ -63,7 +66,14 @@ onMounted(async () => {
   const { feed } = await import("../firebase/messaging.js");
 
   userFeed.value = await feed(user);
-  console.log(userFeed.value);
+
+  if (user.uid == null) {
+    return;
+  }
+
+  const { relevantTournaments } = await import("../firebase/tournaments.js");
+
+  tournaments.value = await relevantTournaments();
 });
 
 /**
@@ -72,9 +82,34 @@ onMounted(async () => {
 watchEffect(async () => {
   if (user.uid != null) {
     const { feed } = await import("../firebase/messaging.js");
+    const { relevantTournaments } = await import("../firebase/tournaments.js");
 
     userFeed.value = await feed(user);
+    tournaments.value = await relevantTournaments();
     console.log(userFeed.value);
+  }
+});
+
+const tournamentsContainer = ref(null);
+
+const handleWheel = (e) => {
+  e.preventDefault();
+  if (tournamentsContainer.value) {
+    tournamentsContainer.value.scrollLeft -= e.deltaY;
+  }
+};
+
+onMounted(() => {
+  if (tournamentsContainer.value) {
+    tournamentsContainer.value.addEventListener("wheel", handleWheel, {
+      passive: false,
+    });
+  }
+});
+
+onUnmounted(() => {
+  if (tournamentsContainer.value) {
+    tournamentsContainer.value.removeEventListener("wheel", handleWheel);
   }
 });
 </script>
@@ -88,6 +123,33 @@ watchEffect(async () => {
           : "Vitaj v systéme " + system + "!"
       }}
     </h1>
+
+    <div
+      class="flex flex-row text-base font-bold gap-3 mt-10 items-center leading-3">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="20"
+        height="20"
+        viewBox="0 0 20 20"
+        fill="none"
+        class="w-5 shrink-0">
+        <path
+          d="M18.648 5.74218C18.4693 5.59295 18.2522 5.49697 18.0215 5.4652C17.7908 5.43343 17.5558 5.46714 17.3433 5.56249L13.3902 7.32031L11.0933 3.17968C10.9836 2.98637 10.8245 2.8256 10.6324 2.71376C10.4402 2.60192 10.2219 2.543 9.9996 2.543C9.77728 2.543 9.55894 2.60192 9.36681 2.71376C9.17468 2.8256 9.01563 2.98637 8.90585 3.17968L6.60897 7.32031L2.65585 5.56249C2.44296 5.46728 2.20768 5.43352 1.97662 5.46503C1.74555 5.49654 1.5279 5.59206 1.34828 5.7408C1.16866 5.88953 1.03423 6.08555 0.960186 6.30669C0.886142 6.52783 0.875438 6.76528 0.929283 6.99218L2.91366 15.4531C2.9516 15.6169 3.02241 15.7713 3.12178 15.907C3.22116 16.0426 3.34703 16.1566 3.49178 16.2422C3.68776 16.3595 3.91182 16.4216 4.14022 16.4219C4.25125 16.4217 4.3617 16.4059 4.46835 16.375C8.08539 15.375 11.906 15.375 15.523 16.375C15.8533 16.4618 16.2045 16.4141 16.4996 16.2422C16.6452 16.1577 16.7718 16.044 16.8713 15.9082C16.9708 15.7724 17.0411 15.6174 17.0777 15.4531L19.0699 6.99218C19.1231 6.76521 19.1119 6.52788 19.0373 6.30699C18.9628 6.08611 18.8279 5.89047 18.648 5.74218ZM13.1246 12.6953C13.1074 12.8493 13.0342 12.9917 12.919 13.0954C12.8038 13.1991 12.6546 13.2569 12.4996 13.2578H12.4371C10.8162 13.0937 9.18295 13.0937 7.5621 13.2578C7.39739 13.2753 7.23247 13.2267 7.10356 13.1227C6.97465 13.0187 6.8923 12.8678 6.8746 12.7031C6.85928 12.5376 6.90969 12.3727 7.01495 12.2441C7.1202 12.1154 7.27183 12.0334 7.43709 12.0156C9.1407 11.8359 10.8585 11.8359 12.5621 12.0156C12.7259 12.0334 12.8763 12.1144 12.9813 12.2413C13.0864 12.3682 13.1378 12.5311 13.1246 12.6953Z"
+          fill="white" />
+      </svg>
+      <h6 class="mt-1">Najbližšie relevantné podujatia</h6>
+    </div>
+    <div
+      ref="tournamentsContainer"
+      class="flex flex-row mt-2 gap-[1.25rem] overflow-x-auto scrollbar-hidden tournaments-container">
+      <tournament
+        v-for="(tournament, index) in tournaments"
+        :key="tournament.id"
+        :tournament="tournament"
+        :style="{ '--delay': index / 20 + 's' }"
+        class="tournament-card" />
+    </div>
+
     <div
       class="flex flex-row text-base font-bold gap-3 mt-10 items-center leading-3">
       <svg
@@ -141,10 +203,38 @@ watchEffect(async () => {
   @apply font-bold;
 }
 
+.tournament-card {
+  opacity: 0;
+  transform: translateX(20px);
+  animation: slideInFromRight 0.5s forwards var(--delay);
+}
+
+.tournaments-container {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.tournaments-container::-webkit-scrollbar {
+  display: none;
+}
+
 @keyframes slideIn {
   100% {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromRight {
+  0% {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 </style>

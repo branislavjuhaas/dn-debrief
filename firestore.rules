@@ -26,5 +26,9 @@ service cloud.firestore {
       allow read: if request.auth != null;
       allow write: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'developer'];
     }
+    match /tournaments/{tournamentId} {
+      allow read: if request.auth != null;
+      allow write: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'developer', 'organizer', 'junior'];
+    }
   }
 }
