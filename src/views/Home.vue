@@ -2,7 +2,7 @@
 // Import necessary Vue functions and custom hooks
 import { onMounted, ref, watch, watchEffect, onUnmounted } from "vue";
 import { useUserStore } from "../stores.js";
-import Tournament from "../components/Event.vue";
+import Event from "../components/Event.vue";
 
 // Get the user store
 const user = useUserStore();
@@ -165,7 +165,7 @@ const imageLoaded = ref(false);
       v-else
       ref="eventsContainer"
       class="flex flex-row mt-2 gap-[1.25rem] overflow-x-auto scrollbar-hidden events-container">
-      <tournament
+      <event
         v-for="(event, index) in events"
         :key="event.id"
         :event="event"

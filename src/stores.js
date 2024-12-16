@@ -210,7 +210,7 @@ export const useFeedStore = defineStore("feed", {
   },
 });
 
-export const useEventsStore = defineStore("tournament", {
+export const useEventsStore = defineStore("event", {
   state: () => ({
     initialized: false,
     events: [],
