@@ -1,6 +1,5 @@
 import {
   collection,
-  doc,
   getDocs,
   getFirestore,
   query,
@@ -26,10 +25,7 @@ export const relevantTournaments = async () => {
   }
 
   const today = new Date();
-  const q = query(
-    collection(db, "tournaments"),
-    where("beginningDate", ">=", today),
-  );
+  const q = query(collection(db, "tournaments"), where("endDate", ">=", today));
   const querySnapshot = await getDocs(q);
   const tournaments = querySnapshot.docs
     .map((doc) => ({
