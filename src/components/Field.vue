@@ -44,6 +44,13 @@ watch(
     emit("update:modelValue", value.value);
   },
 );
+
+watch(
+  () => props.modelValue, // Watch the prop directly
+  (newVal) => {
+    value.value = newVal; // Update the local value when prop changes
+  }
+);
 </script>
 
 <template>
