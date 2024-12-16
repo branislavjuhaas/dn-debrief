@@ -242,10 +242,6 @@ const imageLoaded = ref(false);
   -ms-overflow-style: none;
 }
 
-.events-container::-webkit-scrollbar {
-  display: none;
-}
-
 @keyframes slideIn {
   100% {
     opacity: 1;

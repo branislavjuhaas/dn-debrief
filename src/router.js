@@ -205,7 +205,7 @@ const routes = [
     name: "NewEvent",
     component: () => import("./views/events/New.vue"),
     meta: {
-      title: "Vytvoriť turnaj",
+      title: "Vytvoriť podujatie",
       requiresAuth: true,
       roles: ["developer", "admin", "organizer", "junior"],
     },
