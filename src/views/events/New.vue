@@ -1,5 +1,7 @@
 <script setup>
 import Thumbnail from "../../components/Thumbnail.vue";
+import { ref } from "vue";
+const thumbnailRef = ref(null);
 </script>
 
 <template>
@@ -9,11 +11,16 @@ import Thumbnail from "../../components/Thumbnail.vue";
       class="flex flex-col sm:grid sm:grid-cols-[auto_1fr] w-full bg-white min-h-60 rounded-[1.25rem] p-5 gap-8 transition-all">
       <div class="overflow-hidden rounded-[1.25rem] w-[26.875rem]">
         <thumbnail
+          ref="thumbnailRef"
           name="3. stred"
           beginning-date="10-2-2025"
           end-date="11-2-2025"
-          city="Ružomberok" />
+          city="Ružomberok"
+          id="test" />
       </div>
+      <button class="bg-black" @click="thumbnailRef.uploadThumbnail()">
+        Uploaden
+      </button>
     </div>
   </div>
 </template>

@@ -1,5 +1,122 @@
 <script setup>
+// THIS FILE DOESN'T USE FIREBASE
+
+import { ref } from "vue";
+import { uploadThumbnailImage, relevantEvents } from "../firebase/events.js";
+import { defineExpose } from "vue";
+
 const props = defineProps(["id", "name", "city", "beginningDate", "endDate"]);
+
+const selectedImage = ref(null);
+
+const imageWidth = ref(0);
+const imageHeight = ref(0);
+
+const handleFileChange = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    const objectUrl = URL.createObjectURL(file);
+    const img = new Image();
+    img.src = objectUrl;
+    img.onload = () => {
+      imageWidth.value = img.width;
+      imageHeight.value = img.height;
+
+      selectedImage.value = objectUrl;
+    };
+  }
+};
+
+const useSampleImage = async () => {
+  let availableThumbnails = [
+    "defaults/01.jpg",
+    "defaults/02.jpg",
+    "defaults/03.jpg",
+    "defaults/04.jpg",
+    "defaults/05.jpg",
+    "defaults/06.jpg",
+    "defaults/07.jpg",
+  ];
+
+  const events = await relevantEvents();
+
+  // From the available events, go trough them and remove event.thumbnail from the list if it is there
+  for (let event of events) {
+    availableThumbnails = availableThumbnails.filter(
+      (thumbnail) => thumbnail !== event.originalThumbnail,
+    );
+  }
+
+  console.log(availableThumbnails);
+
+  if (availableThumbnails.length === 0) {
+    return "defaults/DN Cascade.png";
+  }
+
+  const randomIndex = Math.floor(Math.random() * availableThumbnails.length);
+  return availableThumbnails[randomIndex];
+};
+
+const uploadThumbnail = async () => {
+  if (!selectedImage.value) return;
+
+  const img = new Image();
+  img.src = selectedImage.value;
+
+  await new Promise((resolve) => {
+    img.onload = resolve;
+  });
+
+  const targetWidth = 645;
+  const targetHeight = 345;
+  const targetAspect = targetWidth / targetHeight;
+
+  const imgAspect = img.width / img.height;
+
+  let sourceWidth, sourceHeight;
+  let sourceX, sourceY;
+
+  if (imgAspect > targetAspect) {
+    // Image is wider than target aspect ratio
+    sourceHeight = img.height;
+    sourceWidth = sourceHeight * targetAspect;
+    sourceX = (img.width - sourceWidth) / 2;
+    sourceY = 0;
+  } else {
+    // Image is taller than target aspect ratio
+    sourceWidth = img.width;
+    sourceHeight = sourceWidth / targetAspect;
+    sourceX = 0;
+    sourceY = (img.height - sourceHeight) / 2;
+  }
+
+  const canvas = document.createElement("canvas");
+  canvas.width = targetWidth;
+  canvas.height = targetHeight;
+  const ctx = canvas.getContext("2d");
+
+  ctx.drawImage(
+    img,
+    sourceX,
+    sourceY,
+    sourceWidth,
+    sourceHeight,
+    0,
+    0,
+    targetWidth,
+    targetHeight,
+  );
+
+  const blob = await new Promise((resolve) => {
+    canvas.toBlob(resolve, "image/jpeg");
+  });
+
+  await uploadThumbnailImage(props.id, blob);
+};
+
+defineExpose({
+  uploadThumbnail,
+});
 
 const datesAggregate = () => {
   let { beginningDate, endDate } = props;
@@ -19,8 +136,14 @@ const datesAggregate = () => {
 
 <template>
   <div
-    class="thumbnail-card shrink-0 w-[26.875rem] h-[14.375rem] max-w-full relative rounded-[1.25rem] overflow-hidden duration-500">
+    class="thumbnail-card shrink-0 w-[26.875rem] h-[14.375rem] max-w-full relative rounded-[1.25rem] overflow-hidden duration-500 flex items-center justify-center">
     <img
+      v-if="selectedImage"
+      :src="selectedImage"
+      alt=""
+      class="object-cover w-full h-full rounded-[1.25rem]" />
+    <img
+      v-else
       src="../assets/dn-cascade.webp"
       alt=""
       class="w-full h-full object-cover rounded-[1.25rem]" />
@@ -37,19 +160,16 @@ const datesAggregate = () => {
       </p>
     </div>
     <div
-      class="thumbnail-controls absolute grid grid-cols-2 bottom-0 h-14 p-2 w-full opacity-0 items-centers gap-2 duration-300">
-      <div
-        class="flex w-full h-full bg-red border-black border-2 rounded-[0.75rem_0.5rem_0.5rem_0.75rem] justify-center items-center px-4">
-        <input
-          type="range"
-          class="appearance-none w-full border-transparent duration-300"
-          value="0"
-          min="0"
-          max="100" />
-      </div>
+      class="thumbnail-controls flex absolute bottom-0 h-14 p-2 w-full opacity-0 items-centers gap-4">
       <button
-        class="flex bg-red h-10 items-center px-4 vertical-center rounded-[0.5rem_0.75rem_0.75rem_0.5rem] border-2 border-black justify-center hover:bg-black duration-300">
+        @click="$refs.fileInput.click()"
+        class="flex w-full bg-red h-10 items-center px-4 vertical-center rounded-[0.75rem] border-2 border-black justify-center hover:bg-black duration-300">
         <span>Nahrať náhľad</span>
+        <input
+          ref="fileInput"
+          type="file"
+          class="hidden"
+          @change="handleFileChange" />
       </button>
     </div>
   </div>
@@ -91,7 +211,7 @@ const datesAggregate = () => {
 
 input[type="range"] {
   -webkit-appearance: none;
-  background: #ffffff;
+  background: #00e0ff;
   height: 4px;
   border-radius: 2px;
 }
@@ -100,7 +220,7 @@ input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   width: 16px;
   height: 16px;
-  background: #00e0ff;
+  background: #1480c2;
   border-radius: 50%;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -109,7 +229,7 @@ input[type="range"]::-webkit-slider-thumb {
 input[type="range"]::-moz-range-thumb {
   width: 16px;
   height: 16px;
-  background: #00e0ff;
+  background: #1480c2;
   border: none;
   border-radius: 50%;
   cursor: pointer;

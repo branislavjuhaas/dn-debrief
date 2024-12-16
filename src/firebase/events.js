@@ -6,7 +6,13 @@ import {
   where,
 } from "firebase/firestore";
 
-import { getDownloadURL, getStorage, ref } from "firebase/storage";
+import {
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytes,
+  getMetadata,
+} from "firebase/storage";
 import { useEventsStore } from "../stores.js";
 
 const db = getFirestore();
@@ -42,6 +48,7 @@ export const relevantEvents = async () => {
     event.endDate = event.endDate.toDate();
 
     if (event.thumbnail) {
+      event.originalThumbnail = event.thumbnail;
       event.thumbnail = await getThumbnail(event.thumbnail);
     }
   }
@@ -69,4 +76,34 @@ export const getThumbnail = async (filename) => {
     console.error("Error getting image:", error);
     return null;
   }
+};
+
+/**
+ * Uploads a thumbnail image to Firebase Storage if it doesn't already exist.
+ *
+ * @param {string} eventId - The ID of the event.
+ * @param {Blob} imageBlob - The image blob to upload.
+ */
+export const uploadThumbnailImage = async (eventId, imageBlob) => {
+  const storage = getStorage();
+  const filePath = `events/thumbnails/${eventId}.jpg`;
+  const imageRef = ref(storage, filePath);
+
+  try {
+    // Check if the file already exists
+    await getMetadata(imageRef);
+    console.log(`Thumbnail already exists at ${filePath}`);
+  } catch (error) {
+    if (error.code === "storage/object-not-found") {
+      // File doesn't exist, proceed to upload
+      await uploadBytes(imageRef, imageBlob);
+      console.log(`Thumbnail uploaded to ${filePath}`);
+      return "thumbnails/" + eventId + ".jpg";
+    } else {
+      console.error("Error checking thumbnail existence:", error);
+      return null;
+    }
+  }
+
+  return null;
 };
