@@ -1,12 +1,12 @@
 <script setup>
 import { onMounted } from "vue";
 
-const props = defineProps(["tournament"]);
+const props = defineProps(["event"]);
 
-const tournament = props.tournament;
+const event = props.event;
 
 const datesAggregate = () => {
-  const { beginningDate, endDate } = tournament;
+  const { beginningDate, endDate } = event;
 
   const formatDate = (date) =>
     `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
@@ -21,37 +21,37 @@ const datesAggregate = () => {
 <template>
   <router-link
     to="/events/new"
-    class="tournament-card shrink-0 w-[26.875rem] h-[14.375rem] max-w-full relative rounded-[1.25rem] overflow-hidden duration-500">
+    class="event-card shrink-0 w-[26.875rem] h-[14.375rem] max-w-full relative rounded-[1.25rem] overflow-hidden duration-500">
     <img
-      :src="tournament.thumbnail"
+      :src="event.thumbnail"
       alt=""
-      class="tournament-image w-full h-full object-cover rounded-[1.25rem]" />
+      class="event-image w-full h-full object-cover rounded-[1.25rem]" />
     <div
       class="top-gradient absolute top-0 left-0 w-full h-[4.1875rem] p-[1.125rem] flex">
       <p class="text-white font-bold w-full truncate -mt-0.5">
-        {{ tournament.name }}
+        {{ event.name }}
       </p>
     </div>
     <div
       class="bottom-gradient absolute bottom-0 left-0 w-full h-[4.1875rem] p-[1.125rem] flex items-end">
       <p class="text-white font-bold w-full truncate leading-tight -mb-1">
-        {{ datesAggregate() }} - {{ tournament.city }}
+        {{ datesAggregate() }} - {{ event.city }}
       </p>
     </div>
   </router-link>
 </template>
 
 <style scoped>
-.tournament-card {
+.event-card {
   transition: transform 0.3s ease;
   overflow: hidden;
 }
 
-.tournament-card:hover .tournament-image {
+.event-card:hover .event-image {
   transform: scale(1.1);
 }
 
-.tournament-image {
+.event-image {
   transition: transform 0.3s ease-in-out;
   transform-origin: center;
 }

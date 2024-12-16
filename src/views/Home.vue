@@ -2,7 +2,7 @@
 // Import necessary Vue functions and custom hooks
 import { onMounted, ref, watch, watchEffect, onUnmounted } from "vue";
 import { useUserStore } from "../stores.js";
-import Tournament from "../components/Tournament.vue";
+import Tournament from "../components/Event.vue";
 
 // Get the user store
 const user = useUserStore();
@@ -57,7 +57,7 @@ watch(
  */
 const userFeed = ref([]);
 
-const tournaments = ref([]);
+const events = ref([]);
 
 /**
  * On component mount, fetch the user feed and log it.
@@ -73,7 +73,7 @@ onMounted(async () => {
 
   const { relevantEvents } = await import("../firebase/events.js");
 
-  tournaments.value = await relevantEvents();
+  events.value = await relevantEvents();
 });
 
 /**
@@ -85,31 +85,31 @@ watchEffect(async () => {
     const { relevantEvents } = await import("../firebase/events.js");
 
     userFeed.value = await feed(user);
-    tournaments.value = await relevantEvents();
+    events.value = await relevantEvents();
     console.log(userFeed.value);
   }
 });
 
-const tournamentsContainer = ref(null);
+const eventsContainer = ref(null);
 
 const handleWheel = (e) => {
   e.preventDefault();
-  if (tournamentsContainer.value) {
-    tournamentsContainer.value.scrollLeft -= e.deltaY;
+  if (eventsContainer.value) {
+    eventsContainer.value.scrollLeft -= e.deltaY;
   }
 };
 
 onMounted(() => {
-  if (tournamentsContainer.value) {
-    tournamentsContainer.value.addEventListener("wheel", handleWheel, {
+  if (eventsContainer.value) {
+    eventsContainer.value.addEventListener("wheel", handleWheel, {
       passive: false,
     });
   }
 });
 
 onUnmounted(() => {
-  if (tournamentsContainer.value) {
-    tournamentsContainer.value.removeEventListener("wheel", handleWheel);
+  if (eventsContainer.value) {
+    eventsContainer.value.removeEventListener("wheel", handleWheel);
   }
 });
 
@@ -142,15 +142,15 @@ const imageLoaded = ref(false);
       <h6 class="mt-1">Najbližšie relevantné podujatia</h6>
     </div>
     <div
-      v-if="tournaments.length === 0"
+      v-if="events.length === 0"
       class="text-base relative font-bold mt-2 h-[14.375rem] w-full rounded-[1.25rem] bg-[#0f2544]">
       <img
         src="../assets/dn-banner.webp"
-        alt="tournament"
+        alt="event"
         @load="imageLoaded = true"
         :class="[
           'w-full h-full object-cover rounded-[1.25rem] opacity-0',
-          { 'tournaments-placeholder': imageLoaded },
+          { 'events-placeholder': imageLoaded },
         ]" />
       <p
         class="absolute bottom-2 left-[1.125rem] truncate max-w-[calc(100%-2.25rem)]">
@@ -163,14 +163,14 @@ const imageLoaded = ref(false);
     </div>
     <div
       v-else
-      ref="tournamentsContainer"
-      class="flex flex-row mt-2 gap-[1.25rem] overflow-x-auto scrollbar-hidden tournaments-container">
+      ref="eventsContainer"
+      class="flex flex-row mt-2 gap-[1.25rem] overflow-x-auto scrollbar-hidden events-container">
       <tournament
-        v-for="(tournament, index) in tournaments"
-        :key="tournament.id"
-        :tournament="tournament"
+        v-for="(event, index) in events"
+        :key="event.id"
+        :event="event"
         :style="{ '--delay': index / 20 + 's' }"
-        class="tournament-card" />
+        class="event-card" />
     </div>
 
     <div
@@ -212,7 +212,7 @@ const imageLoaded = ref(false);
 </template>
 
 <style scoped>
-.tournaments-placeholder {
+.events-placeholder {
   animation: FadeIn 0.5s forwards;
 }
 .chip {
@@ -229,20 +229,20 @@ const imageLoaded = ref(false);
   @apply font-bold;
 }
 
-.tournament-card {
+.event-card {
   opacity: 0;
   transform: translateX(20px);
   animation: slideInFromRight 0.5s forwards var(--delay);
 }
 
-.tournaments-container {
+.events-container {
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
 
-.tournaments-container::-webkit-scrollbar {
+.events-container::-webkit-scrollbar {
   display: none;
 }
 
