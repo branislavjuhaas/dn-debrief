@@ -33,7 +33,9 @@ const inputRef = ref(null);
 
 // Function to focus the input element
 const focusInput = () => {
-  inputRef.value.focus();
+  if (inputRef.value) {
+    inputRef.value.focus();
+  }
 };
 
 // Watch for changes in the value ref
@@ -49,24 +51,40 @@ watch(
   () => props.modelValue, // Watch the prop directly
   (newVal) => {
     value.value = newVal; // Update the local value when prop changes
-  }
+  },
 );
 </script>
 
 <template>
   <div
-    class="grid border-2 border-black h-12 rounded-[1.25rem] items-center px-5 pt-1 gap-4"
+    class="grid min-h-12 border-2 border-black rounded-[1.25rem] px-5 pt-1 gap-4"
     :class="
       props.type === 'password'
         ? 'grid-cols-[auto_1fr_auto]'
-        : 'grid-cols-[auto_1fr]'
+        : props.type === 'multiline'
+          ? 'grid-cols-[auto_1fr]'
+          : 'grid-cols-[auto_1fr] items-center'
     "
     @click="focusInput">
-    <p class="text-black font-bold">{{ props.label }}</p>
-    <input
+    <p
+      class="text-black font-bold"
+      :class="props.type === 'multiline' ? 'mt-2' : ''">
+      {{ props.label }}
+    </p>
+    <!-- Conditionally render textarea for multiline type -->
+    <textarea
+      v-if="props.type === 'multiline'"
       ref="inputRef"
       :name="props.name"
+      class="w-full h-[calc(100%-1rem)] my-2 outline-none bg-transparent text-black placeholder-grey resize-none"
+      :placeholder="props.placeholder"
+      v-model="value"
+      rows="3" />
+    <!-- Render input for other types -->
+    <input
+      v-else
       :type="showPassword ? 'text' : props.type"
+      ref="inputRef"
       class="w-full outline-none bg-transparent h-auto text-black placeholder-grey"
       :placeholder="props.placeholder"
       v-model="value" />
