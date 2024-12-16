@@ -121,8 +121,14 @@ defineExpose({
 const datesAggregate = () => {
   let { beginningDate, endDate } = props;
 
+  console.log(beginningDate, endDate);
+
   beginningDate = new Date(beginningDate);
   endDate = new Date(endDate);
+
+  if (isNaN(beginningDate) || isNaN(endDate)) {
+    return "Neznáme dátumy";
+  }
 
   const formatDate = (date) =>
     `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
@@ -136,7 +142,7 @@ const datesAggregate = () => {
 
 <template>
   <div
-    class="thumbnail-card shrink-0 w-[26.875rem] h-[14.375rem] max-w-full relative rounded-[1.25rem] overflow-hidden duration-500 flex items-center justify-center">
+    class="thumbnail-card duration-0 shrink-0 w-[26.875rem] h-[14.375rem] max-w-full relative rounded-[1.25rem] overflow-hidden duration-500 flex items-center justify-center">
     <img
       v-if="selectedImage"
       :src="selectedImage"
@@ -150,13 +156,13 @@ const datesAggregate = () => {
     <div
       class="top-gradient absolute top-0 left-0 w-full h-[4.1875rem] p-[1.125rem] flex">
       <p class="text-white font-bold w-full truncate -mt-0.5">
-        {{ props.name }}
+        {{ props.name !== "" ? props.name : "Názov tvoreného podujatia" }}
       </p>
     </div>
     <div
       class="bottom-gradient absolute bottom-0 left-0 w-full h-[4.1875rem] p-[1.125rem] flex items-end">
       <p class="text-white font-bold w-full truncate leading-tight -mb-1">
-        {{ datesAggregate() }} - {{ props.city }}
+        {{ datesAggregate() }} - {{ props.city !== "" ? props.city : "Mesto" }}
       </p>
     </div>
     <div
