@@ -201,6 +201,16 @@ const routes = [
     meta: { title: "Detail ocenenia", requiresAuth: true },
   },
   {
+    path: "/events/new",
+    name: "NewEvent",
+    component: () => import("./views/events/New.vue"),
+    meta: {
+      title: "Vytvoriť turnaj",
+      requiresAuth: true,
+      roles: ["developer", "admin", "organizer", "junior"],
+    },
+  },
+  {
     path: "/:pathMatch(.*)*", // 404
     name: "404",
     component: () => import("./views/Error.vue"),

@@ -71,9 +71,9 @@ onMounted(async () => {
     return;
   }
 
-  const { relevantTournaments } = await import("../firebase/tournaments.js");
+  const { relevantEvents } = await import("../firebase/events.js");
 
-  tournaments.value = await relevantTournaments();
+  tournaments.value = await relevantEvents();
 });
 
 /**
@@ -82,10 +82,10 @@ onMounted(async () => {
 watchEffect(async () => {
   if (user.uid != null) {
     const { feed } = await import("../firebase/messaging.js");
-    const { relevantTournaments } = await import("../firebase/tournaments.js");
+    const { relevantEvents } = await import("../firebase/events.js");
 
     userFeed.value = await feed(user);
-    tournaments.value = await relevantTournaments();
+    tournaments.value = await relevantEvents();
     console.log(userFeed.value);
   }
 });
@@ -152,7 +152,8 @@ const imageLoaded = ref(false);
           'w-full h-full object-cover rounded-[1.25rem] opacity-0',
           { 'tournaments-placeholder': imageLoaded },
         ]" />
-      <p class="absolute bottom-2 left-[1.125rem]">
+      <p
+        class="absolute bottom-2 left-[1.125rem] truncate max-w-[calc(100%-2.25rem)]">
         {{
           useUserStore().uid != null
             ? "Momentálne nie sú dostupné žiadne podujatia."

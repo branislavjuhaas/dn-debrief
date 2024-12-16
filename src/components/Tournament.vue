@@ -20,11 +20,11 @@ const datesAggregate = () => {
 
 <template>
   <router-link
-    :to="`/tournaments/${tournament.id}`"
+    to="/events/new"
     class="tournament-card shrink-0 w-[26.875rem] h-[14.375rem] max-w-full relative rounded-[1.25rem] overflow-hidden duration-500">
     <img
       :src="tournament.thumbnail"
-      alt="tournament"
+      alt=""
       class="tournament-image w-full h-full object-cover rounded-[1.25rem]" />
     <div
       class="top-gradient absolute top-0 left-0 w-full h-[4.1875rem] p-[1.125rem] flex">
