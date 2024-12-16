@@ -112,6 +112,8 @@ onUnmounted(() => {
     tournamentsContainer.value.removeEventListener("wheel", handleWheel);
   }
 });
+
+const imageLoaded = ref(false);
 </script>
 
 <template>
@@ -140,6 +142,26 @@ onUnmounted(() => {
       <h6 class="mt-1">Najbližšie relevantné podujatia</h6>
     </div>
     <div
+      v-if="tournaments.length === 0"
+      class="text-base relative font-bold mt-2 h-[14.375rem] w-full rounded-[1.25rem] bg-[#0f2544]">
+      <img
+        src="../assets/dn-banner.webp"
+        alt="tournament"
+        @load="imageLoaded = true"
+        :class="[
+          'w-full h-full object-cover rounded-[1.25rem] opacity-0',
+          { 'tournaments-placeholder': imageLoaded },
+        ]" />
+      <p class="absolute bottom-2 left-[1.125rem]">
+        {{
+          useUserStore().uid != null
+            ? "Momentálne nie sú dostupné žiadne podujatia."
+            : "Pre zobrazenie podujatí sa, prosím, prihláste!"
+        }}
+      </p>
+    </div>
+    <div
+      v-else
       ref="tournamentsContainer"
       class="flex flex-row mt-2 gap-[1.25rem] overflow-x-auto scrollbar-hidden tournaments-container">
       <tournament
@@ -189,6 +211,9 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+.tournaments-placeholder {
+  animation: FadeIn 0.5s forwards;
+}
 .chip {
   @apply grid grid-rows-[auto_auto] w-full h-full gap-1 bg-white text-black pt-3 pb-2 px-5 rounded-[1.25rem];
 }
@@ -235,6 +260,15 @@ onUnmounted(() => {
   100% {
     opacity: 1;
     transform: translateX(0);
+  }
+}
+
+@keyframes FadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
   }
 }
 </style>
