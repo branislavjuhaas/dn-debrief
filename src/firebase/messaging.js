@@ -14,8 +14,6 @@ import {
 
 import { useFeedStore, useUserStore } from "../stores.js";
 import { version } from "../../package.json";
-import debrief from "../assets/debrief.svg";
-import barca from "../assets/barca.svg";
 
 let system = "DN Cascade";
 
