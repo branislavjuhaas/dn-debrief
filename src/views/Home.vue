@@ -1,7 +1,7 @@
 <script setup>
 // Import necessary Vue functions and custom hooks
 import { onMounted, ref, watch, watchEffect, onUnmounted } from "vue";
-import { useUserStore } from "../stores.js";
+import { useEventsStore, useUserStore } from "../stores.js";
 import Event from "../components/Event.vue";
 
 // Get the user store
@@ -155,7 +155,7 @@ const imageLoaded = ref(false);
       <p
         class="absolute bottom-2 left-[1.125rem] truncate max-w-[calc(100%-2.25rem)]">
         {{
-          useUserStore().uid != null
+          useUserStore().uid != null && useEventsStore().initialized
             ? "Momentálne nie sú dostupné žiadne podujatia."
             : "Pre zobrazenie podujatí sa, prosím, prihláste!"
         }}
