@@ -1,6 +1,6 @@
 <script setup>
 // Import the necessary Vue function
-import { defineProps } from "vue";
+import { defineProps, onMounted } from "vue";
 
 /**
  * Define the props for the component.
@@ -29,6 +29,11 @@ let description;
  * For any other error code, it sets the message to "Nastala chyba".
  */
 switch (props.code) {
+  case 127:
+    message = "Neautorizovaný prístup";
+    description =
+      "Pre prístup musíte byť členom Vývojového programu DN Cascade.";
+    break;
   case 401:
     message = "Neautorizovaný prístup";
     description = "Nemáte dostatočné oprávnenia na zobrazenie tejto stránky.";

@@ -2,6 +2,7 @@
 // Import necessary components and assets
 import debrief from "./../assets/debrief.svg";
 import cascade from "../assets/dn-cascade.svg";
+import cascade_dev from "../assets/dn-cascade-dev.svg";
 import barca from "./../assets/barca.svg";
 import Search from "./Search.vue";
 
@@ -19,6 +20,12 @@ if (window.location.hostname === "debrief.sda.sk") {
 else if (window.location.hostname === "barca.juhaas.eu") {
   logo = barca;
   system = "Barca";
+} else if (
+  window.location.hostname.includes("dev") ||
+  window.location.hostname === "localhost"
+) {
+  logo = cascade_dev;
+  system = "DN Cascade Dev";
 }
 </script>
 

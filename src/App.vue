@@ -18,6 +18,8 @@ if (host === "debrief.sda.sk") {
   title = "DebRIEF";
 } else if (host === "barca.juhaas.eu") {
   title = "Barca";
+} else if (host.includes("dev") || host === "localhost") {
+  title = "DN Cascade Dev";
 }
 
 // Initializing user and loading stores
@@ -44,6 +46,12 @@ const handleUserCreation = async (user, userData) => {
   const { createUser, logout } = await import("./firebase/auth.js");
 
   console.log(userData);
+
+  if (host.includes("dev") && !userData.dev) {
+    await router.push({ name: "Undev" });
+    logout();
+    return;
+  }
 
   // If userData is not provided, create a new user
   if (!userData) {
@@ -137,8 +145,15 @@ const handleUserCreation = async (user, userData) => {
  */
 const handleRedirection = async (authenticated) => {
   try {
+    console.log(
+      "Redirecting user based on route meta, which is: ",
+      router.currentRoute.value.name,
+    );
     // If the user is already on the home page, do nothing
-    if (router.currentRoute.value.name === "Home") {
+    if (
+      router.currentRoute.value.name === "Home" ||
+      router.currentRoute.value.name === "Undev"
+    ) {
       return;
     }
 

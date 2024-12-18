@@ -156,6 +156,13 @@ const routes = [
     meta: { title: "401 Neautorizovaný prístup" },
   },
   {
+    path: "/undev",
+    name: "Undev",
+    component: () => import("./views/Error.vue"),
+    props: { code: 127 },
+    meta: { title: "127 Neautorizovaný prístup" },
+  },
+  {
     path: "/about",
     name: "About",
     component: () => import("./views/About.vue"),
