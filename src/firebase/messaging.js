@@ -14,14 +14,26 @@ import {
 
 import { useFeedStore, useUserStore } from "../stores.js";
 import { version } from "../../package.json";
+import debrief from "../assets/debrief.svg";
+import barca from "../assets/barca.svg";
+
+let system = "DN Cascade";
+
+if (window.location.hostname === "debrief.sda.sk") {
+  system = "DebRIEF";
+} else if (window.location.hostname === "barca.juhaas.eu") {
+  system = "Barca";
+}
 
 // Definujte správy
 const messages = {
   welcome: {
     id: "welcome",
-    title: "Predstavujeme DebRIEF {{Version}}",
+    title: "Predstavujeme " + system + " " + version,
     message:
-      "Vitaj v novej verzii autonónmneho systému DebRIEF, všetky chyby a návrhy funkcií ohlás, prosím, na debrief@sda.sk.",
+      "Vitaj v novej verzii autonónmneho systému " +
+      system +
+      ", všetky chyby a návrhy funkcií ohlás, prosím, na debrief@sda.sk.",
     link: "mailto:debrief@sda.sk?subject=[DebRIEF] Chyba alebo návrh funkcie",
     local: false,
   },
@@ -145,7 +157,6 @@ export const feed = async (user) => {
   let feedMessages = [];
 
   let welcomeMessage = { ...messages.welcome };
-  welcomeMessage.title = welcomeMessage.title.replace("{{Version}}", version);
   feedMessages.push(welcomeMessage);
 
   if (!user || !user.uid) {
