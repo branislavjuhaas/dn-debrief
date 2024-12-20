@@ -2,6 +2,7 @@
 import Thumbnail from "../../components/Thumbnail.vue";
 import { ref, watch } from "vue";
 import Field from "../../components/Field.vue";
+import Schedule from "../../components/Schedule.vue";
 const thumbnailRef = ref(null);
 
 const handName = ref(false);
@@ -14,6 +15,20 @@ const city = ref("");
 const address = ref("");
 const price = ref(30);
 const motion = ref("Všetky tézy tohoto turnaja sú improvizované");
+
+const schedule = ref({
+  days: [
+    {
+      beginning: 810,
+      points: [
+        {
+          name: "otvorenie podujatia",
+          duration: 30,
+        },
+      ],
+    },
+  ],
+});
 
 const regionalTranscendence = (numeral) => {
   // get the last character of the numeral, if 1, return 2, if 2, return 3, if 3, return 1
@@ -120,6 +135,9 @@ watch(id, () => {
         v-model="motion"
         label="Téza"
         class="col-start-1 row-start-6 col-span-full" />
+      <Schedule
+        v-model="schedule"
+        class="col-start-1 row-start-7 col-span-full" />
     </div>
   </div>
 </template>
