@@ -1,6 +1,4 @@
 <script setup>
-import { onMounted } from "vue";
-
 const props = defineProps(["event"]);
 
 const event = props.event;
@@ -12,9 +10,11 @@ const datesAggregate = () => {
     `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
   const formatShortDate = (date) => `${date.getDate()}.${date.getMonth() + 1}`;
 
-  return beginningDate.getFullYear() === endDate.getFullYear()
-    ? `${formatShortDate(beginningDate)} - ${formatShortDate(endDate)}.${endDate.getFullYear()}`
-    : `${formatDate(beginningDate)} - ${formatDate(endDate)}`;
+  return beginningDate.getDate() === endDate.getDate()
+    ? formatDate(beginningDate)
+    : beginningDate.getFullYear() === endDate.getFullYear()
+      ? `${formatShortDate(beginningDate)} - ${formatDate(endDate)}`
+      : `${formatDate(beginningDate)} - ${formatDate(endDate)}`;
 };
 </script>
 
@@ -34,7 +34,7 @@ const datesAggregate = () => {
     </div>
     <div
       class="bottom-gradient absolute bottom-0 left-0 w-full h-[4.1875rem] p-[1.125rem] flex items-end">
-      <p class="text-white font-bold w-full truncate leading-tight -mb-1">
+      <p class="text-white w-full truncate leading-tight -mb-1">
         {{ datesAggregate() }} - {{ event.city }}
       </p>
     </div>
