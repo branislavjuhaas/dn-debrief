@@ -1,6 +1,6 @@
 <script setup>
 import Thumbnail from "../../components/Thumbnail.vue";
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import Field from "../../components/Field.vue";
 import Schedule from "../../components/Schedule.vue";
 const thumbnailRef = ref(null);
@@ -28,6 +28,15 @@ const schedule = ref({
       ],
     },
   ],
+});
+
+const ending = computed(() => {
+  // beginning with the schedule.days days added
+  const date = new Date(beginning.value);
+  const days = schedule.value.days.length - 1;
+  date.setDate(date.getDate() + days);
+
+  return date;
 });
 
 const regionalTranscendence = (numeral) => {
@@ -107,7 +116,7 @@ watch(id, () => {
           ref="thumbnailRef"
           :name="name"
           :beginning-date="beginning"
-          :end-date="'2025-02-11'"
+          :end-date="ending"
           :city="city"
           :id="id" />
       </div>
