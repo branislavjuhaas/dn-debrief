@@ -9,19 +9,23 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(["update:modelValue"]);
 
 // Create local copy of schedule
 const schedule = ref(JSON.parse(JSON.stringify(props.modelValue)));
 
 // Watch for external changes
-watch(() => props.modelValue, (newVal) => {
-  schedule.value = JSON.parse(JSON.stringify(newVal));
-}, { deep: true });
+watch(
+  () => props.modelValue,
+  (newVal) => {
+    schedule.value = JSON.parse(JSON.stringify(newVal));
+  },
+  { deep: true },
+);
 
 // Helper function to emit changes
 const emitChange = () => {
-  emit('update:modelValue', JSON.parse(JSON.stringify(schedule.value)));
+  emit("update:modelValue", JSON.parse(JSON.stringify(schedule.value)));
 };
 
 const start = computed(() =>
@@ -358,9 +362,11 @@ const endDrag = (day) => {
           class="grid grid-cols-[auto_1fr_auto] gap-4 text-black p-2 px-4 rounded-[0.75rem] cursor-move"
           :class="[
             point.isInvalid ? 'bg-grey' : 'bg-blue',
-            isDragging && draggedOverItem?.index === pointIndex ? 'border-2 border-black' : '',
+            isDragging && draggedOverItem?.index === pointIndex
+              ? 'border-2 border-black'
+              : '',
             isDragging && draggedItem?.index === pointIndex ? 'opacity-50' : '',
-            isDragging ? 'cursor-grabbing' : 'cursor-grab'
+            isDragging ? 'cursor-grabbing' : 'cursor-grab',
           ]"
           draggable="true"
           @dragstart="startDrag(day, point, pointIndex)"
@@ -409,7 +415,7 @@ const endDrag = (day) => {
     <div class="w-[2px] bg-black h-full rounded-full shrink-0"></div>
     <p
       @click="addDay"
-      class="flex flex-row text-black font-bold cursor-pointer h-min gap-2 text-nowrap">
+      class="flex flex-row text-black font-bold cursor-pointer h-min gap-2 text-nowrap mr-5">
       <img src="./../assets/icons/plus.svg" alt="+" class="w-5 -mt-1" />
       Pridať deň
     </p>
