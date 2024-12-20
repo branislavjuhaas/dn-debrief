@@ -7,6 +7,8 @@ const thumbnailRef = ref(null);
 
 const handName = ref(false);
 
+const tournament = ref(true);
+
 const id = ref("");
 const name = ref("");
 const beginning = ref("");
@@ -67,24 +69,34 @@ const suggestName = (input) => {
 
   switch (code) {
     case "SZ":
+      tournament.value = true;
       return `${regionalTranscendence(numerals)}. západoslovenský regionálny turnaj`;
     case "SS":
+      tournament.value = true;
       return `${regionalTranscendence(numerals)}. stredoslovenský regionálny turnaj`;
     case "SV":
+      tournament.value = true;
       return `${regionalTranscendence(numerals)}. východoslovenský regionálny turnaj`;
     case "SC":
+      tournament.value = true;
       return `Celoslovenský turnaj 20${numerals.slice(0, 2)}`;
     case "SN":
+      tournament.value = true;
       return `${numerals.slice(2)}. začiatočnícky turnaj 20${numerals.slice(0, 2)}`;
     case "RS":
+      tournament.value = false;
       return `${numerals.slice(2)}. rozhodcovský seminár 20${numerals.slice(0, 2)}`;
     case "DS":
+      tournament.value = false;
       return `${numerals.slice(2)}. dobrovoľnícky seminár 20${numerals.slice(0, 2)}`;
     case "TS":
+      tournament.value = false;
       return `${numerals.slice(2)}. trénerský seminár 20${numerals.slice(0, 2)}`;
     case "US":
+      tournament.value = false;
       return `${numerals.slice(2)}. učiteľský seminár 20${numerals.slice(0, 2)}`;
     case "VZ":
+      tournament.value = false;
       return `Valné zhromaždenie 20${numerals.slice(0, 2)}`;
     default:
       return null;
@@ -103,50 +115,42 @@ watch(id, () => {
   <div class="gap-4">
     <h1 class="text-5xl font-bold mb-2">Vytvoriť podujatie</h1>
     <div
-      class="flex flex-col sm:grid sm:grid-cols-[auto_1fr] w-full bg-white min-h-60 rounded-[1.25rem] p-5 gap-4 transition-all">
-      <Field v-model="id" label="ID" class="col-start-1 row-start-1" />
-      <Field
-        v-model="name"
-        label="Názov"
-        @keyup="handName = true"
-        class="col-start-2 row-start-1" />
-      <div
-        class="col-start-1 self-center row-start-2 overflow-hidden rounded-[1.25rem] w-[26.875rem]">
-        <thumbnail
-          ref="thumbnailRef"
-          :name="name"
-          :beginning-date="beginning"
-          :end-date="ending"
-          :city="city"
-          :id="id" />
+      class="flex flex-col w-full bg-white min-h-60 rounded-[1.25rem] p-5 gap-4 transition-all">
+      <div class="grid grid-cols-2 gap-4">
+        <div
+          class="flex font-bold h-16 min-w-60 px-5 rounded-[1.25rem] border-2 border-black duration-500 items-center justify-center vertical-center text-black cursor-pointer transition-colors"
+          :class="{ 'bg-black text-white': tournament }"
+          @click="tournament = true">
+          <p>Súťažné podujatie</p>
+        </div>
+        <div
+          class="flex font-bold h-16 min-w-60 px-5 rounded-[1.25rem] border-2 border-black duration-500 items-center justify-center vertical-center text-black cursor-pointer transition-colors"
+          :class="{ 'bg-black text-white': !tournament }"
+          @click="tournament = false">
+          <p>Nesúťažné podujatie</p>
+        </div>
       </div>
-      <Field
-        v-model="description"
-        label="Popis"
-        type="multiline"
-        class="col-start-2 row-start-2" />
-      <Field v-model="city" label="Mesto" class="col-start-1 row-start-3" />
-      <Field
-        v-model="beginning"
-        label="Začiatok podujatia"
-        type="date"
-        class="col-start-2 row-start-3" />
-      <Field
-        v-model="address"
-        label="Adresa podujatia"
-        class="col-start-1 row-start-4 col-span-full" />
-      <Field
-        v-model="price"
-        label="Cena"
-        type="number"
-        class="col-start-1 row-start-5 col-span-full" />
-      <Field
-        v-model="motion"
-        label="Téza"
-        class="col-start-1 row-start-6 col-span-full" />
-      <Schedule
-        v-model="schedule"
-        class="col-start-1 row-start-7 col-span-full" />
+      <Field v-model="id" label="ID" />
+      <Field v-model="name" label="Názov" @keyup="handName = true" />
+      <div class="grid grid-cols-[auto_1fr] gap-4">
+        <div
+          class="self-center overflow-hidden rounded-[1.25rem] w-[26.875rem]">
+          <thumbnail
+            ref="thumbnailRef"
+            :name="name"
+            :beginning-date="beginning"
+            :end-date="ending"
+            :city="city"
+            :id="id" />
+        </div>
+        <Field v-model="description" label="Popis" type="multiline" />
+      </div>
+      <Field v-model="beginning" label="Začiatok podujatia" type="date" />
+      <Field v-model="city" label="Mesto" />
+      <Field v-model="address" label="Adresa podujatia" />
+      <Field v-model="price" label="Cena" type="number" />
+      <Field v-model="motion" label="Téza" v-if="tournament" />
+      <Schedule v-model="schedule" />
     </div>
   </div>
 </template>
