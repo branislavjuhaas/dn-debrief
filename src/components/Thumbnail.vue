@@ -58,7 +58,7 @@ const useSampleImage = async () => {
 };
 
 const uploadThumbnail = async () => {
-  if (!selectedImage.value) return;
+  if (!selectedImage.value) return useSampleImage();
 
   const img = new Image();
   img.src = selectedImage.value;
@@ -111,7 +111,7 @@ const uploadThumbnail = async () => {
     canvas.toBlob(resolve, "image/jpeg");
   });
 
-  await uploadThumbnailImage(props.id, blob);
+  return await uploadThumbnailImage(props.id, blob);
 };
 
 defineExpose({
