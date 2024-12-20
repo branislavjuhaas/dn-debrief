@@ -1,11 +1,13 @@
 # DN Cascade
 ![Version](https://img.shields.io/badge/Version-2024.1.7-blue) ![License](https://img.shields.io/badge/License-All_Rights_Reserved-red) ![State](https://img.shields.io/badge/Development_State-Active-green) ![Framework](https://img.shields.io/badge/Framework-Vite_+_Vue-green)
 
-![Project Branding](readme/project-branding.png)
+![Cascade Banner](readme/cascade-banner.png)
 
 ## Description
 
 **DN Cascade | Barca | DebRIEF** is a comprehensive solution designed to cater to the needs of the SDA for data centralization. It is built with a focus on efficiency, scalability, and user experience. The project includes a wide range of features such as user authentication and data management, all tailored to provide a seamless experience for the users. The platform is robust, versatile, and built using the latest technologies to ensure its scalability and efficiency.
+
+![Project Branding](readme/project-branding.png)
 
 ## Access Points
 
