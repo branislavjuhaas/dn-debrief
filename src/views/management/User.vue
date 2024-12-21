@@ -129,7 +129,7 @@ const assignAward = async (awardId) => {
   try {
     await assignAwardToUser(route.params.uid, awardId);
     // Update local state
-    const awardData = availableAwards.value.find(a => a.id === awardId);
+    const awardData = availableAwards.value.find((a) => a.id === awardId);
     if (awardData) {
       userAwards.value.push({ ...awardData, legend: false });
     }
@@ -186,7 +186,7 @@ const makeLegend = async (award) => {
   try {
     await updateAwardLegendStatus(route.params.uid, award.id, true);
     // Update local state
-    const localAward = userAwards.value.find(a => a.id === award.id);
+    const localAward = userAwards.value.find((a) => a.id === award.id);
     if (localAward) {
       localAward.legend = true;
     }
@@ -204,7 +204,7 @@ const unmakeLegend = async (award) => {
   try {
     await updateAwardLegendStatus(route.params.uid, award.id, false);
     // Update local state
-    const localAward = userAwards.value.find(a => a.id === award.id);
+    const localAward = userAwards.value.find((a) => a.id === award.id);
     if (localAward) {
       localAward.legend = false;
     }
@@ -222,7 +222,7 @@ const removeAward = async (award) => {
   try {
     await removeAwardFromUser(route.params.uid, award.id);
     // Update local state
-    userAwards.value = userAwards.value.filter(a => a.id !== award.id);
+    userAwards.value = userAwards.value.filter((a) => a.id !== award.id);
   } catch (error) {
     console.error("Error removing award:", error);
   }
@@ -374,7 +374,7 @@ const saveUserData = async (data) => {
         [data.name]: data.value,
       });
       // Update local state without re-fetching
-      const localData = userData.value.find(item => item.name === data.name);
+      const localData = userData.value.find((item) => item.name === data.name);
       if (localData) {
         localData.value = data.value;
       }
@@ -510,7 +510,7 @@ const updateClubManagerStatus = async () => {
               ['admin', 'developer'].includes(userStore.role)
             "
             class="col-span-1 sm:col-start-2"
-            label="Správca klubu"
+            label="Správca/-kyňa klubu"
             v-model="isClubManager"
             @update:modelValue="updateClubManagerStatus" />
           <dropdown
