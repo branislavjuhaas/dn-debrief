@@ -4,6 +4,8 @@ import {
   getFirestore,
   query,
   where,
+  doc,
+  setDoc,
 } from "firebase/firestore";
 
 import {
@@ -44,8 +46,32 @@ export const relevantEvents = async () => {
   for (const event of events) {
     console.log("Event: ", event);
     // Convert the beginningDate and endDate to Date objects
-    event.beginningDate = event.beginningDate.toDate();
-    event.endDate = event.endDate.toDate();
+    if (event.beginningDate) {
+      const b = event.beginningDate.toDate();
+      event.beginningDate = new Date(
+        Date.UTC(
+          b.getUTCFullYear(),
+          b.getUTCMonth(),
+          b.getUTCDate(),
+          b.getUTCHours(),
+          b.getUTCMinutes(),
+          b.getUTCSeconds(),
+        ),
+      );
+    }
+    if (event.endDate) {
+      const e = event.endDate.toDate();
+      event.endDate = new Date(
+        Date.UTC(
+          e.getUTCFullYear(),
+          e.getUTCMonth(),
+          e.getUTCDate(),
+          e.getUTCHours(),
+          e.getUTCMinutes(),
+          e.getUTCSeconds(),
+        ),
+      );
+    }
 
     if (event.thumbnail) {
       event.originalThumbnail = event.thumbnail;
@@ -108,6 +134,16 @@ export const uploadThumbnailImage = async (eventId, imageBlob) => {
   return null;
 };
 
+/**
+ * Retrieves a list of potential organizers from the database.
+ *
+ * Queries the "users" collection in the database for documents where the
+ * "role" field is either "admin", "organizer", or "junior". Returns an
+ * array of objects containing the user ID and associated data.
+ *
+ * @returns {Promise<Array<{ uid: string, [key: string]: any }>>} A promise that resolves
+ * to an array of user objects with their UID and data.
+ */
 export const getPotentialOrganizers = async () => {
   const q = query(
     collection(db, "users"),
@@ -118,4 +154,20 @@ export const getPotentialOrganizers = async () => {
     uid: doc.id,
     ...doc.data(),
   }));
+};
+
+/**
+ * Sets an event in the 'events' collection in the database.
+ *
+ * @param {Object} event - The event object to be set.
+ * @param {string} event.id - The unique identifier of the event.
+ * @returns {Promise<void>} - Resolves when the event is set successfully.
+ */
+export const setEvent = async (event) => {
+  try {
+    await setDoc(doc(db, "events", event.id), event);
+    console.log(`Event ${event.id} set successfully`);
+  } catch (error) {
+    console.error("Error setting event:", error);
+  }
 };

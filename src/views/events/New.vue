@@ -3,14 +3,27 @@ import Thumbnail from "../../components/Thumbnail.vue";
 import { computed, onMounted, ref, watch, watchEffect } from "vue";
 import Field from "../../components/Field.vue";
 import Schedule from "../../components/Schedule.vue";
-import { useUserStore } from "../../stores.js";
-import { getPotentialOrganizers } from "../../firebase/events.js";
+import { useEventsStore, useLoadingStore, useUserStore } from "../../stores.js";
+import { getPotentialOrganizers, setEvent } from "../../firebase/events.js";
 import Toggle from "../../components/Toggle.vue";
+import router from "../../router.js";
 
+/**
+ * A reactive reference to the thumbnail component
+ * @type {import("vue").Ref<null|object>}
+ */
 const thumbnailRef = ref(null);
 
+/**
+ * Used to detect if the name was manually changed
+ * @type {import("vue").Ref<boolean>}
+ */
 const handName = ref(false);
 
+/**
+ * Indicates if the event is a tournament
+ * @type {import("vue").Ref<boolean>}
+ */
 const tournament = ref(true);
 
 const id = ref("");
@@ -25,6 +38,8 @@ const motion = ref("Všetky tézy tohoto turnaja sú improvizované");
 const potentialOrganizers = ref([]);
 
 const userStore = useUserStore();
+const loadingStore = useLoadingStore();
+const eventsStore = useEventsStore();
 
 const schedule = ref({
   days: [
@@ -40,6 +55,15 @@ const schedule = ref({
   ],
 });
 
+/**
+ * This component handles creating new events, including UI for entering details,
+ * uploading thumbnails, scheduling, and assigning organizers.
+ */
+
+/**
+ * Computed property returning the last day of the event
+ * @return {Date}
+ */
 const ending = computed(() => {
   // beginning with the schedule.days days added
   const date = new Date(beginning.value);
@@ -64,6 +88,11 @@ const regionalTranscendence = (numeral) => {
   }
 };
 
+/**
+ * Suggests a name for the event based on its ID
+ * @param {string} input
+ * @return {string|null}
+ */
 const suggestName = (input) => {
   // split the id to get the first 2 characters and the rest, use fixed length for the first part
   if (input.length !== 5) return null;
@@ -118,6 +147,14 @@ watch(id, () => {
   }
 });
 
+/**
+ * Fetch potential organizers from the backend and store them locally.
+ */
+/**
+ * Fetch potential organizers from the backend and update the local list
+ * @async
+ * @return {Promise<void>}
+ */
 const fetchPotentialOrganizers = async () => {
   console.log(userStore);
 
@@ -155,6 +192,124 @@ onMounted(() => {
     fetchPotentialOrganizers();
   }
 });
+
+/**
+ * Checks if all conditions for submitting the new event are met
+ * @return {boolean}
+ */
+const canSubmit = computed(() => {
+  return (
+    id.value &&
+    name.value &&
+    beginning.value &&
+    city.value &&
+    address.value &&
+    price.value &&
+    (tournament.value ? motion.value : true) &&
+    schedule.value.days.length > 0 &&
+    potentialOrganizers.value.some((organizer) => organizer.selected)
+  );
+});
+
+const getEndTimeInMinutes = (day, pointIndex) => {
+  let endTime = day.beginning;
+  for (let i = 0; i <= pointIndex; i++) {
+    endTime += day.points[i].duration;
+  }
+  return endTime;
+};
+
+/**
+ * Parses the date string as UTC date
+ * @param {string} val
+ * @return {Date}
+ */
+const parseAsUTC = (val) => {
+  // parse dateString as universal date
+  return new Date(val + "T00:00:00Z");
+};
+
+/**
+ * Submits the new event data to the server and navigates back to the home page on success.
+ */
+/**
+ * Submits the new event data to the server
+ * @async
+ * @return {Promise<void>}
+ */
+const submit = async () => {
+  loadingStore.loadingStart();
+
+  // Submit the thumbnail
+  const thumbnail = await thumbnailRef.value.uploadThumbnail();
+
+  // Calculate beginningDate based on the first day's beginning time
+  const firstDay = schedule.value.days[0];
+  const beginningUTC = parseAsUTC(beginning.value);
+  const beginningDate = new Date(
+    beginningUTC.getTime() + firstDay.beginning * 60000,
+  );
+  // Convert to CET if necessary
+  // const beginningDateCET = utcToZonedTime(beginningDate, 'CET');
+
+  // Calculate endDate based on the last day's last point end time
+  const lastDay = schedule.value.days[schedule.value.days.length - 1];
+  const endDateUTC = parseAsUTC(beginning.value);
+  const endDate = new Date(
+    endDateUTC.getTime() +
+      getEndTimeInMinutes(lastDay, lastDay.points.length - 1) * 60000,
+  );
+  // Convert to CET if necessary
+  // const endDateCET = utcToZonedTime(endDate, 'CET');
+
+  // organizers is only array of strings => uid of the selected organizers
+  const organizers = potentialOrganizers.value
+    .filter((organizer) => organizer.selected)
+    .map((organizer) => organizer.uid);
+
+  // { uid: uid, name: name, surname: surname, email: email, phone: phone }
+  const contacts = potentialOrganizers.value
+    .filter((organizer) => organizer.selected)
+    .map((organizer) => ({
+      uid: organizer.uid,
+      name: organizer.name,
+      surname: organizer.surname,
+      email: organizer.email,
+      phone: organizer.phone,
+    }));
+
+  // Create the event
+  const event = {
+    id: id.value.toLowerCase(),
+    name: name.value,
+    beginningDate: beginningDate, // Use beginningDateCET if converted
+    endDate: endDate, // Use endDateCET if converted
+    description: description.value,
+    city: city.value,
+    address: address.value,
+    price: price.value,
+    motion: motion.value,
+    schedule: schedule.value,
+    thumbnail: thumbnail,
+    organizers: organizers,
+    contacts: contacts,
+  };
+
+  console.log(event);
+
+  await setEvent(event)
+    .then(() => {
+      console.log("Event created successfully");
+      eventsStore.addEvent(event);
+      router.push({ name: "Home" });
+      loadingStore.loadingEnd();
+    })
+    .catch((error) => {
+      console.error("Error creating event:", error);
+      router.push({ name: "Home" });
+      loadingStore.loadingEnd();
+    });
+};
 </script>
 
 <template>
@@ -176,8 +331,12 @@ onMounted(() => {
           <p>Nesúťažné podujatie</p>
         </div>
       </div>
-      <Field v-model="id" label="ID" />
-      <Field v-model="name" label="Názov" @keyup="handName = true" />
+      <Field v-model="id" label="ID" placeholder="SZ271" />
+      <Field
+        v-model="name"
+        label="Názov"
+        @keyup="handName = true"
+        placeholder="3. západoslovenský regionálny turnaj" />
       <div class="grid grid-cols-[auto_1fr] gap-4">
         <div
           class="self-center overflow-hidden rounded-[1.25rem] w-[26.875rem]">
@@ -189,14 +348,29 @@ onMounted(() => {
             :city="city"
             :id="id" />
         </div>
-        <Field v-model="description" label="Popis" type="multiline" />
+        <Field
+          v-model="description"
+          label="Popis"
+          type="multiline"
+          placeholder="Popis podujatia (voliteľné)" />
       </div>
       <Field v-model="beginning" label="Začiatok podujatia" type="date" />
-      <Field v-model="city" label="Mesto" />
-      <Field v-model="address" label="Adresa podujatia" />
-      <Field v-model="price" label="Cena" type="number" />
-      <Field v-model="motion" label="Téza" v-if="tournament" />
-      <Schedule v-model="schedule" />
+      <Field v-model="city" label="Mesto" placeholder="Bratislava" />
+      <Field
+        v-model="address"
+        label="Adresa podujatia"
+        placeholder="Ventúrska 5, 811 01 Bratislava" />
+      <Field
+        v-model="price"
+        label="Vstupné (€)"
+        type="number"
+        placeholder="30" />
+      <Field
+        v-model="motion"
+        label="Pripravovaná téza"
+        v-if="tournament"
+        placeholder="Všetky tézy tohoto turnaja sú improvizované" />
+      <Schedule v-model="schedule" :beginning="beginning" />
       <div
         class="flex flex-col w-full h-max-60 border-black border-2 rounded-[1.25rem] px-5 py-3 text-black gap-4">
         <h2 class="font-bold">Organizátori/-ky podujatia</h2>
@@ -210,6 +384,14 @@ onMounted(() => {
               :sublabel="organizer.email" />
           </div>
         </div>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2">
+        <button
+          class="form-primary vertical-center sm:col-start-2"
+          :disabled="!canSubmit"
+          @click="submit">
+          <span>Vytvoriť podujatie</span>
+        </button>
       </div>
     </div>
   </div>
