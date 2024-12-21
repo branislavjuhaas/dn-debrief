@@ -1,8 +1,12 @@
 <script setup>
 import Thumbnail from "../../components/Thumbnail.vue";
-import { computed, ref, watch } from "vue";
+import { computed, onMounted, ref, watch, watchEffect } from "vue";
 import Field from "../../components/Field.vue";
 import Schedule from "../../components/Schedule.vue";
+import { useUserStore } from "../../stores.js";
+import { getPotentialOrganizers } from "../../firebase/events.js";
+import Toggle from "../../components/Toggle.vue";
+
 const thumbnailRef = ref(null);
 
 const handName = ref(false);
@@ -17,6 +21,10 @@ const city = ref("");
 const address = ref("");
 const price = ref(30);
 const motion = ref("Všetky tézy tohoto turnaja sú improvizované");
+
+const potentialOrganizers = ref([]);
+
+const userStore = useUserStore();
 
 const schedule = ref({
   days: [
@@ -109,6 +117,44 @@ watch(id, () => {
     name.value = suggestName(id.value);
   }
 });
+
+const fetchPotentialOrganizers = async () => {
+  console.log(userStore);
+
+  try {
+    const organizers = await getPotentialOrganizers();
+    console.log(organizers);
+    potentialOrganizers.value = [
+      ...organizers
+        .filter((organizer) => organizer.uid !== userStore.uid)
+        .map((organizer) => ({ ...organizer, selected: false })),
+      { ...userStore.userData, self: true, selected: true },
+    ];
+
+    // Sort the potential organizers by surname alphabetically
+    potentialOrganizers.value.sort((a, b) =>
+      a.surname.localeCompare(b.surname),
+    );
+
+    console.log(potentialOrganizers.value);
+  } catch (error) {
+    console.error("Error fetching potential organizers:", error);
+  }
+};
+
+watchEffect(() => {
+  if (userStore.uid != null) {
+    console.log("refetching organizers");
+    fetchPotentialOrganizers();
+  }
+});
+
+onMounted(() => {
+  if (userStore.uid != null) {
+    console.log("refetching organizers");
+    fetchPotentialOrganizers();
+  }
+});
 </script>
 
 <template>
@@ -151,6 +197,20 @@ watch(id, () => {
       <Field v-model="price" label="Cena" type="number" />
       <Field v-model="motion" label="Téza" v-if="tournament" />
       <Schedule v-model="schedule" />
+      <div
+        class="flex flex-col w-full h-max-60 border-black border-2 rounded-[1.25rem] px-5 py-3 text-black gap-4">
+        <h2 class="font-bold">Organizátori/-ky podujatia</h2>
+        <div class="grid grid-cols-[repeat(auto-fill,minmax(20rem,1fr))] gap-4">
+          <div v-for="organizer in potentialOrganizers" :key="organizer.uid">
+            <toggle
+              v-model="organizer.selected"
+              :readonly="organizer.self"
+              :label="organizer.name + ' ' + organizer.surname"
+              :secondary="organizer.email"
+              :sublabel="organizer.email" />
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>

@@ -8,10 +8,10 @@ import {
 
 import {
   getDownloadURL,
+  getMetadata,
   getStorage,
   ref,
   uploadBytes,
-  getMetadata,
 } from "firebase/storage";
 import { useEventsStore } from "../stores.js";
 
@@ -106,4 +106,16 @@ export const uploadThumbnailImage = async (eventId, imageBlob) => {
   }
 
   return null;
+};
+
+export const getPotentialOrganizers = async () => {
+  const q = query(
+    collection(db, "users"),
+    where("role", "in", ["admin", "organizer", "junior"]),
+  );
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs.map((doc) => ({
+    uid: doc.id,
+    ...doc.data(),
+  }));
 };

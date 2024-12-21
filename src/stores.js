@@ -71,6 +71,29 @@ export const useUserStore = defineStore("user", {
         )
       );
     },
+    /**
+     * Get pure user data.
+     * @returns {Object} The user data.
+     */
+    userData() {
+      return {
+        uid: this.uid,
+        provider: this.provider,
+        name: this.name,
+        surname: this.surname,
+        email: this.email,
+        role: this.role,
+        club: this.club,
+        address: this.address,
+        phone: this.phone,
+        birthdate: this.birthdate,
+        supervisor: this.supervisor,
+        supervisorEmail: this.supervisorEmail,
+        seasons: this.seasons,
+        awards: this.awards,
+        clubManager: this.clubManager,
+      };
+    },
   },
   actions: {
     /**
