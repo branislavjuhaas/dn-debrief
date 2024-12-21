@@ -9,6 +9,7 @@ const props = defineProps([
   "name",
   "label",
   "type",
+  "readonly",
   "placeholder",
   "modelValue",
 ]);
@@ -76,6 +77,7 @@ watch(
       v-if="props.type === 'multiline'"
       ref="inputRef"
       :name="props.name"
+      :readonly="props.readonly"
       class="w-full h-[calc(100%-1rem)] my-2 outline-none bg-transparent text-black placeholder-grey resize-none"
       :placeholder="props.placeholder"
       v-model="value"
@@ -84,6 +86,7 @@ watch(
     <input
       v-else
       :type="showPassword ? 'text' : props.type"
+      :readonly="props.readonly"
       ref="inputRef"
       class="w-full outline-none bg-transparent h-auto text-black placeholder-grey"
       :placeholder="props.placeholder"
