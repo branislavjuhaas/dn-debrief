@@ -396,7 +396,9 @@ const endDrag = (day) => {
               type="text"
               placeholder="názov bodu"
               class="bg-transparent"
-              v-model="point.name" />
+              :value="point.name"
+              @input="(e) => { point.name = e.target.value; emitChange(); }"
+            />
             <button
               @click="removePoint(day, pointIndex)"
               v-if="day.points.length > 1">
