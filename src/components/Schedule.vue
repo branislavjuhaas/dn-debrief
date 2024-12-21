@@ -431,6 +431,7 @@ input:focus {
 [draggable="true"] {
   user-select: none;
   -webkit-user-drag: element;
+  cursor: grab;
 }
 
 [draggable="true"]:active {
