@@ -20,7 +20,7 @@ const datesAggregate = () => {
 
 <template>
   <router-link
-    to="/events/new"
+    :to="`/events/${event.id}`"
     class="event-card shrink-0 w-[26.875rem] h-[14.375rem] max-w-full relative rounded-[1.25rem] overflow-hidden duration-500">
     <img
       :src="event.thumbnail"

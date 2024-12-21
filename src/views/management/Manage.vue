@@ -42,6 +42,11 @@ const links = [
     link: "/manage/messages",
     roles: ["developer", "admin"],
   },
+  {
+    name: "Vytvoriť podujatie",
+    link: "/events/new",
+    roles: ["developer", "admin", "organizer", "junior"],
+  },
 ];
 
 // Function to update relevant links
