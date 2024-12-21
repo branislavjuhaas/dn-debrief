@@ -388,7 +388,13 @@ const submit = async () => {
 
 <template>
   <div class="gap-4">
-    <h1 class="text-5xl font-bold mb-2">Vytvoriť podujatie</h1>
+    <h1 class="text-5xl font-bold mb-2">
+      {{
+        !edit
+          ? "Vytvoriť podujatie"
+          : `Upraviť ${name !== "" ? name : "podujatie"}`
+      }}
+    </h1>
     <div
       class="flex flex-col w-full bg-white min-h-60 rounded-[1.25rem] p-5 gap-4 transition-all">
       <div class="grid grid-cols-2 gap-4">
@@ -405,7 +411,7 @@ const submit = async () => {
           <p>Nesúťažné podujatie</p>
         </div>
       </div>
-      <Field v-model="id" label="ID" placeholder="SZ271" />
+      <Field v-model="id" label="ID" placeholder="SZ271" :readonly="edit" />
       <Field
         v-model="name"
         label="Názov"
