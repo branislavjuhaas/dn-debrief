@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch } from "vue";
+import { computed, ref, watch } from "vue";
 
 const props = defineProps({
   beginning: String,
@@ -192,12 +192,10 @@ const removeDay = (index) => {
 /**
  * Checks if editing a point exceeds midnight.
  * @param {Object} day - The day object containing schedule information.
- * @param {number} index - The index of the edited point.
  * @returns {boolean} True if it exceeds midnight, false otherwise.
  */
-const editDoesExceedMidnight = (day, index) => {
+const editDoesExceedMidnight = (day) => {
   const minutesInDay = 24 * 60;
-  const lastPoint = day.points[day.points.length - 1];
   const endOfLastPoint = getEndTimeInMinutes(day, day.points.length - 1);
   console.log(endOfLastPoint, minutesInDay);
   return endOfLastPoint > minutesInDay;
@@ -229,7 +227,6 @@ const onTimeInputChange = (day, index, endTimeStr) => {
 
     if (duration <= 0) {
       point.isInvalid = true;
-      throw new Error("Duration must be positive");
     }
 
     const originalDuration = point.duration;
@@ -238,13 +235,11 @@ const onTimeInputChange = (day, index, endTimeStr) => {
     if (!validateDayTimes(day, index)) {
       point.duration = originalDuration;
       point.isInvalid = true;
-      throw new Error("Time exceeds midnight");
     }
 
-    if (editDoesExceedMidnight(day, index)) {
+    if (editDoesExceedMidnight(day)) {
       point.duration = originalDuration;
       point.isInvalid = true;
-      throw new Error("Time exceeds midnight");
     }
 
     emitChange(); // Emit only if validation passes
@@ -261,8 +256,7 @@ const onTimeInputChange = (day, index, endTimeStr) => {
 const onBeginningTimeChange = (day, timeStr) => {
   try {
     const originalBeginning = day.beginning;
-    const minutes = parseTimeString(timeStr);
-    day.beginning = minutes;
+    day.beginning = parseTimeString(timeStr);
 
     if (!validateDayTimes(day, 0)) {
       day.beginning = originalBeginning;
@@ -339,95 +333,98 @@ const endDrag = (day) => {
 
 <template>
   <div
-    class="flex flex-row px-5 py-3 min-h-60 w-full overflow-x-auto scrollbar-hidden border-2 border-black rounded-[1.25rem] gap-4">
-    <div
-      v-for="(day, index) in schedule.days"
-      :key="index"
-      class="flex flex-col w-96">
-      <div class="grid grid-cols-[1fr_auto] h-5 items-start mb-4">
-        <p class="font-bold text-black h-min">
-          {{ getFormattedDate(start, index) }}
-        </p>
-        <button
-          @click="removeDay(index)"
-          class="p-0 m-0"
-          v-if="schedule.days.length > 1">
-          <img src="./../assets/icons/cross.svg" alt="x" class="w-5" />
-        </button>
-      </div>
-      <div class="flex flex-col gap-2">
-        <div
-          v-for="(point, pointIndex) in day.points"
-          :key="pointIndex"
-          class="grid grid-cols-[auto_1fr_auto] gap-4 text-black p-2 px-4 rounded-[0.75rem] cursor-move"
-          :class="[
-            point.isInvalid ? 'bg-grey' : 'bg-blue',
-            isDragging && draggedOverItem?.index === pointIndex
-              ? 'border-2 border-black'
-              : '',
-            isDragging && draggedItem?.index === pointIndex ? 'opacity-50' : '',
-            isDragging ? 'cursor-grabbing' : 'cursor-grab',
-          ]"
-          draggable="true"
-          @dragstart="startDrag(day, point, pointIndex)"
-          @drag="onDrag"
-          @dragenter="onDragEnter(day, point, pointIndex)"
-          @dragend="endDrag(day)"
-          @dragover.prevent>
-          <div class="flex flex-row">
-            <input
-              type="text"
-              class="bg-transparent w-12 text-center"
-              :value="getStartTime(day, pointIndex)"
-              :readonly="pointIndex !== 0"
-              @change="
-                (e) =>
-                  pointIndex === 0 && onBeginningTimeChange(day, e.target.value)
-              " />
-            <p>-</p>
-            <input
-              type="text"
-              class="bg-transparent w-12 text-center"
-              :value="getEndTime(day, pointIndex)"
-              @change="
-                (e) => onTimeInputChange(day, pointIndex, e.target.value)
-              " />
-          </div>
-          <input
-            type="text"
-            placeholder="názov bodu"
-            class="bg-transparent"
-            v-model="point.name" />
+    class="flex flex-col px-5 py-3 min-h-60 w-full border-2 border-black rounded-[1.25rem] gap-4">
+    <h2 class="text-black font-bold">Harmonogram podujatia</h2>
+    <div class="flex flex-row overflow-x-auto scrollbar-hidden gap-4">
+      <div
+        v-for="(day, index) in schedule.days"
+        :key="index"
+        class="flex flex-col w-96">
+        <div class="grid grid-cols-[1fr_auto] h-5 items-start mb-4">
+          <p class="font-bold text-black h-min">
+            {{ getFormattedDate(start, index) }}
+          </p>
           <button
-            @click="removePoint(day, pointIndex)"
-            v-if="day.points.length > 1">
+            @click="removeDay(index)"
+            class="p-0 m-0"
+            v-if="schedule.days.length > 1">
             <img src="./../assets/icons/cross.svg" alt="x" class="w-5" />
           </button>
         </div>
-        <button
-          @click="addPoint(day)"
-          :disabled="!canAddPoint(day)"
-          class="flex bg-red text-white p-1.5 px-4 rounded-[0.75rem] items-center justify-center hover:bg-black disabled:border-dashed disabled:border-2 disabled:border-black disabled:bg-white disabled:text-grey disabled:cursor-default">
-          <span>Pridať bod</span>
-        </button>
+        <div class="flex flex-col gap-2">
+          <div
+            v-for="(point, pointIndex) in day.points"
+            :key="pointIndex"
+            class="grid grid-cols-[auto_1fr_auto] gap-4 text-black p-2 px-4 rounded-[0.75rem] cursor-move"
+            :class="[
+              point.isInvalid ? 'bg-grey' : 'bg-blue',
+              isDragging && draggedOverItem?.index === pointIndex
+                ? 'border-2 border-black'
+                : '',
+              isDragging && draggedItem?.index === pointIndex
+                ? 'opacity-50'
+                : '',
+              isDragging ? 'cursor-grabbing' : 'cursor-grab',
+            ]"
+            draggable="true"
+            @dragstart="startDrag(day, point, pointIndex)"
+            @drag="onDrag"
+            @dragenter="onDragEnter(day, point, pointIndex)"
+            @dragend="endDrag(day)"
+            @dragover.prevent>
+            <div class="flex flex-row">
+              <input
+                type="text"
+                class="bg-transparent w-12 text-center"
+                :value="getStartTime(day, pointIndex)"
+                :readonly="pointIndex !== 0"
+                @change="
+                  (e) =>
+                    pointIndex === 0 &&
+                    onBeginningTimeChange(day, e.target.value)
+                " />
+              <p>-</p>
+              <input
+                type="text"
+                class="bg-transparent w-12 text-center"
+                :value="getEndTime(day, pointIndex)"
+                @change="
+                  (e) => onTimeInputChange(day, pointIndex, e.target.value)
+                " />
+            </div>
+            <input
+              type="text"
+              placeholder="názov bodu"
+              class="bg-transparent"
+              v-model="point.name" />
+            <button
+              @click="removePoint(day, pointIndex)"
+              v-if="day.points.length > 1">
+              <img src="./../assets/icons/cross.svg" alt="x" class="w-5" />
+            </button>
+          </div>
+          <button
+            @click="addPoint(day)"
+            :disabled="!canAddPoint(day)"
+            class="flex bg-red text-white p-1.5 px-4 rounded-[0.75rem] items-center justify-center hover:bg-black disabled:border-dashed disabled:border-2 disabled:border-black disabled:bg-white disabled:text-grey disabled:cursor-default">
+            <span>Pridať bod</span>
+          </button>
+        </div>
       </div>
+      <div class="w-[2px] bg-black h-full rounded-full shrink-0"></div>
+      <p
+        @click="addDay"
+        class="flex flex-row text-black font-bold cursor-pointer h-min gap-2 text-nowrap mr-5">
+        <img src="./../assets/icons/plus.svg" alt="+" class="w-5 -mt-1" />
+        Pridať deň
+      </p>
     </div>
-    <div class="w-[2px] bg-black h-full rounded-full shrink-0"></div>
-    <p
-      @click="addDay"
-      class="flex flex-row text-black font-bold cursor-pointer h-min gap-2 text-nowrap mr-5">
-      <img src="./../assets/icons/plus.svg" alt="+" class="w-5 -mt-1" />
-      Pridať deň
-    </p>
   </div>
 </template>
 
 <style scoped>
 input:focus {
   outline: none;
-}
-.dragover {
-  border: 2px dashed black;
 }
 
 /* Add these new cursor styles */
