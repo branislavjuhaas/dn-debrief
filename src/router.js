@@ -210,12 +210,31 @@ const routes = [
   {
     path: "/events/new",
     name: "NewEvent",
-    component: () => import("./views/events/New.vue"),
+    component: () => import("./views/events/Edit.vue"),
+    props: { edit: false },
     meta: {
       title: "Vytvoriť podujatie",
       requiresAuth: true,
       roles: ["developer", "admin", "organizer", "junior"],
     },
+  },
+  {
+    path: "/events/:id/edit",
+    name: "EditEvent",
+    component: () => import("./views/events/Edit.vue"),
+    props: { edit: true },
+    meta: {
+      title: "Upraviť podujatie",
+      requiresAuth: true,
+      roles: ["developer", "admin", "organizer", "junior"],
+    },
+  },
+  {
+    path: "/not-found",
+    name: "NotFound",
+    component: () => import("./views/Error.vue"),
+    props: { code: 404 },
+    meta: { title: "404 Stránka nenájdená" },
   },
   {
     path: "/:pathMatch(.*)*", // 404

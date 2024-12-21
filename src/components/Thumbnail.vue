@@ -4,8 +4,17 @@
 import { ref } from "vue";
 import { uploadThumbnailImage, relevantEvents } from "../firebase/events.js";
 import { defineExpose } from "vue";
+import defaultThumbnail from '../assets/dn-cascade.webp';
 
-const props = defineProps(["id", "name", "city", "beginningDate", "endDate"]);
+const props = defineProps([
+  "id",
+  "name",
+  "city",
+  "beginningDate",
+  "endDate",
+  "disabled",
+  "thumbnailPath",
+]);
 
 const selectedImage = ref(null);
 
@@ -146,7 +155,8 @@ const datesAggregate = () => {
 
 <template>
   <div
-    class="thumbnail-card shrink-0 w-[26.875rem] h-[14.375rem] max-w-full relative rounded-[1.25rem] overflow-hidden flex items-center justify-center">
+    class="thumbnail-card shrink-0 w-[26.875rem] h-[14.375rem] max-w-full relative rounded-[1.25rem] overflow-hidden flex items-center justify-center"
+    :class="{ disabled: props.disabled }">
     <img
       v-if="selectedImage"
       :src="selectedImage"
@@ -154,7 +164,7 @@ const datesAggregate = () => {
       class="object-cover w-full h-full rounded-[1.25rem]" />
     <img
       v-else
-      src="../assets/dn-cascade.webp"
+      :src="props.thumbnailPath || defaultThumbnail"
       alt=""
       class="w-full h-full object-cover rounded-[1.25rem]" />
     <div
@@ -190,15 +200,15 @@ const datesAggregate = () => {
 </template>
 
 <style scoped>
-.thumbnail-card:hover .top-gradient {
+.thumbnail-card:not(.disabled):hover .top-gradient {
   top: -4.1875rem;
 }
 
-.thumbnail-card:hover .bottom-gradient {
+.thumbnail-card:not(.disabled):hover .bottom-gradient {
   bottom: -4.1875rem;
 }
 
-.thumbnail-card:hover .thumbnail-controls {
+.thumbnail-card:not(.disabled):hover .thumbnail-controls {
   opacity: 1;
 }
 

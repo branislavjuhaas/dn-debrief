@@ -1,12 +1,24 @@
 <script setup>
 import Thumbnail from "../../components/Thumbnail.vue";
-import { computed, onMounted, ref, watch, watchEffect } from "vue";
+import { computed, onMounted, ref, watch, watchEffect, nextTick } from "vue";
 import Field from "../../components/Field.vue";
 import Schedule from "../../components/Schedule.vue";
 import { useEventsStore, useLoadingStore, useUserStore } from "../../stores.js";
-import { getPotentialOrganizers, setEvent } from "../../firebase/events.js";
+import {
+  getPotentialOrganizers,
+  relevantEvents,
+  setEvent,
+} from "../../firebase/events.js";
 import Toggle from "../../components/Toggle.vue";
 import router from "../../router.js";
+import { useRoute } from "vue-router";
+
+const props = defineProps(["edit"]);
+
+const edit = props.edit;
+
+// if edit, get the :id from the route
+const editEventId = edit ? useRoute().params.id : null;
 
 /**
  * A reactive reference to the thumbnail component
@@ -34,6 +46,10 @@ const city = ref("");
 const address = ref("");
 const price = ref(30);
 const motion = ref("Všetky tézy tohoto turnaja sú improvizované");
+
+const presetThumbnail = ref(null);
+const presetOriginalThumbnail = ref(null);
+const eventOrganizers = ref([]);
 
 const potentialOrganizers = ref([]);
 
@@ -147,6 +163,50 @@ watch(id, () => {
   }
 });
 
+const updateEvent = async (eventId) => {
+  console.log("updating event");
+  const relEvents = await relevantEvents();
+  const event = relEvents.find((event) => event.id === eventId);
+
+  // If the event does not exist, redirect to the 404 page
+  if (!event) {
+    router.push({ name: "NotFound" });
+    return;
+  }
+
+  // Check if user is allowed to edit the event.
+  // User must be developer or admin
+  // or user must be one of the organizers
+  if (!["developer", "admin"].includes(userStore.role)) {
+    if (
+      !["organizer", "junior"].includes(userStore.role) ||
+      !event.organizers.includes(userStore.uid)
+    ) {
+      router.push({ name: "Unauthorized" });
+      return;
+    }
+  }
+
+  console.log(event, "EVENT");
+
+  // Batch update all reactive references
+  nextTick(() => {
+    id.value = event.id;
+    name.value = event.name;
+    beginning.value = event.beginningDate.toISOString().split("T")[0];
+    description.value = event.description;
+    city.value = event.city;
+    address.value = event.address;
+    price.value = event.price;
+    motion.value = event.motion;
+    schedule.value = event.schedule;
+    presetThumbnail.value = event.thumbnail;
+    presetOriginalThumbnail.value = event.originalThumbnail;
+    eventOrganizers.value = event.organizers;
+    tournament.value = event.id.startsWith("S"); // Assuming tournament IDs start with 'S'
+  });
+};
+
 /**
  * Fetch potential organizers from the backend and store them locally.
  */
@@ -164,7 +224,10 @@ const fetchPotentialOrganizers = async () => {
     potentialOrganizers.value = [
       ...organizers
         .filter((organizer) => organizer.uid !== userStore.uid)
-        .map((organizer) => ({ ...organizer, selected: false })),
+        .map((organizer) => ({
+          ...organizer,
+          selected: eventOrganizers.value.includes(organizer.uid),
+        })),
       { ...userStore.userData, self: true, selected: true },
     ];
 
@@ -179,17 +242,21 @@ const fetchPotentialOrganizers = async () => {
   }
 };
 
-watchEffect(() => {
-  if (userStore.uid != null) {
-    console.log("refetching organizers");
-    fetchPotentialOrganizers();
+// Remove the watchEffect and modify onMounted
+watchEffect(async () => {
+  if (edit && userStore.uid) {
+    console.log("updating event from watchEffect");
+    await updateEvent(editEventId);
+    await fetchPotentialOrganizers();
   }
 });
 
-onMounted(() => {
+onMounted(async () => {
+  console.log("mounted");
   if (userStore.uid != null) {
-    console.log("refetching organizers");
-    fetchPotentialOrganizers();
+    if (!edit) {
+      await fetchPotentialOrganizers();
+    }
   }
 });
 
@@ -240,8 +307,11 @@ const parseAsUTC = (val) => {
 const submit = async () => {
   loadingStore.loadingStart();
 
-  // Submit the thumbnail
-  const thumbnail = await thumbnailRef.value.uploadThumbnail();
+  // If no original thumbnail is set, upload the thumbnail and get the path
+  let thumbnail = presetOriginalThumbnail.value;
+  if (presetOriginalThumbnail.value === null) {
+    thumbnail = await thumbnailRef.value.uploadThumbnail();
+  }
 
   // Calculate beginningDate based on the first day's beginning time
   const firstDay = schedule.value.days[0];
@@ -300,7 +370,11 @@ const submit = async () => {
   await setEvent(event)
     .then(() => {
       console.log("Event created successfully");
-      eventsStore.addEvent(event);
+      if (edit) {
+        eventsStore.updateEvent(event);
+      } else {
+        eventsStore.addEvent(event);
+      }
       router.push({ name: "Home" });
       loadingStore.loadingEnd();
     })
@@ -346,7 +420,9 @@ const submit = async () => {
             :beginning-date="beginning"
             :end-date="ending"
             :city="city"
-            :id="id" />
+            :id="id"
+            :thumbnail-path="presetThumbnail"
+            :disabled="edit" />
         </div>
         <Field
           v-model="description"
@@ -390,7 +466,7 @@ const submit = async () => {
           class="form-primary vertical-center sm:col-start-2"
           :disabled="!canSubmit"
           @click="submit">
-          <span>Vytvoriť podujatie</span>
+          <span>{{ edit ? "Uložiť úpravy" : "Vytvoriť podujatie" }}</span>
         </button>
       </div>
     </div>

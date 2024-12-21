@@ -260,5 +260,15 @@ export const useEventsStore = defineStore("event", {
       this.events.push(event);
       this.events.sort((a, b) => a.beginningDate - b.beginningDate);
     },
+    async updateEvent(event) {
+      // Convert the thumbnail to a download URL
+      if (event.thumbnail) {
+        const { getThumbnail } = await import("./firebase/events.js");
+        event.originalThumbnail = event.thumbnail;
+        event.thumbnail = await getThumbnail(event.thumbnail);
+      }
+      this.events = this.events.map((e) => (e.id === event.id ? event : e));
+      this.events.sort((a, b) => a.beginningDate - b.beginningDate);
+    },
   },
 });
