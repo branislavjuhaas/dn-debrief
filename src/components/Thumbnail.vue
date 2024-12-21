@@ -111,7 +111,9 @@ const uploadThumbnail = async () => {
     canvas.toBlob(resolve, "image/jpeg");
   });
 
-  return await uploadThumbnailImage(props.id, blob);
+  const path = await uploadThumbnailImage(props.id, blob);
+
+  return path || useSampleImage();
 };
 
 defineExpose({
