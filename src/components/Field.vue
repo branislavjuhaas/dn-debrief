@@ -21,7 +21,7 @@ const showPassword = ref(false);
 const value = ref(props.modelValue);
 
 // Define the events that this component emits
-const emit = defineEmits(["update:modelValue"]);
+const emit = defineEmits(["update:modelValue", "enter"]);
 
 // Function to toggle the visibility of the password
 const togglePassword = (event) => {
@@ -37,6 +37,10 @@ const focusInput = () => {
   if (inputRef.value) {
     inputRef.value.focus();
   }
+};
+
+const handleEnter = (event) => {
+  emit("enter", event);
 };
 
 // Watch for changes in the value ref
@@ -81,6 +85,7 @@ watch(
       class="w-full h-[calc(100%-1rem)] my-2 outline-none bg-transparent text-black placeholder-grey resize-none"
       :placeholder="props.placeholder"
       v-model="value"
+      @keydown.enter="handleEnter"
       rows="3" />
     <!-- Render input for other types -->
     <input
@@ -90,7 +95,8 @@ watch(
       ref="inputRef"
       class="w-full outline-none bg-transparent h-auto text-black placeholder-grey"
       :placeholder="props.placeholder"
-      v-model="value" />
+      v-model="value"
+      @keydown.enter="handleEnter" />
     <img
       v-if="props.type === 'password'"
       :src="showPassword ? eyeCrossed : eye"
