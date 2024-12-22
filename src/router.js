@@ -74,12 +74,11 @@ const routes = [
     },
   },
   {
-    path: "/clubs/:filter",
-    name: "UsersFilter",
-    component: () => import("./views/management/Users.vue"),
-    props: { filter: true },
+    path: "/clubs/:id",
+    name: "Club",
+    component: () => import("./views/management/Club.vue"),
     meta: {
-      title: "Správa používateľov",
+      title: "Správa debatného klubu",
       requiresAuth: true,
       roles: ["developer", "admin", "cap", "coach"],
     },

@@ -153,7 +153,7 @@ export const updateUserRole = async (uid, newRole) => {
  * @param {Object|null} club - The club object. If null, all users are fetched.
  * @returns {Array} An array of user objects. Each object contains the user's ID and data.
  * @throws Will throw an error if the Firestore query fails.
- */
+ */ 
 export const getUsers = async (club) => {
   // If the club is null, fetch all users. Otherwise, fetch only users where the club is the specified club.
   console.log("club", club);
@@ -382,6 +382,23 @@ export const getUser = async (uid) => {
 
   return user;
 };
+
+/**
+ * Fetches a club from Firestore.
+ * @param {string} clubId - The ID of the club.
+ * @returns {Object|null} The club object or null if not found.
+ */
+export const getClub = async (clubId) => {
+  const clubRef = doc(db, "clubs", clubId);
+  const clubSnapshot = await getDoc(clubRef);
+
+  if (clubSnapshot.exists()) {
+    return { id: clubSnapshot.id, ...clubSnapshot.data() };
+  } else {
+    console.error("Club document does not exist");
+    return null;
+  }
+}
 
 /**
  * Updates a user's seasons in Firestore.
