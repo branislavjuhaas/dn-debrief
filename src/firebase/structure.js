@@ -635,3 +635,59 @@ export const getUsersPaginated = async (
 
   return { users, lastDoc: newLastDocCursor };
 };
+
+/**
+ * Fetches a component from Firestore.
+ * @param {string} collectionName - The name of the collection.
+ * @param {string} id - The ID of the document.
+ * @returns {Object|null} The document data or null if not found.
+ */
+export const getComponent = async (collectionName, id) => {
+  try {
+    const docRef = doc(db, collectionName, id);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return { id: docSnap.id, ...docSnap.data() };
+    } else {
+      console.error("No such document!");
+      return null;
+    }
+  } catch (error) {
+    console.error("Error getting document:", error);
+    return null;
+  }
+};
+
+/**
+ * Creates a new component in Firestore.
+ * @param {string} collectionName - The name of the collection.
+ * @param {Object} data - The data to be added.
+ * @returns {string|null} The ID of the created document or null if failed.
+ */
+export const createComponent = async (collectionName, data) => {
+  try {
+    const docRef = await addDoc(collection(db, collectionName), data);
+    return docRef.id;
+  } catch (error) {
+    console.error("Error creating document:", error);
+    return null;
+  }
+};
+
+/**
+ * Updates a component in Firestore.
+ * @param {string} collectionName - The name of the collection.
+ * @param {string} id - The ID of the document.
+ * @param {Object} data - The data to be updated.
+ * @returns {boolean} True if the update was successful, false otherwise.
+ */
+export const updateComponent = async (collectionName, id, data) => {
+  try {
+    const docRef = doc(db, collectionName, id);
+    await updateDoc(docRef, data);
+    return true;
+  } catch (error) {
+    console.error("Error updating document:", error);
+    return false;
+  }
+};
