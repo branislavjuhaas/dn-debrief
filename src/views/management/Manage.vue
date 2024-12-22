@@ -14,32 +14,32 @@ const club = userStore.club || { name: "", id: "" };
 const links = [
   {
     name: "Správa používateľov",
-    link: "/manage/users",
+    link: "/users",
     roles: ["developer", "admin", "cap"],
   },
   {
     name: "Správa debatných klubov",
-    link: "/manage/clubs",
+    link: "/clubs",
     roles: ["developer", "admin"],
   },
   {
     name: `Správa debatného klubu ${club.name}`,
-    link: `/manage/clubs/${club.id}`,
+    link: `/clubs/${club.id}`,
     roles: ["coach"],
   },
   {
     name: "Presmerovanie na stránku",
-    link: "/manage/route",
+    link: "/route",
     roles: ["developer"],
   },
   {
     name: "Prepočítanie počtu členov",
-    link: "/manage/terminal?command=reevaluate --members",
+    link: "/terminal?command=reevaluate --members",
     roles: ["developer"],
   },
   {
     name: "Správa obsahu",
-    link: "/manage/messages",
+    link: "/feed",
     roles: ["developer", "admin"],
   },
   {
@@ -60,18 +60,17 @@ const updateRelevantLinks = () => {
   if (userStore.clubManager) {
     relevantLinks.value.push({
       name: `Správa debatného klubu ${club.name}`,
-      link: `/manage/clubs/${club.id}`,
+      link: `/clubs/${club.id}`,
       roles: ["coach"],
     });
 
     if (
-      relevantLinks.value.filter(
-        (link) => link.link === `/manage/clubs/${club.id}`,
-      ).length > 1
+      relevantLinks.value.filter((link) => link.link === `/clubs/${club.id}`)
+        .length > 1
     ) {
       relevantLinks.value.splice(
         relevantLinks.value.findIndex(
-          (link) => link.link === `/manage/clubs/${club.id}`,
+          (link) => link.link === `/clubs/${club.id}`,
         ),
         1,
       );

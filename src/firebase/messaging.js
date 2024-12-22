@@ -64,14 +64,14 @@ const messages = {
     title: "Pridaj všetky kluby",
     message:
       "Nezabudni pridať všetky kluby, aby sa mohli zaregistrovať ich členovia.",
-    link: "/manage/clubs",
+    link: "/clubs",
     local: true,
   },
   manageClub: {
     id: "manageClub",
     title: "Spravuj svoj klub",
     message: "Pozri sa na nových členov tvojho klubu a sleduj, ako rastie.",
-    link: "/manage/clubs/{{Id}}",
+    link: "/clubs/{{Id}}",
     local: true,
   },
   learnMore: {

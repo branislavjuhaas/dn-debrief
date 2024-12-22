@@ -59,7 +59,7 @@ const search = async () => {
             link = "/profile/" + hit.path.split("/")[1];
           } else if (index === 1) {
             display = hit.name;
-            link = "/manage/clubs/" + hit.path.split("/")[1];
+            link = "/clubs/" + hit.path.split("/")[1];
           }
           return {
             ...hit,
@@ -87,7 +87,7 @@ const placeholder = computed(() => {
 // Add handleClick function
 const handleClick = (result) => {
   console.log("Clicked on", result);
-  query.value = '';
+  query.value = "";
   active.value = false;
   // Optionally navigate can be handled here if needed
 };

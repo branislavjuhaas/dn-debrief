@@ -63,7 +63,7 @@ const routes = [
     meta: { title: "Panel správy", requiresAuth: true },
   },
   {
-    path: "/manage/users",
+    path: "/users",
     name: "Users",
     component: () => import("./views/management/Users.vue"),
     props: { filter: false },
@@ -74,7 +74,7 @@ const routes = [
     },
   },
   {
-    path: "/manage/clubs/:filter",
+    path: "/clubs/:filter",
     name: "UsersFilter",
     component: () => import("./views/management/Users.vue"),
     props: { filter: true },
@@ -85,7 +85,7 @@ const routes = [
     },
   },
   {
-    path: "/manage/clubs",
+    path: "/clubs",
     name: "Clubs",
     component: () => import("./views/management/Clubs.vue"),
     meta: {
@@ -160,9 +160,9 @@ const routes = [
     },
   },
   {
-    path: "/manage/route",
+    path: "/route",
     name: "Route",
-    component: () => import("./views/management/RouteManager.vue"),
+    component: () => import("./views/management/Route.vue"),
     meta: {
       title: "Presmerovanie na stránku",
       requiresAuth: true,
@@ -241,7 +241,7 @@ const routes = [
     },
   },
   {
-    path: "/manage/terminal",
+    path: "/terminal",
     name: "Terminal",
     component: () => import("./views/management/Terminal.vue"),
     meta: {
@@ -251,9 +251,9 @@ const routes = [
     },
   },
   {
-    path: "/manage/messages",
-    name: "Messages",
-    component: () => import("./views/management/Messages.vue"),
+    path: "/feed",
+    name: "Feed",
+    component: () => import("./views/management/Feed.vue"),
     meta: {
       title: "Správa obsahu",
       requiresAuth: true,
