@@ -397,10 +397,15 @@ const endDrag = (day) => {
               placeholder="názov bodu"
               class="bg-transparent"
               :value="point.name"
-              @input="(e) => { point.name = e.target.value; emitChange(); }"
-            />
+              @input="
+                (e) => {
+                  point.name = e.target.value;
+                  emitChange();
+                }
+              " />
             <button
               @click="removePoint(day, pointIndex)"
+              class="w-5"
               v-if="day.points.length > 1">
               <img src="./../assets/icons/cross.svg" alt="x" class="w-5" />
             </button>

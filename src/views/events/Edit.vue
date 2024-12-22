@@ -397,15 +397,15 @@ const submit = async () => {
     </h1>
     <div
       class="flex flex-col w-full bg-white min-h-60 rounded-[1.25rem] p-5 gap-4 transition-all">
-      <div class="grid grid-cols-2 gap-4">
+      <div class="grid grid-cols-2 gap-4 w-full shrink">
         <div
-          class="flex font-bold h-16 min-w-60 px-5 rounded-[1.25rem] border-2 border-black duration-500 items-center justify-center vertical-center text-black cursor-pointer transition-colors"
+          class="flex font-bold h-16 px-5 rounded-[1.25rem] border-2 border-black duration-500 items-center justify-center vertical-center text-black text-center cursor-pointer transition-colors"
           :class="{ 'bg-black text-white': tournament }"
           @click="tournament = true">
           <p>Súťažné podujatie</p>
         </div>
         <div
-          class="flex font-bold h-16 min-w-60 px-5 rounded-[1.25rem] border-2 border-black duration-500 items-center justify-center vertical-center text-black cursor-pointer transition-colors"
+          class="flex font-bold h-16 px-5 rounded-[1.25rem] border-2 border-black duration-500 items-center justify-center vertical-center text-black text-center cursor-pointer transition-colors"
           :class="{ 'bg-black text-white': !tournament }"
           @click="tournament = false">
           <p>Nesúťažné podujatie</p>
@@ -417,9 +417,9 @@ const submit = async () => {
         label="Názov"
         @keyup="handName = true"
         placeholder="3. západoslovenský regionálny turnaj" />
-      <div class="grid grid-cols-[auto_1fr] gap-4">
+      <div class="flex flex-col sm:grid sm:grid-cols-[auto_1fr] gap-4">
         <div
-          class="self-center overflow-hidden rounded-[1.25rem] w-[26.875rem]">
+          class="self-center overflow-hidden rounded-[1.25rem] w-[26.875rem] max-w-full">
           <thumbnail
             ref="thumbnailRef"
             :name="name"
