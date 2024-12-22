@@ -1,7 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Home from "./views/Home.vue";
-import { collection } from "firebase/firestore";
-import { h } from "vue";
 
 const routes = [
   {
@@ -123,7 +121,7 @@ const routes = [
           name: "membersCount",
           hidden: true,
           defaultValue: 0,
-        }
+        },
       ],
     },
     meta: {
@@ -157,7 +155,7 @@ const routes = [
         {
           name: "membersCount",
           hidden: true,
-        }
+        },
       ],
     },
   },

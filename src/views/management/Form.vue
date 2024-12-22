@@ -3,9 +3,12 @@ import Field from "../../components/Field.vue";
 import Dropdown from "../../components/Dropdown.vue";
 import Toggle from "../../components/Toggle.vue";
 import { ref, computed, onMounted } from "vue";
-import { collection } from "firebase/firestore";
 import { useRoute, useRouter } from "vue-router";
-import { getComponent, updateComponent, createComponent } from "../../firebase/structure.js";
+import {
+  getComponent,
+  updateComponent,
+  createComponent,
+} from "../../firebase/structure.js";
 
 const props = defineProps({
   collection: {
@@ -24,9 +27,7 @@ const props = defineProps({
     type: Array,
     required: true,
     validator: (value) => {
-      return value.every(
-        (field) => "name" in field,
-      );
+      return value.every((field) => "name" in field);
     },
   },
 });
@@ -56,7 +57,9 @@ const canSubmit = computed(() => {
 });
 
 // Compute if fields length is odd
-const hasOddFields = computed(() => props.fields.filter(field => !field.hidden).length % 2 !== 0);
+const hasOddFields = computed(
+  () => props.fields.filter((field) => !field.hidden).length % 2 !== 0,
+);
 
 const route = useRoute();
 const router = useRouter();
@@ -68,7 +71,10 @@ if (props.edit) {
     if (component) {
       props.fields.forEach((field) => {
         if (!field.hidden) {
-          fieldValues.value[field.name] = component[field.name] !== undefined ? component[field.name] : field.defaultValue || "";
+          fieldValues.value[field.name] =
+            component[field.name] !== undefined
+              ? component[field.name]
+              : field.defaultValue || "";
         }
         // Hidden fields are already initialized with default values or null
       });
