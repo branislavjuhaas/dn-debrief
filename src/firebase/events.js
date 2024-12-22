@@ -122,7 +122,7 @@ export const uploadThumbnailImage = async (eventId, imageBlob) => {
   } catch (error) {
     if (error.code === "storage/object-not-found") {
       // File doesn't exist, proceed to upload
-      await uploadBytes(imageRef, imageBlob);
+      await uploadBytes(imageRef, imageBlob, { cacheControl: "public,max-age=31104000" });
       console.log(`Thumbnail uploaded to ${filePath}`);
       return "thumbnails/" + eventId + ".jpg";
     } else {

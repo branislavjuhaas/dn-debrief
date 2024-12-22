@@ -72,7 +72,7 @@ const filteredMembers = computed(() => {
         </div>
         <router-link
           v-for="member in filteredMembers"
-          :key="member.id"
+          :key="`admin-${member.id}`"
           :to="`/profile/${member.id}`"
           v-if="['admin', 'developer'].includes(useUserStore().role)"
           class="grid grid-cols-3 items-center gap-4 rounded-[1.25rem]">
