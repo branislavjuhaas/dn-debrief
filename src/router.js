@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Home from "./views/Home.vue";
+import { collection } from "firebase/firestore";
+import { h } from "vue";
 
 const routes = [
   {
@@ -92,6 +94,71 @@ const routes = [
       title: "Správa klubov",
       requiresAuth: true,
       roles: ["developer", "admin", "cap"],
+    },
+  },
+  {
+    path: "/clubs/new",
+    name: "NewClub",
+    component: () => import("./views/management/Form.vue"),
+    props: {
+      collection: "clubs",
+      edit: false,
+      title: "Vytvoriť debatný klub",
+      fields: [
+        { name: "name", title: "Názov klubu", type: "text" },
+        {
+          name: "active",
+          title: "Aktívny",
+          type: "toggle",
+          optional: true,
+          defaultValue: true,
+        },
+        {
+          name: "zdp",
+          title: "ZDP",
+          optional: true,
+          type: "toggle",
+        },
+        {
+          name: "membersCount",
+          hidden: true,
+          defaultValue: 0,
+        }
+      ],
+    },
+    meta: {
+      title: "Vytvoriť debatný klub",
+      requiresAuth: true,
+      roles: ["developer", "admin"],
+    },
+  },
+  {
+    path: "/clubs/:id/edit",
+    name: "EditClub",
+    component: () => import("./views/management/Form.vue"),
+    props: {
+      collection: "clubs",
+      edit: true,
+      title: "Upraviť debatný klub",
+      fields: [
+        { name: "name", title: "Názov klubu", type: "text" },
+        {
+          name: "active",
+          title: "Aktívny",
+          type: "toggle",
+          optional: true,
+        },
+        {
+          name: "zdp",
+          title: "ZDP",
+          optional: true,
+          type: "toggle",
+        },
+        {
+          name: "membersCount",
+          hidden: true,
+        }
+      ],
     },
   },
   {
