@@ -60,7 +60,8 @@ const filteredMembers = computed(() => {
         </div>
         <router-link
           :to="`/clubs/${clubId}/edit`"
-          class="form-primary vertical-center">
+          class="form-primary vertical-center"
+          v-if="['admin', 'developer'].includes(useUserStore().role)">
           <span>Upraviť</span>
         </router-link>
       </div>
