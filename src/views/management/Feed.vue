@@ -1,8 +1,6 @@
 <script setup>
 import { ref, onMounted, computed } from "vue"; // Add import for computed
 import Field from "../../components/Field.vue";
-import Toggle from "../../components/Toggle.vue";
-import Dropdown from "../../components/Dropdown.vue";
 import { getAllMessages, deleteMessage } from "../../firebase/messaging.js";
 import { useLoadingStore } from "../../stores.js";
 

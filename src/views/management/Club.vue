@@ -1,8 +1,8 @@
 <script setup>
 // Import necessary components and functions
-import { ref, onMounted, computed } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
-import { getUsers, getClub } from "../../firebase/structure.js";
+import { getClub, getUsers } from "../../firebase/structure.js";
 import { useLoadingStore, useUserStore } from "../../stores.js";
 import Field from "../../components/Field.vue";
 import { translateRole } from "../../translate.js";
@@ -17,8 +17,7 @@ const quickFilter = ref("");
 // Fetch club data and members on component mount
 onMounted(async () => {
   useLoadingStore().loadingStart();
-  const usersData = await getUsers(clubId.value);
-  members.value = usersData;
+  members.value = await getUsers(clubId.value);
   clubName.value = (await getClub(clubId.value)).name;
   console.log(clubName.value);
   useLoadingStore().loadingEnd();
