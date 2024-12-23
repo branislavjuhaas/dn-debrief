@@ -1,32 +1,21 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue"; // Add import for computed
 import Field from "../../components/Field.vue";
 import Toggle from "../../components/Toggle.vue";
 import Dropdown from "../../components/Dropdown.vue";
-import { getAllMessages, createMessage, editMessage, deleteMessage } from "../../firebase/messaging.js";
-import { getClubs } from "../../firebase/structure.js";
+import { getAllMessages, deleteMessage } from "../../firebase/messaging.js";
 import { useLoadingStore } from "../../stores.js";
 
 const loadingStore = useLoadingStore();
 const messages = ref([]);
 const clubs = ref([]);
-const newMessage = ref({
-  title: "",
-  message: "",
-  link: "",
-  local: false,
-  filters: {
-    member: false,
-    club: "",
-    role: null,
-  },
-});
+const quickFilter = ref(""); // Add quickFilter
 
 const fetchMessages = async () => {
   loadingStore.loadingStart();
   const allMessages = await getAllMessages();
-  messages.value = allMessages.map(message => {
-    const club = clubs.value.find(club => club.id === message.filters.club);
+  messages.value = allMessages.map((message) => {
+    const club = clubs.value.find((club) => club.id === message.filters.club);
     return {
       ...message,
       filters: {
@@ -38,49 +27,22 @@ const fetchMessages = async () => {
   loadingStore.loadingEnd();
 };
 
-const fetchClubs = async () => {
-  clubs.value = await getClubs(false);
-};
-
-const saveMessage = async () => {
-  newMessage.value.filters.role = null; // Ensure role is always null
-  newMessage.value.filters.member = false; // Ensure member is always false
-  const club = clubs.value.find(club => club.name === newMessage.value.filters.club);
-  newMessage.value.filters.club = club ? club.id : "";
-  const createdMessage = await createMessage(newMessage.value);
-  messages.value.push(createdMessage);
-  resetForm();
-};
-
-const editExistingMessage = async (message) => {
-  await editMessage(newMessage.value.id, newMessage.value);
-    const index = messages.value.findIndex(msg => msg.id === newMessage.value.id);
-    if (index !== -1) {
-      messages.value[index] = { ...newMessage.value };
-    }
-};
-
 const deleteExistingMessage = async (id) => {
   await deleteMessage(id);
-  messages.value = messages.value.filter(msg => msg.id !== id);
+  messages.value = messages.value.filter((msg) => msg.id !== id);
 };
 
-const resetForm = () => {
-  newMessage.value = {
-    title: "",
-    message: "",
-    link: "",
-    local: false,
-    filters: {
-      member: false,
-      club: "",
-      role: null,
-    },
-  };
-};
+const filteredMessages = computed(() => {
+  // Add filteredMessages
+  if (!quickFilter.value) return messages.value;
+  return messages.value.filter(
+    (message) =>
+      message.title.toLowerCase().includes(quickFilter.value.toLowerCase()) ||
+      message.message.toLowerCase().includes(quickFilter.value.toLowerCase()),
+  );
+});
 
 onMounted(async () => {
-  await fetchClubs();
   await fetchMessages();
 });
 </script>
@@ -88,33 +50,46 @@ onMounted(async () => {
 <template>
   <div class="gap-4">
     <h1 class="text-5xl font-bold mb-2">Správa obsahu</h1>
-    <div class="flex flex-col w-full text-black bg-white min-h-60 rounded-[1.25rem] p-5 gap-8 transition-all">
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <field label="Názov" v-model="newMessage.title" />
-        <field label="Obsah" v-model="newMessage.message" />
-        <field label="Odkaz" v-model="newMessage.link" />
-        <toggle label="Lokálny odkaz" v-model="newMessage.local" />
-        <dropdown label="Klub" :options="clubs.map(club => club.name)" v-model="newMessage.filters.club" />
-        <button @click="saveMessage" class="form-primary vertical-center">
-          <span>Pridať správu</span>
-        </button>
-      </div>
+    <div
+      class="flex flex-col w-full text-black bg-white min-h-60 rounded-[1.25rem] p-5 gap-8 transition-all">
       <div class="flex flex-col gap-4">
-        <p class="flex mx-6 font-bold">
-          Existujúce správy
-        </p>
-        <div v-for="message in messages" :key="message.id" class="grid grid-cols-1 sm:grid-cols-4 items-center gap-4 rounded-[1.25rem]">
-          <field label="Názov" v-model="message.title" />
-          <field label="Obsah" v-model="message.message" />
-          <field label="Odkaz" v-model="message.link" />
-          <div class="flex gap-2">
-            <button @click="editExistingMessage(message)" class="form-secondary vertical-center w-full">
-              <span>Upraviť</span>
-            </button>
-            <button @click="deleteExistingMessage(message.id)" class="form-secondary vertical-center w-full">
-              <span>Vymazať</span>
-            </button>
-          </div>
+        <div class="grid sm:grid-cols-2 gap-4">
+          <field label="Filter" v-model="quickFilter" />
+          <!-- Add filter input -->
+          <router-link to="/feed/new" class="form-primary vertical-center">
+            <span>Vytvoriť príspevok</span>
+          </router-link>
+        </div>
+        <h2 class="font-bold my-4">Zoznam príspevkov</h2>
+        <div
+          v-for="message in filteredMessages"
+          :key="message.id"
+          class="grid grid-cols-[1fr_auto] md:grid-cols-[1fr_2fr_auto] grid-rows-2 items-center gap-4 rounded-[1.25rem] border-2 border-black px-5 h-22 py-3">
+          <p class="truncate col-start-1 md:col-span-1">
+            <span class="font-bold">Názov</span>
+            {{ message.title }}
+          </p>
+          <p class="truncate col-start-1 md:col-start-2 md:col-span-1">
+            <span class="font-bold">Obsah</span>
+            {{ message.message }}
+          </p>
+          <p class="truncate md:row-start-2 col-start-1 md:col-span-2">
+            <span class="font-bold">Odkaz</span>
+            {{ message.link }}
+          </p>
+          <router-link
+            :to="`/feed/${message.id}/edit`"
+            class="w-5 h-5 col-start-2 md:col-start-3 row-start-1 -mt-1">
+            <img src="./../../assets/icons/edit.svg" alt="delete" class="w-5" />
+          </router-link>
+          <button
+            @click="deleteExistingMessage(message.id)"
+            class="w-5 h-5 col-start-2 md:col-start-3 row-start-2 -mt-1">
+            <img
+              src="./../../assets/icons/cross.svg"
+              alt="delete"
+              class="w-5" />
+          </button>
         </div>
       </div>
     </div>

@@ -158,6 +158,11 @@ const routes = [
         },
       ],
     },
+    meta: {
+      title: "Upraviť debatný klub",
+      requiresAuth: true,
+      roles: ["developer", "admin"],
+    },
   },
   {
     path: "/route",
@@ -256,6 +261,58 @@ const routes = [
     component: () => import("./views/management/Feed.vue"),
     meta: {
       title: "Správa obsahu",
+      requiresAuth: true,
+      roles: ["developer", "admin"],
+    },
+  },
+  {
+    path: "/feed/new",
+    name: "FeedCreate",
+    component: () => import("./views/management/Form.vue"),
+    props: {
+      collection: "messages",
+      edit: false,
+      title: "Vytvoriť príspevok",
+      fields: [
+        { name: "title", title: "Názov", type: "text" },
+        { name: "message", title: "Obsah", type: "text" },
+        { name: "link", title: "Odkaz", type: "text" },
+        { name: "local", title: "Lokálny", type: "toggle" },
+        {
+          name: "filters",
+          defaultValue: { club: "", member: true, role: null },
+          hidden: true,
+        },
+      ],
+    },
+    meta: {
+      title: "Vytvoriť príspevok",
+      requiresAuth: true,
+      roles: ["developer", "admin"],
+    },
+  },
+  {
+    path: "/feed/:id/edit",
+    name: "FeedEdit",
+    component: () => import("./views/management/Form.vue"),
+    props: {
+      collection: "messages",
+      edit: true,
+      title: "Upraviť príspevok",
+      fields: [
+        { name: "title", title: "Názov", type: "text" },
+        { name: "message", title: "Obsah", type: "text" },
+        { name: "link", title: "Odkaz", type: "text" },
+        { name: "local", title: "Lokálny", type: "toggle" },
+        {
+          name: "filters",
+          defaultValue: { club: "", member: true, role: null },
+          hidden: true,
+        },
+      ],
+    },
+    meta: {
+      title: "Upraviť príspevok",
       requiresAuth: true,
       roles: ["developer", "admin"],
     },
