@@ -75,8 +75,12 @@ if (props.edit) {
             component[field.name] !== undefined
               ? component[field.name]
               : field.defaultValue || "";
+        } else {
+          fieldValues.value[field.name] =
+            component[field.name] !== undefined
+              ? component[field.name]
+              : field.defaultValue || null;
         }
-        // Hidden fields are already initialized with default values or null
       });
     }
   });
