@@ -10,16 +10,15 @@ import { translateRole } from "../../translate.js";
 // Define reactive variables for club data, members, and filters
 const route = useRoute();
 const clubId = ref(route.params.id);
-const clubName = ref("");
+const club = ref("");
 const members = ref([]);
 const quickFilter = ref("");
 
 // Fetch club data and members on component mount
 onMounted(async () => {
   useLoadingStore().loadingStart();
+  club.value = await getClub(clubId.value);
   members.value = await getUsers(clubId.value);
-  clubName.value = (await getClub(clubId.value)).name;
-  console.log(clubName.value);
   useLoadingStore().loadingEnd();
 });
 
@@ -36,7 +35,7 @@ const filteredMembers = computed(() => {
 
 <template>
   <div class="gap-4">
-    <h1 class="text-5xl font-bold mb-2">Debatný klub {{ clubName }}</h1>
+    <h1 class="text-5xl font-bold mb-2">Debatný klub {{ club.name }}</h1>
     <div
       class="flex flex-col w-full text-black bg-white min-h-60 rounded-[1.25rem] p-5 gap-8 transition-all">
       <div
@@ -51,11 +50,12 @@ const filteredMembers = computed(() => {
         }">
         <field label="Filter" v-model="quickFilter" />
         <div
-          class="flex flex-col h-12 w-full border-2 border-black rounded-[1.25rem] justify-center px-5 vertical-center truncate">
+          class="flex flex-row justify-between h-12 w-full border-2 border-black rounded-[1.25rem] items-center px-5 vertical-center truncate">
           <p>
             <span class="font-bold">Počet členov</span>
             {{ members.length }}
           </p>
+          <p v-if="club.zdp" class="font-bold">ZDP</p>
         </div>
         <router-link
           :to="`/clubs/${clubId}/edit`"

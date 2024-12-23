@@ -1,7 +1,5 @@
 <script setup>
 // Import necessary components and functions
-import Field from "../../components/Field.vue";
-import Toggle from "../../components/Toggle.vue";
 import { onMounted, ref } from "vue";
 import { getClubsWithMembersCount } from "../../firebase/structure.js";
 import { useLoadingStore } from "../../stores.js";
@@ -18,8 +16,7 @@ const clubs = ref([]);
 
 // Fetch clubs data on component mount
 onMounted(async () => {
-  const clubsData = await getClubsWithMembersCount();
-  clubs.value = clubsData;
+  clubs.value = await getClubsWithMembersCount();
 
   // End loading state
   useLoadingStore().loadingEnd();
@@ -89,18 +86,25 @@ const createClub = async () => {
     <h1 class="text-5xl font-bold mb-2">Zoznam debatných klubov</h1>
     <div
       class="flex flex-col w-full text-black bg-white min-h-60 rounded-[1.25rem] p-5 gap-8 transition-all">
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <field label="Názov klubu" v-model="newClub" />
-        <toggle label="Aktívny" v-model="newActive" />
-        <button @click="createClub" class="form-primary vertical-center">
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div
+          class="flex flex-col h-12 w-full border-2 border-black rounded-[1.25rem] justify-center px-5 vertical-center truncate">
+          <p>
+            <span class="font-bold">Počet klubov</span>
+            {{ clubs.length }}
+          </p>
+        </div>
+        <router-link to="clubs/new" class="form-primary vertical-center">
           <span>Vytvoriť klub</span>
-        </button>
+        </router-link>
       </div>
       <div class="flex flex-col gap-4">
-        <div class="grid grid-rows-1 font-bold gap-4 items-center grid-cols-3">
+        <div
+          class="grid grid-rows-1 font-bold gap-4 items-center grid-cols-[3fr_1fr_1fr_1fr]">
           <p>Názov</p>
           <p>Počet členov</p>
           <p>Aktívny</p>
+          <p>ZDP</p>
         </div>
       </div>
       <div class="flex flex-col gap-4">
@@ -108,18 +112,16 @@ const createClub = async () => {
           v-for="club in clubs"
           :to="'/clubs/' + club.id"
           :key="club.id"
-          class="grid grid-cols-3 items-center cursor-pointer gap-4 rounded-[1.25rem] duration-150 transition-all delay-300 hover:py-5 hover:text-red">
+          class="grid grid-cols-[3fr_1fr_1fr_1fr] items-center cursor-pointer gap-4 rounded-[1.25rem] duration-150 transition-all delay-300 hover:py-5 hover:text-red">
           <p class="truncate">{{ club.name }}</p>
-          <p class="overflow-hidden sm:truncate">
+          <p class="overflow-hidden truncate">
             {{ club.membersCount }}
           </p>
-          <p
-            @click.prevent="
-              updateClubStatus(club.id, !club.active, $event);
-              club.active = !club.active;
-            "
-            class="overflow-hidden underline sm:truncate">
+          <p class="overflow-hidden truncate">
             {{ club.active ? "Áno" : "Nie" }}
+          </p>
+          <p class="overflow-hidden truncate">
+            {{ club.zdp ? "Áno" : "Nie" }}
           </p>
         </router-link>
       </div>
