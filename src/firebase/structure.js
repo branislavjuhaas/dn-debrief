@@ -153,7 +153,7 @@ export const updateUserRole = async (uid, newRole) => {
  * @param {Object|null} club - The club object. If null, all users are fetched.
  * @returns {Array} An array of user objects. Each object contains the user's ID and data.
  * @throws Will throw an error if the Firestore query fails.
- */ 
+ */
 export const getUsers = async (club) => {
   // If the club is null, fetch all users. Otherwise, fetch only users where the club is the specified club.
   console.log("club", club);
@@ -398,7 +398,7 @@ export const getClub = async (clubId) => {
     console.error("Club document does not exist");
     return null;
   }
-}
+};
 
 /**
  * Updates a user's seasons in Firestore.
@@ -604,56 +604,6 @@ export const updateUserClubManagerStatus = async (uid, clubManagerStatus) => {
 };
 
 /**
- * Fetches a paginated list of users from Firestore.
- * @param {Object|null} club - The club object. If null, fetches all users.
- * @param {number} pageSize - Number of users per page.
- * @param {Object} lastDocCursor - The last document's cursor data for pagination.
- * @returns {Object} An object containing the users array and the new cursor.
- */
-export const getUsersPaginated = async (
-  club,
-  pageSize,
-  lastDocCursor = null,
-) => {
-  let usersQuery = collection(db, "users");
-
-  if (club) {
-    usersQuery = query(usersQuery, where("clubId", "==", club.id));
-  }
-
-  usersQuery = query(
-    usersQuery,
-    orderBy("name"),
-    orderBy("__name__"),
-    limit(pageSize),
-  );
-
-  if (lastDocCursor) {
-    usersQuery = query(
-      usersQuery,
-      startAfter(lastDocCursor.name, lastDocCursor.id),
-    );
-  }
-
-  const querySnapshot = await getDocs(usersQuery);
-  const users = [];
-  querySnapshot.forEach((doc) => {
-    users.push({ id: doc.id, ...doc.data() });
-  });
-
-  const lastVisibleDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
-  let newLastDocCursor = null;
-  if (lastVisibleDoc) {
-    newLastDocCursor = {
-      name: lastVisibleDoc.data().name,
-      id: lastVisibleDoc.id,
-    };
-  }
-
-  return { users, lastDoc: newLastDocCursor };
-};
-
-/**
  * Fetches a component from Firestore.
  * @param {string} collectionName - The name of the collection.
  * @param {string} id - The ID of the document.
@@ -708,3 +658,74 @@ export const updateComponent = async (collectionName, id, data) => {
     return false;
   }
 };
+
+/**
+ * Retrieves user statistics for the current year.
+ * @returns {Object} An object containing:
+ *   - totalUsers: Total number of users in the collection.
+ *   - usersCurrentYear: Number of users with a season in the current year.
+ *   - usersCurrentYearConfirmed: Number of users with a season in the current year and confirmed status.
+ */
+export const getUserStatistics = async () => {
+  const currentYear = new Date().getFullYear().toString();
+  try {
+    // Total number of users
+    const totalUsersSnapshot = await getDocs(collection(db, "users"));
+    const totalUsers = totalUsersSnapshot.size;
+
+    // Users with a season in the current year and confirmed status
+    const usersCurrentYearConfirmedSnapshot = await getDocs(
+      query(
+        collection(db, "users"),
+        where("seasons", "array-contains", {
+          year: currentYear,
+          confirmed: true,
+        }),
+      ),
+    );
+    const usersCurrentYearConfirmed = usersCurrentYearConfirmedSnapshot.size;
+
+    // Users with a season in the current year, regardless of confirmed status
+    const usersCurrentYearSnapshot = await getDocs(
+      query(
+        collection(db, "users"),
+        where("seasons", "array-contains", { year: currentYear, confirmed: false }),
+      ),
+    );
+    const usersCurrentYear = usersCurrentYearSnapshot.size + usersCurrentYearConfirmed;
+
+    return {
+      totalUsers,
+      usersCurrentYear,
+      usersCurrentYearConfirmed,
+    };
+  } catch (error) {
+    console.error("Error retrieving user statistics: ", error);
+    return {
+      totalUsers: 0,
+      usersCurrentYear: 0,
+      usersCurrentYearConfirmed: 0,
+    };
+  }
+};
+
+/**
+ * Fetches the last 10 created users from Firestore.
+ * @returns {Array} An array of the last 10 user objects.
+ */
+export const getLast10Users = async () => {
+  try {
+    const usersRef = collection(db, "users");
+    const q = query(usersRef, orderBy("createdAt", "desc"), limit(10));
+    const querySnapshot = await getDocs(q);
+    const users = [];
+    querySnapshot.forEach((doc) => {
+      users.push({ id: doc.id, ...doc.data() });
+    });
+    return users;
+  } catch (error) {
+    console.error("Error fetching last 10 users:", error);
+    return [];
+  }
+};
+

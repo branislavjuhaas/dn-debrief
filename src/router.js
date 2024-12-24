@@ -66,7 +66,6 @@ const routes = [
     path: "/users",
     name: "Users",
     component: () => import("./views/management/Users.vue"),
-    props: { filter: false },
     meta: {
       title: "Správa používateľov",
       requiresAuth: true,
