@@ -11,7 +11,8 @@ service cloud.firestore {
       );
       allow write: if (request.auth.uid == userId
                      && (!('role' in resource.data) || !('role' in request.resource.data) || request.resource.data.role == resource.data.role)
-                     && (!('awards' in resource.data) || !('awards' in request.resource.data) || request.resource.data.awards == resource.data.awards))
+                     && (!('awards' in resource.data) || !('awards' in request.resource.data) || request.resource.data.awards == resource.data.awards)
+                     && (!('createdAt' in resource.data) || !('createdAt' in request.resource.data) || request.resource.data.createdAt == resource.data.createdAt))
                      || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'developer'];
     }
     match /clubs/{clubId} {

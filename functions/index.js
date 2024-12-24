@@ -13,6 +13,7 @@ const Recipient = require("mailersend").Recipient;
 const EmailParams = require("mailersend").EmailParams;
 const MailerSend = require("mailersend").MailerSend;
 const { onSchedule } = require("firebase-functions/v2/scheduler");
+const { onDocumentCreated } = require("firebase-functions/v2/firestore");
 
 // All available logging functions
 const { logger } = require("firebase-functions/v2");
@@ -314,3 +315,18 @@ exports.sendRegistrationReminders = onSchedule(
     }
   },
 );
+
+/**
+ * Sets the 'createdAt' field for a user document upon creation.
+ *
+ * @function setCreatedAt
+ * @param {object} snap - The snapshot of the created document.
+ * @param {object} context - The context object.
+ * @returns {Promise<void>} A promise that resolves when the 'createdAt' field is set.
+ */
+exports.setCreatedAt = onDocumentCreated('users/{userId}', (snap, context) => {
+  return snap.ref.set(
+    { createdAt: admin.firestore.FieldValue.serverTimestamp() },
+    { merge: true }
+  );
+});
