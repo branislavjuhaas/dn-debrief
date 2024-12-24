@@ -72,7 +72,7 @@ onMounted(async () => {
             class="animated-circle" />
         </svg>
         <div
-          class="absolute flex flex-col top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center mt-3 items-center transition-all duration-300">
+          class="absolute flex flex-col top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center mt-2.5 items-center transition-all duration-300">
           <div class="flex flex-row h-12">
             <h2 class="text-5xl font-bold">
               {{ usersLoaded ? totalUsers : "--" }}

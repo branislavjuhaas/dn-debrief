@@ -226,7 +226,7 @@ onMounted(() => {
       // If the user does not exist, create it
       // Redirect the user to the home page
       // if google is defined
-      if (google && google.accounts.id) {
+      if (typeof google !== 'undefined' && google.accounts.id) {
         google.accounts.id.cancel();
       }
 
