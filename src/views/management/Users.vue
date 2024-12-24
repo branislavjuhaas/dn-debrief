@@ -318,7 +318,7 @@ const filteredUsers = computed(() => {
 
 <template>
   <div class="gap-4">
-    <h1 class="text-5xl font-bold mb-2">
+    <h1>
       {{
         !props.filter
           ? "Zoznam používateľov"

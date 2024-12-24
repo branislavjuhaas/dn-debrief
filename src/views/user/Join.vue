@@ -246,7 +246,7 @@ const message = route.query.message || "";
 
 <template>
   <div class="gap-4">
-    <h1 class="text-5xl font-bold mb-2">
+    <h1>
       {{ "Registrácia do SDA na sezónu " + seasons.join("/") }}
     </h1>
     <div

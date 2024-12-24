@@ -35,7 +35,7 @@ const filteredMembers = computed(() => {
 
 <template>
   <div class="gap-4">
-    <h1 class="text-5xl font-bold mb-2">Debatný klub {{ club.name }}</h1>
+    <h1>Debatný klub {{ club.name }}</h1>
     <div
       class="flex flex-col w-full text-black bg-white min-h-60 rounded-[1.25rem] p-5 gap-8 transition-all">
       <div

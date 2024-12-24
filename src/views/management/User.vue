@@ -401,7 +401,7 @@ const updateClubManagerStatus = async () => {
 
 <template>
   <div class="gap-4" @click="contextMenuVisible = false">
-    <h1 class="text-5xl font-bold mb-2">
+    <h1>
       {{ userFullName }}
     </h1>
     <div

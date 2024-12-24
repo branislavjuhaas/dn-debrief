@@ -45,7 +45,7 @@ onMounted(() => {
 
 <template>
   <div v-if="award" class="gap-4">
-    <h1 class="text-5xl font-bold mb-2">
+    <h1>
       {{ isLegendary ? award.legendary.title : award.regular.title }}
     </h1>
     <div

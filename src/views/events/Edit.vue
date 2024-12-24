@@ -388,7 +388,7 @@ const submit = async () => {
 
 <template>
   <div class="gap-4">
-    <h1 class="text-5xl font-bold mb-2">
+    <h1>
       {{
         !edit
           ? "Vytvoriť podujatie"

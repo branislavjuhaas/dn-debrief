@@ -52,7 +52,7 @@ switch (props.code) {
 
 <template>
   <div>
-    <h1 class="text-5xl">
+    <h1>
       <b>{{ code + " - " + message }}</b>
     </h1>
     <p class="text-xl mt-2">{{ description }}</p>

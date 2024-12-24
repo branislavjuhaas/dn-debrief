@@ -1,6 +1,12 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import { reevaluateMembersCount, createClub, createMessage, editClub, editMessage } from "../../firebase/structure.js";
+import {
+  reevaluateMembersCount,
+  createClub,
+  createMessage,
+  editClub,
+  editMessage,
+} from "../../firebase/structure.js";
 import { useRoute, useRouter } from "vue-router";
 
 const command = ref("");
@@ -58,13 +64,17 @@ const commands = {
 
     if (args.length === 0) {
       for (const cmd in availableCommands) {
-        output.value.push(`${cmd.toUpperCase()}   -   ${availableCommands[cmd].description}`);
+        output.value.push(
+          `${cmd.toUpperCase()}   -   ${availableCommands[cmd].description}`,
+        );
       }
     } else {
       const cmd = args[0];
       if (availableCommands[cmd]) {
         output.value.push(`${cmd}: ${availableCommands[cmd].description}`);
-        output.value.push(`Arguments: ${availableCommands[cmd].arguments.join(", ")}`);
+        output.value.push(
+          `Arguments: ${availableCommands[cmd].arguments.join(", ")}`,
+        );
         output.value.push(`Example: ${availableCommands[cmd].example}`);
       } else {
         output.value.push(`No help available for command: ${cmd}`);
@@ -152,7 +162,7 @@ onMounted(() => {
 
 <template>
   <div class="gap-4 h-full">
-    <h1 class="text-5xl font-bold mb-2">Terminál</h1>
+    <h1>Terminál</h1>
     <div
       class="flex flex-col w-full bg-black text-white min-h-60 rounded-[1.25rem] p-5 transition-all overflow-auto scrollbar-hidden">
       <div id="terminal-output">
@@ -171,21 +181,21 @@ onMounted(() => {
 </template>
 
 <style scoped>
-  .form-primary {
-    background-color: black;
-    color: white;
-    border: 2px solid white;
-    padding: 0.5rem 1rem;
-    border-radius: 0.25rem;
-    cursor: pointer;
-  }
+.form-primary {
+  background-color: black;
+  color: white;
+  border: 2px solid white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
 
-  .form-primary:hover {
-    background-color: white;
-    color: black;
-  }
+.form-primary:hover {
+  background-color: white;
+  color: black;
+}
 
-  .focus-border-0:focus {
-    outline: none;
-  }
+.focus-border-0:focus {
+  outline: none;
+}
 </style>

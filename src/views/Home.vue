@@ -118,7 +118,7 @@ const imageLoaded = ref(false);
 
 <template>
   <div>
-    <h1 class="text-5xl font-bold">
+    <h1>
       {{
         user.uid != null
           ? greeting + ", " + user.name + "!"
@@ -127,7 +127,7 @@ const imageLoaded = ref(false);
     </h1>
 
     <div
-      class="flex flex-row text-base font-bold gap-3 mt-10 items-center leading-3">
+      class="flex flex-row text-base font-bold gap-3 mt-8 items-center leading-3">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="20"

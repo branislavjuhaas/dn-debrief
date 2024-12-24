@@ -29,6 +29,10 @@ a {
     @apply text-black no-underline hover:text-red duration-150;
 }
 
+h1 {
+  @apply font-bold text-5xl mb-2 text-left;
+}
+
 input:disabled {
   @apply cursor-not-allowed bg-transparent;
 }

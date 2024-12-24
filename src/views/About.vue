@@ -46,7 +46,7 @@ setSystemName();
 
 <template>
   <div class="gap-4">
-    <h1 class="text-5xl font-bold mb-2">O systéme {{ system }}</h1>
+    <h1>O systéme {{ system }}</h1>
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
       <div
         class="flex flex-row justify-between bg-white rounded-[1.25rem] p-5 gap-4 text-black vertical-center items-center">

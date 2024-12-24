@@ -21,7 +21,7 @@ const navigate = () => {
 
 <template>
   <div class="gap-4">
-    <h1 class="text-5xl font-bold mb-2">Presmerovanie na stránku</h1>
+    <h1>Presmerovanie na stránku</h1>
     <div
       class="flex flex-col justify-between w-full bg-white min-h-60 rounded-[1.25rem] p-5 gap-16 transition-all">
       <div class="flex flex-col gap-4">

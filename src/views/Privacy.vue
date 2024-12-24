@@ -2,7 +2,7 @@
 
 <template>
   <div class="text-justify print:text-black">
-    <h1 class="text-5xl text-left font-bold mb-2 leading-tight">
+    <h1 class="leading-tight">
       Vyhlásenie Slovenskej debatnej asociácie o ochrane osobných údajov pre
       službu DebRIEF
     </h1>
