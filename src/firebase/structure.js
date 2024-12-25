@@ -13,7 +13,6 @@ import {
   documentId,
   arrayUnion,
   orderBy,
-  startAfter,
   limit,
 } from "firebase/firestore";
 
