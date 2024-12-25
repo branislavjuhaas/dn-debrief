@@ -689,10 +689,14 @@ export const getUserStatistics = async () => {
     const usersCurrentYearSnapshot = await getDocs(
       query(
         collection(db, "users"),
-        where("seasons", "array-contains", { year: currentYear, confirmed: false }),
+        where("seasons", "array-contains", {
+          year: currentYear,
+          confirmed: false,
+        }),
       ),
     );
-    const usersCurrentYear = usersCurrentYearSnapshot.size + usersCurrentYearConfirmed;
+    const usersCurrentYear =
+      usersCurrentYearSnapshot.size + usersCurrentYearConfirmed;
 
     return {
       totalUsers,
@@ -710,13 +714,13 @@ export const getUserStatistics = async () => {
 };
 
 /**
- * Fetches the last 10 created users from Firestore.
- * @returns {Array} An array of the last 10 user objects.
+ * Fetches the last 4 created users from Firestore.
+ * @returns {Array} An array of the last 4 user objects.
  */
-export const getLast10Users = async () => {
+export const getRecentUsers = async () => {
   try {
     const usersRef = collection(db, "users");
-    const q = query(usersRef, orderBy("createdAt", "desc"), limit(10));
+    const q = query(usersRef, orderBy("createdAt", "desc"), limit(4));
     const querySnapshot = await getDocs(q);
     const users = [];
     querySnapshot.forEach((doc) => {
@@ -724,8 +728,7 @@ export const getLast10Users = async () => {
     });
     return users;
   } catch (error) {
-    console.error("Error fetching last 10 users:", error);
+    console.error("Error fetching recent users:", error);
     return [];
   }
 };
-
