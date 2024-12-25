@@ -9,6 +9,7 @@
     "dev-build": "node scripts/increment-version-dev.cjs && vite build",
     "deploy": "npm run build && firebase deploy --only hosting && firebase deploy --only hosting:dev",
     "dev-deploy": "npm run dev-build && firebase deploy --only hosting:dev",
+    "maintain": "node scripts/maintain.cjs && firebase deploy --only hosting && firebase deploy --only hosting:dev",
     "preview": "vite preview"
   },
   "dependencies": {
