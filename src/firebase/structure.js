@@ -713,13 +713,13 @@ export const getUserStatistics = async () => {
 };
 
 /**
- * Fetches the last 4 created users from Firestore.
- * @returns {Array} An array of the last 4 user objects.
+ * Fetches the last 10 created users from Firestore.
+ * @returns {Array} An array of the last 10 user objects.
  */
 export const getRecentUsers = async () => {
   try {
     const usersRef = collection(db, "users");
-    const q = query(usersRef, orderBy("createdAt", "desc"), limit(4));
+    const q = query(usersRef, orderBy("createdAt", "desc"), limit(10));
     const querySnapshot = await getDocs(q);
     const users = [];
     querySnapshot.forEach((doc) => {

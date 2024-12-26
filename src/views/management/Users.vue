@@ -207,12 +207,11 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="gap-4 h-full">
+  <div class="gap-4">
     <h1>Správa používateľov</h1>
     <div
-      class="grid sm:grid-cols-[auto_1fr] w-full bg-white text-black min-h-80 rounded-[1.25rem] p-5 transition-all overflow-auto scrollbar-hidden gap-12">
-      <div
-        class="aspect-square w-80 h-80 sm:h-full sm:w-full relative justify-self-center">
+      class="grid sm:grid-cols-[auto_auto_1fr] w-full bg-white text-black min-h-80 h-fit rounded-[1.25rem] p-5 transition-all overflow-auto scrollbar-hidden gap-6">
+      <div class="w-80 h-80 relative justify-self-center">
         <svg
           width="100"
           height="100"
@@ -271,17 +270,18 @@ onMounted(async () => {
           </div>
         </div>
       </div>
-      <div class="grid grid-rows-[auto_auto_1fr] h-full gap-4">
-        <div class="grid sm:grid-cols-2 gap-4 h-min items-center">
+      <div class="w-[2px] h-full bg-black rounded-full hidden sm:flex" />
+      <div class="grid grid-rows-[auto_auto_1fr] h-auto gap-4">
+        <div class="grid md:grid-cols-2 gap-4 items-center">
           <div
-            class="flex flex-row justify-start h-12 w-full border-2 border-black rounded-[1.25rem] items-center px-5 vertical-center truncate">
-            <p>
-              <span class="font-bold">Nedávno pridaní používatelia</span>
+            class="flex flex-row justify-start h-12 w-full items-center text-center md:text-left px-5 vertical-center truncate md:row-start-1 row-start-2">
+            <p class="w-full">
+              <span class="font-bold w-full">Nedávno vytvorené účty</span>
             </p>
           </div>
           <button
             @click="exportAll"
-            class="form-primary vertical-center"
+            class="form-primary vertical-center row-start-1"
             :disabled="exported">
             <span>Exportovať všetkých</span>
           </button>
@@ -292,7 +292,7 @@ onMounted(async () => {
           <p>Stav registrácie</p>
         </div>
         <div
-          class="flex flex-col text-left truncate gap-4 w-full h-full overflow-y-auto scrollbar-hidden">
+          class="flex flex-col text-left truncate gap-4 w-full h-auto overflow-y-auto scrollbar-hidden">
           <router-link
             v-for="user in recentUsers"
             :key="user.uid"
@@ -302,13 +302,16 @@ onMounted(async () => {
             <p class="truncate">{{ user.name }} {{ user.surname }}</p>
             <p class="truncate">
               {{
-                user.seasons.some(
-                  (season) => season.year == currentYear && season.confirmed,
-                )
-                  ? "Potvrdená"
-                  : user.seasons.some((season) => season.year == currentYear)
-                    ? "Nepotvrdená"
-                    : "Chýba registrácia"
+                !user.seasons
+                  ? "Chýba registrácia"
+                  : user.seasons.some(
+                        (season) =>
+                          season.year == currentYear && season.confirmed,
+                      )
+                    ? "Potvrdená"
+                    : user.seasons.some((season) => season.year == currentYear)
+                      ? "Nepotvrdená"
+                      : "Chýba registrácia"
               }}
             </p>
           </router-link>
