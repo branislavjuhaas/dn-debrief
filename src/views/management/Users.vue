@@ -287,9 +287,9 @@ onMounted(async () => {
           </button>
         </div>
         <div class="grid grid-cols-3 gap-4 font-bold text-left truncate h-auto">
-          <p>UID</p>
-          <p>Meno a priezvisko</p>
-          <p>Stav registrácie</p>
+          <p class="truncate">UID</p>
+          <p class="truncate">Meno a priezvisko</p>
+          <p class="truncate">Stav registrácie</p>
         </div>
         <div
           class="flex flex-col text-left truncate gap-4 w-full h-auto overflow-y-auto scrollbar-hidden">
