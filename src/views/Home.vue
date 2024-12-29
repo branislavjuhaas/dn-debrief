@@ -118,7 +118,7 @@ const imageLoaded = ref(false);
 
 <template>
   <div>
-    <h1>
+    <h1 class="leading-[1.1] -mb-2">
       {{
         user.uid != null
           ? greeting + ", " + user.name + "!"

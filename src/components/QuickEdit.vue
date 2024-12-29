@@ -23,37 +23,42 @@ const emit = defineEmits(["update"]);
       });
     ">
     <p class="font-bold">{{ props.title }}</p>
-    <input
-      class="text-right"
-      v-if="editing"
-      v-model="value"
-      :type="props.type" />
-    <p v-else class="text-right" :class="{ 'text-red' : props.readonly }">
-      {{ confirmedValue }}
-    </p>
-    <Transition name="fly">
-      <div v-if="editing">
-        <button
-          @click.stop="
-            value = confirmedValue;
-            editing = false;
-          "
-          class="mt-1">
-          <img src="./../assets/icons/cross.svg" alt="X" class="w-5" />
-        </button>
-        <button
-          @click.stop="
-            if (value !== confirmedValue) {
-              emit('update', props.name, value);
-            }
-            confirmedValue = value;
-            editing = false;
-          "
-          class="mt-1">
-          <img src="./../assets/icons/check.svg" alt="√" class="w-5" />
-        </button>
-      </div>
-    </Transition>
+    <div class="flex flex-row gap-4">
+      <input
+        class="text-right w-full"
+        v-if="editing"
+        v-model="value"
+        :type="props.type" />
+      <p
+        v-else
+        class="text-right w-full"
+        :class="{ 'text-red': props.readonly }">
+        {{ confirmedValue }}
+      </p>
+      <Transition name="fly">
+        <div class="flex flex-row gap-2" v-if="editing">
+          <button
+            @click.stop="
+              value = confirmedValue;
+              editing = false;
+            "
+            class="w-5 h-5">
+            <img src="./../assets/icons/cross.svg" alt="X" class="w-5" />
+          </button>
+          <button
+            @click.stop="
+              if (value !== confirmedValue) {
+                emit('update', props.name, value);
+              }
+              confirmedValue = value;
+              editing = false;
+            "
+            class="w-5 h-5">
+            <img src="./../assets/icons/check.svg" alt="√" class="w-5" />
+          </button>
+        </div>
+      </Transition>
+    </div>
   </div>
 </template>
 
