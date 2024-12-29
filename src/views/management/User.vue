@@ -6,9 +6,9 @@ import {
   assignAwardToUser,
   updateAwardLegendStatus,
   removeAwardFromUser,
-  updateUserData as updateUserDataInFirebase,
   getClubs,
   updateUserClubManagerStatus,
+  updateUserProperty,
 } from "../../firebase/structure.js";
 import router from "../../router.js";
 import Dropdown from "../../components/Dropdown.vue";
@@ -21,6 +21,7 @@ import {
 } from "../../translate.js";
 import { logEvent } from "firebase/analytics";
 import { analytics } from "../../main.js";
+import QuickEdit from "../../components/QuickEdit.vue";
 
 const route = useRoute();
 const userStore = useUserStore();
@@ -44,14 +45,16 @@ const isClubManager = ref(false);
 let actualRole = "";
 const clubs = ref([]);
 
+const readonlyProperties = ["club", "uid", "member"];
+
 /**
  * Formats user data for display.
  * @param {string} uid - The user ID.
  * @param {Object} user - The user data.
  * @returns {Array} - The formatted user data.
  */
-function formatUserData(uid, user) {
-  return [
+const formatUserData = (uid, user) =>
+  [
     { name: "uid", value: uid },
     { name: "club", value: user.club ? user.club.name : null },
     {
@@ -73,7 +76,6 @@ function formatUserData(uid, user) {
     { name: "supervisor", value: user.supervisor },
     { name: "supervisorEmail", value: user.supervisorEmail },
   ].filter((item) => item.value !== null && item.value !== undefined);
-}
 
 /**
  * Updates the user data.
@@ -342,51 +344,6 @@ watch(userRole, async (newRole, oldRole) => {
 });
 
 /**
- * Handles left-click on a user data field.
- * @param {Event} event - The event object.
- * @param {Object} data - The user data object.
- */
-const handleLeftClickUserData = (event, data) => {
-  if (
-    (userStore.role !== "admin" && userStore.role !== "developer") ||
-    data.name === "uid" ||
-    data.name === "email" ||
-    data.name === "member" ||
-    data.name === "club" ||
-    (userStore.role === "admin" && actualRole === "developer")
-  ) {
-    return;
-  }
-  event.preventDefault();
-  data.editing = true;
-  data.originalValue = data.value;
-  contextMenuVisible.value = false;
-};
-
-/**
- * Saves the edited user data and updates Firebase.
- * @param {Object} data - The user data object.
- */
-const saveUserData = async (data) => {
-  if (data.value !== data.originalValue) {
-    try {
-      await updateUserDataInFirebase(route.params.uid, {
-        [data.name]: data.value,
-      });
-      // Update local state without re-fetching
-      const localData = userData.value.find((item) => item.name === data.name);
-      if (localData) {
-        localData.value = data.value;
-      }
-    } catch (error) {
-      console.error("Error updating user data:", error);
-      data.value = data.originalValue;
-    }
-  }
-  data.editing = false;
-};
-
-/**
  * Updates the club manager status for the user.
  */
 const updateClubManagerStatus = async () => {
@@ -395,6 +352,24 @@ const updateClubManagerStatus = async () => {
     await updateUserClubManagerStatus(route.params.uid, isClubManager.value);
   } catch (error) {
     console.error("Error updating club manager status:", error);
+  }
+};
+
+/**
+ * Updates a specific property of the current user.
+ * @param {string} name - The name of the property to update.
+ * @param {any} value - The new value for the property.
+ */
+const quickUpdateUserProperty = async (name, value) => {
+  try {
+    await updateUserProperty(route.params.uid, name, value);
+    // Update local state if necessary
+    const localData = userData.value.find((item) => item.name === name);
+    if (localData) {
+      localData.value = value;
+    }
+  } catch (error) {
+    console.error("Error updating user property:", error);
   }
 };
 </script>
@@ -407,22 +382,15 @@ const updateClubManagerStatus = async () => {
     <div
       class="flex flex-col justify-between w-full bg-white min-h-60 rounded-[1.25rem] p-5 gap-16 transition-all">
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div
+        <quick-edit
           v-for="data in userData"
           :key="data.name"
-          class="flex flex-row justify-between h-12 px-5 items-center text-black vertical-center"
-          @click="handleLeftClickUserData($event, data)">
-          <p class="font-bold whitespace-nowrap">
-            {{ translateKey(data.name) }}
-          </p>
-          <input
-            v-if="data.editing && data.name !== 'club'"
-            v-model="data.value"
-            @blur="saveUserData(data)"
-            @keyup.enter="saveUserData(data)"
-            class="bg-transparent outline-none text-right w-full overflow-hidden" />
-          <p v-if="!data.editing" class="text-right">{{ data.value }}</p>
-        </div>
+          :name="data.name"
+          :readonly="readonlyProperties.includes(data.name)"
+          :type="data.name === 'birthdate' ? 'date' : 'text'"
+          :title="translateKey(data.name)"
+          :value="data.value"
+          @update="(name, value) => quickUpdateUserProperty(name, value)" />
       </div>
       <div class="flex flex-col gap-4">
         <div

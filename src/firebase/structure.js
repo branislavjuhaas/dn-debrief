@@ -172,30 +172,6 @@ export const getUsers = async (club) => {
 };
 
 /**
- * Fetches the count of members in a specific club from Firestore.
- *
- * This function fetches the count of users associated with a specific club from Firestore.
- * The club is specified by the clubId parameter. If the clubId parameter is not provided,
- * the function returns 0.
- *
- * @async
- * @param {string|null} clubId - The ID of the club. If null, the function returns 0.
- * @returns {number} The count of users associated with the specified club.
- * @throws Will throw an error if the Firestore query fails.
- */
-const getClubMembersCount = async (clubId) => {
-  if (!clubId) {
-    return 0;
-  }
-
-  const usersRef = collection(db, "users");
-  const clubRef = doc(db, "clubs", clubId);
-  const q = query(usersRef, where("club", "==", clubRef));
-  const querySnapshot = await getDocs(q);
-  return querySnapshot.size;
-};
-
-/**
  * Fetches all clubs from Firestore and adds a 'membersCount' property to each club.
  * The 'membersCount' property represents the number of users associated with each club.
  *
@@ -573,20 +549,6 @@ export const fetchAllClubs = async () => {
 };
 
 /**
- * Updates a user's data in Firestore.
- * @param {string} uid - The user's ID.
- * @param {Object} updatedData - The updated user data.
- */
-export const updateUserData = async (uid, updatedData) => {
-  try {
-    await updateDoc(doc(db, `users/${uid}`), updatedData);
-  } catch (error) {
-    console.error("Error updating user data: ", error);
-    return error;
-  }
-};
-
-/**
  * Updates the club manager status of a user in Firestore.
  * @param {string} uid - The user's ID.
  * @param {boolean} clubManagerStatus - The new club manager status.
@@ -729,5 +691,22 @@ export const getRecentUsers = async () => {
   } catch (error) {
     console.error("Error fetching recent users:", error);
     return [];
+  }
+};
+
+/**
+ * Updates a specific property of a user in Firestore.
+ * @param {string} uid - The user's ID.
+ * @param {string} name - The name of the property to update.
+ * @param {any} value - The new value for the property.
+ */
+export const updateUserProperty = async (uid, name, value) => {
+  try {
+    await updateDoc(doc(db, `users/${uid}`), {
+      [name]: value,
+    });
+  } catch (error) {
+    console.error("Error updating user property:", error);
+    throw error;
   }
 };
