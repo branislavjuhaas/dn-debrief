@@ -85,7 +85,7 @@ const createClub = async () => {
   <div class="gap-4">
     <h1>Zoznam debatných klubov</h1>
     <div
-      class="flex flex-col w-full text-black bg-white min-h-60 rounded-[1.25rem] p-5 gap-8 transition-all">
+      class="flex flex-col w-full text-black bg-white min-h-60 rounded-[1.25rem] p-5 gap-8">
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div
           class="flex flex-col h-12 w-full border-2 border-black rounded-[1.25rem] justify-center px-5 vertical-center truncate">
@@ -109,10 +109,11 @@ const createClub = async () => {
       </div>
       <div class="flex flex-col gap-4">
         <router-link
-          v-for="club in clubs"
+          v-for="(club, index) in clubs"
           :to="'/clubs/' + club.id"
           :key="club.id"
-          class="grid grid-cols-[3fr_1fr_1fr_1fr] items-center cursor-pointer gap-4 rounded-[1.25rem] duration-150 transition-all delay-300 hover:py-5 hover:text-red">
+          :style="{ '--delay': index * 0.035 + 's' }"
+          class="grid grid-cols-[3fr_1fr_1fr_1fr] items-center cursor-pointer gap-4 rounded-[1.25rem] duration-100 hover:text-red fade-in fly-in opacity-0">
           <p class="truncate">{{ club.name }}</p>
           <p class="overflow-hidden truncate">
             {{ club.membersCount }}
@@ -129,4 +130,24 @@ const createClub = async () => {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes flyIn {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in forwards;
+  animation-delay: var(--delay);
+}
+
+.fly-in {
+  animation: flyIn 0.5s ease-out forwards;
+  animation-delay: var(--delay);
+}
+</style>

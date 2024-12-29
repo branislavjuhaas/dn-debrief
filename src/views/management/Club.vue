@@ -71,11 +71,12 @@ const filteredMembers = computed(() => {
           <p>Rola</p>
         </div>
         <router-link
-          v-for="member in filteredMembers"
+          v-for="(member, index) in filteredMembers"
           :key="`admin-${member.id}`"
           :to="`/profile/${member.id}`"
           v-if="['admin', 'developer'].includes(useUserStore().role)"
-          class="grid grid-cols-3 items-center gap-4 rounded-[1.25rem]">
+          :style="{ '--delay': index * 0.035 + 's' }"
+          class="grid grid-cols-3 items-center gap-4 rounded-[1.25rem] fade-in fly-in opacity-0">
           <p class="truncate">{{ member.id }}</p>
           <p class="overflow-hidden sm:truncate">
             {{ member.name + " " + member.surname }}
@@ -86,9 +87,10 @@ const filteredMembers = computed(() => {
         </router-link>
         <div
           v-else
-          v-for="member in filteredMembers"
+          v-for="(member, index) in filteredMembers"
           :key="member.id"
-          class="grid grid-cols-3 items-center gap-4 rounded-[1.25rem]">
+          :style="{ '--delay': index * 0.035 + 's' }"
+          class="grid grid-cols-3 items-center gap-4 rounded-[1.25rem] fade-in fly-in opacity-0">
           <p class="truncate">{{ member.id }}</p>
           <p class="overflow-hidden sm:truncate">
             {{ member.name + " " + member.surname }}
@@ -102,4 +104,34 @@ const filteredMembers = computed(() => {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes flyIn {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in forwards;
+  animation-delay: var(--delay);
+}
+
+.fly-in {
+  animation: flyIn 0.5s ease-out forwards;
+  animation-delay: var(--delay);
+}
+</style>
