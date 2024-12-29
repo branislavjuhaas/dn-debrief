@@ -46,6 +46,7 @@ const city = ref("");
 const address = ref("");
 const price = ref(30);
 const motion = ref("Všetky tézy tohoto turnaja sú improvizované");
+const deadline = ref("");
 
 const presetThumbnail = ref(null);
 const presetOriginalThumbnail = ref(null);
@@ -61,6 +62,7 @@ const schedule = ref({
   days: [
     {
       beginning: 810,
+      offset: 0,
       points: [
         {
           name: "otvorenie podujatia",
@@ -83,7 +85,10 @@ const schedule = ref({
 const ending = computed(() => {
   // beginning with the schedule.days days added
   const date = new Date(beginning.value);
-  const days = schedule.value.days.length - 1;
+
+  // Get the sum of offsets of all days
+  const sum = schedule.value.days.reduce((acc, day) => acc + day.offset, 0);
+  const days = schedule.value.days.length + sum - 1;
   date.setDate(date.getDate() + days);
 
   return date;
@@ -199,6 +204,7 @@ const updateEvent = async (eventId) => {
     address.value = event.address;
     price.value = event.price;
     motion.value = event.motion;
+    deadline.value = event.deadline.toISOString().split("T")[0];
     schedule.value = event.schedule;
     presetThumbnail.value = event.thumbnail;
     presetOriginalThumbnail.value = event.originalThumbnail;
@@ -272,6 +278,7 @@ const canSubmit = computed(() => {
     city.value &&
     address.value &&
     price.value &&
+    deadline.value &&
     (tournament.value ? motion.value : true) &&
     schedule.value.days.length > 0 &&
     potentialOrganizers.value.some((organizer) => organizer.selected)
@@ -359,6 +366,7 @@ const submit = async () => {
     address: address.value,
     price: price.value,
     motion: motion.value,
+    deadline: new Date(deadline.value),
     schedule: schedule.value,
     thumbnail: thumbnail,
     organizers: organizers,
@@ -452,6 +460,7 @@ const submit = async () => {
         label="Pripravovaná téza"
         v-if="tournament"
         placeholder="Všetky tézy tohoto turnaja sú improvizované" />
+      <Field v-model="deadline" label="Deadline na registráciu" type="date" />
       <Schedule v-model="schedule" :beginning="beginning" />
       <div
         class="flex flex-col w-full h-max-60 border-black border-2 rounded-[1.25rem] px-5 py-3 text-black gap-4">

@@ -107,6 +107,7 @@ const minutesToTime = (minutes) => {
 const addDay = () => {
   schedule.value.days.push({
     beginning: 540,
+    offset: 0,
     points: [{ name: "", duration: 30 }],
   });
   emitChange();
@@ -269,6 +270,19 @@ const onBeginningTimeChange = (day, timeStr) => {
   }
 };
 
+/**
+ * Calculates the cumulative index based on the given index and the sum of day offsets.
+ *
+ * @param {number} index - The base index to calculate from.
+ * @returns {number} The cumulative index.
+ */
+const getCumulativeIndex = (index) => {
+  const sum = schedule.value.days
+    .slice(0, index)
+    .reduce((acc, day) => acc + day.offset, 0);
+  return index + sum;
+};
+
 // Add these new refs for drag and drop
 const draggedItem = ref(null);
 const draggedOverItem = ref(null);
@@ -341,9 +355,32 @@ const endDrag = (day) => {
         :key="index"
         class="flex flex-col w-96">
         <div class="grid grid-cols-[1fr_auto] h-5 items-start mb-4">
-          <p class="font-bold text-black h-min">
-            {{ getFormattedDate(start, index) }}
-          </p>
+          <div class="flex flex-row items-start">
+            <button
+              @click="
+                day.offset--;
+                emitChange();
+              "
+              class="p-0 m-0 h-min disabled:opacity-50"
+              :disabled="(index === 0 && day.offset <= 0) || day.offset <= -1"
+              v-if="schedule.days.length > 1">
+              <img src="./../assets/icons/v-left.svg" alt="<" class="w-5" />
+            </button>
+            <button
+              @click="
+                day.offset++;
+                emitChange();
+              "
+              class="p-0 m-0 h-min"
+              v-if="schedule.days.length > 1">
+              <img src="./../assets/icons/v-right.svg" alt=">" class="w-5" />
+            </button>
+            <p class="font-bold text-black ml-2 h-min">
+              {{
+                getFormattedDate(start, getCumulativeIndex(index) + day.offset)
+              }}
+            </p>
+          </div>
           <button
             @click="removeDay(index)"
             class="p-0 m-0"
