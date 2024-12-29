@@ -226,7 +226,7 @@ onMounted(() => {
       // If the user does not exist, create it
       // Redirect the user to the home page
       // if google is defined
-      if (typeof google !== 'undefined' && google.accounts.id) {
+      if (typeof google !== "undefined" && google.accounts.id) {
         google.accounts.id.cancel();
       }
 
@@ -291,7 +291,7 @@ watchEffect(() => {
     <!-- Loading overlay -->
     <div
       v-if="loadingStore.loading"
-      class="absolute inset-0 bg-transparent"></div>
+      class="absolute inset-0 bg-transparent cursor-wait"></div>
   </div>
 </template>
 
