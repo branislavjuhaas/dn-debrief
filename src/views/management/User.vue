@@ -45,7 +45,7 @@ const isClubManager = ref(false);
 let actualRole = "";
 const clubs = ref([]);
 
-const readonlyProperties = ["club", "uid", "member"];
+const readonlyProperties = ["club", "uid", "member", "email"];
 
 /**
  * Formats user data for display.
