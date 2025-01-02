@@ -40,8 +40,8 @@ if (
       <p class="hidden mt-1 sm:flex">
         {{
           isDebrief
-            ? "2024 Slovenská debatná asociácia"
-            : "2024 Branislav Juhás"
+            ? "2024 - 2025 Slovenská debatná asociácia"
+            : "2024 - 2025 Branislav Juhás"
         }}
       </p>
 
