@@ -188,3 +188,15 @@ export const setEvent = async (event) => {
     console.error("Error setting event:", error);
   }
 };
+
+/**
+ * Retrieves a specific event by its ID using relevant events.
+ *
+ * @param {string} eventId - The ID of the event to retrieve.
+ * @returns {Promise<Object|null>} A promise that resolves to the event object or null if not found.
+ */
+export const getEventById = async (eventId) => {
+  const events = await relevantEvents();
+  return events.find(event => event.id === eventId) || null;
+};
+
