@@ -24,7 +24,7 @@ const routes = [
     path: "/auth/forgot",
     name: "Forgot",
     component: () => import("./views/user/Forgot.vue"),
-    meta: { title: "Obnovenie hesla", anonymousOnly: true },
+    meta: { title: "Obnovenie hesla" },
   },
   {
     path: "/profile",

@@ -5,12 +5,15 @@ import { translateError } from "../../translate.js";
 import Field from "../../components/Field.vue";
 import Toggle from "../../components/Toggle.vue";
 import { useLoadingStore } from "../../stores.js";
+import { useRoute } from "vue-router";
 
 // Define reactive variables
 const email = ref("");
 const password = ref("");
 const remember = ref(false);
 const message = ref("");
+
+const thenLink = useRoute().query.then;
 
 /**
  * This asynchronous function handles user login.

@@ -160,13 +160,20 @@ const handleRedirection = async (authenticated) => {
     const routeMeta = router.currentRoute.value.meta;
 
     // If the route's meta is anonymousOnly and user is logged in, redirect to home
-    if (routeMeta.anonymousOnly && authenticated) {
+    if (router.currentRoute.value.name === "Auth") {
+      const thenQuery = router.currentRoute.value.query.then;
+      await router.push(thenQuery ? thenQuery : { name: "Home" });
+    } else if (routeMeta.anonymousOnly && authenticated) {
       console.log("Redirecting to home");
       await router.push({ name: "Home" });
     }
     // If the route's meta requiresAuth and user is not logged in, redirect to auth
     else if (routeMeta.requiresAuth && !authenticated) {
-      await router.push({ name: "Auth" });
+      const currentRoute = router.currentRoute.value;
+      await router.push({
+        name: "Auth",
+        query: { then: currentRoute.fullPath },
+      });
     }
     // If the route's meta requires a specific role and user does not have it, redirect to unauthorized
     else if (routeMeta.roles && !routeMeta.roles.includes(userStore.role)) {
@@ -245,7 +252,12 @@ onMounted(() => {
     // Router guard to protect routes based on authentication status
     router.beforeEach((to, from, next) => {
       if (to.meta.requiresAuth && !userStore.uid) {
-        next("/auth");
+        // Get the current route and redirect based on the route meta
+        const currentRoute = router.currentRoute.value;
+        next(
+          "/auth" +
+            (currentRoute.fullPath ? `?then=${currentRoute.fullPath}` : ""),
+        );
       } else if (to.meta.anonymousOnly && userStore.uid) {
         next("/profile");
       } else if (to.meta.roles && !to.meta.roles.includes(userStore.role)) {
