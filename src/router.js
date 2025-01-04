@@ -340,6 +340,21 @@ const routes = [
     },
   },
   {
+    path: "/events/rules",
+    name: "Rules",
+    component: () => import("./views/events/Rules.vue"),
+    meta: {
+      title:
+        "Pravidlá registrácie a účasti na podujatiach Slovenskej debatnej asociácie",
+    },
+  },
+  {
+    path: "/events/:id",
+    name: "Event",
+    component: () => import("./views/events/Event.vue"),
+    meta: { title: "Detail podujatia", requiresAuth: true },
+  },
+  {
     path: "/events/:id/edit",
     name: "EditEvent",
     component: () => import("./views/events/Edit.vue"),
