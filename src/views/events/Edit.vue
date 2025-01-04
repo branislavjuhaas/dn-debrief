@@ -5,6 +5,7 @@ import Field from "../../components/Field.vue";
 import Schedule from "../../components/Schedule.vue";
 import { useEventsStore, useLoadingStore, useUserStore } from "../../stores.js";
 import {
+  getEventById,
   getPotentialOrganizers,
   relevantEvents,
   setEvent,
@@ -47,6 +48,7 @@ const address = ref("");
 const price = ref(30);
 const motion = ref("Všetky tézy tohoto turnaja sú improvizované");
 const deadline = ref("");
+const link = ref("");
 
 const presetThumbnail = ref(null);
 const presetOriginalThumbnail = ref(null);
@@ -170,8 +172,7 @@ watch(id, () => {
 
 const updateEvent = async (eventId) => {
   console.log("updating event");
-  const relEvents = await relevantEvents();
-  const event = relEvents.find((event) => event.id === eventId);
+  const event = await getEventById(eventId);
 
   // If the event does not exist, redirect to the 404 page
   if (!event) {
@@ -210,6 +211,7 @@ const updateEvent = async (eventId) => {
     presetOriginalThumbnail.value = event.originalThumbnail;
     eventOrganizers.value = event.organizers;
     tournament.value = event.id.startsWith("S"); // Assuming tournament IDs start with 'S'
+    link.value = event.link;
   });
 };
 
@@ -257,6 +259,14 @@ watchEffect(async () => {
   }
 });
 
+watchEffect(() => {
+  if (userStore.uid != null) {
+    if (!edit) {
+      fetchPotentialOrganizers();
+    }
+  }
+});
+
 onMounted(async () => {
   console.log("mounted");
   if (userStore.uid != null) {
@@ -281,7 +291,8 @@ const canSubmit = computed(() => {
     deadline.value &&
     (tournament.value ? motion.value : true) &&
     schedule.value.days.length > 0 &&
-    potentialOrganizers.value.some((organizer) => organizer.selected)
+    potentialOrganizers.value.some((organizer) => organizer.selected) &&
+    link.value
   );
 });
 
@@ -371,6 +382,7 @@ const submit = async () => {
     thumbnail: thumbnail,
     organizers: organizers,
     contacts: contacts,
+    link: link.value,
   };
 
   console.log(event);
@@ -391,6 +403,8 @@ const submit = async () => {
       router.push({ name: "Home" });
       loadingStore.loadingEnd();
     });
+
+    router.push({ name: "Home" });
 };
 </script>
 
@@ -476,6 +490,7 @@ const submit = async () => {
           </div>
         </div>
       </div>
+      <Field v-model="link" label="Link na registráciu" placeholder="https://forms.gle/DN" />
       <div class="grid grid-cols-1 sm:grid-cols-2">
         <button
           class="form-primary vertical-center sm:col-start-2"

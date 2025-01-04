@@ -155,9 +155,11 @@ const imageLoaded = ref(false);
       <p
         class="absolute bottom-2 left-[1.125rem] truncate max-w-[calc(100%-2.25rem)]">
         {{
-          useUserStore().uid != null && useEventsStore().initialized
-            ? "Momentálne nie sú dostupné žiadne podujatia."
-            : "Pre zobrazenie podujatí sa, prosím, prihláste!"
+          useUserStore().uid != null
+            ? useEventsStore().initialized
+              ? "Momentálne nie sú dostupné žiadne podujatia."
+              : "Systém čaká na načítanie podujatí."
+            : "Pre zobrazenie podujatí sa, prosím, prihlás!"
         }}
       </p>
     </div>

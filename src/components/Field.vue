@@ -65,7 +65,7 @@ watch(
     class="grid min-h-12 border-2 border-black rounded-[1.25rem] px-5 pt-1 gap-4"
     :class="
       props.type === 'password'
-        ? 'grid-cols-[auto_1fr_auto]'
+        ? 'grid-cols-[auto_1fr_auto] items-center'
         : props.type === 'multiline'
           ? 'grid-cols-[auto_1fr]'
           : 'grid-cols-[auto_1fr] items-center'
