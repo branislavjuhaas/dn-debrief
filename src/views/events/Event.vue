@@ -1,19 +1,16 @@
 <script setup>
-import { computed, onMounted, ref, watch, watchEffect } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { getEventById } from "../../firebase/events";
 import { useUserStore } from "../../stores.js";
 import { formatSlovakDate } from "../../utilities.js";
-import Toggle from "../../components/Toggle.vue";
 
 const id = useRoute().params.id;
 const userStore = useUserStore();
 
 const event = ref(null);
 
-const message = ref("");
-
-watchEffect(() => {
+const message = computed(() => {
   if (!userStore.uid) {
     return "Pre registráciu na podujatie sa musíte prihlásiť.";
   }
@@ -22,7 +19,7 @@ watchEffect(() => {
     return "Pre registráciu na podujatie musíte byť členom/-kou SDA.";
   }
 
-  if (event.value?.deadline < new Date()) {
+  if (event.value?.deadline.getDate() < new Date().getDate()) {
     return "Registrácia na podujatie je uzavretá.";
   }
 

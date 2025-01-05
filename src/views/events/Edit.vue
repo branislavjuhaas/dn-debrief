@@ -7,7 +7,6 @@ import { useEventsStore, useLoadingStore, useUserStore } from "../../stores.js";
 import {
   getEventById,
   getPotentialOrganizers,
-  relevantEvents,
   setEvent,
 } from "../../firebase/events.js";
 import Toggle from "../../components/Toggle.vue";
@@ -341,12 +340,14 @@ const submit = async () => {
   // const beginningDateCET = utcToZonedTime(beginningDate, 'CET');
 
   // Calculate endDate based on the last day's last point end time
-  const lastDay = schedule.value.days[schedule.value.days.length - 1];
-  const endDateUTC = parseAsUTC(beginning.value);
-  const endDate = new Date(
-    endDateUTC.getTime() +
-      getEndTimeInMinutes(lastDay, lastDay.points.length - 1) * 60000,
+  const endDate = ending.value;
+  // Add minutes to the last day's last point end time
+  const minutesOfLastDay = getEndTimeInMinutes(
+    schedule.value.days[schedule.value.days.length - 1],
+    schedule.value.days[schedule.value.days.length - 1].points.length - 1,
   );
+
+  endDate.setMinutes(endDate.getMinutes() + minutesOfLastDay);
   // Convert to CET if necessary
   // const endDateCET = utcToZonedTime(endDate, 'CET');
 
