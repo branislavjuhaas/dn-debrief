@@ -16,7 +16,6 @@ const dedicatedTo = [
   "Viere Kampošovej",
   "Branislavovi Erkenovi",
   "Terézii Brišovej",
-  "Tíkeji",
   "Branislavovi Faktorovi",
 ];
 
