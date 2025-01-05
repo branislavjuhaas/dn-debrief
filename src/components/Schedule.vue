@@ -226,7 +226,7 @@ const onTimeInputChange = (day, index, endTimeStr) => {
     const endMinutes = parseTimeString(endTimeStr);
     const duration = endMinutes - startMinutes;
 
-    if (duration <= 0) {
+    if (duration < 0) {
       point.isInvalid = true;
     }
 

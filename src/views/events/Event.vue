@@ -120,7 +120,7 @@ watch(
     <div
       class="grid grid-flow-row grid-cols-1 sm:grid-cols-3 xl:grid-cols-[auto_auto_auto_1fr] gap-4 min-h-12 w-full text-black font-bold">
       <div
-        class="flex flex-row gap-2 h-12 w-full items-center bg-white px-5 rounded-[1.25rem]">
+        class="flex flex-row gap-2 h-12 w-full items-center bg-white px-5 rounded-[1.25rem] shrink-0">
         <img
           src="./../../assets/icons/calendar.svg"
           alt="calendar"
@@ -128,7 +128,7 @@ watch(
         <p class="mt-1">{{ eventDates ? eventDates : "~~.~~.~~~~" }}</p>
       </div>
       <div
-        class="flex flex-row gap-2 h-12 w-full items-center bg-white px-5 rounded-[1.25rem]">
+        class="flex flex-row gap-2 h-12 w-full items-center bg-white px-5 rounded-[1.25rem] shrink-0">
         <img
           src="./../../assets/icons/deadline.svg"
           alt="calendar"
@@ -138,22 +138,24 @@ watch(
         </p>
       </div>
       <div
-        class="flex flex-row gap-2 h-12 w-full items-center bg-white px-5 rounded-[1.25rem]">
+        class="flex flex-row gap-2 h-12 w-full items-center bg-white px-5 rounded-[1.25rem] shrink-0">
         <img src="./../../assets/icons/bills.svg" alt="calendar" class="w-5" />
         <p class="mt-1">{{ event ? `${event.price}&euro;` : "~~&euro;" }}</p>
       </div>
       <div
-        class="flex flex-row gap-2 h-12 w-full col-span-full xl:col-span-1 items-center bg-white px-5 rounded-[1.25rem]">
+        class="flex flex-row gap-2 min-h-12 py-2 xl:h-12 overflow-x-hidden w-full col-span-full xl:col-span-1 items-center bg-white px-5 rounded-[1.25rem] shrink-0">
         <img
           src="./../../assets/icons/location.svg"
           alt="calendar"
           class="w-5" />
-        <p class="mt-1 truncate">{{ event ? event.address : "" }}</p>
+        <p class="mt-1 max-w-full xl:truncate text-nowrap">
+          {{ event ? event.address : "" }}
+        </p>
       </div>
     </div>
     <div
       v-if="event?.motion"
-      class="flex flex-row gap-2 h-12 w-full items-center bg-white text-black font-bold px-5 rounded-[1.25rem]">
+      class="flex flex-row gap-2 min-h-12 py-2 w-full items-center bg-white text-black font-bold px-5 rounded-[1.25rem]">
       <img src="./../../assets/icons/cube.svg" alt="calendar" class="w-5" />
       <p class="mt-1">{{ event.motion }}</p>
     </div>
@@ -170,8 +172,8 @@ watch(
             <div
               v-for="(day, index) in event?.schedule.days"
               :key="day.id"
-              class="grid grid-cols-[auto_auto] grid-flow-row h-min">
-              <h2 class="text-black font-bold mb-4 col-span-2">
+              class="grid grid-cols-[auto_auto_auto_auto] grid-flow-row h-min">
+              <h2 class="text-black font-bold mb-4 col-span-full">
                 {{
                   getFormattedDate(
                     event?.beginningDate,
@@ -182,11 +184,19 @@ watch(
               <template
                 v-for="(point, pointIndex) in day.points"
                 :key="point.id">
-                <p class="font-bold mr-2">
+                <p class="font-bold mr-1">
                   {{ minutesToTime(getCumulativeMinutes(day, pointIndex)) }}
+                </p>
+                <p class="font-bold mr-1">
+                  {{ point.duration > 0 ? "-" : "" }}
+                </p>
+                <p class="font-bold mr-2">
                   {{
                     point.duration > 0
-                      ? `- ${minutesToTime(getCumulativeMinutes(day, pointIndex) + point.duration)}`
+                      ? minutesToTime(
+                          getCumulativeMinutes(day, pointIndex) +
+                            point.duration,
+                        )
                       : ""
                   }}
                 </p>
