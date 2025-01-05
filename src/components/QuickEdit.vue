@@ -1,11 +1,19 @@
 <script setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
 
 const props = defineProps(["readonly", "title", "value", "name", "type"]);
 const editing = ref(false);
 const value = ref(props.value);
 const confirmedValue = ref(props.value);
 const emit = defineEmits(["update"]);
+
+watch(
+  () => props.value,
+  (newValue) => {
+    value.value = newValue;
+    confirmedValue.value = newValue;
+  }
+);
 </script>
 
 <template>
