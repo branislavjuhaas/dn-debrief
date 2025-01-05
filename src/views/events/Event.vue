@@ -249,7 +249,9 @@ watch(
     <router-link
       v-if="
         userStore.role !== null &&
-        ['developer', 'admin', 'organizer', 'junior'].includes(userStore.role)
+        (['developer', 'admin'].includes(userStore.role) ||
+          (['organizer', 'junior'].includes(userStore.role) &&
+            event?.organizers?.includes(userStore.uid)))
       "
       :to="{ name: 'EditEvent', params: { id: id } }"
       class="alternative vertical-center w-full">

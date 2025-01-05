@@ -188,7 +188,7 @@ const updateEvent = async (eventId) => {
       !["organizer", "junior"].includes(userStore.role) ||
       !event.organizers.includes(userStore.uid)
     ) {
-      router.push({ name: "Unauthorized" });
+      await router.push({ name: "Unauthorized" });
       return;
     }
   }
@@ -404,7 +404,7 @@ const submit = async () => {
       loadingStore.loadingEnd();
     });
 
-    router.push({ name: "Home" });
+  router.push({ name: "Home" });
 };
 </script>
 
@@ -490,7 +490,10 @@ const submit = async () => {
           </div>
         </div>
       </div>
-      <Field v-model="link" label="Link na registráciu" placeholder="https://forms.gle/DN" />
+      <Field
+        v-model="link"
+        label="Link na registráciu"
+        placeholder="https://forms.gle/DN" />
       <div class="grid grid-cols-1 sm:grid-cols-2">
         <button
           class="form-primary vertical-center sm:col-start-2"
