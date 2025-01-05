@@ -1,6 +1,6 @@
 <script setup>
 // Import necessary components and functions
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { getClub, getUsers } from "../../firebase/structure.js";
 import { useLoadingStore, useUserStore } from "../../stores.js";
@@ -30,6 +30,20 @@ const filteredMembers = computed(() => {
       .toLowerCase()
       .includes(quickFilter.value.toLowerCase()),
   );
+});
+
+// Watch for changes in route.params.id to update club data and members
+watch(() => route.params.id, async () => {
+  clubId.value = route.params.id;
+  useLoadingStore().loadingStart();
+  try {
+    club.value = await getClub(clubId.value);
+    members.value = await getUsers(clubId.value);
+  } catch (error) {
+    console.error(error);
+  } finally {
+    useLoadingStore().loadingEnd();
+  }
 });
 </script>
 
