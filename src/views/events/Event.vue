@@ -118,9 +118,9 @@ watch(
   <div class="gap-4">
     <h1>{{ event?.name ?? "Detail podujatia" }}</h1>
     <div
-      class="grid grid-cols-[auto_auto_auto_1fr] gap-4 h-12 w-full text-black font-bold">
+      class="grid grid-flow-row grid-cols-1 sm:grid-cols-3 xl:grid-cols-[auto_auto_auto_1fr] gap-4 min-h-12 w-full text-black font-bold">
       <div
-        class="flex flex-row gap-2 h-full w-fit items-center bg-white px-5 rounded-[1.25rem]">
+        class="flex flex-row gap-2 h-12 w-full items-center bg-white px-5 rounded-[1.25rem]">
         <img
           src="./../../assets/icons/calendar.svg"
           alt="calendar"
@@ -128,7 +128,7 @@ watch(
         <p class="mt-1">{{ eventDates ? eventDates : "~~.~~.~~~~" }}</p>
       </div>
       <div
-        class="flex flex-row gap-2 h-full w-fit items-center bg-white px-5 rounded-[1.25rem]">
+        class="flex flex-row gap-2 h-12 w-full items-center bg-white px-5 rounded-[1.25rem]">
         <img
           src="./../../assets/icons/deadline.svg"
           alt="calendar"
@@ -138,17 +138,17 @@ watch(
         </p>
       </div>
       <div
-        class="flex flex-row gap-2 h-full w-fit items-center bg-white px-5 rounded-[1.25rem]">
+        class="flex flex-row gap-2 h-12 w-full items-center bg-white px-5 rounded-[1.25rem]">
         <img src="./../../assets/icons/bills.svg" alt="calendar" class="w-5" />
         <p class="mt-1">{{ event ? `${event.price}&euro;` : "~~&euro;" }}</p>
       </div>
       <div
-        class="flex flex-row gap-2 h-full w-full items-center bg-white px-5 rounded-[1.25rem]">
+        class="flex flex-row gap-2 h-12 w-full col-span-full xl:col-span-1 items-center bg-white px-5 rounded-[1.25rem]">
         <img
           src="./../../assets/icons/location.svg"
           alt="calendar"
           class="w-5" />
-        <p class="mt-1">{{ event ? event.address : "" }}</p>
+        <p class="mt-1 truncate">{{ event ? event.address : "" }}</p>
       </div>
     </div>
     <div

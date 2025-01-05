@@ -4,7 +4,7 @@
 import { ref } from "vue";
 import { uploadThumbnailImage, relevantEvents } from "../firebase/events.js";
 import { defineExpose } from "vue";
-import defaultThumbnail from '../assets/dn-cascade.webp';
+import defaultThumbnail from "../assets/dn-cascade.webp";
 
 const props = defineProps([
   "id",
@@ -43,8 +43,6 @@ const useSampleImage = async () => {
     "defaults/03.jpg",
     "defaults/04.jpg",
     "defaults/05.jpg",
-    "defaults/06.jpg",
-    "defaults/07.jpg",
   ];
 
   const events = await relevantEvents();
