@@ -1,7 +1,7 @@
 {
   "name": "dn-cascade",
   "private": true,
-  "version": "2025.1.7 - DEV",
+  "version": "2025.1.9 - DEV",
   "type": "module",
   "scripts": {
     "dev": "vite",
