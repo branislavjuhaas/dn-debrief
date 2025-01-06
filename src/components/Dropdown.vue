@@ -30,6 +30,15 @@ watch(
     }
   },
 );
+
+// Watch for changes in the modelValue prop
+watch(
+  () => props.modelValue,
+  () => {
+    // Update the value ref with the new modelValue
+    value.value = props.modelValue;
+  },
+);
 </script>
 
 <template>
@@ -40,7 +49,9 @@ watch(
     <p class="font-bold" :class="props.disabled ? 'text-grey' : ''">
       {{ props.label }}
     </p>
-    <p class="truncate" :class="props.disabled ? 'text-grey' : ''">{{ value }}</p>
+    <p class="truncate" :class="props.disabled ? 'text-grey' : ''">
+      {{ value }}
+    </p>
     <img
       src="./../assets/icons/down.svg"
       alt="expand"

@@ -42,6 +42,7 @@ const contextMenuVisible = ref(false);
 const contextMenuPosition = ref({ x: 0, y: 0 });
 const selectedAward = ref(null);
 const isClubManager = ref(false);
+const isDev = ref(false);
 let actualRole = "";
 const clubs = ref([]);
 
@@ -106,6 +107,7 @@ const updateUserData = async () => {
     });
 
     isClubManager.value = user.clubManager || false;
+    isDev.value = user.dev || false;
   } catch (error) {
     if (error.code === "permission-denied") {
       await router.push("/unauthorized");
@@ -372,6 +374,19 @@ const quickUpdateUserProperty = async (name, value) => {
     console.error("Error updating user property:", error);
   }
 };
+
+/**
+ * Updates the userDev status.
+ * @param {boolean} newValue - The new value for userDev.
+ */
+const updateUserDevStatus = async (newValue) => {
+  try {
+    await updateUserProperty(route.params.uid, "dev", newValue);
+    isDev.value = newValue;
+  } catch (error) {
+    console.error("Error updating userDev status:", error);
+  }
+};
 </script>
 
 <template>
@@ -470,6 +485,15 @@ const quickUpdateUserProperty = async (name, value) => {
             class="form-secondary vertical-center col-start-1 sm:col-start-2">
             <span>Potvrdiť registráciu</span>
           </button>
+
+          <!-- New toggle for developer -->
+          <toggle
+            v-if="userRole && !userPending && userStore.role === 'developer'"
+            class="col-start-1 sm:col-start-1"
+            label="Člen/-ka VpDNC"
+            v-model="isDev"
+            @update:modelValue="updateUserDevStatus" />
+
           <toggle
             v-if="
               userRole &&
