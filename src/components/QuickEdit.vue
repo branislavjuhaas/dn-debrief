@@ -12,7 +12,7 @@ watch(
   (newValue) => {
     value.value = newValue;
     confirmedValue.value = newValue;
-  }
+  },
 );
 </script>
 
@@ -37,10 +37,7 @@ watch(
         v-if="editing"
         v-model="value"
         :type="props.type" />
-      <p
-        v-else
-        class="text-right w-full"
-        :class="{ 'text-red': props.readonly }">
+      <p v-else class="text-right w-full" :class="{ italic: props.readonly }">
         {{ confirmedValue }}
       </p>
       <Transition name="fly">
