@@ -48,8 +48,10 @@ const clubs = ref([]);
 
 const readonlyProperties = ["club", "uid", "member", "email"];
 
+const alwaysVisibleProperties = ["phone"];
+
 /**
- * Formats user data for display.
+ * Formats user data for display with adding always visible properties if they are not present.
  * @param {string} uid - The user ID.
  * @param {Object} user - The user data.
  * @returns {Array} - The formatted user data.
@@ -76,7 +78,11 @@ const formatUserData = (uid, user) =>
     { name: "birthdate", value: user.birthdate },
     { name: "supervisor", value: user.supervisor },
     { name: "supervisorEmail", value: user.supervisorEmail },
-  ].filter((item) => item.value !== null && item.value !== undefined);
+  ].filter((item) => item.value !== null && item.value !== undefined).concat(
+    alwaysVisibleProperties
+      .filter((property) => !user[property])
+      .map((property) => ({ name: property, value: "" })),
+  );
 
 /**
  * Updates the user data.

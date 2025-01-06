@@ -36,9 +36,10 @@ watch(
         class="text-right w-full"
         v-if="editing"
         v-model="value"
-        :type="props.type" />
-      <p v-else class="text-right w-full" :class="{ italic: props.readonly }">
-        {{ confirmedValue }}
+        :type="props.type"
+        :placeholder="!props.value ? 'zadaj hodnotu' : ''" />
+      <p v-else class="text-right w-full" :class="{ italic: props.readonly || !props.value, 'text-grey': !props.value }">
+        {{ confirmedValue ? confirmedValue : 'zadaj hodnotu' }}
       </p>
       <Transition name="fly">
         <div class="flex flex-row gap-2" v-if="editing">
