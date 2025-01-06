@@ -7,6 +7,9 @@ import router from "../../router.js";
 // Get the user store
 const userStore = useUserStore();
 
+// Host of the current window
+const host = window.location.hostname;
+
 /**
  * This asynchronous function handles user logout.
  * It imports the `logout` function from the firebase auth module, and attempts to log out the user.
@@ -118,6 +121,13 @@ const logout = async () => {
       class="alternative vertical-center w-full">
       <p>Prejsť na panel správy</p>
     </router-link>
+    <a
+      href="https://dev.debrief.sda.sk"
+      v-if="userStore.dev === true && !host.includes('dev')"
+      to="/manage"
+      class="alternative vertical-center w-full">
+      <p>Otvoriť najnovšiu verziu pre členov Vývojového programu DN Cascade</p>
+    </a>
   </div>
 </template>
 

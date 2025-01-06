@@ -103,6 +103,7 @@ const handleUserCreation = async (user, userData) => {
       null,
       null,
       null,
+      null,
     );
 
     loadingStore.loadingEnd();
@@ -136,6 +137,7 @@ const handleUserCreation = async (user, userData) => {
     userData.seasons,
     userData.awards,
     userData.clubManager,
+    userData.dev,
   );
 };
 
