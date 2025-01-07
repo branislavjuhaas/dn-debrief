@@ -43,8 +43,8 @@ const links = [
     roles: ["developer", "admin"],
   },
   {
-    name: "Vytvoriť podujatie",
-    link: "/events/new",
+    name: "Správa podujatí",
+    link: "/events",
     roles: ["developer", "admin", "organizer", "junior"],
   },
 ];

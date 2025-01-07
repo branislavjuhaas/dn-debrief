@@ -329,6 +329,16 @@ const routes = [
     meta: { title: "Detail ocenenia", requiresAuth: true },
   },
   {
+    path: "/events",
+    name: "Events",
+    component: () => import("./views/events/Manager.vue"),
+    meta: {
+      title: "Správa podujatí",
+      requiresAuth: true,
+      roles: ["developer", "admin", "cap", "organizer", "junior", "motions"],
+    },
+  },
+  {
     path: "/events/new",
     name: "NewEvent",
     component: () => import("./views/events/Edit.vue"),

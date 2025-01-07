@@ -56,7 +56,7 @@ export const joinAdultUser = async (
 ) => {
   try {
     await runTransaction(db, async (transaction) => {
-      const clubRef = doc(db, `clubs/${club.id}`);
+      const clubRef = doc(db, `clubs/${club}`);
       const clubSnapshot = await transaction.get(clubRef);
 
       if (!clubSnapshot.exists) {
@@ -101,7 +101,7 @@ export const joinUser = async (
 ) => {
   try {
     await runTransaction(db, async (transaction) => {
-      const clubRef = doc(db, `clubs/${club.id}`);
+      const clubRef = doc(db, `clubs/${club}`);
       const clubSnapshot = await transaction.get(clubRef);
 
       if (!clubSnapshot.exists) {
