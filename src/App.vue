@@ -3,7 +3,7 @@
 // Importing necessary components and libraries
 import { onAuthStateChanged, getAuth } from "firebase/auth";
 import { useLoadingStore, useUserStore } from "./stores.js";
-import { nextTick, onMounted, watchEffect } from "vue";
+import { nextTick, onMounted, watchEffect, watch, computed } from "vue";
 import { googleOneTap } from "vue3-google-login";
 import Header from "./components/Header.vue";
 import Footer from "./components/Footer.vue";
@@ -271,14 +271,19 @@ onMounted(() => {
   });
 });
 
-// Watch for loading state changes and prevent keyboard navigation when loading
-watchEffect(() => {
-  if (loadingStore.loading) {
-    window.addEventListener("keydown", preventKeyboardNavigation, false);
-  } else {
-    window.removeEventListener("keydown", preventKeyboardNavigation, false);
+// Create a computed reference to ensure reactivity
+const isLoading = computed(() => loadingStore.loading);
+
+watch(
+  isLoading,
+  (value) => {
+    if (value) {
+      window.addEventListener("keydown", preventKeyboardNavigation, false);
+    } else {
+      window.removeEventListener("keydown", preventKeyboardNavigation, false);
+    }
   }
-});
+);
 </script>
 
 <template>

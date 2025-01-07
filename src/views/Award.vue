@@ -78,10 +78,13 @@ onMounted(() => {
             class="w-full"
             :name="'awardType'"
             :label="'Typ ocenenia'"
-            :options="['Obyčajné', 'Legendárne']"
-            :modelValue="isLegendary ? 'Legendárne' : 'Štandardné'"
+            :options="[
+              { text: 'Štandardné', value: 'standard' },
+              { text: 'Legendárne', value: 'legendary' },
+            ]"
+            :modelValue="isLegendary ? 'legendary' : 'standard'"
             @update:modelValue="
-              (value) => (isLegendary = value === 'Legendárne')
+              (value) => (isLegendary = value === 'legendary')
             " />
         </div>
       </div>

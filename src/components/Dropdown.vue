@@ -1,21 +1,35 @@
 <script setup>
 // Import necessary functions from Vue
-import { ref, watch } from "vue";
+import { ref, watch, computed } from "vue";
 
 // Define the props that this component accepts
-const props = defineProps([
-  "name",
-  "label",
-  "options",
-  "disabled",
-  "modelValue",
-]);
+const props = defineProps({
+  name: String,
+  label: String,
+  options: {
+    type: Array,
+    required: true,
+  },
+  disabled: Boolean,
+  modelValue: [String, Number],
+});
 
 // Define a ref to control the dropdown expansion
 const expand = ref(false);
 
 // Define a ref to hold the current value of the dropdown
 const value = ref(props.modelValue);
+
+// Computed property to get the display text
+const selectedText = computed(() => {
+  const selectedOption = props.options.find(option => option.value === value.value);
+  return selectedOption ? selectedOption.text : '';
+});
+
+// Computed property to filter out hidden options
+const visibleOptions = computed(() => {
+  return props.options.filter(option => !option.hidden);
+});
 
 // Define the events that this component emits
 const emit = defineEmits(["update:modelValue"]);
@@ -49,8 +63,9 @@ watch(
     <p class="font-bold" :class="props.disabled ? 'text-grey' : ''">
       {{ props.label }}
     </p>
+    <!-- Display the selected text instead of value -->
     <p class="truncate" :class="props.disabled ? 'text-grey' : ''">
-      {{ value }}
+      {{ selectedText }}
     </p>
     <img
       src="./../assets/icons/down.svg"
@@ -59,12 +74,13 @@ watch(
     <div
       v-if="expand"
       class="flex flex-col max-h-96 overflow-y-auto scrollbar-hidden absolute bg-white border-2 border-black text-black rounded-[1.25rem] top-12 left-0 w-full z-10">
+      <!-- Iterate over visibleOptions instead of all options -->
       <p
-        v-for="option in props.options"
-        :key="option"
-        @click="value = option"
+        v-for="option in visibleOptions"
+        :key="option.value"
+        @click="value = option.value"
         class="flex px-5 h-12 items-center cursor-pointer hover:text-red">
-        {{ option }}
+        {{ option.text }}
       </p>
     </div>
   </div>

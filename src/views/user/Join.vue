@@ -16,8 +16,8 @@ const wasRegistered = userStore.seasons.some(
 );
 
 // State variables
-const club = ref(userStore.club ? userStore.club.name : "");
-console.log(userStore.birthdate);
+const selectedClubId = ref(userStore.club ? userStore.club.id : "");
+const clubs = ref([]);
 const birthdate = ref(
   userStore.birthdate
     ? new Date(
@@ -49,19 +49,16 @@ console.log(userStore);
 const mail = ref(userStore.supervisorEmail || "");
 
 // Fetch clubs data on component mount
-let clubsData = ref([]);
 onMounted(async () => {
-  clubsData.value = await getClubs(true);
-  clubsData.value.sort((a, b) => a.name.localeCompare(b.name));
+  clubs.value = await getClubs(true);
+  clubs.value.sort((a, b) => a.name.localeCompare(b.name));
 });
-// Compute club names from clubs data
-const clubNames = computed(() => clubsData.value.map((club) => club.name));
 
 // Compute whether the form can be submitted
 const canSubmit = computed(() => {
   if (!adult.value) {
     return (
-      club.value &&
+      selectedClubId.value &&
       birthdate.value &&
       address.value &&
       supervisor.value &&
@@ -69,14 +66,10 @@ const canSubmit = computed(() => {
       phone.value
     );
   } else {
-    return club.value && birthdate.value && address.value && phone.value;
+    return (
+      selectedClubId.value && birthdate.value && address.value && phone.value
+    );
   }
-});
-
-// Watch for changes in club selection
-let selectedClub = null;
-watch(club, (newClubName) => {
-  selectedClub = clubsData.value.find((club) => club.name === newClubName);
 });
 
 const seasons =
@@ -196,7 +189,7 @@ const register = async () => {
       ),
   );
 
-  userStore.club = club;
+  userStore.club = clubs.value.find((club) => club.id === selectedClubId.value);
   userStore.address = address;
   userStore.phone = phone;
   userStore.birthdate = ref(birthdateString);
@@ -205,7 +198,7 @@ const register = async () => {
   if (adult.value) {
     await joinAdultUser(
       userStore.uid,
-      selectedClub,
+      selectedClubId.value,
       address.value,
       phone.value,
       birthdateString,
@@ -214,7 +207,7 @@ const register = async () => {
   } else {
     await joinUser(
       userStore.uid,
-      selectedClub,
+      selectedClubId.value,
       address.value,
       phone.value,
       birthdateString,
@@ -253,11 +246,10 @@ const message = route.query.message || "";
       class="flex flex-col justify-between w-full bg-white min-h-60 rounded-[1.25rem] p-5 gap-16">
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Dropdown
-          name="club"
-          v-model.trim="club"
-          label="Debatný klub"
-          type="dropdown"
-          :options="clubNames" />
+          :label="'Debatný klub'"
+          :options="clubs.map((club) => ({ text: club.name, value: club.id }))"
+          v-model="selectedClubId"
+          :disabled="false" />
         <Field
           name="address"
           v-model.trim="address"

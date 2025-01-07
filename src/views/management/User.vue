@@ -15,7 +15,6 @@ import Dropdown from "../../components/Dropdown.vue";
 import Toggle from "../../components/Toggle.vue";
 import { useUserStore } from "../../stores.js";
 import {
-  reverseTranslateRole,
   translateKey,
   translateRole,
 } from "../../translate.js";
@@ -78,11 +77,13 @@ const formatUserData = (uid, user) =>
     { name: "birthdate", value: user.birthdate },
     { name: "supervisor", value: user.supervisor },
     { name: "supervisorEmail", value: user.supervisorEmail },
-  ].filter((item) => item.value !== null && item.value !== undefined).concat(
-    alwaysVisibleProperties
-      .filter((property) => !user[property])
-      .map((property) => ({ name: property, value: "" })),
-  );
+  ]
+    .filter((item) => item.value !== null && item.value !== undefined)
+    .concat(
+      alwaysVisibleProperties
+        .filter((property) => !user[property])
+        .map((property) => ({ name: property, value: "" })),
+    );
 
 /**
  * Updates the user data.
@@ -93,7 +94,7 @@ const updateUserData = async () => {
   try {
     const user = await getUser(userId);
     userData.value = formatUserData(userId, user);
-    actualRole = translateRole(user.role) || "Používateľ/-ka";
+    actualRole = user.role || "user";
     userRole.value = actualRole;
     userFullName.value = `${user.name} ${user.surname}`;
     userPending.value = !!(
@@ -346,7 +347,7 @@ watch(userRole, async (newRole, oldRole) => {
   if (newRole === actualRole) return;
 
   const { updateUserRole } = await import("../../firebase/structure.js");
-  await updateUserRole(route.params.uid, reverseTranslateRole(newRole));
+  await updateUserRole(route.params.uid, newRole);
 
   actualRole = newRole;
 });
@@ -503,7 +504,7 @@ const updateUserDevStatus = async (newValue) => {
           <toggle
             v-if="
               userRole &&
-              !['Vedúci/-a klubu', 'Používateľ/-ka'].includes(userRole) &&
+              !['coach', 'user'].includes(userRole) &&
               !userPending &&
               ['admin', 'developer'].includes(userStore.role)
             "
@@ -517,16 +518,16 @@ const updateUserDevStatus = async (newValue) => {
             label="Funkcia"
             v-model="userRole"
             :disabled="
-              userRole === 'Vývojár' && useUserStore().role === 'admin'
+              userRole === 'developer' && userStore.role === 'admin'
             "
             :options="[
-              'Administrátor/-ka',
-              'Hlavný/-á rozhodca/-kyňa',
-              'Vedúci/-a klubu',
-              'Používateľ/-ka',
-              'Organizátor/-ka',
-              'Junior organizátor/-ka',
-              'Tézový výbor',
+              { text: 'Administrátor/-ka', value: 'admin' },
+              { text: 'Hlavný/-a rozhodca/-kyňa', value: 'cap' },
+              { text: 'Vedúci/-a klubu', value: 'coach' },
+              { text: 'Používateľ/-ka', value: 'user' },
+              { text: 'Organizátor/-ka', value: 'organizer' },
+              { text: 'Junior organizátor/-ka', value: 'junior' },
+              { text: 'Tézový výbor', value: 'motion' },
             ]" />
         </div>
       </div>
