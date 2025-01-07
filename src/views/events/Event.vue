@@ -12,15 +12,21 @@ const event = ref(null);
 
 const message = computed(() => {
   if (!userStore.uid) {
-    return "Pre registráciu na podujatie sa musíte prihlásiť.";
+    return { text: "Pre registráciu na podujatie sa musíte prihlásiť." };
   }
 
   if (!userStore.isMember) {
-    return "Pre registráciu na podujatie musíte byť členom/-kou SDA.";
+    return {
+      text: "Pre registráciu na podujatie sa musíte {LINK}.",
+      link: "/join",
+      linkText: "stať členom SDA",
+    };
   }
 
   if (event.value?.deadline.getDate() < new Date().getDate()) {
-    return "Registrácia na podujatie je uzavretá.";
+    return {
+      text: "Registrácia na podujatie je uzavretá.",
+    };
   }
 
   return "";
@@ -228,7 +234,20 @@ watch(
         <p
           v-if="message !== ''"
           class="form-message row-start-3 sm:row-start-1">
-          {{ message }}
+          {{
+            // part of the link if there is one
+            message.text.split("{LINK}")[0]
+          }}
+          <router-link
+            v-if="message.link"
+            :to="message.link"
+            class="text-red underline">
+            {{ message.linkText }}
+          </router-link>
+          {{
+            // part of the link if there is one
+            message.text.split("{LINK}")[1]
+          }}
         </p>
         <router-link
           to="/events/rules"
