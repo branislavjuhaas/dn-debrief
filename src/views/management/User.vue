@@ -14,10 +14,7 @@ import router from "../../router.js";
 import Dropdown from "../../components/Dropdown.vue";
 import Toggle from "../../components/Toggle.vue";
 import { useUserStore } from "../../stores.js";
-import {
-  translateKey,
-  translateRole,
-} from "../../translate.js";
+import { translateKey, translateRole } from "../../translate.js";
 import { logEvent } from "firebase/analytics";
 import { analytics } from "../../main.js";
 import QuickEdit from "../../components/QuickEdit.vue";
@@ -517,10 +514,9 @@ const updateUserDevStatus = async (newValue) => {
             class="col-start-1 col-span-1 sm:col-start-3 sm:col-span-2"
             label="Funkcia"
             v-model="userRole"
-            :disabled="
-              userRole === 'developer' && userStore.role === 'admin'
-            "
+            :disabled="userRole === 'developer' && userStore.role === 'admin'"
             :options="[
+              { text: 'Vývojár', value: 'developer', hidden: true },
               { text: 'Administrátor/-ka', value: 'admin' },
               { text: 'Hlavný/-a rozhodca/-kyňa', value: 'cap' },
               { text: 'Vedúci/-a klubu', value: 'coach' },

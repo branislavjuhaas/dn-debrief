@@ -18,17 +18,17 @@ const props = defineProps({
 const expand = ref(false);
 
 // Define a ref to hold the current value of the dropdown
-const value = ref(props.modelValue);
+const value = ref(props.modelValue || '');
 
 // Computed property to get the display text
 const selectedText = computed(() => {
-  const selectedOption = props.options.find(option => option.value === value.value);
+  const selectedOption = Array.isArray(props.options) ? props.options.find(option => option.value === value.value) : null;
   return selectedOption ? selectedOption.text : '';
 });
 
 // Computed property to filter out hidden options
 const visibleOptions = computed(() => {
-  return props.options.filter(option => !option.hidden);
+  return Array.isArray(props.options) ? props.options.filter(option => !option.hidden) : [];
 });
 
 // Define the events that this component emits
