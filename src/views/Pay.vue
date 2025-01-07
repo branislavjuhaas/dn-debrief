@@ -81,7 +81,7 @@ watchEffect(() => {
       </transition>
       <div class="flex flex-col gap-4 justify-between">
         <div class="flex flex-col gap-4">
-          <div v-if="info" class="information vertical-center">
+          <div v-if="info" class="information vertical-center text-justify">
             <p class="font-bold">{{ info }}</p>
           </div>
           <div class="information vertical-center">
@@ -120,6 +120,6 @@ watchEffect(() => {
 }
 
 .information {
-  @apply flex flex-row justify-between h-12 px-5 items-center text-black;
+  @apply flex flex-row justify-between min-h-12 px-5 items-center text-black;
 }
 </style>
