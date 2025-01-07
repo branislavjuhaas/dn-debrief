@@ -105,7 +105,7 @@ onMounted(async () => {
   await fetchEvent();
 });
 
-watch(id, async () => {
+watch(() => id, async () => {
   await fetchEvent();
 });
 
