@@ -232,8 +232,11 @@ export const getEventsBetweenDates = async (
  */
 export const uploadEventFile = async (file, userId, userFullName) => {
   if (file.size > 10 * 1024 * 1024) {
-    // 10MB
-    throw new Error("File size exceeds 10MB.");
+    // 10MB file size limit. Error code limit-exceeded, message: "Firebase Storage: Object 'events/files/...' size exceeds the limit of 10485760 bytes."
+    const error = new Error();
+    error.code = "storage/limit-exceeded";
+    error.message = "File size exceeds the limit of 10MB";
+    throw error;
   }
 
   const storage = getStorage();

@@ -3,9 +3,11 @@ import { onMounted, ref } from "vue";
 import Toggle from "../../components/Toggle.vue";
 import Dropdown from "../../components/Dropdown.vue";
 import { relevantEvents, uploadEventFile } from "../../firebase/events.js";
-import { useUserStore } from "../../stores.js";
+import { useLoadingStore, useUserStore } from "../../stores.js";
 import Field from "../../components/Field.vue";
 import Files from "./Files.vue";
+
+const filesErrorMessage = ref("");
 
 const mode = ref(window.location.hash.slice(1) || "events");
 const onlyMyEvents = ref(false);
@@ -16,6 +18,8 @@ const region = ref("");
 const filesFilter = ref("");
 
 const fetchedEvents = ref([]);
+
+const loadingStore = useLoadingStore();
 
 console.log(fromDate.value, toDate.value);
 
@@ -42,13 +46,24 @@ const uploadFile = async () => {
     input.click();
   });
 
-  const uploadedPath = await uploadEventFile(
-    file,
-    userStore.uid,
-    userStore.fullName,
-  );
+  loadingStore.loadingStart();
 
-  filesRef.value.addFile(file.name, uploadedPath);
+  uploadEventFile(file, userStore.uid, userStore.fullName)
+    .then((path) => {
+      filesRef.value.addFile(file.name, path);
+      loadingStore.loadingEnd();
+    })
+    .catch((error) => {
+      console.error(error);
+      loadingStore.loadingEnd();
+      if (error.code === "storage/limit-exceeded") {
+        filesErrorMessage.value = "Maximálna veľkosť súboru je 10 MB.";
+      } else if (error.code === "storage/unauthorized") {
+        filesErrorMessage.value = "Nemáte oprávnenie na nahrávanie súborov.";
+      } else {
+        filesErrorMessage.value = "Nastala chyba pri nahrávaní súboru.";
+      }
+    });
 };
 
 const filesRef = ref(null);
@@ -102,6 +117,11 @@ const filesRef = ref(null);
             class="col-span-full" />
         </template>
       </div>
+      <p
+        v-if="mode === 'files' && filesErrorMessage"
+        class="text-red w-full text-center font-bold">
+        {{ filesErrorMessage }}
+      </p>
       <files
         v-if="mode === 'files'"
         ref="filesRef"
