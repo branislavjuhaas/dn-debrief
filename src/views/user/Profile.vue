@@ -133,7 +133,7 @@ const logout = async () => {
 
 <style scoped>
 .alternative {
-  @apply flex flex-row items-center h-12 bg-white text-black rounded-[1.25rem] border-2 border-red border-opacity-0 font-bold px-5 duration-150 cursor-pointer hover:border-opacity-100;
+  @apply flex flex-row items-center min-h-12 py-2 bg-white text-black rounded-[1.25rem] border-2 border-red border-opacity-0 font-bold px-5 duration-150 cursor-pointer hover:border-opacity-100;
 }
 
 #legends {
