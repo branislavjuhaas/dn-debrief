@@ -13,6 +13,8 @@ import {
   getMetadata,
   getStorage,
   ref,
+  listAll,
+  deleteObject,
   uploadBytes,
 } from "firebase/storage";
 import { useEventsStore } from "../stores.js";
@@ -197,10 +199,14 @@ export const setEvent = async (event) => {
  */
 export const getEventById = async (eventId) => {
   const events = await relevantEvents();
-  return events.find(event => event.id === eventId) || null;
+  return events.find((event) => event.id === eventId) || null;
 };
 
-export const getEventsBetweenDates = async (startDate, endDate, organizer = null) => {
+export const getEventsBetweenDates = async (
+  startDate,
+  endDate,
+  organizer = null,
+) => {
   const q = query(
     collection(db, "events"),
     where("beginningDate", ">=", startDate),
@@ -212,18 +218,24 @@ export const getEventsBetweenDates = async (startDate, endDate, organizer = null
     id: doc.id,
     ...doc.data(),
   }));
-}
+};
 
 /**
  * Uploads a file to Firebase Storage's "events/files" directory.
  * Sets the custom metadata to include the UID of the user who uploaded the file.
- * 
+ *
  * @param {File} file - The file to upload.
  * @param {string} userId - The UID of the user who uploaded the file.
+ * @param {string} userFullName - The full name of the user who
  * @returns {Promise<string>} A promise that resolves to the download URL of the uploaded file.
- * @throws {Error} If the upload fails.
+ * @throws {Error} If the upload fails or the file size exceeds 10MB.
  */
-export const uploadEventFile = async (file, userId) => {
+export const uploadEventFile = async (file, userId, userFullName) => {
+  if (file.size > 10 * 1024 * 1024) {
+    // 10MB
+    throw new Error("File size exceeds 10MB.");
+  }
+
   const storage = getStorage();
   const filePath = `events/files/${file.name}`;
   const fileRef = ref(storage, filePath);
@@ -231,19 +243,21 @@ export const uploadEventFile = async (file, userId) => {
   try {
     await uploadBytes(fileRef, file, {
       customMetadata: {
-        uploadedBy: userId,
+        uploadedByUID: userId,
+        uploadedBy: userFullName,
       },
     });
+    console.log(`File uploaded to ${filePath}, download URL: ${fileRef}`);
     return await getDownloadURL(fileRef);
   } catch (error) {
     console.error("Error uploading file:", error);
     throw error;
   }
-}
+};
 
 /**
  * Retrieves the download URL of a file stored in Firebase Storage.
- * 
+ *
  * @param {string} filename - The name of the file.
  * @returns {Promise<string>} A promise that resolves to the download URL of the file.
  */
@@ -251,40 +265,55 @@ export const getEventFile = async (filename) => {
   const storage = getStorage();
   const fileRef = ref(storage, `events/files/${filename}`);
   return await getDownloadURL(fileRef);
-}
+};
 
 /**
  * Deletes a file stored in Firebase Storage.
- * 
+ *
  * @param {string} filename - The name of the file to delete.
  * @returns {Promise<void>} A promise that resolves when the file is deleted.
  */
 export const deleteEventFile = async (filename) => {
   const storage = getStorage();
   const fileRef = ref(storage, `events/files/${filename}`);
-  await fileRef.delete();
-}
+  await deleteObject(fileRef).then(() => {
+    console.log(`File ${filename} deleted successfully`);
+  });
+};
 
 /**
-  * Lists all files in the "events/files" directory in Firebase Storage.
-  * 
-  * @returns {Promise<Array<string>>} A promise that resolves to an array of filenames together with their download URLs, last modified time, and metadata.createdBy.
-  * @throws {Error} If the list operation fails.
-  */
+ * Lists all files in the "events/files" directory in Firebase Storage.
+ *
+ * @returns {Promise<Array<string>>} A promise that resolves to an array of filenames together with their download URLs, last modified time, and metadata.createdBy.
+ * @throws {Error} If the list operation fails.
+ */
 export const listEventFiles = async () => {
   const storage = getStorage();
   const filesRef = ref(storage, "events/files");
-  const listResult = await storage.list(filesRef);
 
-  const files = await Promise.all(listResult.items.map(async (item) => {
-    const metadata = await getMetadata(item);
-    return {
-      name: item.name,
-      downloadURL: await getDownloadURL(item),
-      lastModified: metadata.updated,
-      createdBy: metadata.customMetadata?.uploadedBy,
-    };
-  }));
+  try {
+    const listResult = await listAll(filesRef);
 
-  return files;
-}
+    const files = await Promise.all(
+      listResult.items.map(async (itemRef) => {
+        const metadata = await getMetadata(itemRef);
+        return {
+          name: itemRef.name,
+          downloadURL: await getDownloadURL(itemRef),
+          lastModified: metadata.updated,
+          uploadedByUID: metadata.customMetadata?.uploadedByUID,
+          uploadedBy: metadata.customMetadata?.uploadedBy,
+        };
+      }),
+    );
+
+    files.sort((a, b) => new Date(b.lastModified) - new Date(a.lastModified));
+
+    console.log("Files: ", files);
+
+    return files;
+  } catch (error) {
+    console.error("Error listing event files:", error);
+    throw error;
+  }
+};
