@@ -307,6 +307,37 @@ const resendConfirmationEmail = async () => {
 };
 
 /**
+ * Updates the user's role by calling the updateUserRole function 'setUserRole' with arguments: userId and newRole.
+ * @param {string} newRole - The new role for the user.
+ * @returns {Promise<void>} - The promise that resolves when the role is updated.
+ * @throws {Error} - The error that occurred during the role update.
+ */
+const updateUserRole = async (newRole) => {
+  const { httpsCallable } = await import("firebase/functions");
+  const { functions } = await import("../../main.js");
+
+  const setUserRoleFunction = httpsCallable(functions, "setUserRole");
+
+  const data = {
+    uid: route.params.uid,
+    role: newRole,
+  };
+
+  setUserRoleFunction(data)
+    .then((result) => {
+      console.log(result.data);
+      actualRole = newRole;
+    })
+    .catch((error) => {
+      const code = error.code;
+      const message = error.message;
+      const details = error.details;
+      console.log(
+        `Error Code: ${code}, Message: ${message}, Details: ${details}`,
+      );
+    });
+};
+/**
  * Confirms the user's registration.
  */
 const confirmRegistration = async () => {
@@ -338,16 +369,6 @@ onMounted(() => {
 });
 
 watch(() => route.params.uid, updateUserData);
-
-watch(userRole, async (newRole, oldRole) => {
-  if (newRole === oldRole) return;
-  if (newRole === actualRole) return;
-
-  const { updateUserRole } = await import("../../firebase/structure.js");
-  await updateUserRole(route.params.uid, newRole);
-
-  actualRole = newRole;
-});
 
 /**
  * Updates the club manager status for the user.
@@ -514,6 +535,7 @@ const updateUserDevStatus = async (newValue) => {
             class="col-start-1 col-span-1 sm:col-start-3 sm:col-span-2"
             label="Funkcia"
             v-model="userRole"
+            @update:modelValue="updateUserRole"
             :disabled="userRole === 'developer' && userStore.role === 'admin'"
             :options="[
               { text: 'Vývojár', value: 'developer', hidden: true },

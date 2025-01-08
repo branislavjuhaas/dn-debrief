@@ -265,12 +265,16 @@ exports.sendRegistrationReminders = onSchedule(
       const usersToRemind = usersSnapshot.docs.filter((doc) => {
         const userData = doc.data();
         const hasCurrentYearSeason = userData.seasons?.some(
-          (season) => season.year === currentYear
+          (season) => season.year === currentYear,
         );
         const hasUnconfirmedCurrentYearSeason = userData.seasons?.some(
-          (season) => season.year === currentYear && !season.confirmed
+          (season) => season.year === currentYear && !season.confirmed,
         );
-        return hasCurrentYearSeason && hasUnconfirmedCurrentYearSeason && !userData.reminded;
+        return (
+          hasCurrentYearSeason &&
+          hasUnconfirmedCurrentYearSeason &&
+          !userData.reminded
+        );
       });
 
       for (const userDoc of usersToRemind) {
@@ -326,6 +330,45 @@ exports.setCreatedAt = onDocumentCreated("users/{userId}", async (event) => {
   const userRef = admin.firestore().collection("users").doc(userId);
   await userRef.set(
     { createdAt: admin.firestore.FieldValue.serverTimestamp() },
-    { merge: true }
+    { merge: true },
   );
 });
+
+/**
+ * Callable function to set user's role by provided UID and role.
+ * Function writes the role to the user's custom claims and firestore user document.
+ * Function is protected by Firebase App Check and requires 'admin' or 'developer' role.
+ *
+ * @function setUserRole
+ */
+exports.setUserRole = onCall(
+  { enforceAppCheck: true },
+  async (data, request) => {
+
+    const uid = data.data.uid;
+    const role = data.data.role;
+
+    if (
+      !data.auth.token.role ||
+      !["admin", "developer"].includes(data.auth.token.role)
+    ) {
+      throw new functions.https.HttpsError(
+        "permission-denied",
+        "Permission denied",
+      );
+    }
+
+    try {
+      await admin.auth().setCustomUserClaims(uid, { role });
+      await admin.firestore().collection("users").doc(uid).update({ role });
+      return { success: true };
+    } catch (error) {
+      logger.error("Error setting user role:", error);
+      throw new functions.https.HttpsError(
+        "internal",
+        "Internal server error",
+        error,
+      );
+    }
+  },
+);

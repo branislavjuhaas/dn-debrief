@@ -127,7 +127,7 @@ const handleUserCreation = async (user, userData) => {
     user.email,
     userData.name,
     userData.surname,
-    userData.role,
+    user.role,
     userData.club,
     userData.address,
     userData.phone,
@@ -232,6 +232,12 @@ onMounted(() => {
     loadingStore.loadingStart();
     const { getUser } = await import("./firebase/auth.js");
     if (user) {
+
+      // Set the user role based on the ID token to ensure server-side accuracy
+      user.role = await user.getIdTokenResult().then((idTokenResult) => {
+        return idTokenResult.claims.role;
+      });
+
       // If the user does not exist, create it
       // Redirect the user to the home page
       // if google is defined
@@ -274,16 +280,13 @@ onMounted(() => {
 // Create a computed reference to ensure reactivity
 const isLoading = computed(() => loadingStore.loading);
 
-watch(
-  isLoading,
-  (value) => {
-    if (value) {
-      window.addEventListener("keydown", preventKeyboardNavigation, false);
-    } else {
-      window.removeEventListener("keydown", preventKeyboardNavigation, false);
-    }
+watch(isLoading, (value) => {
+  if (value) {
+    window.addEventListener("keydown", preventKeyboardNavigation, false);
+  } else {
+    window.removeEventListener("keydown", preventKeyboardNavigation, false);
   }
-);
+});
 </script>
 
 <template>
