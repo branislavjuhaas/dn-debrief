@@ -88,7 +88,7 @@ const removeFile = (file) => {
       <p class="font-bold">{{ file.name }}</p>
       <p>
         {{ file.uploadedBy }}
-        {{ file.uploadedByUID === useUserStore().uid ? "- Ja" : "" }}
+        {{ file.uploadedByUID === useUserStore().uid ? "(JA)" : "" }}
       </p>
       <p>
         {{ formatSlovakDate(new Date(file.lastModified)) }}

@@ -237,7 +237,11 @@ const fetchPotentialOrganizers = async () => {
           ...organizer,
           selected: eventOrganizers.value.includes(organizer.uid),
         })),
-        { ...userStore.userData, self: true, selected: eventOrganizers.value.includes(userStore.uid) },
+      {
+        ...userStore.userData,
+        self: true,
+        selected: eventOrganizers.value.includes(userStore.uid),
+      },
     ];
 
     // Remove all potential organizers that have duplicate UIDs
@@ -251,7 +255,7 @@ const fetchPotentialOrganizers = async () => {
     }
 
     potentialOrganizers.value = uniqueOrganizers;
-    
+
     // Sort the potential organizers by surname alphabetically
     potentialOrganizers.value.sort((a, b) =>
       a.surname.localeCompare(b.surname),
@@ -426,11 +430,11 @@ const submit = async (draft) => {
 
 <template>
   <div class="gap-4">
-    <h1>
+    <h1 class="leading-[1.1]" style="text-wrap: pretty">
       {{
         !edit
           ? "Vytvoriť podujatie"
-          : `Upraviť ${name !== "" ? name : "podujatie"}`
+          : `Upraviť ${name !== "" ? name : "podujatie"} ${draft ? "(Koncept)" : ""}`
       }}
     </h1>
     <div
@@ -515,7 +519,7 @@ const submit = async (draft) => {
           class="form-secondary vertical-center"
           :disabled="!canSubmit"
           @click="submit(true)">
-          <span>{{ draft ? "Uložiť ako koncept" : "Zmeniť na koncept" }}</span>
+          <span>{{ draft ? "Uložiť koncept" : "Zmeniť na koncept" }}</span>
         </button>
         <button
           class="form-primary vertical-center sm:col-start-2"

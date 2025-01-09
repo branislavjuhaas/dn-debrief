@@ -4,6 +4,7 @@ import { useRoute } from "vue-router";
 import { getEventById } from "../../firebase/events";
 import { useUserStore } from "../../stores.js";
 import { formatSlovakDate } from "../../utilities.js";
+import router from "../../router.js";
 
 const id = useRoute().params.id;
 const userStore = useUserStore();
@@ -93,6 +94,11 @@ const getCumulativeMinutes = (day, index) => {
 const fetchEvent = async () => {
   if (userStore.uid) {
     event.value = await getEventById(id);
+
+    if (!event.value) {
+      await router.push({ name: "NotFound" });
+    }
+
     console.log(event.value);
   }
 };
@@ -105,9 +111,12 @@ onMounted(async () => {
   await fetchEvent();
 });
 
-watch(() => id, async () => {
-  await fetchEvent();
-});
+watch(
+  () => id,
+  async () => {
+    await fetchEvent();
+  },
+);
 
 watch(
   () => userStore.uid,

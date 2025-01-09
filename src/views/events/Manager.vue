@@ -42,6 +42,8 @@ const uploadFile = async () => {
   const file = await new Promise((resolve) => {
     const input = document.createElement("input");
     input.type = "file";
+    // Set filter in dialog to only for supported file types (pdf, doc, docx, xls, xlsx, ppt, pptx, jpg, jpeg, png)
+    input.accept = ".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png|*";
     input.onchange = () => resolve(input.files[0]);
     input.click();
   });
