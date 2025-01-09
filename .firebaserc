@@ -7,6 +7,9 @@
       "hosting": {
         "dev": [
           "dev-dn-cascade"
+        ],
+        "prod": [
+          "dn-cascade"
         ]
       }
     }
