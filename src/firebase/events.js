@@ -6,6 +6,7 @@ import {
   where,
   doc,
   setDoc,
+  getDoc,
 } from "firebase/firestore";
 
 import {
@@ -35,7 +36,11 @@ export const relevantEvents = async () => {
   }
 
   const today = new Date();
-  const q = query(collection(db, "events"), where("endDate", ">=", today));
+  const q = query(
+    collection(db, "events"),
+    where("endDate", ">=", today),
+    where("draft", "!=", true),
+  );
   const querySnapshot = await getDocs(q);
   const events = querySnapshot.docs
     .map((doc) => ({
@@ -200,6 +205,34 @@ export const setEvent = async (event) => {
 export const getEventById = async (eventId) => {
   const events = await relevantEvents();
   return events.find((event) => event.id === eventId) || null;
+};
+
+/**
+ * Retrieves a specific event by its ID using relevant events.
+ *
+ * @param {string} eventId - The ID of the event to retrieve.
+ * @returns {Promise<Object|null>} A promise that resolves to the event object or null if not found.
+ */
+export const getFirebaseEvent = async (eventId) => {
+  // Fetch event from database, where elementId is equal to eventId
+  const eventRef = doc(db, "events", eventId);
+  const eventSnapshot = await getDoc(eventRef);
+  if (eventSnapshot.exists()) {
+    const event = eventSnapshot.data();
+    event.id = eventSnapshot.id;
+    event.beginningDate = event.beginningDate.toDate();
+    event.endDate = event.endDate.toDate();
+    event.deadline = event.deadline.toDate();
+
+    if (event.thumbnail) {
+      event.originalThumbnail = event.thumbnail;
+      event.thumbnail = await getThumbnail(event.thumbnail);
+    }
+
+    return event;
+  } else {
+    return null;
+  }
 };
 
 export const getEventsBetweenDates = async (

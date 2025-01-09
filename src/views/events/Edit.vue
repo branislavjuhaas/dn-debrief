@@ -5,7 +5,7 @@ import Field from "../../components/Field.vue";
 import Schedule from "../../components/Schedule.vue";
 import { useEventsStore, useLoadingStore, useUserStore } from "../../stores.js";
 import {
-  getEventById,
+  getFirebaseEvent,
   getPotentialOrganizers,
   setEvent,
 } from "../../firebase/events.js";
@@ -48,6 +48,7 @@ const price = ref(30);
 const motion = ref("Všetky tézy tohoto turnaja sú improvizované");
 const deadline = ref("");
 const link = ref("");
+const draft = ref(true);
 
 const presetThumbnail = ref(null);
 const presetOriginalThumbnail = ref(null);
@@ -171,11 +172,11 @@ watch(id, () => {
 
 const updateEvent = async (eventId) => {
   console.log("updating event");
-  const event = await getEventById(eventId);
+  const event = await getFirebaseEvent(eventId);
 
   // If the event does not exist, redirect to the 404 page
   if (!event) {
-    router.push({ name: "NotFound" });
+    await router.push({ name: "NotFound" });
     return;
   }
 
@@ -195,7 +196,7 @@ const updateEvent = async (eventId) => {
   console.log(event, "EVENT");
 
   // Batch update all reactive references
-  nextTick(() => {
+  await nextTick(() => {
     id.value = event.id;
     name.value = event.name;
     beginning.value = event.beginningDate.toISOString().split("T")[0];
@@ -211,6 +212,7 @@ const updateEvent = async (eventId) => {
     eventOrganizers.value = event.organizers;
     tournament.value = event.id.startsWith("S"); // Assuming tournament IDs start with 'S'
     link.value = event.link;
+    draft.value = event.draft || false;
   });
 };
 
@@ -235,9 +237,21 @@ const fetchPotentialOrganizers = async () => {
           ...organizer,
           selected: eventOrganizers.value.includes(organizer.uid),
         })),
-      { ...userStore.userData, self: true, selected: true },
+        { ...userStore.userData, self: true, selected: eventOrganizers.value.includes(userStore.uid) },
     ];
 
+    // Remove all potential organizers that have duplicate UIDs
+    const uniqueOrganizers = [];
+    const uniqueUIDs = [];
+    for (const organizer of potentialOrganizers.value) {
+      if (!uniqueUIDs.includes(organizer.uid)) {
+        uniqueOrganizers.push(organizer);
+        uniqueUIDs.push(organizer.uid);
+      }
+    }
+
+    potentialOrganizers.value = uniqueOrganizers;
+    
     // Sort the potential organizers by surname alphabetically
     potentialOrganizers.value.sort((a, b) =>
       a.surname.localeCompare(b.surname),
@@ -321,7 +335,7 @@ const parseAsUTC = (val) => {
  * @async
  * @return {Promise<void>}
  */
-const submit = async () => {
+const submit = async (draft) => {
   loadingStore.loadingStart();
 
   // If no original thumbnail is set, upload the thumbnail and get the path
@@ -360,11 +374,11 @@ const submit = async () => {
   const contacts = potentialOrganizers.value
     .filter((organizer) => organizer.selected)
     .map((organizer) => ({
-      uid: organizer.uid,
-      name: organizer.name,
-      surname: organizer.surname,
-      email: organizer.email,
-      phone: organizer.phone,
+      uid: organizer.uid || "",
+      name: organizer.name || "",
+      surname: organizer.surname || "",
+      email: organizer.email || "",
+      phone: organizer.phone || "",
     }));
 
   // Create the event
@@ -384,6 +398,7 @@ const submit = async () => {
     organizers: organizers,
     contacts: contacts,
     link: link.value,
+    draft: draft,
   };
 
   console.log(event);
@@ -495,12 +510,20 @@ const submit = async () => {
         v-model="link"
         label="Link na registráciu"
         placeholder="https://forms.gle/DN" />
-      <div class="grid grid-cols-1 sm:grid-cols-2">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+        <button
+          class="form-secondary vertical-center"
+          :disabled="!canSubmit"
+          @click="submit(true)">
+          <span>{{ draft ? "Uložiť ako koncept" : "Zmeniť na koncept" }}</span>
+        </button>
         <button
           class="form-primary vertical-center sm:col-start-2"
           :disabled="!canSubmit"
-          @click="submit">
-          <span>{{ edit ? "Uložiť úpravy" : "Vytvoriť podujatie" }}</span>
+          @click="submit(false)">
+          <span>
+            {{ edit ? "Zverejniť úpravy" : "Zverejniť podujatie" }}
+          </span>
         </button>
       </div>
     </div>
