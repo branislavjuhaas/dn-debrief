@@ -24,7 +24,7 @@ const message = computed(() => {
     };
   }
 
-  if (event.value?.deadline.getDate() < new Date().getDate()) {
+  if (event.value?.deadline < new Date()) {
     return {
       text: "Registrácia na podujatie je uzavretá.",
     };
@@ -176,7 +176,7 @@ watch(
       <div class="flex flex-col gap-8">
         <p
           v-if="event?.description"
-          class="text-justify border-b-2 pb-8 border-black border-dashed">
+          class="text-justify border-b-2 pb-8 border-black border-dashed whitespace-pre-line">
           {{ event.description }}
         </p>
         <div class="flex flex-col border-b-2 pb-8 border-black border-dashed">
