@@ -22,7 +22,7 @@ const rl = readline.createInterface({
 rl.question("Enter UID: ", async (uid) => {
   try {
     getAuth()
-      .setCustomUserClaims(uid, { admin: true })
+      .setCustomUserClaims(uid, { role: "developer" })
       .then(() => {
         // The new custom claims will propagate to the user's ID token the
         // next time a new one is issued.
