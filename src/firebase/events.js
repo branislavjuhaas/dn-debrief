@@ -204,7 +204,13 @@ export const setEvent = async (event) => {
  */
 export const getEventById = async (eventId) => {
   const events = await relevantEvents();
-  return events.find((event) => event.id === eventId) || null;
+  const event = events.find((event) => event.id === eventId);
+  if (event) {
+    return event;
+  }
+
+  // Try to get event from database
+  return await getFirebaseEvent(eventId);
 };
 
 /**
@@ -235,32 +241,15 @@ export const getFirebaseEvent = async (eventId) => {
   }
 };
 
-export const getEventsBetweenDates = async (
-  startDate,
-  endDate,
-  organizer = null,
-) => {
-  const q = query(
-    collection(db, "events"),
-    where("beginningDate", ">=", startDate),
-    where("endDate", "<=", endDate),
-    where(organizer, "in", "organizers"),
-  );
-  const querySnapshot = await getDocs(q);
-  return querySnapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  }));
-};
-
 /**
  * Uploads a file to Firebase Storage's "events/files" directory.
  * Sets the custom metadata to include the UID of the user who uploaded the file.
+ * If a file with the same name exists, adds a  string to make it unique.
  *
  * @param {File} file - The file to upload.
  * @param {string} userId - The UID of the user who uploaded the file.
  * @param {string} userFullName - The full name of the user who
- * @returns {Promise<string>} A promise that resolves to the download URL of the uploaded file.
+ * @returns {Promise<{downloadURL: string, fileName: string}>} A promise that resolves to an object containing the download URL and name of the uploaded file.
  * @throws {Error} If the upload fails or the file size exceeds 10MB.
  */
 export const uploadEventFile = async (file, userId, userFullName) => {
@@ -273,8 +262,28 @@ export const uploadEventFile = async (file, userId, userFullName) => {
   }
 
   const storage = getStorage();
-  const filePath = `events/files/${file.name}`;
-  const fileRef = ref(storage, filePath);
+  let fileName = file.name;
+  let filePath = `events/files/${fileName}`;
+  let fileRef = ref(storage, filePath);
+
+  // Check if file already exists
+  try {
+    await getMetadata(fileRef);
+    // File exists, add random string to name
+    const randomStr = Date.now().toString(36);
+    const fileExt = fileName.includes('.') ? fileName.split('.').pop() : '';
+    const baseName = fileName.includes('.') ? fileName.substring(0, fileName.lastIndexOf('.')) : fileName;
+    
+    fileName = `${baseName}_${randomStr}${fileExt ? '.' + fileExt : ''}`;
+    filePath = `events/files/${fileName}`;
+    fileRef = ref(storage, filePath);
+  } catch (error) {
+    // If error is "object-not-found", file doesn't exist which is fine
+    if (error.code !== "storage/object-not-found") {
+      console.error("Error checking file existence:", error);
+      throw error;
+    }
+  }
 
   try {
     await uploadBytes(fileRef, file, {
@@ -284,7 +293,9 @@ export const uploadEventFile = async (file, userId, userFullName) => {
       },
     });
     console.log(`File uploaded to ${filePath}, download URL: ${fileRef}`);
-    return await getDownloadURL(fileRef);
+    const downloadURL = await getDownloadURL(fileRef);
+    console.log(`File name: ${fileName}, download URL: ${downloadURL}`);
+    return { downloadURL, fileName };
   } catch (error) {
     console.error("Error uploading file:", error);
     throw error;
@@ -352,4 +363,28 @@ export const listEventFiles = async () => {
     console.error("Error listing event files:", error);
     throw error;
   }
+};
+
+export const getEventsBetweenDates = async (startDate, endDate) => {
+  const q = query(
+    collection(db, "events"),
+    where("endDate", ">=", startDate),
+    where("beginningDate", "<=", endDate),
+  );
+  const querySnapshot = await getDocs(q);
+
+  console.log("querySnapshot: ", querySnapshot);
+
+  const events = await Promise.all(
+    querySnapshot.docs.map(async (doc) => ({
+      id: doc.id,
+      originalThumbnail: doc.data().thumbnail,
+      ...doc.data(),
+      thumbnail: await getThumbnail(doc.data().thumbnail),
+    })),
+  );
+
+  console.log("events: ", events);
+
+  return events;
 };

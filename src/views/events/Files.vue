@@ -33,6 +33,7 @@ const extensionIcon = (filename) => {
 };
 
 const addFile = (filename, link) => {
+  console.log("Adding file", filename, link);
   files.value.unshift({
     name: filename,
     uploadedBy: useUserStore().fullName,

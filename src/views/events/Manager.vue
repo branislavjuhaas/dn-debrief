@@ -51,8 +51,9 @@ const uploadFile = async () => {
   loadingStore.loadingStart();
 
   uploadEventFile(file, userStore.uid, userStore.fullName)
-    .then((path) => {
-      filesRef.value.addFile(file.name, path);
+    .then(( eventResponse ) => {
+      console.log(eventResponse);
+      filesRef.value.addFile(eventResponse.fileName, eventResponse.downloadURL);
       loadingStore.loadingEnd();
     })
     .catch((error) => {
