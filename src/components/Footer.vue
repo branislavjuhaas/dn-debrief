@@ -6,26 +6,6 @@ import { translateRole } from "../translate.js";
 // Initialize user and loading stores
 const user = useUserStore();
 const loading = useLoadingStore();
-
-// Get the current date in the format of "day/month"
-const date =
-  new Date().getDate().toString() +
-  "/" +
-  (new Date().getMonth() + 1).toString();
-
-// By default, set isDebrief to true
-let isDebrief = true;
-
-// Check the hostname and specific dates to determine the value of isDebrief
-if (
-  window.location.hostname !== "debrief.sda.sk" ||
-  date === "23/1" ||
-  date === "10/3" ||
-  date === "28/6" ||
-  date === "17/11"
-) {
-  isDebrief = false;
-}
 </script>
 
 <template>
@@ -37,13 +17,7 @@ if (
       class="absolute h-1 w-10 bg-red rounded left-0 top-0" />
     <div
       class="flex flex-row justify-between items-center max-w-[1320px] h-full w-full">
-      <p class="hidden mt-1 sm:flex">
-        {{
-          isDebrief
-            ? "2024 - 2025 Slovenská debatná asociácia"
-            : "2024 - 2025 Branislav Juhás"
-        }}
-      </p>
+      <p class="hidden mt-1 sm:flex">2024 - 2025 | Branislav Juhás</p>
 
       <div class="flex flex-row gap-14 items-center w-full sm:w-auto">
         <a href="https://sda.sk/gdpr" class="hidden mt-1 sm:flex">GDPR</a>
