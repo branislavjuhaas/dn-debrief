@@ -6,6 +6,7 @@ import { relevantEvents, uploadEventFile } from "../../firebase/events.js";
 import { useLoadingStore, useUserStore } from "../../stores.js";
 import Field from "../../components/Field.vue";
 import Files from "./Files.vue";
+import Events from "./Events.vue";
 
 const filesErrorMessage = ref("");
 
@@ -51,7 +52,7 @@ const uploadFile = async () => {
   loadingStore.loadingStart();
 
   uploadEventFile(file, userStore.uid, userStore.fullName)
-    .then(( eventResponse ) => {
+    .then((eventResponse) => {
       console.log(eventResponse);
       filesRef.value.addFile(eventResponse.fileName, eventResponse.downloadURL);
       loadingStore.loadingEnd();
@@ -87,23 +88,7 @@ const filesRef = ref(null);
           @update:model-value="setMode"
           label="Zobraziť" />
         <template v-if="mode === 'events'">
-          <div
-            class="grid grid-cols-[auto_auto_1fr_auto_auto] sm:col-span-2 h-12 w-full border-2 border-black rounded-[1.25rem] justify-between px-5 vertical-center truncate items-center">
-            <p class="mr-2 font-bold">od</p>
-            <input type="date" v-model="fromDate" />
-            <p class="col-start-4 mr-2 font-bold">od</p>
-            <input type="date" v-model="toDate" />
-          </div>
           <toggle v-model="onlyMyEvents" label="Len moje podujatia" />
-          <dropdown
-            :options="[
-              { text: 'Stredoslovenský', value: 'ss' },
-              { text: 'Západoslovenský', value: 'sz' },
-              { text: 'Východoslovenský', value: 'sv' },
-              { text: 'Všetky podujatia', value: '' },
-            ]"
-            label="Región"
-            v-model="region" />
           <router-link to="events/new" class="form-primary vertical-center">
             <span>Vytvoriť podujatie</span>
           </router-link>
@@ -130,6 +115,7 @@ const filesRef = ref(null);
         ref="filesRef"
         :onlyMyFiles="onlyMyFiles"
         :filter="filesFilter" />
+      <events v-else :onlyMyEvents="onlyMyEvents" />
     </div>
   </div>
 </template>

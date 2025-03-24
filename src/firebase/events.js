@@ -271,10 +271,12 @@ export const uploadEventFile = async (file, userId, userFullName) => {
     await getMetadata(fileRef);
     // File exists, add random string to name
     const randomStr = Date.now().toString(36);
-    const fileExt = fileName.includes('.') ? fileName.split('.').pop() : '';
-    const baseName = fileName.includes('.') ? fileName.substring(0, fileName.lastIndexOf('.')) : fileName;
-    
-    fileName = `${baseName}_${randomStr}${fileExt ? '.' + fileExt : ''}`;
+    const fileExt = fileName.includes(".") ? fileName.split(".").pop() : "";
+    const baseName = fileName.includes(".")
+      ? fileName.substring(0, fileName.lastIndexOf("."))
+      : fileName;
+
+    fileName = `${baseName}_${randomStr}${fileExt ? "." + fileExt : ""}`;
     filePath = `events/files/${fileName}`;
     fileRef = ref(storage, filePath);
   } catch (error) {
@@ -366,6 +368,7 @@ export const listEventFiles = async () => {
 };
 
 export const getEventsBetweenDates = async (startDate, endDate) => {
+  endDate.setHours(23, 59, 59, 999);
   const q = query(
     collection(db, "events"),
     where("endDate", ">=", startDate),
@@ -384,7 +387,14 @@ export const getEventsBetweenDates = async (startDate, endDate) => {
     })),
   );
 
-  console.log("events: ", events);
+  console.log(
+    "Got ",
+    events.length,
+    " events between ",
+    startDate.toLocaleString(),
+    " and ",
+    endDate.toLocaleString(),
+  );
 
   return events;
 };

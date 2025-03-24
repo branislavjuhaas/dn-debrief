@@ -11,6 +11,17 @@ const userStore = useUserStore();
 
 const event = ref(null);
 
+// Add sanitizedDescription computed property
+const sanitizedDescription = computed(() =>
+  // if there is https:// or http:// in the description, add a href tag for each link
+  event.value && event.value.description
+    ? event.value.description
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>')
+    : "",
+);
+
 const message = computed(() => {
   if (!userStore.uid) {
     return { text: "Pre registráciu na podujatie sa musíte prihlásiť." };
@@ -175,10 +186,10 @@ watch(
       class="flex flex-col justify-between w-full bg-white text-black min-h-60 rounded-[1.25rem] p-5 gap-16">
       <div class="flex flex-col gap-8">
         <p
+          id="event-description"
           v-if="event?.description"
-          class="text-justify border-b-2 pb-8 border-black border-dashed whitespace-pre-line">
-          {{ event.description }}
-        </p>
+          v-html="sanitizedDescription"
+          class="text-justify border-b-2 pb-8 border-black border-dashed whitespace-pre-line"></p>
         <div class="flex flex-col border-b-2 pb-8 border-black border-dashed">
           <div id="schedule" class="flex flex-row flex-wrap max-w-full gap-12">
             <div
@@ -293,5 +304,10 @@ a:hover img {
 
 .alternative {
   @apply flex flex-row items-center h-12 bg-white text-black rounded-[1.25rem] border-2 border-red border-opacity-0 font-bold px-5 duration-150 cursor-pointer hover:border-opacity-100;
+}
+
+/*all a elements injected into #event-description shall have underline using deep*/
+:deep(#event-description a) {
+  text-decoration: underline;
 }
 </style>

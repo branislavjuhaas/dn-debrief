@@ -33,18 +33,21 @@ const filteredMembers = computed(() => {
 });
 
 // Watch for changes in route.params.id to update club data and members
-watch(() => route.params.id, async () => {
-  clubId.value = route.params.id;
-  useLoadingStore().loadingStart();
-  try {
-    club.value = await getClub(clubId.value);
-    members.value = await getUsers(clubId.value);
-  } catch (error) {
-    console.error(error);
-  } finally {
-    useLoadingStore().loadingEnd();
-  }
-});
+watch(
+  () => route.params.id,
+  async () => {
+    clubId.value = route.params.id;
+    useLoadingStore().loadingStart();
+    try {
+      club.value = await getClub(clubId.value);
+      members.value = await getUsers(clubId.value);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      useLoadingStore().loadingEnd();
+    }
+  },
+);
 </script>
 
 <template>
@@ -67,7 +70,15 @@ watch(() => route.params.id, async () => {
           class="flex flex-row justify-between h-12 w-full border-2 border-black rounded-[1.25rem] items-center px-5 vertical-center truncate">
           <p>
             <span class="font-bold">Počet členov</span>
-            {{ members.length }}
+            {{
+              members.filter((member) =>
+                member.seasons.some(
+                  (season) =>
+                    season.year === new Date().getFullYear().toString() &&
+                    season.confirmed,
+                ),
+              ).length
+            }}
           </p>
           <p v-if="club.zdp" class="font-bold">ZDP</p>
         </div>
@@ -90,7 +101,14 @@ watch(() => route.params.id, async () => {
           :to="`/profile/${member.id}`"
           v-if="['admin', 'developer'].includes(useUserStore().role)"
           :style="{ '--delay': index * 0.035 + 's' }"
-          class="grid grid-cols-3 items-center gap-4 rounded-[1.25rem] fade-in fly-in opacity-0">
+          class="grid grid-cols-3 items-center gap-4 rounded-[1.25rem] fade-in fly-in opacity-0"
+          :class="{
+            'text-grey': !member.seasons.some(
+              (season) =>
+                season.year === new Date().getFullYear().toString() &&
+                season.confirmed,
+            ),
+          }">
           <p class="truncate">{{ member.id }}</p>
           <p class="overflow-hidden sm:truncate">
             {{ member.name + " " + member.surname }}
@@ -104,7 +122,14 @@ watch(() => route.params.id, async () => {
           v-for="(member, index) in filteredMembers"
           :key="member.id"
           :style="{ '--delay': index * 0.035 + 's' }"
-          class="grid grid-cols-3 items-center gap-4 rounded-[1.25rem] fade-in fly-in opacity-0">
+          class="grid grid-cols-3 items-center gap-4 rounded-[1.25rem] fade-in fly-in opacity-0"
+          :class="{
+            'text-grey': !member.seasons.some(
+              (season) =>
+                season.year === new Date().getFullYear().toString() &&
+                season.confirmed,
+            ),
+          }">
           <p class="truncate">{{ member.id }}</p>
           <p class="overflow-hidden sm:truncate">
             {{ member.name + " " + member.surname }}

@@ -340,11 +340,16 @@ exports.setCreatedAt = onDocumentCreated("users/{userId}", async (event) => {
  * Function is protected by Firebase App Check and requires 'admin' or 'developer' role.
  *
  * @function setUserRole
+ * @param {Object} data - The request data object.
+ * @param {Object} request - The request object.
+ * @returns {Object} The response object indicating success.
+ * @throws {functions.https.HttpsError} If the user does not have the required permissions or if an error occurs during the execution
+ * of the function.
+ * @async
  */
 exports.setUserRole = onCall(
   { enforceAppCheck: true },
   async (data, request) => {
-
     const uid = data.data.uid;
     const role = data.data.role;
 
