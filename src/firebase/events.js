@@ -367,16 +367,10 @@ export const listEventFiles = async () => {
   }
 };
 
-export const getEventsBetweenDates = async (startDate, endDate) => {
-  endDate.setHours(23, 59, 59, 999);
-  const q = query(
-    collection(db, "events"),
-    where("endDate", ">=", startDate),
-    where("beginningDate", "<=", endDate),
-  );
+export const getEventsAfterNow = async () => {
+  const today = new Date();
+  const q = query(collection(db, "events"), where("endDate", ">=", today));
   const querySnapshot = await getDocs(q);
-
-  console.log("querySnapshot: ", querySnapshot);
 
   const events = await Promise.all(
     querySnapshot.docs.map(async (doc) => ({
@@ -385,15 +379,6 @@ export const getEventsBetweenDates = async (startDate, endDate) => {
       ...doc.data(),
       thumbnail: await getThumbnail(doc.data().thumbnail),
     })),
-  );
-
-  console.log(
-    "Got ",
-    events.length,
-    " events between ",
-    startDate.toLocaleString(),
-    " and ",
-    endDate.toLocaleString(),
   );
 
   return events;

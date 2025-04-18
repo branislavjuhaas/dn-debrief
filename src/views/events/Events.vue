@@ -1,7 +1,7 @@
 <script setup>
 import { computed, onMounted, ref, watch, reactive } from "vue";
 import { useUserStore } from "../../stores.js";
-import { getEventsBetweenDates } from "../../firebase/events.js";
+import { getEventsAfterNow } from "../../firebase/events.js";
 
 import trophy from "../../assets/icons/trophy.svg";
 import book from "../../assets/icons/book.svg";
@@ -38,39 +38,8 @@ const filteredEvents = computed(() => {
   });
 });
 
-// watch for changes in the props date range
-// If it exceeds the maximum date range, extend the maximum date range and fetch events between the extension of the maximum date range
-watch(
-  () => props.from,
-  async (newFrom) => {
-    newFrom = new Date(newFrom);
-    if (newFrom < maximumDateRange.from) {
-      events.value = events.value
-        .concat(await getEventsBetweenDates(newFrom, maximumDateRange.from))
-        .sort((a, b) => a.beginningDate.toDate() - b.beginningDate.toDate());
-      maximumDateRange.from = newFrom;
-    }
-  },
-);
-
-watch(
-  () => props.to,
-  async (newTo) => {
-    newTo = new Date(newTo);
-    if (newTo > maximumDateRange.to) {
-      events.value = events.value
-        .concat(await getEventsBetweenDates(maximumDateRange.to, newTo))
-        .sort((a, b) => a.beginningDate.toDate() - b.beginningDate.toDate());
-      maximumDateRange.to = newTo;
-    }
-  },
-);
-
 onMounted(async () => {
-  events.value = await getEventsBetweenDates(
-    maximumDateRange.from,
-    maximumDateRange.to,
-  );
+  events.value = await getEventsAfterNow();
 });
 
 const datesAggregate = (beginningDate, endDate) => {
