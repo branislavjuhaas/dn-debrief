@@ -1,7 +1,7 @@
 <script setup>
 // Import necessary Vue functions and custom hooks
 import { onMounted, ref, watch, watchEffect, onUnmounted } from "vue";
-import { useEventsStore, useUserStore } from "../stores.js";
+import { useEventsStore, useFeedStore, useUserStore } from "../stores.js";
 import Event from "../components/Event.vue";
 
 // Get the user store
@@ -135,6 +135,7 @@ const dismissHeader = () => {
   }
 
   userFeed.value.header = null;
+  useFeedStore().dismissHeaderMessage();
 };
 
 const imageLoaded = ref(false);

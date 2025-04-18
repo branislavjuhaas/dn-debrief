@@ -238,6 +238,9 @@ export const useFeedStore = defineStore("feed", {
       this.initialized = true;
       this.headerMessage = headerMessage;
     },
+    dismissHeaderMessage() {
+      this.headerMessage = null;
+    },
   },
 });
 
