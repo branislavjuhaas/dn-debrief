@@ -85,6 +85,41 @@ const messages = {
 };
 
 /**
+ * Fetches one message from Firestore where header is true and active is true.
+ *
+ * @returns {Promise<Object>} - A promise that resolves to the header message object.
+ */
+export const getHeaderMessage = async () => {
+  // Get Firestore database instance
+  const db = getFirestore();
+
+  // Reference to the messages collection in Firestore
+  const messageCollection = collection(db, "messages");
+
+  // Create a Firestore query to fetch the header message
+  const q = query(
+    messageCollection,
+    where("header", "==", true),
+    where("active", "==", true),
+  );
+
+  // Execute the query and get the documents
+  const querySnapshot = await getDocs(q);
+
+  // Iterate through the query results and construct message objects
+  let headerMessage = null;
+  querySnapshot.forEach((doc) => {
+    const data = doc.data();
+    headerMessage = {
+      id: doc.id,
+      ...data,
+    };
+  });
+
+  return headerMessage; // Return the header message object
+};
+
+/**
  * Fetches cloud messages from Firestore based on user filters and updates the feed store.
  *
  * @returns {Promise<Array>} - A promise that resolves to an array of messages.
@@ -93,7 +128,10 @@ const getCloudMessages = async () => {
   // Check if the feed store is already initialized and return the existing messages if true
   if (useFeedStore().initialized) {
     console.log("Feed store already initialized");
-    return useFeedStore().feedMessages;
+    return {
+      feed: useFeedStore().feedMessages,
+      header: useFeedStore().headerMessage,
+    };
   }
 
   console.log("Fetching cloud messages");
@@ -115,6 +153,7 @@ const getCloudMessages = async () => {
   const q = query(
     messageCollection,
     and(
+      where("header", "==", false),
       or(
         where("filters.member", "==", userStore.isMember),
         where("filters.member", "==", false),
@@ -141,9 +180,11 @@ const getCloudMessages = async () => {
     messages.push(message); // Add the message to the messages array
   });
 
+  const header = await getHeaderMessage(); // Fetch the header message
+
   // Update the feed store with the fetched messages
-  useFeedStore().initialize(messages);
-  return messages; // Return the fetched messages
+  useFeedStore().initialize(messages, header);
+  return { feed: messages, header: header };
 };
 
 /**
@@ -182,13 +223,13 @@ export const feed = async (user) => {
   }
 
   const cloudMessages = await getCloudMessages();
-  feedMessages = feedMessages.concat(cloudMessages);
+  feedMessages = feedMessages.concat(cloudMessages.feed);
 
   if (feedMessages.length <= 2) {
     feedMessages.push(messages.learnMore);
   }
 
-  return feedMessages;
+  return { feed: feedMessages, header: cloudMessages.header };
 };
 
 /**

@@ -218,6 +218,7 @@ export const useFeedStore = defineStore("feed", {
   state: () => ({
     initialized: false,
     messages: [],
+    headerMessage: null,
   }),
   getters: {
     /**
@@ -232,9 +233,10 @@ export const useFeedStore = defineStore("feed", {
     /**
      * Initialize the feed messages.
      */
-    initialize(messages) {
+    initialize(messages, headerMessage) {
       this.messages = messages;
       this.initialized = true;
+      this.headerMessage = headerMessage;
     },
   },
 });
