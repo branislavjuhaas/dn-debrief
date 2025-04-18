@@ -3,7 +3,6 @@
 import { onMounted, ref, watch, watchEffect, onUnmounted } from "vue";
 import { useEventsStore, useUserStore } from "../stores.js";
 import Event from "../components/Event.vue";
-import { feed } from "../firebase/messaging.js";
 
 // Get the user store
 const user = useUserStore();
@@ -54,11 +53,16 @@ watch(
   },
 );
 
-// Get the feed from firebase/messaging.js,
-/**
- * @type {import('vue').Ref<any[]>}
- */
 const userFeed = ref({ feed: [], header: null });
+
+const checkHeader = (header) => {
+  if (header) {
+    return header.repeat === false
+      ? localStorage.getItem(`header-${header.id}`) !== "true"
+      : true;
+  }
+  return false;
+};
 
 const events = ref([]);
 
@@ -69,6 +73,10 @@ onMounted(async () => {
   const { feed } = await import("../firebase/messaging.js");
 
   userFeed.value = await feed(user);
+
+  userFeed.value.header = checkHeader(userFeed.value.header)
+    ? userFeed.value.header
+    : null;
 
   if (user.uid == null) {
     return;
@@ -88,6 +96,11 @@ watchEffect(async () => {
     const { relevantEvents } = await import("../firebase/events.js");
 
     userFeed.value = await feed(user);
+
+    userFeed.value.header = checkHeader(userFeed.value.header)
+      ? userFeed.value.header
+      : null;
+
     events.value = await relevantEvents();
     console.log(userFeed.value);
   }
@@ -115,6 +128,14 @@ onUnmounted(() => {
     eventsContainer.value.removeEventListener("wheel", handleWheel);
   }
 });
+
+const dismissHeader = () => {
+  if (userFeed.value.header.repeat === false) {
+    localStorage.setItem(`header-${userFeed.value.header.id}`, "true");
+  }
+
+  userFeed.value.header = null;
+};
 
 const imageLoaded = ref(false);
 </script>
@@ -145,7 +166,33 @@ const imageLoaded = ref(false);
       <h6 class="mt-1">Najbližšie relevantné udalosti</h6>
     </div>
     <div
-      v-if="events.length === 0"
+      v-if="userFeed.header"
+      class="text-base flex relative font-bold mt-2 h-[14.375rem] w-full rounded-[1.25rem] bg-[#0f2544] overflow-hidden">
+      <button
+        @click="dismissHeader"
+        class="absolute w-8 h-8 overflow-hidden cursor-pointer transition-all duration-200 flex top-4 gap-2 left-4 z-10 bg-white/25 rounded-lg p-1.5 hover:w-[7.4rem]">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 20 20"
+          fill="none"
+          class="w-5 h-5 shrink-0">
+          <path
+            d="M15.1831 3.93306L3.93306 15.1831C3.81585 15.3003 3.75 15.4592 3.75 15.625C3.75 15.7908 3.81585 15.9497 3.93306 16.0669C4.05027 16.1842 4.20924 16.25 4.375 16.25C4.54076 16.25 4.69973 16.1842 4.81694 16.0669L16.0669 4.81694C16.1842 4.69973 16.25 4.54076 16.25 4.375C16.25 4.20924 16.1842 4.05027 16.0669 3.93306C15.9497 3.81585 15.7908 3.75 15.625 3.75C15.4592 3.75 15.3003 3.81585 15.1831 3.93306Z"
+            fill="white" />
+          <path
+            d="M4.81694 3.93306C4.69973 3.81585 4.54076 3.75 4.375 3.75C4.20924 3.75 4.05027 3.81585 3.93306 3.93306C3.81585 4.05027 3.75 4.20924 3.75 4.375C3.75 4.54076 3.81585 4.69973 3.93306 4.81694L15.1831 16.0669C15.3003 16.1842 15.4592 16.25 15.625 16.25C15.7908 16.25 15.9497 16.1842 16.0669 16.0669C16.1842 15.9497 16.25 15.7908 16.25 15.625C16.25 15.4592 16.1842 15.3003 16.0669 15.1831L4.81694 3.93306Z"
+            fill="white" />
+        </svg>
+        <p class="font-normal leading-none mt-1 uppercase">Rozumiem</p>
+      </button>
+      <div
+        class="flex w-full h-full object-cover text-white leading-tight header-message"
+        v-html="userFeed.header.content" />
+    </div>
+    <div
+      v-else-if="events.length === 0"
       class="text-base relative font-bold mt-2 h-[14.375rem] w-full rounded-[1.25rem] bg-[#0f2544]">
       <img
         src="../assets/dn-banner.webp"
@@ -162,7 +209,7 @@ const imageLoaded = ref(false);
             ? useEventsStore().initialized
               ? "Momentálne nie sú dostupné žiadne podujatia."
               : "Systém čaká na načítanie podujatí."
-            : "Pre zobrazenie podujatí sa, prosím, prihlás!"
+            : "Pre zobrazenie obsahu sa, prosím, prihlás!"
         }}
       </p>
     </div>
@@ -218,7 +265,7 @@ const imageLoaded = ref(false);
 
 <style scoped>
 .events-placeholder {
-  animation: FadeIn 0.5s forwards;
+  animation: fadeIn 0.5s forwards;
 }
 .chip {
   @apply grid grid-rows-[auto_auto] w-full h-full gap-1 bg-white text-black pt-3 pb-2 px-5 rounded-[1.25rem];
@@ -247,6 +294,19 @@ const imageLoaded = ref(false);
   -ms-overflow-style: none;
 }
 
+.header-message :deep(h1) {
+  @apply text-3xl md:text-5xl;
+}
+
+.header-message :deep(p) {
+  @apply text-sm md:text-base font-normal;
+}
+
+.header-message {
+  opacity: 0;
+  animation: fadeIn 0.5s forwards;
+}
+
 @keyframes slideIn {
   100% {
     opacity: 1;
@@ -265,7 +325,7 @@ const imageLoaded = ref(false);
   }
 }
 
-@keyframes FadeIn {
+@keyframes fadeIn {
   0% {
     opacity: 0;
   }
