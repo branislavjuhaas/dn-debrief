@@ -296,7 +296,7 @@ const imageLoaded = ref(false);
 }
 
 .header-message :deep(h1) {
-  @apply text-3xl md:text-5xl;
+  @apply text-3xl md:text-4xl;
 }
 
 .header-message :deep(p) {
