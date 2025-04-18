@@ -94,14 +94,10 @@ export const getHeaderMessage = async () => {
   const db = getFirestore();
 
   // Reference to the messages collection in Firestore
-  const messageCollection = collection(db, "messages");
+  const headersCollection = collection(db, "headers");
 
   // Create a Firestore query to fetch the header message
-  const q = query(
-    messageCollection,
-    where("header", "==", true),
-    where("active", "==", true),
-  );
+  const q = query(headersCollection, where("active", "==", true));
 
   // Execute the query and get the documents
   const querySnapshot = await getDocs(q);
@@ -153,7 +149,6 @@ const getCloudMessages = async () => {
   const q = query(
     messageCollection,
     and(
-      where("header", "==", false),
       or(
         where("filters.member", "==", userStore.isMember),
         where("filters.member", "==", false),
