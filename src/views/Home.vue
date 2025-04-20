@@ -3,6 +3,7 @@
 import { onMounted, ref, watch, watchEffect, onUnmounted } from "vue";
 import { useEventsStore, useFeedStore, useUserStore } from "../stores.js";
 import Event from "../components/Event.vue";
+import router from "../router.js";
 
 // Get the user store
 const user = useUserStore();
@@ -138,6 +139,28 @@ const dismissHeader = () => {
   useFeedStore().dismissHeaderMessage();
 };
 
+/**
+ * Handles clicks on links within the header.
+ * Prevents default navigation. Uses Vue router for internal links
+ * and opens external links in a new tab.
+ * @param {MouseEvent} e - The click event.
+ */
+const handleHeaderClick = (e) => {
+  const target = e.target.closest("a");
+  if (target) {
+    const href = target.getAttribute("href");
+    if (href) {
+      e.preventDefault();
+      const url = new URL(href, window.location.origin);
+      if (url.hostname === window.location.hostname) {
+        router.push(url.pathname + url.search);
+      } else {
+        window.open(href, "_blank");
+      }
+    }
+  }
+};
+
 const imageLoaded = ref(false);
 </script>
 
@@ -189,7 +212,8 @@ const imageLoaded = ref(false);
         <p class="font-normal leading-none mt-1 uppercase">Rozumiem</p>
       </button>
       <div
-        class="flex w-full h-full object-cover text-white leading-tight header-message"
+        class="flex w-full h-full object-cover !text-white leading-tight header-message"
+        @click="handleHeaderClick"
         v-html="userFeed.header.content" />
     </div>
     <div
