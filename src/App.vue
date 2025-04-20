@@ -9,7 +9,7 @@ import Header from "./components/Header.vue";
 import Footer from "./components/Footer.vue";
 import router from "./router.js";
 import { logEvent } from "firebase/analytics";
-import { analytics } from "./main.js";
+import { analytics, initializeAnalytics } from "./main.js";
 
 const host = window.location.hostname;
 let title = "DN Cascade";
@@ -55,6 +55,9 @@ const handleUserCreation = async (user, userData) => {
 
   // If userData is not provided, create a new user
   if (!userData) {
+    // Remove cookie 'cookies=true' if it exists
+    document.cookie = "cookies=true; max-age=0; path=/";
+
     // If the user is email password user, create from store
     if (user.providerData[0].providerId === "password") {
       createUser(user.uid, user.email, userStore.name, userStore.surname).catch(
@@ -104,6 +107,7 @@ const handleUserCreation = async (user, userData) => {
       null,
       null,
       null,
+      null,
     );
 
     loadingStore.loadingEnd();
@@ -138,7 +142,16 @@ const handleUserCreation = async (user, userData) => {
     userData.awards,
     userData.clubManager,
     userData.dev,
+    userData.cookies,
   );
+
+  // Set the cookie based on userData.cookies
+  if (!userData.cookies) {
+    document.cookie = "cookies=true; max-age=0; path=/";
+  } else {
+    document.cookie = "cookies=true; max-age=31536000; path=/";
+    initializeAnalytics();
+  }
 };
 
 /**
@@ -232,7 +245,6 @@ onMounted(() => {
     loadingStore.loadingStart();
     const { getUser } = await import("./firebase/auth.js");
     if (user) {
-
       // Set the user role based on the ID token to ensure server-side accuracy
       user.role = await user.getIdTokenResult().then((idTokenResult) => {
         return idTokenResult.claims.role;

@@ -23,6 +23,7 @@ export const useUserStore = defineStore("user", {
     awards: [],
     clubManager: false,
     dev: false,
+    cookies: null,
   }),
   getters: {
     /**
@@ -134,6 +135,7 @@ export const useUserStore = defineStore("user", {
       awards,
       clubManager,
       dev,
+      cookies,
     ) {
       this.uid = uid;
       this.provider = provider;
@@ -151,6 +153,7 @@ export const useUserStore = defineStore("user", {
       this.awards = awards || [];
       this.clubManager = clubManager || false;
       this.dev = dev || false;
+      this.cookies = cookies || null;
     },
     /**
      * Log out the user.
@@ -170,6 +173,7 @@ export const useUserStore = defineStore("user", {
       this.awards = [];
       this.clubManager = false;
       this.dev = false;
+      this.cookies = null;
     },
     /**
      * Add a season to the user's seasons.

@@ -51,7 +51,26 @@ createApp(App)
 export const functions = getFunctions(app);
 
 // Get Firebase Analytics instance
-export const analytics = getAnalytics(app);
+export let analytics = null;
+
+/**
+ * Initialize Firebase Analytics if it is not already initialized.
+ * This function checks if the analytics instance is null and initializes it if so.
+ *
+ * @function initializeAnalytics
+ * @returns {void}
+ */
+export const initializeAnalytics = () => {
+  console.log("Initializing analytics");
+  if (!analytics) {
+    analytics = getAnalytics(app);
+  }
+};
+
+// if there is a cookie cookies=true then initialize analytics
+if (document.cookie.includes("cookies=true")) {
+  initializeAnalytics();
+}
 
 /**
  * Initializes Firestore with a persistent local cache.
