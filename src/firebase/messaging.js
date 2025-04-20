@@ -195,12 +195,12 @@ export const feed = async (user) => {
 
   if (!user || !user.uid) {
     feedMessages.push(messages.auth);
-    return feedMessages;
+    return { feed: feedMessages, header: null };
   }
 
   if (!user.isJoining) {
     feedMessages.push(messages.join);
-    return feedMessages;
+    return { feed: feedMessages, header: null };
   }
 
   if (user.isJoining && !user.isMember) {
@@ -224,7 +224,9 @@ export const feed = async (user) => {
     feedMessages.push(messages.learnMore);
   }
 
-  return { feed: feedMessages, header: cloudMessages.header };
+  console.log("Feed messages:", feedMessages);
+
+  return { feed: feedMessages, header: cloudMessages.header || null };
 };
 
 /**
