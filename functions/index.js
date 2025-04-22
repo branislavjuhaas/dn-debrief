@@ -335,6 +335,32 @@ exports.setCreatedAt = onDocumentCreated("users/{userId}", async (event) => {
 });
 
 /**
+ * Sets the 'season' field for an event document upon creation based on its beginningDate.
+ *
+ * @function setEventSeason
+ */
+exports.setEventSeason = onDocumentCreated(
+  "events/{eventId}",
+  async (event) => {
+    const eventId = event.params.eventId;
+    const data = event.data.data();
+    if (!data || !data.beginningDate) {
+      logger.error("Missing beginningDate for event", eventId);
+      return;
+    }
+    const date = data.beginningDate.toDate();
+    const month = date.getMonth(); // 0-indexed (0 = January)
+    const year = date.getFullYear();
+    const season = month < 8 ? `${year - 1}/${year}` : `${year}/${year + 1}`;
+    await admin
+      .firestore()
+      .collection("events")
+      .doc(eventId)
+      .update({ season });
+  },
+);
+
+/**
  * Callable function to set user's role by provided UID and role.
  * Function writes the role to the user's custom claims and firestore user document.
  * Function is protected by Firebase App Check and requires 'admin' or 'developer' role.
