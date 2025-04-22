@@ -63,13 +63,14 @@ const search = async () => {
         return result.hits.map((hit) => {
           let display, link;
           if (index === 0) {
-            display = hit.name + " " + hit.surname;
+            display = `${hit.name} ${hit.surname}`;
             link = "/profile/" + hit.path.split("/")[1];
           } else if (index === 1) {
             display = hit.name;
             link = "/clubs/" + hit.path.split("/")[1];
           } else if (index === 2) {
-            display = hit.name;
+            console.log(hit);
+            display = `${hit.name} (${hit.season})`;
             link = "/events/" + hit.path.split("/")[1];
           }
           return {
