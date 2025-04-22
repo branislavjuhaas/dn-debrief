@@ -1,6 +1,6 @@
-# DN Cascade Platform Messaging Protocol
+# DN Cascade Platform Messaging Protocol v1.1
 
-**Version:** 1.0
+**Version:** 1.1
 **Date:** April 22, 2025
 
 ## 1. Introduction
@@ -130,6 +130,11 @@ interface Header {
 
 - **`id`** (`string`): The unique identifier for the header, corresponding to its Firestore document ID. Used for dismissal tracking.
 - **`content`** (`string`): A string containing the full HTML markup to be rendered within the header component. This allows for rich formatting, images, and embedded styles. Links within the content are handled dynamically to use the Vue router for internal links and `target="_blank"` for external ones.
+  - **Variable Substitution:** The `content` string can contain placeholders that will be dynamically replaced with user or system information before rendering. Available variables:
+    - `{{system}}`: The name of the current system variant (e.g., "DN Cascade", "DebRIEF", "Barca").
+    - `{{name}}`: The first name of the currently logged-in user.
+    - `{{fullName}}`: The full name of the currently logged-in user.
+    - `{{version}}`: The current application version (from `package.json`).
 - **`active`** (`boolean`): If `true`, this header is eligible for display. Only one active header is typically shown at a time.
 - **`repeat`** (`boolean`): Controls the dismissal behavior:
   - `true`: The header will be shown every time the user visits the Home view as long as it remains `active`.
@@ -163,7 +168,8 @@ The query logic generally aims to include messages where:
 ## 5. Header Display Logic
 
 1.  The application fetches potential header messages from the `headers` collection in Firestore where `active` is `true`.
-2.  If a header is found and its `repeat` value is `false`, the application checks `localStorage` for a key `header-${id}`.
-3.  If the key exists with value `"true"`, the header is considered dismissed and is not displayed.
-4.  Otherwise (header found, and either `repeat` is `true` or it hasn't been dismissed), the header's `content` is rendered.
-5.  If the user clicks the dismiss button on a header where `repeat` is `false`, the `localStorage` key `header-${id}` is set to `"true"`, and the header is hidden for the current session.
+2.  Before displaying, the application hydrates the `content` string by replacing placeholders like `{{system}}`, `{{name}}`, `{{fullName}}`, and `{{version}}` with the actual values.
+3.  If a header is found and its `repeat` value is `false`, the application checks `localStorage` for a key `header-${id}`.
+4.  If the key exists with value `"true"`, the header is considered dismissed and is not displayed.
+5.  Otherwise (header found, hydrated, and either `repeat` is `true` or it hasn't been dismissed), the header's `content` is rendered.
+6.  If the user clicks the dismiss button on a header where `repeat` is `false`, the `localStorage` key `header-${id}` is set to `"true"`, and the header is hidden for the current session.
