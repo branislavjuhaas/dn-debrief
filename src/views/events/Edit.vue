@@ -503,7 +503,6 @@ const submit = async (draft) => {
           <div v-for="organizer in potentialOrganizers" :key="organizer.uid">
             <toggle
               v-model="organizer.selected"
-              :readonly="organizer.self"
               :label="organizer.name + ' ' + organizer.surname"
               :secondary="organizer.email"
               :sublabel="organizer.email" />
