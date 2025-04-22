@@ -4,6 +4,7 @@ import { onMounted, ref, watch, watchEffect, onUnmounted } from "vue";
 import { useEventsStore, useFeedStore, useUserStore } from "../stores.js";
 import Event from "../components/Event.vue";
 import router from "../router.js";
+import { version } from "../../package.json";
 
 // Get the user store
 const user = useUserStore();
@@ -56,6 +57,23 @@ watch(
 
 const userFeed = ref({ feed: [], header: null });
 
+/**
+ * Function to hydrate the header content with system and user information.
+ * @param {Object} header - The header object containing the content to be hydrated.
+ * @returns {Object} - The hydrated header object.
+ */
+const hydrateHeader = (header) => {
+  if (!header) return null;
+  if (header.content == null) return header;
+
+  header.content = header.content.replace(/{{system}}/g, system);
+  header.content = header.content.replace(/{{name}}/g, user.name);
+  header.content = header.content.replace(/{{fullName}}/g, user.fullName);
+  header.content = header.content.replace(/{{version}}/g, version);
+
+  return header;
+};
+
 const checkHeader = (header) => {
   if (header) {
     return header.repeat === false
@@ -79,6 +97,8 @@ onMounted(async () => {
     ? userFeed.value.header
     : null;
 
+  userFeed.value.header = hydrateHeader(userFeed.value.header);
+
   if (user.uid == null) {
     return;
   }
@@ -101,6 +121,8 @@ watchEffect(async () => {
     userFeed.value.header = checkHeader(userFeed.value.header)
       ? userFeed.value.header
       : null;
+
+    userFeed.value.header = hydrateHeader(userFeed.value.header);
 
     events.value = await relevantEvents();
     console.log(userFeed.value);
