@@ -251,7 +251,7 @@ const imageLoaded = ref(false);
     </div>
 
     <div
-      class="flex flex-row text-base font-bold gap-3 mt-10 items-center leading-3">
+      class="flex flex-row text-base font-bold gap-3 mt-4 items-center leading-3">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="20"
