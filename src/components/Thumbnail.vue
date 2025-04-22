@@ -3,7 +3,6 @@
 
 import { ref } from "vue";
 import { uploadThumbnailImage, relevantEvents } from "../firebase/events.js";
-import { defineExpose } from "vue";
 import defaultThumbnail from "../assets/dn-cascade.webp";
 
 const props = defineProps([
