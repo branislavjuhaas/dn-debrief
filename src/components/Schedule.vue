@@ -25,7 +25,12 @@ watch(
 
 // Helper function to emit changes
 const emitChange = () => {
-  emit("update:modelValue", JSON.parse(JSON.stringify(schedule.value)));
+  // Deep clone and remove component-only isInvalid flags
+  const emitted = JSON.parse(JSON.stringify(schedule.value));
+  emitted.days.forEach((day) => {
+    day.points.forEach((point) => delete point.isInvalid);
+  });
+  emit("update:modelValue", emitted);
 };
 
 const start = computed(() =>
@@ -42,6 +47,12 @@ const weekDays = [
   "Sobota",
 ];
 
+/**
+ * Formats a date string for a given starting date and offset index.
+ * @param {Date} beginning - The starting date.
+ * @param {number} index - Offset in days from the beginning date.
+ * @returns {string} Formatted date with weekday and day.month.
+ */
 const getFormattedDate = (beginning, index) => {
   const date = new Date(beginning);
   date.setDate(date.getDate() + index);
@@ -52,10 +63,10 @@ const getFormattedDate = (beginning, index) => {
 };
 
 /**
- * Calculates the start time for a given day and point index.
- * @param {Object} day - The day object containing schedule information.
- * @param {number} pointIndex - The index of the point within the day's points.
- * @returns {string} The formatted start time.
+ * Calculates the start time for a given point in a day.
+ * @param {Object} day - The day object containing schedule info.
+ * @param {number} pointIndex - Index of the point.
+ * @returns {string} Formatted start time HH:MM.
  */
 const getStartTime = (day, pointIndex) => {
   const startOffset =
@@ -191,22 +202,21 @@ const removeDay = (index) => {
 };
 
 /**
- * Checks if editing a point exceeds midnight.
- * @param {Object} day - The day object containing schedule information.
- * @returns {boolean} True if it exceeds midnight, false otherwise.
+ * Checks if editing the last point exceeds midnight.
+ * @param {Object} day - Day object.
+ * @returns {boolean} True if exceeds 24h limit.
  */
 const editDoesExceedMidnight = (day) => {
   const minutesInDay = 24 * 60;
   const endOfLastPoint = getEndTimeInMinutes(day, day.points.length - 1);
-  console.log(endOfLastPoint, minutesInDay);
   return endOfLastPoint > minutesInDay;
 };
 
 /**
- * Handles changes to the end time input for a point.
- * @param {Object} day - The day object containing schedule information.
- * @param {number} index - The index of the point being edited.
- * @param {string} endTimeStr - The new end time string.
+ * Handles changes to the end time input for a schedule point.
+ * @param {Object} day - Day object.
+ * @param {number} index - Point index.
+ * @param {string} endTimeStr - End time string HH:MM.
  */
 const onTimeInputChange = (day, index, endTimeStr) => {
   const point = day.points[index];
@@ -216,8 +226,6 @@ const onTimeInputChange = (day, index, endTimeStr) => {
     point.duration = 0;
     return;
   }
-
-  console.log(day, index, endTimeStr, "doing actual checks");
 
   try {
     const startMinutes =
@@ -230,20 +238,15 @@ const onTimeInputChange = (day, index, endTimeStr) => {
       point.isInvalid = true;
     }
 
-    const originalDuration = point.duration;
+    const original = point.duration;
     point.duration = duration;
 
-    if (!validateDayTimes(day, index)) {
-      point.duration = originalDuration;
+    if (!validateDayTimes(day, index) || editDoesExceedMidnight(day)) {
+      point.duration = original;
       point.isInvalid = true;
     }
 
-    if (editDoesExceedMidnight(day)) {
-      point.duration = originalDuration;
-      point.isInvalid = true;
-    }
-
-    emitChange(); // Emit only if validation passes
+    emitChange();
   } catch {
     point.isInvalid = true;
   }
