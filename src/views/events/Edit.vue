@@ -13,7 +13,13 @@ import Toggle from "../../components/Toggle.vue";
 import router from "../../router.js";
 import { useRoute } from "vue-router";
 
-const props = defineProps(["edit"]);
+const props = defineProps({
+  edit: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
+});
 
 const edit = props.edit;
 

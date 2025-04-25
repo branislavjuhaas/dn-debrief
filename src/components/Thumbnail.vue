@@ -5,15 +5,36 @@ import { ref } from "vue";
 import { uploadThumbnailImage, relevantEvents } from "../firebase/events.js";
 import defaultThumbnail from "../assets/dn-cascade.webp";
 
-const props = defineProps([
-  "id",
-  "name",
-  "city",
-  "beginningDate",
-  "endDate",
-  "disabled",
-  "thumbnailPath",
-]);
+const props = defineProps({
+  id: {
+    type: [String, Number],
+    required: true,
+  },
+  name: {
+    type: String,
+    default: "",
+  },
+  city: {
+    type: String,
+    default: "",
+  },
+  beginningDate: {
+    type: [String, Date],
+    required: true,
+  },
+  endDate: {
+    type: [String, Date],
+    required: true,
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
+  thumbnailPath: {
+    type: String,
+    default: "",
+  },
+});
 
 const selectedImage = ref(null);
 

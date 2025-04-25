@@ -5,14 +5,37 @@ import eye from "../assets/icons/eye.svg";
 import eyeCrossed from "../assets/icons/eye-crossed.svg";
 
 // Define the props that this component accepts
-const props = defineProps([
-  "name",
-  "label",
-  "type",
-  "readonly",
-  "placeholder",
-  "modelValue",
-]);
+const props = defineProps({
+  name: {
+    type: String,
+    required: false,
+    default: "",
+  },
+  label: {
+    type: String,
+    required: true,
+  },
+  type: {
+    type: String,
+    required: false,
+    default: "text",
+  },
+  readonly: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
+  placeholder: {
+    type: String,
+    required: false,
+    default: "",
+  },
+  modelValue: {
+    type: [String, Number],
+    required: false,
+    default: "",
+  },
+});
 
 // Define a ref to control the visibility of the password
 const showPassword = ref(false);

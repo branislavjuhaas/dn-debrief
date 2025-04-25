@@ -5,13 +5,24 @@ import square from "../assets/icons/square.svg";
 import squareChecked from "../assets/icons/square-checked.svg";
 
 // Define component props
-const props = defineProps([
-  "checked",
-  "label",
-  "secondary",
-  "modelValue",
-  "readonly",
-]);
+const props = defineProps({
+  modelValue: {
+    type: Boolean,
+    required: true,
+  },
+  label: {
+    type: String,
+    required: true,
+  },
+  secondary: {
+    type: String,
+    default: "",
+  },
+  readonly: {
+    type: Boolean,
+    default: false,
+  },
+});
 
 // Create a reactive reference for the checked state
 const checked = ref(props.modelValue);

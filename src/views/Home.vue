@@ -5,7 +5,6 @@ import { useEventsStore, useFeedStore, useUserStore } from "../stores.js";
 import EventCard from "../components/EventCard.vue";
 import router from "../router.js";
 import { version } from "../../package.json";
-import EventCard from "../components/EventCard.vue";
 
 // Get the user store
 const user = useUserStore();

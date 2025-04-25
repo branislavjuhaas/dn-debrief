@@ -2,7 +2,10 @@
 import { computed, ref, watch } from "vue";
 
 const props = defineProps({
-  beginning: String,
+  beginning: {
+    type: String,
+    default: null,
+  },
   modelValue: {
     type: Object,
     required: true,

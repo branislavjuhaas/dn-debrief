@@ -95,49 +95,51 @@ watch(
           <p>Meno a priezvisko</p>
           <p>Rola</p>
         </div>
-        <router-link
-          v-for="(member, index) in filteredMembers"
-          v-if="['admin', 'developer'].includes(useUserStore().role)"
-          :key="`admin-${member.id}`"
-          :to="`/profile/${member.id}`"
-          :style="{ '--delay': index * 0.035 + 's' }"
-          class="grid grid-cols-3 items-center gap-4 rounded-[1.25rem] fade-in fly-in opacity-0"
-          :class="{
-            'text-grey': !member.seasons.some(
-              (season) =>
-                season.year === new Date().getFullYear().toString() &&
-                season.confirmed,
-            ),
-          }">
-          <p class="truncate">{{ member.id }}</p>
-          <p class="overflow-hidden sm:truncate">
-            {{ member.name + " " + member.surname }}
-          </p>
-          <p class="overflow-hidden sm:truncate">
-            {{ translateRole(member.role || "user") }}
-          </p>
-        </router-link>
-        <div
-          v-for="(member, index) in filteredMembers"
-          v-else
-          :key="member.id"
-          :style="{ '--delay': index * 0.035 + 's' }"
-          class="grid grid-cols-3 items-center gap-4 rounded-[1.25rem] fade-in fly-in opacity-0"
-          :class="{
-            'text-grey': !member.seasons.some(
-              (season) =>
-                season.year === new Date().getFullYear().toString() &&
-                season.confirmed,
-            ),
-          }">
-          <p class="truncate">{{ member.id }}</p>
-          <p class="overflow-hidden sm:truncate">
-            {{ member.name + " " + member.surname }}
-          </p>
-          <p class="overflow-hidden sm:truncate">
-            {{ translateRole(member.role || "user") }}
-          </p>
-        </div>
+        <template v-if="['admin', 'developer'].includes(useUserStore().role)">
+          <router-link
+            v-for="(member, index) in filteredMembers"
+            :key="`admin-${member.id}`"
+            :to="`/profile/${member.id}`"
+            :style="{ '--delay': index * 0.035 + 's' }"
+            class="grid grid-cols-3 items-center gap-4 rounded-[1.25rem] fade-in fly-in opacity-0"
+            :class="{
+              'text-grey': !member.seasons.some(
+                (season) =>
+                  season.year === new Date().getFullYear().toString() &&
+                  season.confirmed,
+              ),
+            }">
+            <p class="truncate">{{ member.id }}</p>
+            <p class="overflow-hidden sm:truncate">
+              {{ member.name + " " + member.surname }}
+            </p>
+            <p class="overflow-hidden sm:truncate">
+              {{ translateRole(member.role || "user") }}
+            </p>
+          </router-link>
+        </template>
+        <template v-else>
+          <div
+            v-for="(member, index) in filteredMembers"
+            :key="member.id"
+            :style="{ '--delay': index * 0.035 + 's' }"
+            class="grid grid-cols-3 items-center gap-4 rounded-[1.25rem] fade-in fly-in opacity-0"
+            :class="{
+              'text-grey': !member.seasons.some(
+                (season) =>
+                  season.year === new Date().getFullYear().toString() &&
+                  season.confirmed,
+              ),
+            }">
+            <p class="truncate">{{ member.id }}</p>
+            <p class="overflow-hidden sm:truncate">
+              {{ member.name + " " + member.surname }}
+            </p>
+            <p class="overflow-hidden sm:truncate">
+              {{ translateRole(member.role || "user") }}
+            </p>
+          </div>
+        </template>
       </div>
     </div>
   </div>

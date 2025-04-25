@@ -1,7 +1,29 @@
 <script setup>
 import { ref, watch } from "vue";
 
-const props = defineProps(["readonly", "title", "value", "name", "type"]);
+const props = defineProps({
+  readonly: {
+    type: Boolean,
+    default: false,
+  },
+  title: {
+    type: String,
+    required: true,
+  },
+  value: {
+    type: [String, Number],
+    default: "",
+  },
+  name: {
+    type: String,
+    required: true,
+  },
+  type: {
+    type: String,
+    default: "text",
+  },
+});
+
 const editing = ref(false);
 const value = ref(props.value);
 const confirmedValue = ref(props.value);
@@ -38,8 +60,14 @@ watch(
         class="text-right w-full"
         :type="props.type"
         :placeholder="!props.value ? 'zadaj hodnotu' : ''" />
-      <p v-else class="text-right w-full" :class="{ italic: props.readonly || !props.value, 'text-grey': !props.value }">
-        {{ confirmedValue ? confirmedValue : 'zadaj hodnotu' }}
+      <p
+        v-else
+        class="text-right w-full"
+        :class="{
+          italic: props.readonly || !props.value,
+          'text-grey': !props.value,
+        }">
+        {{ confirmedValue ? confirmedValue : "zadaj hodnotu" }}
       </p>
       <Transition name="fly">
         <div v-if="editing" class="flex flex-row gap-2">

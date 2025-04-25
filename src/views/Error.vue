@@ -7,7 +7,12 @@ import { defineProps, onMounted } from "vue";
  * @type {Object} props - The props object.
  * @property {number} props.code - The error code.
  */
-const props = defineProps(["code"]);
+const props = defineProps({
+  code: {
+    type: Number,
+    required: true,
+  },
+});
 
 /**
  * The error message to be displayed.

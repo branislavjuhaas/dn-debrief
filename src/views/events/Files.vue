@@ -5,8 +5,14 @@ import { formatSlovakDate } from "../../utilities.js";
 import { useUserStore } from "../../stores.js";
 
 const props = defineProps({
-  onlyMyFiles: Boolean,
-  filter: String,
+  onlyMyFiles: {
+    type: Boolean,
+    default: false,
+  },
+  filter: {
+    type: String,
+    default: "",
+  },
 });
 
 /**

@@ -274,6 +274,7 @@ watch(
             :class="`grid w-full gap-4 grid-cols-1 sm:grid-cols-${Math.min(event.contacts.length, 2)} md:grid-cols-${Math.min(event.contacts.length, 3)} lg:grid-cols-${Math.min(event.contacts.length, 4)}`">
             <ContactCard
               v-for="organizer in event.contacts"
+              :key="organizer.uid"
               :href="'mailto:' + organizer.email"
               :contact="organizer" />
           </div>
