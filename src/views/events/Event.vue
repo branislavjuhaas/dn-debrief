@@ -12,7 +12,7 @@ import { getEventById, getEventFile } from "../../firebase/events";
 import { useUserStore } from "../../stores.js";
 import { formatSlovakDate } from "../../utilities.js";
 import router from "../../router.js";
-import Contact from "../../components/Contact.vue";
+import ContactCard from "../../components/ContactCard.vue";
 import up from "../../assets/icons/up.svg";
 import down from "../../assets/icons/down.svg";
 
@@ -272,7 +272,7 @@ watch(
           <h6 class="font-bold">Organizátori/-ky podujatia</h6>
           <div
             :class="`grid w-full gap-4 grid-cols-1 sm:grid-cols-${Math.min(event.contacts.length, 2)} md:grid-cols-${Math.min(event.contacts.length, 3)} lg:grid-cols-${Math.min(event.contacts.length, 4)}`">
-            <Contact
+            <ContactCard
               v-for="organizer in event.contacts"
               :href="'mailto:' + organizer.email"
               :contact="organizer" />
