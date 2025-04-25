@@ -1,5 +1,10 @@
 <script setup>
-const props = defineProps(["event"]);
+const props = defineProps({
+  event: {
+    type: Object,
+    required: true,
+  },
+});
 
 const event = props.event;
 
