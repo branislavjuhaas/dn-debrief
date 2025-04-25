@@ -60,13 +60,13 @@ watch([password, confirm], () => {
       class="flex flex-col justify-between w-full bg-white min-h-60 rounded-[1.25rem] p-5 gap-16 transition-all">
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <field
-          name="newPassword"
           v-model="password"
+          name="newPassword"
           label="Nové heslo"
           type="password" />
         <field
-          name="confirmPassword"
           v-model="confirm"
+          name="confirmPassword"
           label="Potvrdenie hesla"
           type="password" />
       </div>
@@ -79,8 +79,8 @@ watch([password, confirm], () => {
         </p>
         <button
           :disabled="!canSubmit"
-          @click="change"
-          class="form-primary vertical-center col-start-1 sm:col-start-2">
+          class="form-primary vertical-center col-start-1 sm:col-start-2"
+          @click="change">
           <span>Zmeniť</span>
         </button>
       </div>

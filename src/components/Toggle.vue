@@ -37,8 +37,8 @@ watch(
 
 <template>
   <div
-    @click="!props.readonly && (checked = !checked)"
-    class="grid grid-cols-[auto_1fr] items-center h-12 px-4 gap-2 border-2 border-black border-dashed rounded-[1.25rem] cursor-pointer hover:border-solid">
+    class="grid grid-cols-[auto_1fr] items-center h-12 px-4 gap-2 border-2 border-black border-dashed rounded-[1.25rem] cursor-pointer hover:border-solid"
+    @click="!props.readonly && (checked = !checked)">
     <img :src="checked ? squareChecked : square" class="cursor-pointer w-5" />
     <p class="text-black mt-1 truncate">
       <span class="font-bold">{{ props.label }}</span>

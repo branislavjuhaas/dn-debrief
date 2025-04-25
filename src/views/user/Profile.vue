@@ -104,13 +104,13 @@ const logout = async () => {
         </div>
         <button
           v-if="userStore.provider === 'password'"
-          @click="router.push('/profile/edit')"
-          class="form-secondary vertical-center col-start-1 sm:col-start-2">
+          class="form-secondary vertical-center col-start-1 sm:col-start-2"
+          @click="router.push('/profile/edit')">
           <span>Zmeniť heslo</span>
         </button>
         <button
-          @click="logout"
-          class="form-primary vertical-center col-start-1 sm:col-start-3">
+          class="form-primary vertical-center col-start-1 sm:col-start-3"
+          @click="logout">
           <span>Odhlásiť sa</span>
         </button>
       </div>
@@ -122,8 +122,8 @@ const logout = async () => {
       <p>Prejsť na panel správy</p>
     </router-link>
     <a
-      href="https://dev.debrief.sda.sk"
       v-if="userStore.dev === true && !host.includes('dev')"
+      href="https://dev.debrief.sda.sk"
       to="/manage"
       class="alternative vertical-center w-full">
       <p>Otvoriť najnovšiu verziu pre členov Vývojového programu DN Cascade</p>

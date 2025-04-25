@@ -11,8 +11,8 @@ const props = defineProps({
 
 <template>
   <a
-    :href="'mailto:' + contact.email"
     :key="contact.id"
+    :href="'mailto:' + contact.email"
     class="flex flex-row border-2 border-black rounded-[1.25rem] px-5 justify-between py-2 hover:border-red">
     <div class="flex flex-row items-center gap-2">
       <img src="./../assets/icons/educator.svg" alt="" class="w-5 h-5" />

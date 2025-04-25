@@ -111,25 +111,25 @@ watch([email, name, surname, password, confirm], () => {
       class="flex flex-col justify-between w-full bg-white min-h-60 rounded-[1.25rem] p-5 gap-16">
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <field
-          name="email"
           v-model="email"
+          name="email"
           label="Email"
           type="text"
           class="col-span-1 sm:col-span-2" />
-        <field name="firstname" v-model="name" label="Meno" type="text" />
+        <field v-model="name" name="firstname" label="Meno" type="text" />
         <field
-          name="surname"
           v-model="surname"
+          name="surname"
           label="Priezvisko"
           type="text" />
         <field
-          name="newPassword"
           v-model="password"
+          name="newPassword"
           label="Heslo"
           type="password" />
         <field
-          name="confirmPassword"
           v-model="confirm"
+          name="confirmPassword"
           label="Potvrdenie hesla"
           type="password" />
       </div>
@@ -142,8 +142,8 @@ watch([email, name, surname, password, confirm], () => {
         </p>
         <button
           :disabled="!canSubmit"
-          @click="register"
-          class="form-primary vertical-center col-start-1 sm:col-start-2">
+          class="form-primary vertical-center col-start-1 sm:col-start-2"
+          @click="register">
           <span>Vytvoriť účet</span>
         </button>
       </div>

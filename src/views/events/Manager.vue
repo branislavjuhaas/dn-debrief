@@ -85,8 +85,8 @@ const filesRef = ref(null);
             { text: 'Podujatia', value: 'events' },
             { text: 'Súbory', value: 'files' },
           ]"
-          @update:model-value="setMode"
-          label="Zobraziť" />
+          label="Zobraziť"
+          @update:model-value="setMode" />
         <template v-if="mode === 'events'">
           <toggle v-model="onlyMyEvents" label="Len moje podujatia" />
           <router-link to="events/new" class="form-primary vertical-center">
@@ -113,9 +113,9 @@ const filesRef = ref(null);
       <files
         v-if="mode === 'files'"
         ref="filesRef"
-        :onlyMyFiles="onlyMyFiles"
+        :only-my-files="onlyMyFiles"
         :filter="filesFilter" />
-      <events v-else :onlyMyEvents="onlyMyEvents" />
+      <events v-else :only-my-events="onlyMyEvents" />
     </div>
   </div>
 </template>

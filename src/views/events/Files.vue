@@ -74,10 +74,10 @@ const removeFile = (file) => {
 <template>
   <div class="flex flex-col w-full gap-10">
     <a
-      :href="file.downloadURL"
-      target="_blank"
       v-for="file in filteredFiles"
       :key="file.name"
+      :href="file.downloadURL"
+      target="_blank"
       class="grid grid-cols-[1.25rem_5fr_2fr_0.7fr_auto] rounded-[1.25rem] px-5 gap-4">
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -95,12 +95,12 @@ const removeFile = (file) => {
         {{ formatSlovakDate(new Date(file.lastModified)) }}
       </p>
       <button
-        @click.prevent="removeFile(file)"
         :disabled="
           file.uploadedByUID !== useUserStore().uid &&
           ['developer', 'admin'].includes(useUserStore().role) === false
         "
-        class="cursor-pointer w-5 m-0 p-0 h-5">
+        class="cursor-pointer w-5 m-0 p-0 h-5"
+        @click.prevent="removeFile(file)">
         <img
           src="./../../assets/icons/trash.svg"
           alt="expand"

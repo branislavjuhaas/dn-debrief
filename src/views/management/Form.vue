@@ -107,24 +107,24 @@ const handleSubmit = async () => {
           <template v-if="!field.hidden">
             <Field
               v-if="field.type !== 'dropdown' && field.type !== 'toggle'"
-              :name="field.name"
               v-model.trim="fieldValues[field.name]"
+              :name="field.name"
               :label="field.title"
               :type="field.type"
               :required="!field.optional"
               :class="{ 'sm:col-span-2': hasOddFields && index === 0 }" />
             <Dropdown
               v-else-if="field.type === 'dropdown'"
-              :name="field.name"
               v-model.trim="fieldValues[field.name]"
+              :name="field.name"
               :label="field.title"
               :options="field.options || []"
               :required="!field.optional"
               :class="{ 'sm:col-span-2': hasOddFields && index === 0 }" />
             <Toggle
               v-else
-              :name="field.name"
               v-model="fieldValues[field.name]"
+              :name="field.name"
               :label="field.title"
               :class="{ 'sm:col-span-2': hasOddFields && index === 0 }" />
           </template>
@@ -135,8 +135,8 @@ const handleSubmit = async () => {
         class="grid grid-flow-col gap-4 items-center grid-rows-2 sm:grid-rows-1 sm:grid-cols-[1fr_auto]">
         <button
           :disabled="!canSubmit"
-          @click="handleSubmit"
-          class="form-primary vertical-center col-start-1 sm:col-start-2 row-start-2 sm:row-start-1">
+          class="form-primary vertical-center col-start-1 sm:col-start-2 row-start-2 sm:row-start-1"
+          @click="handleSubmit">
           <span>{{ props.edit ? "Uložiť úpravy" : "Vytvoriť" }}</span>
         </button>
       </div>

@@ -251,7 +251,7 @@ onMounted(async () => {
               alt="verified"
               class="h-12 -mt-1" />
           </div>
-          <div class="flex flex-row gap-2" v-if="usersLoaded">
+          <div v-if="usersLoaded" class="flex flex-row gap-2">
             <div class="flex flex-row h-5 gap-1">
               <p>{{ registeredUsers }}</p>
               <img
@@ -280,9 +280,9 @@ onMounted(async () => {
             </p>
           </div>
           <button
-            @click="exportAll"
             class="form-primary vertical-center row-start-1"
-            :disabled="exported">
+            :disabled="exported"
+            @click="exportAll">
             <span>Exportovať všetkých</span>
           </button>
         </div>

@@ -69,10 +69,10 @@ const googleLogin = async () => {
       class="flex flex-col justify-between w-full bg-white min-h-60 rounded-[1.25rem] p-5 gap-16">
       <div class="flex flex-col gap-4">
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <field name="email" v-model="email" label="Email" type="text" />
+          <field v-model="email" name="email" label="Email" type="text" />
           <field
-            name="password"
             v-model="password"
+            name="password"
             label="Heslo"
             type="password" />
         </div>
@@ -101,7 +101,7 @@ const googleLogin = async () => {
       </div>
     </div>
     <div class="grid grid-cols-1 gap-5 w-full sm:grid-cols-2">
-      <button @click="googleLogin" class="alternative vertical-center">
+      <button class="alternative vertical-center" @click="googleLogin">
         <span>Prihlásiť sa pomocou účtu Google</span>
       </button>
       <router-link to="/auth/register" class="alternative vertical-center">

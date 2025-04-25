@@ -113,13 +113,13 @@ const handleClick = (result) => {
     <img src="../assets/icons/search.svg" alt="search" class="h-5" />
     <input
       v-model="query"
-      @input="search"
-      @focusout="hideResults"
-      @focus="active = true"
       :disabled="user.uid == null || !user.role || user.role === 'user'"
       type="text"
       :placeholder="placeholder"
-      class="w-full outline-none bg-transparent placeholder-black mt-1 h-auto disabled:placeholder-grey" />
+      class="w-full outline-none bg-transparent placeholder-black mt-1 h-auto disabled:placeholder-grey"
+      @input="search"
+      @focusout="hideResults"
+      @focus="active = true" />
     <div
       v-if="active && searchResults.length > 0"
       id="searchResults"
@@ -128,8 +128,8 @@ const handleClick = (result) => {
         v-for="result in searchResults"
         :key="result.objectID"
         :to="result.link"
-        @click="handleClick(result)"
-        class="grid grid-cols-[auto_1fr] gap-3">
+        class="grid grid-cols-[auto_1fr] gap-3"
+        @click="handleClick(result)">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="20"

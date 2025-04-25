@@ -25,7 +25,7 @@ const navigate = () => {
     <div
       class="flex flex-col justify-between w-full bg-white min-h-60 rounded-[1.25rem] p-5 gap-16 transition-all">
       <div class="flex flex-col gap-4">
-        <field label="Cesta" v-model="route" @enter="navigate" />
+        <field v-model="route" label="Cesta" @enter="navigate" />
       </div>
       <div
         class="grid grid-flow-col gap-4 items-center grid-rows-2 sm:grid-rows-1 sm:grid-cols-[1fr_auto]">

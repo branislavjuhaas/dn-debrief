@@ -148,21 +148,21 @@ if (resetCode !== null) {
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <field
           v-if="!resetCode"
-          name="email"
           v-model="email"
+          name="email"
           label="Email"
           type="text"
           class="col-span-1 sm:col-span-2" />
         <field
           v-if="resetCode"
-          name="newPassword"
           v-model="password"
+          name="newPassword"
           label="Nové heslo"
           type="password" />
         <field
           v-if="resetCode"
-          name="confirmPassword"
           v-model="confirm"
+          name="confirmPassword"
           label="Potvrdenie hesla"
           type="password" />
       </div>
@@ -175,8 +175,8 @@ if (resetCode !== null) {
         </p>
         <button
           :disabled="!canSubmit"
-          @click="handleReset"
-          class="form-primary vertical-center col-start-1 sm:col-start-2">
+          class="form-primary vertical-center col-start-1 sm:col-start-2"
+          @click="handleReset">
           <span>{{ resetCode ? "Obnoviť heslo" : "Odoslať email" }}</span>
         </button>
       </div>

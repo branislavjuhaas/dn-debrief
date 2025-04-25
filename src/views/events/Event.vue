@@ -227,8 +227,8 @@ watch(
           <h6 class="font-bold">Popis podujatia</h6>
           <p
             id="event-description"
-            v-html="sanitizedDescription"
-            class="text-justify whitespace-pre-line"></p>
+            class="text-justify whitespace-pre-line"
+            v-html="sanitizedDescription"></p>
         </div>
         <div class="flex flex-col">
           <div id="schedule" class="flex flex-row flex-wrap max-w-full gap-12">
@@ -328,15 +328,15 @@ watch(
           </router-link>
         </p>
         <button
-          @click="showRules = !showRules"
-          class="form-secondary vertical-center col-start-1 gap-2 sm:col-start-2">
+          class="form-secondary vertical-center col-start-1 gap-2 sm:col-start-2"
+          @click="showRules = !showRules">
           <img :src="showRules ? up : down" alt="rules" class="w-5 h-5 !mt-0" />
           <span>Pravidlá registrácie</span>
         </button>
         <button
-          @click="register"
           class="form-primary vertical-center col-start-1 sm:col-start-3"
-          :disabled="message !== ''">
+          :disabled="message !== ''"
+          @click="register">
           <span>Registrovať sa</span>
         </button>
       </div>

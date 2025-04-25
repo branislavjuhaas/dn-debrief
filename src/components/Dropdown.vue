@@ -78,8 +78,8 @@ watch(
       <p
         v-for="option in visibleOptions"
         :key="option.value"
-        @click="value = option.value"
-        class="flex px-5 h-12 items-center cursor-pointer hover:text-red">
+        class="flex px-5 h-12 items-center cursor-pointer hover:text-red"
+        @click="value = option.value">
         {{ option.text }}
       </p>
     </div>

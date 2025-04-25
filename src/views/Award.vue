@@ -82,8 +82,8 @@ onMounted(() => {
               { text: 'Štandardné', value: 'standard' },
               { text: 'Legendárne', value: 'legendary' },
             ]"
-            :modelValue="isLegendary ? 'legendary' : 'standard'"
-            @update:modelValue="
+            :model-value="isLegendary ? 'legendary' : 'standard'"
+            @update:model-value="
               (value) => (isLegendary = value === 'legendary')
             " />
         </div>

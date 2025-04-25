@@ -246,36 +246,36 @@ const message = route.query.message || "";
       class="flex flex-col justify-between w-full bg-white min-h-60 rounded-[1.25rem] p-5 gap-16">
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Dropdown
+          v-model="selectedClubId"
           :label="'Debatný klub'"
           :options="clubs.map((club) => ({ text: club.name, value: club.id }))"
-          v-model="selectedClubId"
           :disabled="false" />
         <Field
-          name="address"
           v-model.trim="address"
+          name="address"
           label="Adresa bydliska"
           type="text"
           placeholder="Ventúrska 5, 811 01 Bratislava" />
         <Field
-          name="birthdate"
           v-model.trim="birthdate"
+          name="birthdate"
           label="Dátum narodenia"
           type="date" />
         <Field
-          name="phoneNumber"
           v-model.trim="phone"
+          name="phoneNumber"
           label="Telefónne číslo"
           type="tel" />
         <Field
           v-if="!adult"
-          name="supervisor"
           v-model.trim="supervisor"
+          name="supervisor"
           label="Celé meno zákonného zástupcu"
           type="text" />
         <Field
           v-if="!adult"
-          name="mail"
           v-model.trim="mail"
+          name="mail"
           label="E-mail zákonného zástupcu"
           type="email" />
       </div>
@@ -286,8 +286,8 @@ const message = route.query.message || "";
         </div>
         <button
           :disabled="!canSubmit"
-          @click="register"
-          class="form-primary vertical-center col-start-1 sm:col-start-2 row-start-2 sm:row-start-1">
+          class="form-primary vertical-center col-start-1 sm:col-start-2 row-start-2 sm:row-start-1"
+          @click="register">
           <span>Registrovať</span>
         </button>
       </div>

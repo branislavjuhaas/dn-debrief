@@ -67,13 +67,13 @@ const rejectCookies = async () => {
       <div
         class="grid grid-cols-2 sm:flex sm:flex-row gap-14 max-sm:pb-4 items-center w-full sm:w-auto">
         <button
-          @click="rejectCookies"
-          class="mt-1 flex hover:red max-sm:w-full items-center justify-center">
+          class="mt-1 flex hover:red max-sm:w-full items-center justify-center"
+          @click="rejectCookies">
           <span>Odmietnuť</span>
         </button>
         <button
-          @click="acceptCookies"
-          class="flex min-w-40 font-bold px-5 h-10 border-2 border-black rounded-[1.25rem] max-sm:w-full items-center justify-center duration-150 hover:bg-red hover:text-white vertical-center">
+          class="flex min-w-40 font-bold px-5 h-10 border-2 border-black rounded-[1.25rem] max-sm:w-full items-center justify-center duration-150 hover:bg-red hover:text-white vertical-center"
+          @click="acceptCookies">
           <span>Povoliť</span>
         </button>
       </div>

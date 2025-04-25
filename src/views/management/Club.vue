@@ -65,7 +65,7 @@ watch(
             useUserStore().role,
           ),
         }">
-        <field label="Filter" v-model="quickFilter" />
+        <field v-model="quickFilter" label="Filter" />
         <div
           class="flex flex-row justify-between h-12 w-full border-2 border-black rounded-[1.25rem] items-center px-5 vertical-center truncate">
           <p>
@@ -83,9 +83,9 @@ watch(
           <p v-if="club.zdp" class="font-bold">ZDP</p>
         </div>
         <router-link
+          v-if="['admin', 'developer'].includes(useUserStore().role)"
           :to="`/clubs/${clubId}/edit`"
-          class="form-primary vertical-center"
-          v-if="['admin', 'developer'].includes(useUserStore().role)">
+          class="form-primary vertical-center">
           <span>Upraviť</span>
         </router-link>
       </div>
@@ -97,9 +97,9 @@ watch(
         </div>
         <router-link
           v-for="(member, index) in filteredMembers"
+          v-if="['admin', 'developer'].includes(useUserStore().role)"
           :key="`admin-${member.id}`"
           :to="`/profile/${member.id}`"
-          v-if="['admin', 'developer'].includes(useUserStore().role)"
           :style="{ '--delay': index * 0.035 + 's' }"
           class="grid grid-cols-3 items-center gap-4 rounded-[1.25rem] fade-in fly-in opacity-0"
           :class="{
@@ -118,8 +118,8 @@ watch(
           </p>
         </router-link>
         <div
-          v-else
           v-for="(member, index) in filteredMembers"
+          v-else
           :key="member.id"
           :style="{ '--delay': index * 0.035 + 's' }"
           class="grid grid-cols-3 items-center gap-4 rounded-[1.25rem] fade-in fly-in opacity-0"

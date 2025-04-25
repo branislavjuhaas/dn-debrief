@@ -110,8 +110,8 @@ const createClub = async () => {
       <div class="flex flex-col gap-4">
         <router-link
           v-for="(club, index) in clubs"
-          :to="'/clubs/' + club.id"
           :key="club.id"
+          :to="'/clubs/' + club.id"
           :style="{ '--delay': index * 0.035 + 's' }"
           class="grid grid-cols-[3fr_1fr_1fr_1fr] items-center cursor-pointer gap-4 rounded-[1.25rem] duration-100 hover:text-red fade-in fly-in opacity-0">
           <p class="truncate">{{ club.name }}</p>

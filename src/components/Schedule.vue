@@ -360,22 +360,22 @@ const endDrag = (day) => {
         <div class="grid grid-cols-[1fr_auto] h-5 items-start mb-4">
           <div class="flex flex-row items-start">
             <button
+              v-if="schedule.days.length > 1"
+              class="p-0 m-0 h-min disabled:opacity-50"
+              :disabled="(index === 0 && day.offset <= 0) || day.offset <= -1"
               @click="
                 day.offset--;
                 emitChange();
-              "
-              class="p-0 m-0 h-min disabled:opacity-50"
-              :disabled="(index === 0 && day.offset <= 0) || day.offset <= -1"
-              v-if="schedule.days.length > 1">
+              ">
               <img src="./../assets/icons/v-left.svg" alt="<" class="w-5" />
             </button>
             <button
+              v-if="schedule.days.length > 1"
+              class="p-0 m-0 h-min"
               @click="
                 day.offset++;
                 emitChange();
-              "
-              class="p-0 m-0 h-min"
-              v-if="schedule.days.length > 1">
+              ">
               <img src="./../assets/icons/v-right.svg" alt=">" class="w-5" />
             </button>
             <p class="font-bold text-black ml-2 h-min">
@@ -385,9 +385,9 @@ const endDrag = (day) => {
             </p>
           </div>
           <button
-            @click="removeDay(index)"
+            v-if="schedule.days.length > 1"
             class="p-0 m-0"
-            v-if="schedule.days.length > 1">
+            @click="removeDay(index)">
             <img src="./../assets/icons/cross.svg" alt="x" class="w-5" />
           </button>
         </div>
@@ -444,24 +444,24 @@ const endDrag = (day) => {
                 }
               " />
             <button
-              @click="removePoint(day, pointIndex)"
+              v-if="day.points.length > 1"
               class="w-5"
-              v-if="day.points.length > 1">
+              @click="removePoint(day, pointIndex)">
               <img src="./../assets/icons/cross.svg" alt="x" class="w-5" />
             </button>
           </div>
           <button
-            @click="addPoint(day)"
             :disabled="!canAddPoint(day)"
-            class="flex bg-red text-white p-1.5 px-4 rounded-[0.75rem] items-center justify-center hover:bg-black disabled:border-dashed disabled:border-2 disabled:border-black disabled:bg-white disabled:text-grey disabled:cursor-default">
+            class="flex bg-red text-white p-1.5 px-4 rounded-[0.75rem] items-center justify-center hover:bg-black disabled:border-dashed disabled:border-2 disabled:border-black disabled:bg-white disabled:text-grey disabled:cursor-default"
+            @click="addPoint(day)">
             <span>Pridať bod</span>
           </button>
         </div>
       </div>
       <div class="w-[2px] bg-black h-full rounded-full shrink-0"></div>
       <p
-        @click="addDay"
-        class="flex flex-row text-black font-bold cursor-pointer h-min gap-2 text-nowrap mr-5">
+        class="flex flex-row text-black font-bold cursor-pointer h-min gap-2 text-nowrap mr-5"
+        @click="addDay">
         <img src="./../assets/icons/plus.svg" alt="+" class="w-5 -mt-1" />
         Pridať deň
       </p>

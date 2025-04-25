@@ -172,9 +172,9 @@ onMounted(() => {
         <p class="text-white">?</p>
         <input
           v-model="command"
+          class="text-white bg-black text-normal w-full px-2 border-0 focus-border-0"
           @keyup.enter="executeCommand()"
-          @keydown="handleKeyDown"
-          class="text-white bg-black text-normal w-full px-2 border-0 focus-border-0" />
+          @keydown="handleKeyDown" />
       </div>
     </div>
   </div>

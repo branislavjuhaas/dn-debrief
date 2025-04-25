@@ -52,7 +52,7 @@ onMounted(async () => {
       class="flex flex-col w-full text-black bg-white min-h-60 rounded-[1.25rem] p-5 gap-8 transition-all">
       <div class="flex flex-col gap-4">
         <div class="grid sm:grid-cols-2 gap-4">
-          <field label="Filter" v-model="quickFilter" />
+          <field v-model="quickFilter" label="Filter" />
           <!-- Add filter input -->
           <router-link to="/feed/new" class="form-primary vertical-center">
             <span>Vytvoriť príspevok</span>
@@ -81,8 +81,8 @@ onMounted(async () => {
             <img src="./../../assets/icons/edit.svg" alt="delete" class="w-5" />
           </router-link>
           <button
-            @click="deleteExistingMessage(message.id)"
-            class="w-5 h-5 col-start-2 md:col-start-3 row-start-2 -mt-1">
+            class="w-5 h-5 col-start-2 md:col-start-3 row-start-2 -mt-1"
+            @click="deleteExistingMessage(message.id)">
             <img
               src="./../../assets/icons/cross.svg"
               alt="delete"

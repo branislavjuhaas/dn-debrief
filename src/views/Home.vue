@@ -215,8 +215,8 @@ const imageLoaded = ref(false);
       v-if="userFeed.header"
       class="text-base flex relative font-bold mt-2 h-[14.375rem] w-full rounded-[1.25rem] bg-[#0f2544] overflow-hidden">
       <button
-        @click="dismissHeader"
-        class="absolute w-8 h-8 overflow-hidden cursor-pointer transition-all duration-200 flex top-4 gap-2 left-4 z-10 bg-white/25 rounded-lg p-1.5 hover:w-[7.4rem]">
+        class="absolute w-8 h-8 overflow-hidden cursor-pointer transition-all duration-200 flex top-4 gap-2 left-4 z-10 bg-white/25 rounded-lg p-1.5 hover:w-[7.4rem]"
+        @click="dismissHeader">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="20"
@@ -244,11 +244,11 @@ const imageLoaded = ref(false);
       <img
         src="../assets/dn-banner.webp"
         alt="event"
-        @load="imageLoaded = true"
         :class="[
           'w-full h-full object-cover rounded-[1.25rem] opacity-0',
           { 'events-placeholder': imageLoaded },
-        ]" />
+        ]"
+        @load="imageLoaded = true" />
       <p
         class="absolute bottom-2 left-[1.125rem] truncate max-w-[calc(100%-2.25rem)]">
         {{

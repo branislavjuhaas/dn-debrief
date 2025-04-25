@@ -446,8 +446,8 @@ const updateUserDevStatus = async (newValue) => {
             class="flex flex-row gap-8 overflow-x-auto scrollbar-hidden">
             <router-link
               v-for="(award, index) in userAwards"
-              :to="'/awards/' + award.id"
               :key="award.id"
+              :to="'/awards/' + award.id"
               class="relative"
               @contextmenu="handleRightClick($event, award)">
               <svg
@@ -498,26 +498,26 @@ const updateUserDevStatus = async (newValue) => {
             v-if="
               userPending && ['admin', 'developer'].includes(userStore.role)
             "
-            @click="resendConfirmationEmail"
-            class="form-secondary vertical-center col-start-1">
+            class="form-secondary vertical-center col-start-1"
+            @click="resendConfirmationEmail">
             <span>Poslať overenie</span>
           </button>
           <button
             v-if="
               userPending && ['admin', 'developer'].includes(userStore.role)
             "
-            @click="confirmRegistration"
-            class="form-secondary vertical-center col-start-1 sm:col-start-2">
+            class="form-secondary vertical-center col-start-1 sm:col-start-2"
+            @click="confirmRegistration">
             <span>Potvrdiť registráciu</span>
           </button>
 
           <!-- New toggle for developer -->
           <toggle
             v-if="userRole && !userPending && userStore.role === 'developer'"
+            v-model="isDev"
             class="col-start-1 sm:col-start-1"
             label="Člen/-ka VpDNC"
-            v-model="isDev"
-            @update:modelValue="updateUserDevStatus" />
+            @update:model-value="updateUserDevStatus" />
 
           <toggle
             v-if="
@@ -526,16 +526,15 @@ const updateUserDevStatus = async (newValue) => {
               !userPending &&
               ['admin', 'developer'].includes(userStore.role)
             "
+            v-model="isClubManager"
             class="col-span-1 sm:col-start-2"
             label="Správca/-kyňa klubu"
-            v-model="isClubManager"
-            @update:modelValue="updateClubManagerStatus" />
+            @update:model-value="updateClubManagerStatus" />
           <dropdown
             v-if="userRole && ['admin', 'developer'].includes(userStore.role)"
+            v-model="userRole"
             class="col-start-1 col-span-1 sm:col-start-3 sm:col-span-2"
             label="Funkcia"
-            v-model="userRole"
-            @update:modelValue="updateUserRole"
             :disabled="userRole === 'developer' && userStore.role === 'admin'"
             :options="[
               { text: 'Vývojár', value: 'developer', hidden: true },
@@ -546,7 +545,8 @@ const updateUserDevStatus = async (newValue) => {
               { text: 'Organizátor/-ka', value: 'organizer' },
               { text: 'Junior organizátor/-ka', value: 'junior' },
               { text: 'Tézový výbor', value: 'motion' },
-            ]" />
+            ]"
+            @update:model-value="updateUserRole" />
         </div>
       </div>
     </div>

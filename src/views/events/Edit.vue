@@ -457,18 +457,18 @@ const submit = async (draft) => {
       <Field
         v-model="name"
         label="Názov"
-        @keyup="handName = true"
-        placeholder="3. západoslovenský regionálny turnaj" />
+        placeholder="3. západoslovenský regionálny turnaj"
+        @keyup="handName = true" />
       <div class="flex flex-col sm:grid sm:grid-cols-[auto_1fr] gap-4">
         <div
           class="self-center overflow-hidden rounded-[1.25rem] w-[26.875rem] max-w-full">
           <thumbnail
+            :id="id"
             ref="thumbnailRef"
             :name="name"
             :beginning-date="beginning"
             :end-date="ending"
             :city="city"
-            :id="id"
             :thumbnail-path="presetThumbnail"
             :disabled="edit" />
         </div>
@@ -490,9 +490,9 @@ const submit = async (draft) => {
         type="number"
         placeholder="30" />
       <Field
+        v-if="tournament"
         v-model="motion"
         label="Pripravovaná téza"
-        v-if="tournament"
         placeholder="Všetky tézy tohoto turnaja sú improvizované" />
       <Field v-model="deadline" label="Deadline na registráciu" type="date" />
       <Schedule v-model="schedule" :beginning="beginning" />

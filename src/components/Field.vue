@@ -80,28 +80,28 @@ watch(
     <textarea
       v-if="props.type === 'multiline'"
       ref="inputRef"
+      v-model="value"
       :name="props.name"
       :readonly="props.readonly"
       class="w-full h-[calc(100%-1rem)] my-2 outline-none bg-transparent text-black placeholder-grey resize-none"
       :placeholder="props.placeholder"
-      v-model="value"
-      @keydown.enter="handleEnter"
-      rows="3" />
+      rows="3"
+      @keydown.enter="handleEnter" />
     <!-- Render input for other types -->
     <input
       v-else
+      ref="inputRef"
+      v-model="value"
       :type="showPassword ? 'text' : props.type"
       :readonly="props.readonly"
-      ref="inputRef"
       class="w-full outline-none bg-transparent h-auto text-black placeholder-grey"
       :placeholder="props.placeholder"
-      v-model="value"
       @keydown.enter="handleEnter" />
     <img
       v-if="props.type === 'password'"
       :src="showPassword ? eyeCrossed : eye"
-      @click="togglePassword"
-      class="cursor-pointer w-5" />
+      class="cursor-pointer w-5"
+      @click="togglePassword" />
   </div>
 </template>
 
