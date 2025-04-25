@@ -252,6 +252,7 @@ const datesAggregate = () => {
 }
 
 input[type="range"] {
+  appearance: none;
   -webkit-appearance: none;
   background: #00e0ff;
   height: 4px;
