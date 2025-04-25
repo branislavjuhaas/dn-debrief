@@ -4,7 +4,7 @@ import { useRoute } from "vue-router";
 import { translateAwardCategory } from "../translate.js";
 import { getAwardById } from "../firebase/awards.js";
 import { useUserStore } from "../stores.js";
-import Dropdown from "../components/Dropdown.vue";
+import DropDown from "../components/DropDown.vue";
 
 // State variables
 const award = ref(null);
@@ -74,7 +74,7 @@ onMounted(() => {
           </p>
         </div>
         <div class="flex justify-end">
-          <Dropdown
+          <DropDown
             class="w-full"
             :name="'awardType'"
             :label="'Typ ocenenia'"

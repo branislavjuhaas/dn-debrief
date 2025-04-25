@@ -4,31 +4,44 @@ import { ref, watch, computed } from "vue";
 
 // Define the props that this component accepts
 const props = defineProps({
-  name: String,
-  label: String,
+  name: {
+    type: String,
+    default: "dropdown",
+  },
+  label: {
+    type: String,
+    default: "Label",
+  },
   options: {
     type: Array,
     required: true,
   },
   disabled: Boolean,
-  modelValue: [String, Number],
+  modelValue: {
+    type: [String, Number],
+    default: "",
+  },
 });
 
 // Define a ref to control the dropdown expansion
 const expand = ref(false);
 
 // Define a ref to hold the current value of the dropdown
-const value = ref(props.modelValue || '');
+const value = ref(props.modelValue || "");
 
 // Computed property to get the display text
 const selectedText = computed(() => {
-  const selectedOption = Array.isArray(props.options) ? props.options.find(option => option.value === value.value) : null;
-  return selectedOption ? selectedOption.text : '';
+  const selectedOption = Array.isArray(props.options)
+    ? props.options.find((option) => option.value === value.value)
+    : null;
+  return selectedOption ? selectedOption.text : "";
 });
 
 // Computed property to filter out hidden options
 const visibleOptions = computed(() => {
-  return Array.isArray(props.options) ? props.options.filter(option => !option.hidden) : [];
+  return Array.isArray(props.options)
+    ? props.options.filter((option) => !option.hidden)
+    : [];
 });
 
 // Define the events that this component emits
