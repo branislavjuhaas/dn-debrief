@@ -10,6 +10,7 @@ export default [
   {
     rules: {
       "vue/multi-word-component-names": "off",
+      "vue/no-v-html": "off",
     },
     languageOptions: {
       sourceType: "module",
