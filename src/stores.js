@@ -156,6 +156,17 @@ export const useUserStore = defineStore("user", {
       this.cookies = cookies || null;
     },
     /**
+     * Update user data in the store.
+     * @param {Object} userData - Partial or full user data to update.
+     */
+    updateUser(userData) {
+      Object.keys(userData).forEach((key) => {
+        if (key in this) {
+          this[key] = userData[key];
+        }
+      });
+    },
+    /**
      * Log out the user.
      */
     logOut() {

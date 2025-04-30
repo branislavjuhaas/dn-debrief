@@ -53,7 +53,7 @@ const logout = async () => {
         </router-link>
       </div>
       <div
-        class="grid grid-flow-col gap-4 items-center sm:grid-rows-1 sm:grid-cols-[1fr_auto_auto]">
+        class="grid grid-flow-col gap-4 items-center sm:grid-rows-1 sm:grid-cols-[1fr_auto]">
         <div class="col-start-1 w-full">
           <div
             v-if="
@@ -102,17 +102,23 @@ const logout = async () => {
             </router-link>
           </div>
         </div>
-        <button
-          v-if="userStore.provider === 'password'"
-          class="form-secondary vertical-center col-start-1 sm:col-start-2"
-          @click="router.push('/users/me/reset')">
-          <span>Zmeniť heslo</span>
-        </button>
-        <button
-          class="form-primary vertical-center col-start-1 sm:col-start-3"
-          @click="logout">
-          <span>Odhlásiť sa</span>
-        </button>
+        <div
+          class="flex flex-col sm:flex-row gap-4 items-center w-full sm:w-auto">
+          <button
+            v-if="userStore.provider === 'password'"
+            class="form-secondary vertical-center"
+            @click="router.push('/users/me/reset')">
+            <span>Zmeniť heslo</span>
+          </button>
+          <router-link
+            to="/users/me/edit"
+            class="form-secondary vertical-center">
+            <span>Upraviť profil</span>
+          </router-link>
+          <button class="form-primary vertical-center" @click="logout">
+            <span>Odhlásiť sa</span>
+          </button>
+        </div>
       </div>
     </div>
     <router-link

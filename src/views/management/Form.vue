@@ -2,18 +2,27 @@
 import Field from "../../components/Field.vue";
 import DropDown from "../../components/DropDown.vue";
 import Toggle from "../../components/Toggle.vue";
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import {
   getComponent,
   updateComponent,
   createComponent,
 } from "../../firebase/structure.js";
+import { useUserStore } from "../../stores.js";
+
+// Watch for changes in userstore.uid and load the document if it changes
+const userStore = useUserStore();
 
 const props = defineProps({
   collection: {
     type: String,
     required: true,
+  },
+  id: {
+    type: String,
+    required: false,
+    default: null,
   },
   edit: {
     type: Boolean,
@@ -31,6 +40,20 @@ const props = defineProps({
     },
   },
 });
+
+const getCurrentId = () => {
+  const route = useRoute();
+
+  const id = props.id || route.params.id;
+
+  // If the id is 'me', return the current user's uid
+  if (props.collection === "users" && id === "me") {
+    const user = userStore;
+    return user.uid;
+  }
+
+  return id;
+};
 
 // Create reactive refs for all field values
 const fieldValues = ref({});
@@ -61,35 +84,58 @@ const hasOddFields = computed(
   () => props.fields.filter((field) => !field.hidden).length % 2 !== 0,
 );
 
-const route = useRoute();
+const loadEditedDocument = async () => {
+  const id = getCurrentId();
+  let component = null;
+
+  if (props.collection === "users" && props.id === "me") {
+    component = userStore;
+  } else {
+    component = await getComponent(props.collection, id);
+  }
+
+  if (component) {
+    props.fields.forEach((field) => {
+      if (!field.hidden) {
+        fieldValues.value[field.name] =
+          component[field.name] !== undefined
+            ? component[field.name]
+            : field.defaultValue || "";
+      } else {
+        fieldValues.value[field.name] =
+          component[field.name] !== undefined
+            ? component[field.name]
+            : field.defaultValue || null;
+      }
+    });
+  }
+};
+
 const router = useRouter();
 
 if (props.edit) {
-  const id = route.params.id;
+  const id = getCurrentId();
   onMounted(async () => {
-    const component = await getComponent(props.collection, id);
-    if (component) {
-      props.fields.forEach((field) => {
-        if (!field.hidden) {
-          fieldValues.value[field.name] =
-            component[field.name] !== undefined
-              ? component[field.name]
-              : field.defaultValue || "";
-        } else {
-          fieldValues.value[field.name] =
-            component[field.name] !== undefined
-              ? component[field.name]
-              : field.defaultValue || null;
-        }
-      });
-    }
+    await loadEditedDocument();
   });
 }
+
+watch(
+  () => userStore.uid,
+  (newUid) => {
+    if (newUid && props.edit) {
+      loadEditedDocument();
+    }
+  },
+);
 
 // Handle form submission
 const handleSubmit = async () => {
   if (props.edit) {
-    await updateComponent(props.collection, route.params.id, fieldValues.value);
+    await updateComponent(props.collection, getCurrentId(), fieldValues.value);
+
+    if (!(props.collection === "users" && props.id === "me")) return;
+    userStore.updateUser(fieldValues.value);
   } else {
     await createComponent(props.collection, fieldValues.value);
   }
