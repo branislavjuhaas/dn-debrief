@@ -99,7 +99,7 @@ watch(
           <router-link
             v-for="(member, index) in filteredMembers"
             :key="`admin-${member.id}`"
-            :to="`/profile/${member.id}`"
+            :to="`/users/${member.id}`"
             :style="{ '--delay': index * 0.035 + 's' }"
             class="grid grid-cols-3 items-center gap-4 rounded-[1.25rem] fade-in fly-in opacity-0"
             :class="{

@@ -24,7 +24,7 @@ const userStore = useUserStore();
 
 // Redirect to profile if the user is viewing their own profile
 if (userStore.uid === route.params.uid) {
-  router.push("/profile");
+  router.push("/users/me");
 }
 
 const userData = ref([]);

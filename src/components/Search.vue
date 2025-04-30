@@ -64,7 +64,7 @@ const search = async () => {
           let display, link;
           if (index === 0) {
             display = `${hit.name} ${hit.surname}`;
-            link = "/profile/" + hit.path.split("/")[1];
+            link = "/users/" + hit.path.split("/")[1];
           } else if (index === 1) {
             display = hit.name;
             link = "/clubs/" + hit.path.split("/")[1];

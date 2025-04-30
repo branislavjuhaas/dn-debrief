@@ -291,11 +291,12 @@ onMounted(async () => {
           <p class="truncate">Meno a priezvisko</p>
           <p class="truncate">Stav registrácie</p>
         </div>
-        <div class="flex flex-col text-left truncate gap-4 w-full h-auto overflow-y-auto scrollbar-hidden">
+        <div
+          class="flex flex-col text-left truncate gap-4 w-full h-auto overflow-y-auto scrollbar-hidden">
           <router-link
             v-for="(user, index) in recentUsers"
             :key="user.uid"
-            :to="`/profile/${user.id}`"
+            :to="`/users/${user.id}`"
             :style="{ '--delay': index * 0.035 + 's' }"
             class="grid grid-cols-3 gap-4 truncate fade-in fly-in opacity-0">
             <p class="truncate">{{ user.id }}</p>
@@ -330,13 +331,23 @@ onMounted(async () => {
 
 /* New Animations */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes flyIn {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .fade-in {

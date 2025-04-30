@@ -39,7 +39,7 @@ interface MessageFilters {
 - **`message`** (`string`): The descriptive body text of the message.
 - **`link`** (`string | null`): An optional URL associated with the message. If present, the message component will act as a link.
 - **`local`** (`boolean`): Determines how the `link` is handled:
-  - `true`: The `link` is treated as an internal application route (e.g., `/profile`, `/events/some-event-id`) and navigation is handled by the Vue router.
+  - `true`: The `link` is treated as an internal application route (e.g., `/users/me`, `/events/some-event-id`) and navigation is handled by the Vue router.
   - `false`: The `link` is treated as an external URL (e.g., `https://sda.sk`, `mailto:info@sda.sk`) and is opened in a new browser tab.
 - **`filters`** (`MessageFilters`, Optional): An object defining targeting rules for cloud-based messages. This field is **not** present on locally defined messages.
   - **`filters.member`** (`boolean`): If `true`, the message targets users who _are_ SDA members. If `false`, it targets users who are _not_ members, or it can be interpreted as targeting _all_ users depending on the query logic (current logic uses `false` to mean "target non-members or everyone").

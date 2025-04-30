@@ -27,22 +27,43 @@ const routes = [
     meta: { title: "Obnovenie hesla" },
   },
   {
-    path: "/profile",
+    path: "/users/me",
     name: "Profile",
     component: () => import("./views/user/Profile.vue"),
     meta: { title: "Profil", requiresAuth: true },
   },
   {
-    path: "/profile/edit",
+    path: "/users/me/reset",
     name: "Edit",
     component: () => import("./views/user/Edit.vue"),
     meta: { title: "Zmena hesla", requiresAuth: true },
   },
   {
-    path: "/profile/:uid",
+    path: "/users/:uid",
     name: "User",
     component: () => import("./views/management/User.vue"),
     meta: { title: "Profil používateľa", requiresAuth: true },
+  },
+  {
+    path: "/users/:uid/edit",
+    name: "EditUser",
+    component: () => import("./views/management/Form.vue"),
+    props: {
+      collection: "users",
+      edit: true,
+      title: "Upraviť používateľa",
+      fields: [
+        { name: "name", title: "Meno", type: "text" },
+        { name: "email", title: "E-mail", type: "text" },
+        { name: "role", title: "Rola", type: "select" },
+        { name: "club", title: "Klub", type: "select" },
+        { name: "active", title: "Aktívny", type: "toggle" },
+      ],
+    },
+    meta: {
+      title: "Upraviť používateľa",
+      requiresAuth: true,
+    },
   },
   {
     path: "/join",

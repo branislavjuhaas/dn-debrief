@@ -105,7 +105,7 @@ const logout = async () => {
         <button
           v-if="userStore.provider === 'password'"
           class="form-secondary vertical-center col-start-1 sm:col-start-2"
-          @click="router.push('/profile/edit')">
+          @click="router.push('/users/me/reset')">
           <span>Zmeniť heslo</span>
         </button>
         <button

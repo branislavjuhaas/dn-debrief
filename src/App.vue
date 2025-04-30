@@ -279,7 +279,7 @@ onMounted(() => {
             (currentRoute.fullPath ? `?then=${currentRoute.fullPath}` : ""),
         );
       } else if (to.meta.anonymousOnly && userStore.uid) {
-        next("/profile");
+        next("/users/me");
       } else if (to.meta.roles && !to.meta.roles.includes(userStore.role)) {
         next("/unauthorized");
       } else {
