@@ -92,7 +92,7 @@ const handleUserCreation = async (user, userData) => {
     // Set the user data
     userStore.setUser(
       user.uid,
-      user.providerData[0].providerId,
+      user.providerData.map((p) => p.providerId).join(":"),
       user.email,
       user.displayName.substring(0, user.displayName.lastIndexOf(" ")),
       user.displayName.substring(user.displayName.lastIndexOf(" ") + 1),
@@ -127,7 +127,7 @@ const handleUserCreation = async (user, userData) => {
   // If userData is provided, set the user data
   userStore.setUser(
     user.uid,
-    user.providerData[0].providerId,
+    user.providerData.map((p) => p.providerId).join(":"),
     user.email,
     userData.name,
     userData.surname,

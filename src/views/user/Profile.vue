@@ -103,19 +103,24 @@ const logout = async () => {
           </div>
         </div>
         <div
-          class="flex flex-col sm:flex-row gap-4 items-center w-full sm:w-auto">
+          class="flex flex-col sm:flex-row col-start-1 sm:col-start-2 gap-4 items-center w-full sm:w-auto">
           <button
-            v-if="userStore.provider === 'password'"
-            class="form-secondary vertical-center"
+            v-if="
+              userStore.provider &&
+              userStore.provider.toLowerCase().includes('password')
+            "
+            class="form-secondary vertical-center max-sm:w-full"
             @click="router.push('/users/me/reset')">
             <span>Zmeniť heslo</span>
           </button>
           <router-link
             to="/users/me/edit"
-            class="form-secondary vertical-center">
+            class="form-secondary vertical-center max-sm:w-full">
             <span>Upraviť profil</span>
           </router-link>
-          <button class="form-primary vertical-center" @click="logout">
+          <button
+            class="form-primary vertical-center max-sm:w-full"
+            @click="logout">
             <span>Odhlásiť sa</span>
           </button>
         </div>
@@ -128,7 +133,10 @@ const logout = async () => {
       <p>Prejsť na panel správy</p>
     </router-link>
     <a
-      v-if="userStore.dev === true && !host.includes('dev')"
+      v-if="
+        userStore.dev === true &&
+        !(host.includes('dev') || host.includes('localhost'))
+      "
       href="https://dev.debrief.sda.sk"
       to="/manage"
       class="alternative vertical-center w-full">
