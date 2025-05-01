@@ -354,7 +354,7 @@ const endDrag = (day) => {
 <template>
   <div
     class="flex flex-col px-5 py-3 min-h-60 w-full border-2 border-black rounded-[1.25rem] gap-4">
-    <h2 class="text-black font-bold">Harmonogram podujatia</h2>
+    <h6 class="mb-0 text-black font-bold">Harmonogram podujatia</h6>
     <div class="flex flex-row overflow-x-auto scrollbar-hidden gap-4">
       <div
         v-for="(day, index) in schedule.days"

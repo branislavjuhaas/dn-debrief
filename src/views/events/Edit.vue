@@ -205,6 +205,7 @@ const updateEvent = async (eventId) => {
   await nextTick(() => {
     id.value = event.id;
     name.value = event.name;
+    handName.value = true;
     beginning.value = event.beginningDate.toISOString().split("T")[0];
     description.value = event.description;
     city.value = event.city;
@@ -216,7 +217,7 @@ const updateEvent = async (eventId) => {
     presetThumbnail.value = event.thumbnail;
     presetOriginalThumbnail.value = event.originalThumbnail;
     eventOrganizers.value = event.organizers;
-    tournament.value = event.id.startsWith("S"); // Assuming tournament IDs start with 'S'
+    tournament.value = event.motion !== null;
     link.value = event.link;
     draft.value = event.draft || false;
   });
@@ -504,7 +505,7 @@ const submit = async (draft) => {
       <Schedule v-model="schedule" :beginning="beginning" />
       <div
         class="flex flex-col w-full h-max-60 border-black border-2 rounded-[1.25rem] px-5 py-3 text-black gap-4">
-        <h2 class="font-bold">Organizátori/-ky podujatia</h2>
+        <h6 class="font-bold mb-0">Organizátori/-ky podujatia</h6>
         <div class="grid grid-cols-[repeat(auto-fill,minmax(20rem,1fr))] gap-4">
           <div v-for="organizer in potentialOrganizers" :key="organizer.uid">
             <toggle
