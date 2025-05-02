@@ -99,6 +99,18 @@ export const relevantEvents = async () => {
       event.originalThumbnail = event.thumbnail;
       event.thumbnail = await getThumbnail(event.thumbnail);
     }
+
+    // Process sponsors - convert file names to download URLs
+    if (event.sponsors && event.sponsors.length > 0) {
+      event.sponsors = await Promise.all(
+        event.sponsors.map(async (sponsor) => {
+          return {
+            original: sponsor,
+            url: await getEventFile(sponsor),
+          };
+        }),
+      );
+    }
   }
 
   // Use the event store to initialize the events
@@ -189,8 +201,22 @@ export const getPotentialOrganizers = async () => {
  */
 export const setEvent = async (event) => {
   try {
-    await setDoc(doc(db, "events", event.id), event);
-    console.log(`Event ${event.id} set successfully`);
+    // Create a copy of the event to avoid modifying the original
+    const eventToSave = { ...event };
+
+    if (eventToSave.sponsors && eventToSave.sponsors.length > 0) {
+      if (
+        typeof eventToSave.sponsors[0] === "object" &&
+        eventToSave.sponsors[0].original
+      ) {
+        eventToSave.sponsors = eventToSave.sponsors.map(
+          (sponsor) => sponsor.original,
+        );
+      }
+    }
+
+    await setDoc(doc(db, "events", eventToSave.id), eventToSave);
+    console.log(`Event ${eventToSave.id} set successfully`);
   } catch (error) {
     console.error("Error setting event:", error);
   }
@@ -235,6 +261,18 @@ export const getFirebaseEvent = async (eventId) => {
       event.thumbnail = await getThumbnail(event.thumbnail);
     }
 
+    // Process sponsors - convert file names to download URLs
+    if (event.sponsors && event.sponsors.length > 0) {
+      event.sponsors = await Promise.all(
+        event.sponsors.map(async (sponsor) => {
+          return {
+            original: sponsor,
+            url: await getEventFile(sponsor),
+          };
+        }),
+      );
+    }
+
     return event;
   } else {
     return null;
@@ -269,22 +307,21 @@ export const uploadEventFile = async (file, userId, userFullName) => {
   // Check if file already exists
   try {
     await getMetadata(fileRef);
-    // File exists, add random string to name
-    const randomStr = Date.now().toString(36);
-    const fileExt = fileName.includes(".") ? fileName.split(".").pop() : "";
-    const baseName = fileName.includes(".")
-      ? fileName.substring(0, fileName.lastIndexOf("."))
-      : fileName;
-
-    fileName = `${baseName}_${randomStr}${fileExt ? "." + fileExt : ""}`;
+    // File exists, generate a unique name
+    const timestamp = Date.now().toString(36);
+    const dotIndex = fileName.lastIndexOf(".");
+    const baseName =
+      dotIndex !== -1 ? fileName.substring(0, dotIndex) : fileName;
+    const ext = dotIndex !== -1 ? fileName.substring(dotIndex) : "";
+    fileName = `${baseName}_${timestamp}${ext}`;
     filePath = `events/files/${fileName}`;
     fileRef = ref(storage, filePath);
   } catch (error) {
-    // If error is "object-not-found", file doesn't exist which is fine
     if (error.code !== "storage/object-not-found") {
       console.error("Error checking file existence:", error);
       throw error;
     }
+    // File does not exist, proceed as normal
   }
 
   try {
@@ -312,8 +349,13 @@ export const uploadEventFile = async (file, userId, userFullName) => {
  */
 export const getEventFile = async (filename) => {
   const storage = getStorage();
-  const fileRef = ref(storage, `events/files/${filename}`);
-  return await getDownloadURL(fileRef);
+  try {
+    const fileRef = ref(storage, `events/files/${filename}`);
+    return await getDownloadURL(fileRef);
+  } catch (error) {
+    console.error("Error getting event file:", error);
+    return null;
+  }
 };
 
 /**

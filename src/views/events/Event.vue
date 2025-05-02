@@ -155,17 +155,6 @@ const fetchEvent = async (id) => {
   if (!event.value) {
     await router.push({ name: "NotFound" });
   }
-
-  event.value.sponsors = await Promise.all(
-    event.value.sponsors.map(async (sponsor) => {
-      return {
-        original: sponsor,
-        url: await getEventFile(sponsor),
-      };
-    }),
-  );
-
-  console.log(event.value.sponsors);
 };
 
 /**
