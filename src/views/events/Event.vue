@@ -268,7 +268,10 @@ watch(
               :contact="organizer" />
           </div>
         </div>
-        <div v-if="event?.sponsors" id="sponsors" class="flex flex-col gap-2">
+        <div
+          v-if="event?.sponsors.length > 0"
+          id="sponsors"
+          class="flex flex-col gap-2">
           <h6 class="font-bold">Podujatie podporili</h6>
           <div
             class="flex flex-row gap-8 flex-wrap overflow-hidden items-center justify-center">
