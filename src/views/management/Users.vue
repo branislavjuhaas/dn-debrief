@@ -211,81 +211,75 @@ onMounted(async () => {
     <h1>Správa používateľov</h1>
     <div
       class="grid sm:grid-cols-[auto_auto_1fr] w-full bg-white text-black min-h-80 h-fit rounded-[1.25rem] p-5 transition-all overflow-auto scrollbar-hidden gap-6">
-      <div class="w-80 h-80 relative justify-self-center">
-        <svg
-          width="100"
-          height="100"
-          viewBox="0 0 100 100"
-          class="w-full h-full">
-          <circle
-            cx="50"
-            cy="50"
-            r="45"
-            stroke-width="10"
-            stroke="#00C1F2"
-            fill="transparent"
-            :stroke-dasharray="circumference"
-            :stroke-dashoffset="circumference * offset"
-            stroke-linecap="round"
-            class="animated-circle" />
-          <circle
-            cx="50"
-            cy="50"
-            r="45"
-            stroke-width="10"
-            stroke="#E81525"
-            fill="transparent"
-            :stroke-dasharray="circumference"
-            :stroke-dashoffset="circumference * confirmedOffset"
-            stroke-linecap="round"
-            class="animated-circle" />
-        </svg>
-        <div
-          class="absolute flex flex-col top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center mt-2.5 items-center transition-all duration-300">
-          <div class="flex flex-row h-12">
-            <h2 class="text-5xl font-bold">
-              {{ usersLoaded ? totalUsers : "--" }}
-            </h2>
-            <img
-              src="./../../assets/icons/id.svg"
-              alt="verified"
-              class="h-12 -mt-1" />
-          </div>
-          <div v-if="usersLoaded" class="flex flex-row gap-2">
-            <div class="flex flex-row h-5 gap-1">
-              <p>{{ registeredUsers }}</p>
+      <div class="flex flex-col gap-8 justify-between items-center">
+        <div class="w-80 h-80 relative justify-self-center">
+          <svg
+            width="100"
+            height="100"
+            viewBox="0 0 100 100"
+            class="w-full h-full">
+            <circle
+              cx="50"
+              cy="50"
+              r="45"
+              stroke-width="10"
+              stroke="#00C1F2"
+              fill="transparent"
+              :stroke-dasharray="circumference"
+              :stroke-dashoffset="circumference * offset"
+              stroke-linecap="round"
+              class="animated-circle" />
+            <circle
+              cx="50"
+              cy="50"
+              r="45"
+              stroke-width="10"
+              stroke="#E81525"
+              fill="transparent"
+              :stroke-dasharray="circumference"
+              :stroke-dashoffset="circumference * confirmedOffset"
+              stroke-linecap="round"
+              class="animated-circle" />
+          </svg>
+          <div
+            class="absolute flex flex-col top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center mt-2.5 items-center transition-all duration-300">
+            <div class="flex flex-row h-12">
+              <h2 class="text-5xl font-bold">
+                {{ usersLoaded ? totalUsers : "--" }}
+              </h2>
               <img
-                src="./../../assets/icons/unverified.svg"
+                src="./../../assets/icons/id.svg"
                 alt="verified"
-                class="w-5" />
+                class="h-12 -mt-1" />
             </div>
-            <p>|</p>
-            <div class="flex flex-row h-5 gap-1 font-bold">
-              <p>{{ confirmedUsers }}</p>
-              <img
-                src="./../../assets/icons/verified.svg"
-                alt="verified"
-                class="w-5" />
+            <div v-if="usersLoaded" class="flex flex-row gap-2">
+              <div class="flex flex-row h-5 gap-1">
+                <p>{{ registeredUsers }}</p>
+                <img
+                  src="./../../assets/icons/unverified.svg"
+                  alt="verified"
+                  class="w-5" />
+              </div>
+              <p>|</p>
+              <div class="flex flex-row h-5 gap-1 font-bold">
+                <p>{{ confirmedUsers }}</p>
+                <img
+                  src="./../../assets/icons/verified.svg"
+                  alt="verified"
+                  class="w-5" />
+              </div>
             </div>
           </div>
         </div>
+        <button
+          class="form-primary vertical-center w-full"
+          :disabled="exported"
+          @click="exportAll">
+          <span>Exportovať všetkých</span>
+        </button>
       </div>
       <div class="w-[2px] h-full bg-black rounded-full hidden sm:flex" />
       <div class="grid grid-rows-[auto_auto_1fr] h-auto gap-4">
-        <div class="grid md:grid-cols-2 gap-4 items-center">
-          <div
-            class="flex flex-row justify-start h-12 w-full items-center text-center md:text-left px-5 vertical-center truncate md:row-start-1 row-start-2">
-            <p class="w-full">
-              <span class="font-bold w-full">Nedávno vytvorené účty</span>
-            </p>
-          </div>
-          <button
-            class="form-primary vertical-center row-start-1"
-            :disabled="exported"
-            @click="exportAll">
-            <span>Exportovať všetkých</span>
-          </button>
-        </div>
         <div class="grid grid-cols-3 gap-4 font-bold text-left truncate h-auto">
           <p class="truncate">UID</p>
           <p class="truncate">Meno a priezvisko</p>
