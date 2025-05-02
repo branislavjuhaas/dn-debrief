@@ -8,6 +8,7 @@ import {
   editMessage,
 } from "../../firebase/structure.js";
 import { useRoute, useRouter } from "vue-router";
+import { version } from "../../../package.json";
 
 const command = ref("");
 const output = ref([]);
@@ -59,6 +60,11 @@ const commands = {
         description: "Clear the terminal output",
         arguments: [],
         example: "clear",
+      },
+      ver: {
+        description: "Show the current version",
+        arguments: [],
+        example: "ver",
       },
     };
 
@@ -121,6 +127,9 @@ const commands = {
   clear: () => {
     output.value = [];
   },
+  ver: () => {
+    output.value.push(`DN Cascade ${version} (Member of DN Family)`);
+  },
 };
 
 const executeCommand = () => {
@@ -166,7 +175,7 @@ onMounted(() => {
     <div
       class="flex flex-col w-full bg-black text-white min-h-60 rounded-[1.25rem] p-5 transition-all overflow-auto scrollbar-hidden">
       <div id="terminal-output">
-        <pre class="font-epilogue">{{ output.join("\n") }}</pre>
+        <pre class="font-epilogue tracking-wide">{{ output.join("\n") }}</pre>
       </div>
       <div class="flex flex-row w-full items-center">
         <p class="text-white">?</p>
