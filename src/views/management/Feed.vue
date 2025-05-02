@@ -58,7 +58,7 @@ onMounted(async () => {
             <span>Vytvoriť príspevok</span>
           </router-link>
         </div>
-        <h2 class="font-bold my-4">Zoznam príspevkov</h2>
+        <h6 class="font-bold my-4 mb-0">Zoznam príspevkov</h6>
         <div
           v-for="message in filteredMessages"
           :key="message.id"
