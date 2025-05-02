@@ -1,7 +1,6 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import Toggle from "../../components/Toggle.vue";
-import DropDown from "../../components/DropDown.vue";
 import { relevantEvents, uploadEventFile } from "../../firebase/events.js";
 import { useLoadingStore, useUserStore } from "../../stores.js";
 import Field from "../../components/Field.vue";
@@ -24,7 +23,8 @@ const loadingStore = useLoadingStore();
 
 console.log(fromDate.value, toDate.value);
 
-const setMode = () => {
+const setMode = (newMode) => {
+  mode.value = newMode;
   window.location.hash = mode.value;
 };
 
@@ -76,48 +76,80 @@ const filesRef = ref(null);
 <template>
   <div class="gap-4">
     <h1>Správa podujatí - {{ mode === "events" ? "Podujatia" : "Súbory" }}</h1>
-    <div
-      class="flex flex-col w-full text-black bg-white min-h-60 rounded-[1.25rem] p-5 gap-8">
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <DropDown
-          v-model="mode"
-          :options="[
-            { text: 'Podujatia', value: 'events' },
-            { text: 'Súbory', value: 'files' },
-          ]"
-          label="Zobraziť"
-          @update:model-value="setMode" />
-        <template v-if="mode === 'events'">
-          <toggle v-model="onlyMyEvents" label="Len moje podujatia" />
-          <router-link to="events/new" class="form-primary vertical-center">
-            <span>Vytvoriť podujatie</span>
-          </router-link>
-        </template>
-        <template v-else>
-          <toggle v-model="onlyMyFiles" label="Len mnou vytvorené" />
-          <button class="form-primary vertical-center" @click="uploadFile">
-            <span>Nahrať súbor</span>
-          </button>
-          <field
-            v-model.trim="filesFilter"
-            label="Filter"
-            type="text"
-            class="col-span-full" />
-        </template>
+    <div class="flex flex-col gap-[4px]">
+      <div class="flex flex-row bg-white rounded-[1.25rem_1.25rem_0_0]">
+        <button
+          @click="setMode('events')"
+          class="tab-button"
+          :class="{ 'active-tab': mode === 'events' }">
+          Podujatia
+        </button>
+        <button
+          @click="setMode('files')"
+          class="tab-button"
+          :class="{ 'active-tab': mode === 'files' }">
+          Súbory
+        </button>
       </div>
-      <p
-        v-if="mode === 'files' && filesErrorMessage"
-        class="text-red w-full text-center font-bold">
-        {{ filesErrorMessage }}
-      </p>
-      <files
-        v-if="mode === 'files'"
-        ref="filesRef"
-        :only-my-files="onlyMyFiles"
-        :filter="filesFilter" />
-      <events v-else :only-my-events="onlyMyEvents" />
+
+      <!-- Tab content -->
+      <div
+        class="flex flex-col w-full text-black bg-white min-h-60 rounded-[0_0_1.25rem_1.25rem] p-5 gap-8">
+        <div class="flex flex-col sm:flex-row gap-4 items-center">
+          <template v-if="mode === 'events'">
+            <toggle
+              class="header-control"
+              v-model="onlyMyEvents"
+              label="Len moje podujatia" />
+            <router-link
+              to="events/new"
+              class="form-primary vertical-center header-control">
+              <span>Vytvoriť podujatie</span>
+            </router-link>
+          </template>
+          <template v-else>
+            <field
+              v-model.trim="filesFilter"
+              label="Filter"
+              type="text"
+              class="header-control" />
+            <toggle
+              class="header-control"
+              v-model="onlyMyFiles"
+              label="Len mnou vytvorené" />
+            <button
+              class="form-primary vertical-center header-control"
+              @click="uploadFile">
+              <span>Nahrať súbor</span>
+            </button>
+          </template>
+        </div>
+        <p
+          v-if="mode === 'files' && filesErrorMessage"
+          class="text-red w-full text-center font-bold">
+          {{ filesErrorMessage }}
+        </p>
+        <files
+          v-show="mode === 'files'"
+          ref="filesRef"
+          :only-my-files="onlyMyFiles"
+          :filter="filesFilter" />
+        <events v-show="mode === 'events'" :only-my-events="onlyMyEvents" />
+      </div>
     </div>
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.tab-button {
+  @apply w-full text-black pt-6 pb-5 px-4;
+}
+
+.active-tab {
+  @apply font-bold;
+}
+
+.header-control {
+  @apply w-full;
+}
+</style>
