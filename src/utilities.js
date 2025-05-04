@@ -5,10 +5,14 @@
  * @returns {string} The formatted date string in 'dd.mm.yyyy' format.
  */
 export const formatSlovakDate = (date) => {
+  if (typeof date === "string") {
+    date = new Date(date);
+  }
+
   const day = date.getDate();
   const month = date.getMonth() + 1;
   const year = date.getFullYear();
-  return `${day}.${month}.${year}`;
+  return `${day}. ${month}. ${year}`;
 };
 
 /**
