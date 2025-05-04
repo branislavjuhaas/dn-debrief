@@ -1,5 +1,6 @@
 <script setup>
 import { ref, watch } from "vue";
+import { formatSlovakDate } from "../utilities";
 
 const props = defineProps({
   readonly: {
@@ -11,7 +12,7 @@ const props = defineProps({
     required: true,
   },
   value: {
-    type: [String, Number],
+    type: [String, Number, Date],
     default: "",
   },
   name: {
@@ -36,6 +37,13 @@ watch(
     confirmedValue.value = newValue;
   },
 );
+
+const processValue = (value) => {
+  if (props.type === "date") {
+    return formatSlovakDate(value);
+  }
+  return value;
+};
 </script>
 
 <template>
@@ -67,7 +75,7 @@ watch(
           italic: props.readonly || !props.value,
           'text-grey': !props.value,
         }">
-        {{ confirmedValue ? confirmedValue : "zadaj hodnotu" }}
+        {{ confirmedValue ? processValue(confirmedValue) : "zadaj hodnotu" }}
       </p>
       <Transition name="fly">
         <div v-if="editing" class="flex flex-row gap-2">
