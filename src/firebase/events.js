@@ -215,7 +215,17 @@ export const setEvent = async (event) => {
       }
     }
 
-    await setDoc(doc(db, "events", eventToSave.id), eventToSave);
+    // Check if document exists first
+    const docRef = doc(db, "events", eventToSave.id);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      // Update existing document
+      await updateDoc(docRef, eventToSave);
+    } else {
+      // Create new document if it doesn't exist
+      await setDoc(docRef, eventToSave);
+    }
     console.log(`Event ${eventToSave.id} set successfully`);
   } catch (error) {
     console.error("Error setting event:", error);
