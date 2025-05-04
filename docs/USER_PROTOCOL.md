@@ -16,16 +16,18 @@ The user document is stored in the `users` collection in Firestore. Each documen
   "club": "DocumentReference('clubs/clubId')", // Reference to the user's club document (optional)
   "address": "string", // User's postal address (optional)
   "phone": "string", // User's phone number (optional)
-  "birthdate": "string", // User's date of birth (YYYY-MM-DD format) (optional)
+  "birthdate": "Timestamp", // User's date of birth as Firestore Timestamp (optional)
   "supervisor": "string", // Name of the legal supervisor (for underage users) (optional)
   "supervisorEmail": "string", // Email of the legal supervisor (for underage users) (optional)
-  "seasons": [ // Array of seasons the user participated in
+  "seasons": [
+    // Array of seasons the user participated in
     {
       "year": "string", // Year of the season (e.g., "2024")
       "confirmed": "boolean" // Whether the membership for this season is confirmed (paid)
     }
   ],
-  "awards": [ // Array of awards received by the user
+  "awards": [
+    // Array of awards received by the user
     {
       "award": "DocumentReference('awards/awardId')", // Reference to the award document
       "legend": "boolean" // Whether this award is marked as legendary for the user
@@ -34,7 +36,7 @@ The user document is stored in the `users` collection in Firestore. Each documen
   "clubManager": "boolean", // Whether the user is a manager of their club. Defaults to false.
   "dev": "boolean", // Whether the user is part of the developer program. Defaults to false.
   "cookies": "boolean", // User's consent for analytics cookies (optional)
-  "createdAt": "Timestamp" // When the user was created (optional, added by server script on document creation)
+  "createdAt": "Timestamp", // When the user was created (stored as Firestore Timestamp)
   "reminded": "boolean" // Whether the user has been reminded about membership payment (optional)
 }
 ```
@@ -45,6 +47,8 @@ The user document is stored in the `users` collection in Firestore. Each documen
 - The `club` field stores a Firestore `DocumentReference`. When fetched, the application resolves this reference to get club details.
 - The `awards` field stores an array of objects, each containing a `DocumentReference` to an award and a boolean indicating if it's legendary. The application resolves these references.
 - The `seasons` array tracks membership years and payment confirmation.
+- The `birthdate` field is stored as a Firestore `Timestamp` and converted to a JavaScript `Date` object when retrieved by the application.
+- The `createdAt` field is stored as a Firestore `Timestamp` and is used for sorting recent users.
 
 ## User Actions
 
@@ -64,16 +68,16 @@ These actions are primarily handled by functions within `src/firebase/auth.js` a
 
 ### Data Retrieval
 
-- **`getUser(uid)`**: Fetches a specific user document by UID. Resolves `club` and `awards` references. (`src/firebase/auth.js` and `src/firebase/structure.js` - Note: Duplicate function name, context determines which is used).
+- **`getUser(uid)`**: Fetches a specific user document by UID. Resolves `club` and `awards` references. Converts the `birthdate` Timestamp to a JavaScript Date object. (`src/firebase/auth.js` and `src/firebase/structure.js` - Note: Duplicate function name, context determines which is used).
 - **`getUsers(club)`**: Fetches all users, optionally filtering by a specific club reference. (`src/firebase/structure.js`)
 - **`fetchAllUsers()`**: Fetches all user documents without resolving references. (`src/firebase/structure.js`)
-- **`getRecentUsers()`**: Fetches the 10 most recently created users based on the `createdAt` field. (`src/firebase/structure.js`)
+- **`getRecentUsers()`**: Fetches the 10 most recently created users based on the `createdAt` Timestamp field. (`src/firebase/structure.js`)
 - **`getUserStatistics()`**: Calculates statistics about total users and membership status for the current year. (`src/firebase/structure.js`)
 
 ### Data Modification
 
-- **`joinAdultUser(uid, club, address, phone, birthdate, seasons)`**: Updates an existing user document for an adult joining a club. Sets `club` (as a DocumentReference), `address`, `phone`, `birthdate`, and `seasons` (array of season objects). Uses a transaction. (`src/firebase/structure.js`)
-- **`joinUser(uid, club, address, phone, birthdate, seasons, supervisor, supervisorEmail)`**: Updates an existing user document for any user joining a club. Sets `club` (as a DocumentReference), `address`, `phone`, `birthdate`, `seasons` (array of season objects), and potentially `supervisor` and `supervisorEmail`. Uses a transaction. (`src/firebase/structure.js`)
+- **`joinAdultUser(uid, club, address, phone, birthdate, seasons)`**: Updates an existing user document for an adult joining a club. Sets `club` (as a DocumentReference), `address`, `phone`, `birthdate` (as a Timestamp), and `seasons` (array of season objects). Uses a transaction. (`src/firebase/structure.js`)
+- **`joinUser(uid, club, address, phone, birthdate, seasons, supervisor, supervisorEmail)`**: Updates an existing user document for any user joining a club. Sets `club` (as a DocumentReference), `address`, `phone`, `birthdate` (as a Timestamp), `seasons` (array of season objects), and potentially `supervisor` and `supervisorEmail`. Uses a transaction. (`src/firebase/structure.js`)
 - **`updateUserRole(uid, newRole)`**: Updates the `role` field for a specific user. (`src/firebase/structure.js`)
 - **`updateUserSeasons(userId)`**: Confirms the membership for the current (and potentially next) season by setting `confirmed: true` in the relevant `seasons` array entry/entries. Also sets the `reminded` field to `false`. Increments the `membersCount` on the associated club document (indirect effect). (`src/firebase/structure.js`)
 - **`assignAwardToUser(userId, awardId)`**: Adds a new object `{ award: DocumentReference('awards/awardId'), legend: false }` to the user's `awards` array. (`src/firebase/structure.js`)
