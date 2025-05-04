@@ -1,9 +1,5 @@
 const { initializeApp, cert } = require("firebase-admin/app");
-const {
-  getFirestore,
-  Timestamp,
-  FieldValue,
-} = require("firebase-admin/firestore");
+const { getFirestore, Timestamp } = require("firebase-admin/firestore");
 const serviceAccount = require("./key.json");
 
 // Initialize Firebase Admin
@@ -98,7 +94,6 @@ async function updateBirthdateFields() {
       // Add to batch update
       batch.update(doc.ref, {
         birthdate: timestamp,
-        updatedAt: FieldValue.serverTimestamp(),
       });
 
       currentBatchCount++;
