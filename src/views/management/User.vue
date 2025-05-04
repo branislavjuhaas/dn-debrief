@@ -271,6 +271,17 @@ const resendConfirmationEmail = async () => {
   const { httpsCallable } = await import("firebase/functions");
   const { functions } = await import("../../main.js");
 
+  const birthdateItem = userData.value.find(
+    (item) => item.name === "birthdate",
+  );
+
+  // calculate age based on birthdate including even day and month, not only year
+  const age =
+    (new Date().getTime() - new Date(birthdateItem.value).getTime()) /
+    (1000 * 60 * 60 * 24 * 365.25);
+
+  const isAdult = age >= 18;
+
   const personalized = !userData.value.find(
     (item) => item.name === "supervisor",
   )
@@ -278,8 +289,9 @@ const resendConfirmationEmail = async () => {
     : `registráciu tvojho dieťaťa`;
 
   const emailItem =
-    userData.value.find((item) => item.name === "supervisorEmail") ||
-    userData.value.find((item) => item.name === "email");
+    age >= 18
+      ? userData.value.find((item) => item.name === "email")
+      : userData.value.find((item) => item.name === "supervisorEmail");
   const uidItem = userData.value.find((item) => item.name === "uid");
 
   const data = {

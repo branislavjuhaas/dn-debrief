@@ -8,6 +8,14 @@ import { getClubs, joinAdultUser, joinUser } from "../../firebase/structure.js";
 import router from "../../router.js";
 import { formatISODate } from "../../helpers/utilities.js";
 
+const getAge = (birthd) => {
+  console.log("Birthdate:", birthd);
+  return (
+    (new Date().getTime() - new Date(birthd).getTime()) /
+    (1000 * 60 * 60 * 24 * 365.25)
+  );
+};
+
 // Initializing user store
 const userStore = useUserStore();
 
@@ -22,14 +30,7 @@ const address = ref(userStore.address || "");
 const phone = ref(userStore.phone || "");
 const adult = ref(true);
 const now = new Date();
-let age = now.getFullYear() - new Date(birthdate.value).getFullYear();
-if (
-  now.getMonth() < new Date(birthdate.value).getMonth() ||
-  (now.getMonth() === new Date(birthdate.value).getMonth() &&
-    now.getDate() < new Date(birthdate.value).getDate())
-) {
-  age--;
-}
+let age = getAge(birthdate.value);
 adult.value = age >= 18;
 
 // State variables for non-adult users
@@ -71,14 +72,8 @@ const seasons =
 // Watch for changes in birthdate to determine if user is an adult
 watch(birthdate, (birthdate) => {
   const now = new Date();
-  let age = now.getFullYear() - new Date(birthdate.value).getFullYear();
-  if (
-    now.getMonth() < new Date(birthdate.value).getMonth() ||
-    (now.getMonth() === new Date(birthdate.value).getMonth() &&
-      now.getDate() < new Date(birthdate.value).getDate())
-  ) {
-    age--;
-  }
+  let age = getAge(birthdate);
+  console.log("Age:", age);
   adult.value = age >= 18;
 });
 
