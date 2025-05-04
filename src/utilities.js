@@ -12,6 +12,19 @@ export const formatSlovakDate = (date) => {
 };
 
 /**
+ * Formats a Date object into an ISO date string.
+ *
+ * @param {Date} date - The date to format.
+ * @returns {string} The formatted date string in 'yyyy-mm-dd' format.
+ */
+export const formatISODate = (date) => {
+  const day = date.getDate().toString().padStart(2, "0");
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const year = date.getFullYear();
+  return `${year}-${month}-${day}`;
+};
+
+/**
  * Despite liberals' objections, determines gender based on the provided name and surname.
  *
  * @param {string} name - The first name of the individual.
