@@ -68,20 +68,19 @@ watchEffect(() => {
 
 <template>
   <div class="gap-4">
-    <h1 class="text-5xl font-bold mb-2">
+    <h1>
       {{ "Platba za " + subAccusative }}
     </h1>
     <div
       class="grid grid-rows-[auto_auto] grid-cols-1 w-full bg-white min-h-60 rounded-[1.25rem] p-5 gap-16 sm:grid-rows-1 sm:grid-cols-[auto_1fr]">
-      <transition name="fade">
-        <div v-if="isLoading" class="h-80 w-80 bg-white"></div>
-        <div v-else class="flex flex-col items-center">
-          <img :src="qr" alt="QR Code" class="w-80 rounded-xl" />
-        </div>
-      </transition>
+      <div class="flex flex-col items-center h-80 sm:w-80" :class="{ 'max-h-fit': !isLoading }">
+        <transition name="fade">
+          <img v-if="!isLoading" :src="qr" alt="QR Code" class="w-80 max-w-full aspect-square rounded-xl" />
+        </transition>
+      </div>
       <div class="flex flex-col gap-4 justify-between">
         <div class="flex flex-col gap-4">
-          <div v-if="info" class="information vertical-center">
+          <div v-if="info" class="information vertical-center text-justify">
             <p class="font-bold">{{ info }}</p>
           </div>
           <div class="information vertical-center">
@@ -106,20 +105,17 @@ watchEffect(() => {
 </template>
 
 <style scoped>
+.information {
+  @apply flex flex-row justify-between min-h-12 px-5 items-center text-black;
+}
+
 .fade-enter-active {
   transition: opacity 0.5s;
 }
-
-.fade-leave-active {
-  display: none;
-}
-
-.fade-enter,
-.fade-leave-to {
+.fade-enter-from {
   opacity: 0;
 }
-
-.information {
-  @apply flex flex-row justify-between h-12 px-5 items-center text-black;
+.fade-enter-to {
+  opacity: 1;
 }
 </style>

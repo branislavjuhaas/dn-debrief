@@ -12,6 +12,8 @@ import {
   writeBatch,
   documentId,
   arrayUnion,
+  orderBy,
+  limit,
 } from "firebase/firestore";
 
 const db = getFirestore();
@@ -54,7 +56,7 @@ export const joinAdultUser = async (
 ) => {
   try {
     await runTransaction(db, async (transaction) => {
-      const clubRef = doc(db, `clubs/${club.id}`);
+      const clubRef = doc(db, `clubs/${club}`);
       const clubSnapshot = await transaction.get(clubRef);
 
       if (!clubSnapshot.exists) {
@@ -99,7 +101,7 @@ export const joinUser = async (
 ) => {
   try {
     await runTransaction(db, async (transaction) => {
-      const clubRef = doc(db, `clubs/${club.id}`);
+      const clubRef = doc(db, `clubs/${club}`);
       const clubSnapshot = await transaction.get(clubRef);
 
       if (!clubSnapshot.exists) {
@@ -167,30 +169,6 @@ export const getUsers = async (club) => {
   });
 
   return users;
-};
-
-/**
- * Fetches the count of members in a specific club from Firestore.
- *
- * This function fetches the count of users associated with a specific club from Firestore.
- * The club is specified by the clubId parameter. If the clubId parameter is not provided,
- * the function returns 0.
- *
- * @async
- * @param {string|null} clubId - The ID of the club. If null, the function returns 0.
- * @returns {number} The count of users associated with the specified club.
- * @throws Will throw an error if the Firestore query fails.
- */
-const getClubMembersCount = async (clubId) => {
-  if (!clubId) {
-    return 0;
-  }
-
-  const usersRef = collection(db, "users");
-  const clubRef = doc(db, "clubs", clubId);
-  const q = query(usersRef, where("club", "==", clubRef));
-  const querySnapshot = await getDocs(q);
-  return querySnapshot.size;
 };
 
 /**
@@ -364,6 +342,10 @@ export const getUser = async (uid) => {
   const user = querySnapshot.docs[0].data();
   console.log("User data: ", user);
 
+  if (user.birthdate) {
+    user.birthdate = user.birthdate.toDate();
+  }
+
   if (user.club) {
     const clubSnapshot = await getDoc(user.club);
     if (clubSnapshot.exists()) {
@@ -378,6 +360,23 @@ export const getUser = async (uid) => {
   }
 
   return user;
+};
+
+/**
+ * Fetches a club from Firestore.
+ * @param {string} clubId - The ID of the club.
+ * @returns {Object|null} The club object or null if not found.
+ */
+export const getClub = async (clubId) => {
+  const clubRef = doc(db, "clubs", clubId);
+  const clubSnapshot = await getDoc(clubRef);
+
+  if (clubSnapshot.exists()) {
+    return { id: clubSnapshot.id, ...clubSnapshot.data() };
+  } else {
+    console.error("Club document does not exist");
+    return null;
+  }
 };
 
 /**
@@ -554,15 +553,164 @@ export const fetchAllClubs = async () => {
 };
 
 /**
- * Updates a user's data in Firestore.
+ * Updates the club manager status of a user in Firestore.
  * @param {string} uid - The user's ID.
- * @param {Object} updatedData - The updated user data.
+ * @param {boolean} clubManagerStatus - The new club manager status.
  */
-export const updateUserData = async (uid, updatedData) => {
+export const updateUserClubManagerStatus = async (uid, clubManagerStatus) => {
   try {
-    await updateDoc(doc(db, `users/${uid}`), updatedData);
+    await updateDoc(doc(db, `users/${uid}`), {
+      clubManager: clubManagerStatus,
+    });
   } catch (error) {
-    console.error("Error updating user data: ", error);
+    console.error("Error updating club manager status: ", error);
     return error;
+  }
+};
+
+/**
+ * Fetches a component from Firestore.
+ * @param {string} collectionName - The name of the collection.
+ * @param {string} id - The ID of the document.
+ * @returns {Object|null} The document data or null if not found.
+ */
+export const getComponent = async (collectionName, id) => {
+  try {
+    const docRef = doc(db, collectionName, id);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return { id: docSnap.id, ...docSnap.data() };
+    } else {
+      console.error("No such document!");
+      return null;
+    }
+  } catch (error) {
+    console.error("Error getting document:", error);
+    return null;
+  }
+};
+
+/**
+ * Creates a new component in Firestore.
+ * @param {string} collectionName - The name of the collection.
+ * @param {Object} data - The data to be added.
+ * @returns {string|null} The ID of the created document or null if failed.
+ */
+export const createComponent = async (collectionName, data) => {
+  try {
+    const docRef = await addDoc(collection(db, collectionName), data);
+    return docRef.id;
+  } catch (error) {
+    console.error("Error creating document:", error);
+    return null;
+  }
+};
+
+/**
+ * Updates a component in Firestore.
+ * @param {string} collectionName - The name of the collection.
+ * @param {string} id - The ID of the document.
+ * @param {Object} data - The data to be updated.
+ * @returns {boolean} True if the update was successful, false otherwise.
+ */
+export const updateComponent = async (collectionName, id, data) => {
+  try {
+    const docRef = doc(db, collectionName, id);
+    await updateDoc(docRef, data);
+    return true;
+  } catch (error) {
+    console.error("Error updating document:", error);
+    return false;
+  }
+};
+
+/**
+ * Retrieves user statistics for the current year.
+ * @returns {Object} An object containing:
+ *   - totalUsers: Total number of users in the collection.
+ *   - usersCurrentYear: Number of users with a season in the current year.
+ *   - usersCurrentYearConfirmed: Number of users with a season in the current year and confirmed status.
+ */
+export const getUserStatistics = async () => {
+  const currentYear = new Date().getFullYear().toString();
+  try {
+    // Total number of users
+    const totalUsersSnapshot = await getDocs(collection(db, "users"));
+    const totalUsers = totalUsersSnapshot.size;
+
+    // Users with a season in the current year and confirmed status
+    const usersCurrentYearConfirmedSnapshot = await getDocs(
+      query(
+        collection(db, "users"),
+        where("seasons", "array-contains", {
+          year: currentYear,
+          confirmed: true,
+        }),
+      ),
+    );
+    const usersCurrentYearConfirmed = usersCurrentYearConfirmedSnapshot.size;
+
+    // Users with a season in the current year, regardless of confirmed status
+    const usersCurrentYearSnapshot = await getDocs(
+      query(
+        collection(db, "users"),
+        where("seasons", "array-contains", {
+          year: currentYear,
+          confirmed: false,
+        }),
+      ),
+    );
+    const usersCurrentYear =
+      usersCurrentYearSnapshot.size + usersCurrentYearConfirmed;
+
+    return {
+      totalUsers,
+      usersCurrentYear,
+      usersCurrentYearConfirmed,
+    };
+  } catch (error) {
+    console.error("Error retrieving user statistics: ", error);
+    return {
+      totalUsers: 0,
+      usersCurrentYear: 0,
+      usersCurrentYearConfirmed: 0,
+    };
+  }
+};
+
+/**
+ * Fetches the last 10 created users from Firestore.
+ * @returns {Array} An array of the last 10 user objects.
+ */
+export const getRecentUsers = async () => {
+  try {
+    const usersRef = collection(db, "users");
+    const q = query(usersRef, orderBy("createdAt", "desc"), limit(10));
+    const querySnapshot = await getDocs(q);
+    const users = [];
+    querySnapshot.forEach((doc) => {
+      users.push({ id: doc.id, ...doc.data() });
+    });
+    return users;
+  } catch (error) {
+    console.error("Error fetching recent users:", error);
+    return [];
+  }
+};
+
+/**
+ * Updates a specific property of a user in Firestore.
+ * @param {string} uid - The user's ID.
+ * @param {string} name - The name of the property to update.
+ * @param {any} value - The new value for the property.
+ */
+export const updateUserProperty = async (uid, name, value) => {
+  try {
+    await updateDoc(doc(db, `users/${uid}`), {
+      [name]: value,
+    });
+  } catch (error) {
+    console.error("Error updating user property:", error);
+    throw error;
   }
 };

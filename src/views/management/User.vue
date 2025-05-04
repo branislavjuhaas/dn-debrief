@@ -6,26 +6,26 @@ import {
   assignAwardToUser,
   updateAwardLegendStatus,
   removeAwardFromUser,
-  updateUserData as updateUserDataInFirebase,
   getClubs,
+  updateUserClubManagerStatus,
+  updateUserProperty,
 } from "../../firebase/structure.js";
 import router from "../../router.js";
-import Dropdown from "../../components/Dropdown.vue";
+import DropDown from "../../components/DropDown.vue";
+import Toggle from "../../components/Toggle.vue";
 import { useUserStore } from "../../stores.js";
-import {
-  reverseTranslateRole,
-  translateKey,
-  translateRole,
-} from "../../translate.js";
+import { translateKey, translateRole } from "../../helpers/translate.js";
 import { logEvent } from "firebase/analytics";
 import { analytics } from "../../main.js";
+import QuickEdit from "../../components/QuickEdit.vue";
+import { formatISODate } from "../../helpers/utilities.js";
 
 const route = useRoute();
 const userStore = useUserStore();
 
 // Redirect to profile if the user is viewing their own profile
 if (userStore.uid === route.params.uid) {
-  router.push("/profile");
+  router.push("/users/me");
 }
 
 const userData = ref([]);
@@ -38,17 +38,23 @@ const showAwardDropdown = ref(false);
 const contextMenuVisible = ref(false);
 const contextMenuPosition = ref({ x: 0, y: 0 });
 const selectedAward = ref(null);
+const isClubManager = ref(false);
+const isDev = ref(false);
 let actualRole = "";
 const clubs = ref([]);
 
+const readonlyProperties = ["club", "uid", "member", "email"];
+
+const alwaysVisibleProperties = ["phone"];
+
 /**
- * Formats user data for display.
+ * Formats user data for display with adding always visible properties if they are not present.
  * @param {string} uid - The user ID.
  * @param {Object} user - The user data.
  * @returns {Array} - The formatted user data.
  */
-function formatUserData(uid, user) {
-  return [
+const formatUserData = (uid, user) =>
+  [
     { name: "uid", value: uid },
     { name: "club", value: user.club ? user.club.name : null },
     {
@@ -66,21 +72,28 @@ function formatUserData(uid, user) {
     { name: "phone", value: user.phone },
     { name: "email", value: user.email },
     { name: "address", value: user.address },
-    { name: "birthdate", value: user.birthdate },
+    { name: "birthdate", value: formatISODate(user.birthdate) },
     { name: "supervisor", value: user.supervisor },
     { name: "supervisorEmail", value: user.supervisorEmail },
-  ].filter((item) => item.value !== null && item.value !== undefined);
-}
+  ]
+    .filter((item) => item.value !== null && item.value !== undefined)
+    .concat(
+      alwaysVisibleProperties
+        .filter((property) => !user[property])
+        .map((property) => ({ name: property, value: "" })),
+    );
 
 /**
  * Updates the user data.
  */
 const updateUserData = async () => {
+  console.log("UPDATING USER DATA");
   const userId = route.params.uid;
   try {
     const user = await getUser(userId);
+    console.log("US", user);
     userData.value = formatUserData(userId, user);
-    actualRole = translateRole(user.role) || "Používateľ";
+    actualRole = user.role || "user";
     userRole.value = actualRole;
     userFullName.value = `${user.name} ${user.surname}`;
     userPending.value = !!(
@@ -92,12 +105,15 @@ const updateUserData = async () => {
       )
     );
 
-    userAwards.value = user.awards.map((award) => {
+    userAwards.value = (user.awards || []).map((award) => {
       const awardData = availableAwards.value.find(
         (availableAward) => availableAward.id === award.award.id,
       );
       return { ...awardData, legend: !!award.legend };
     });
+
+    isClubManager.value = user.clubManager || false;
+    isDev.value = user.dev || false;
   } catch (error) {
     if (error.code === "permission-denied") {
       await router.push("/unauthorized");
@@ -122,7 +138,11 @@ const getAwards = async () => {
 const assignAward = async (awardId) => {
   try {
     await assignAwardToUser(route.params.uid, awardId);
-    await updateUserData();
+    // Update local state
+    const awardData = availableAwards.value.find((a) => a.id === awardId);
+    if (awardData) {
+      userAwards.value.push({ ...awardData, legend: false });
+    }
   } catch (error) {
     console.error("Error assigning award:", error);
   }
@@ -175,7 +195,11 @@ const handleRightClick = (event, award) => {
 const makeLegend = async (award) => {
   try {
     await updateAwardLegendStatus(route.params.uid, award.id, true);
-    await updateUserData();
+    // Update local state
+    const localAward = userAwards.value.find((a) => a.id === award.id);
+    if (localAward) {
+      localAward.legend = true;
+    }
   } catch (error) {
     console.error("Error making legend:", error);
   }
@@ -189,7 +213,11 @@ const makeLegend = async (award) => {
 const unmakeLegend = async (award) => {
   try {
     await updateAwardLegendStatus(route.params.uid, award.id, false);
-    await updateUserData();
+    // Update local state
+    const localAward = userAwards.value.find((a) => a.id === award.id);
+    if (localAward) {
+      localAward.legend = false;
+    }
   } catch (error) {
     console.error("Error unmaking legend:", error);
   }
@@ -203,7 +231,8 @@ const unmakeLegend = async (award) => {
 const removeAward = async (award) => {
   try {
     await removeAwardFromUser(route.params.uid, award.id);
-    await updateUserData();
+    // Update local state
+    userAwards.value = userAwards.value.filter((a) => a.id !== award.id);
   } catch (error) {
     console.error("Error removing award:", error);
   }
@@ -242,6 +271,17 @@ const resendConfirmationEmail = async () => {
   const { httpsCallable } = await import("firebase/functions");
   const { functions } = await import("../../main.js");
 
+  const birthdateItem = userData.value.find(
+    (item) => item.name === "birthdate",
+  );
+
+  // calculate age based on birthdate including even day and month, not only year
+  const age =
+    (new Date().getTime() - new Date(birthdateItem.value).getTime()) /
+    (1000 * 60 * 60 * 24 * 365.25);
+
+  const isAdult = age >= 18;
+
   const personalized = !userData.value.find(
     (item) => item.name === "supervisor",
   )
@@ -249,8 +289,9 @@ const resendConfirmationEmail = async () => {
     : `registráciu tvojho dieťaťa`;
 
   const emailItem =
-    userData.value.find((item) => item.name === "supervisorEmail") ||
-    userData.value.find((item) => item.name === "email");
+    age >= 18
+      ? userData.value.find((item) => item.name === "email")
+      : userData.value.find((item) => item.name === "supervisorEmail");
   const uidItem = userData.value.find((item) => item.name === "uid");
 
   const data = {
@@ -279,6 +320,37 @@ const resendConfirmationEmail = async () => {
   logEvent(analytics, "resend_confiramtion", { method: "Poslať overenie" });
 };
 
+/**
+ * Updates the user's role by calling the updateUserRole function 'setUserRole' with arguments: userId and newRole.
+ * @param {string} newRole - The new role for the user.
+ * @returns {Promise<void>} - The promise that resolves when the role is updated.
+ * @throws {Error} - The error that occurred during the role update.
+ */
+const updateUserRole = async (newRole) => {
+  const { httpsCallable } = await import("firebase/functions");
+  const { functions } = await import("../../main.js");
+
+  const setUserRoleFunction = httpsCallable(functions, "setUserRole");
+
+  const data = {
+    uid: route.params.uid,
+    role: newRole,
+  };
+
+  setUserRoleFunction(data)
+    .then((result) => {
+      console.log(result.data);
+      actualRole = newRole;
+    })
+    .catch((error) => {
+      const code = error.code;
+      const message = error.message;
+      const details = error.details;
+      console.log(
+        `Error Code: ${code}, Message: ${message}, Details: ${details}`,
+      );
+    });
+};
 /**
  * Confirms the user's registration.
  */
@@ -312,81 +384,71 @@ onMounted(() => {
 
 watch(() => route.params.uid, updateUserData);
 
-watch(userRole, async (newRole, oldRole) => {
-  if (newRole === oldRole) return;
-  if (newRole === actualRole) return;
-
-  const { updateUserRole } = await import("../../firebase/structure.js");
-  await updateUserRole(route.params.uid, reverseTranslateRole(newRole));
-
-  actualRole = newRole;
-});
-
 /**
- * Handles left-click on a user data field.
- * @param {Event} event - The event object.
- * @param {Object} data - The user data object.
+ * Updates the club manager status for the user.
  */
-const handleLeftClickUserData = (event, data) => {
-  if (
-    (userStore.role !== "admin" && userStore.role !== "developer") ||
-    data.name === "uid" ||
-    data.name === "email" ||
-    data.name === "member" ||
-    data.name === "club" ||
-    (userStore.role === "admin" && actualRole === "developer")
-  ) {
-    return;
+const updateClubManagerStatus = async () => {
+  console.log("MANAGING CLUB");
+  try {
+    await updateUserClubManagerStatus(route.params.uid, isClubManager.value);
+  } catch (error) {
+    console.error("Error updating club manager status:", error);
   }
-  event.preventDefault();
-  data.editing = true;
-  data.originalValue = data.value;
-  contextMenuVisible.value = false;
 };
 
 /**
- * Saves the edited user data and updates Firebase.
- * @param {Object} data - The user data object.
+ * Updates a specific property of the current user.
+ * @param {string} name - The name of the property to update.
+ * @param {any} value - The new value for the property.
  */
-const saveUserData = async (data) => {
-  if (data.value !== data.originalValue) {
-    try {
-      await updateUserDataInFirebase(route.params.uid, {
-        [data.name]: data.value,
-      });
-    } catch (error) {
-      console.error("Error updating user data:", error);
-      data.value = data.originalValue;
-    }
+const quickUpdateUserProperty = async (name, value) => {
+  if (name === "birthdate" && typeof value === "string") {
+    value = new Date(value) || null;
   }
-  data.editing = false;
+
+  try {
+    await updateUserProperty(route.params.uid, name, value);
+    // Update local state if necessary
+    const localData = userData.value.find((item) => item.name === name);
+    if (localData) {
+      localData.value = value;
+    }
+  } catch (error) {
+    console.error("Error updating user property:", error);
+  }
+};
+
+/**
+ * Updates the userDev status.
+ * @param {boolean} newValue - The new value for userDev.
+ */
+const updateUserDevStatus = async (newValue) => {
+  try {
+    await updateUserProperty(route.params.uid, "dev", newValue);
+    isDev.value = newValue;
+  } catch (error) {
+    console.error("Error updating userDev status:", error);
+  }
 };
 </script>
 
 <template>
   <div class="gap-4" @click="contextMenuVisible = false">
-    <h1 class="text-5xl font-bold mb-2">
+    <h1>
       {{ userFullName }}
     </h1>
     <div
       class="flex flex-col justify-between w-full bg-white min-h-60 rounded-[1.25rem] p-5 gap-16 transition-all">
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div
+        <quick-edit
           v-for="data in userData"
           :key="data.name"
-          class="flex flex-row justify-between h-12 px-5 items-center text-black vertical-center"
-          @click="handleLeftClickUserData($event, data)">
-          <p class="font-bold whitespace-nowrap">
-            {{ translateKey(data.name) }}
-          </p>
-          <input
-            v-if="data.editing && data.name !== 'club'"
-            v-model="data.value"
-            @blur="saveUserData(data)"
-            @keyup.enter="saveUserData(data)"
-            class="bg-transparent outline-none text-right w-full overflow-hidden" />
-          <p v-if="!data.editing" class="text-right">{{ data.value }}</p>
-        </div>
+          :name="data.name"
+          :readonly="readonlyProperties.includes(data.name)"
+          :type="data.name === 'birthdate' ? 'date' : 'text'"
+          :title="translateKey(data.name)"
+          :value="data.value"
+          @update="(name, value) => quickUpdateUserProperty(name, value)" />
       </div>
       <div class="flex flex-col gap-4">
         <div
@@ -402,8 +464,8 @@ const saveUserData = async (data) => {
             class="flex flex-row gap-8 overflow-x-auto scrollbar-hidden">
             <router-link
               v-for="(award, index) in userAwards"
-              :to="'/awards/' + award.id"
               :key="award.id"
+              :to="'/awards/' + award.id"
               class="relative"
               @contextmenu="handleRightClick($event, award)">
               <svg
@@ -451,31 +513,58 @@ const saveUserData = async (data) => {
         <div
           class="grid grid-flow-col items-center sm:grid-rows-1 gap-4 sm:grid-cols-4">
           <button
-            v-if="userPending"
-            @click="resendConfirmationEmail"
-            class="form-secondary vertical-center col-start-1">
+            v-if="
+              userPending && ['admin', 'developer'].includes(userStore.role)
+            "
+            class="form-secondary vertical-center col-start-1"
+            @click="resendConfirmationEmail">
             <span>Poslať overenie</span>
           </button>
           <button
-            v-if="userPending"
-            @click="confirmRegistration"
-            class="form-secondary vertical-center col-start-1 sm:col-start-2">
+            v-if="
+              userPending && ['admin', 'developer'].includes(userStore.role)
+            "
+            class="form-secondary vertical-center col-start-1 sm:col-start-2"
+            @click="confirmRegistration">
             <span>Potvrdiť registráciu</span>
           </button>
-          <dropdown
+
+          <!-- New toggle for developer -->
+          <toggle
+            v-if="userRole && !userPending && userStore.role === 'developer'"
+            v-model="isDev"
+            class="col-start-1 sm:col-start-1"
+            label="Člen/-ka VpDNC"
+            @update:model-value="updateUserDevStatus" />
+
+          <toggle
+            v-if="
+              userRole &&
+              !['coach', 'user'].includes(userRole) &&
+              !userPending &&
+              ['admin', 'developer'].includes(userStore.role)
+            "
+            v-model="isClubManager"
+            class="col-span-1 sm:col-start-2"
+            label="Správca/-kyňa klubu"
+            @update:model-value="updateClubManagerStatus" />
+          <DropDown
             v-if="userRole && ['admin', 'developer'].includes(userStore.role)"
+            v-model="userRole"
             class="col-start-1 col-span-1 sm:col-start-3 sm:col-span-2"
             label="Funkcia"
-            v-model="userRole"
-            :disabled="
-              userRole === 'Vývojár' && useUserStore().role === 'admin'
-            "
+            :disabled="userRole === 'developer' && userStore.role === 'admin'"
             :options="[
-              'Administrátor/-ka',
-              'Hlavný/-á rozhodca/-kyňa',
-              'Vedúci/-a klubu',
-              'Používateľ/-ka',
-            ]" />
+              { text: 'Vývojár', value: 'developer', hidden: true },
+              { text: 'Administrátor/-ka', value: 'admin' },
+              { text: 'Hlavný/-a rozhodca/-kyňa', value: 'cap' },
+              { text: 'Vedúci/-a klubu', value: 'coach' },
+              { text: 'Používateľ/-ka', value: 'user' },
+              { text: 'Organizátor/-ka', value: 'organizer' },
+              { text: 'Junior organizátor/-ka', value: 'junior' },
+              { text: 'Tézový výbor', value: 'motion' },
+            ]"
+            @update:model-value="updateUserRole" />
         </div>
       </div>
     </div>

@@ -26,6 +26,8 @@
           title = 'DebRIEF';
         } else if (host === 'barca.juhaas.eu') {
           title = 'Barca';
+        } else if (host.includes("dev") || host === 'localhost') {
+          title = 'DN Cascade Dev';
         }
 
         document.title = title;

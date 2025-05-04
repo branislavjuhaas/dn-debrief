@@ -16,7 +16,6 @@ const dedicatedTo = [
   "Viere Kampošovej",
   "Branislavovi Erkenovi",
   "Terézii Brišovej",
-  "Tíkeji",
   "Branislavovi Faktorovi",
 ];
 
@@ -46,7 +45,7 @@ setSystemName();
 
 <template>
   <div class="gap-4">
-    <h1 class="text-5xl font-bold mb-2">O systéme {{ system }}</h1>
+    <h1>O systéme {{ system }}</h1>
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
       <div
         class="flex flex-row justify-between bg-white rounded-[1.25rem] p-5 gap-4 text-black vertical-center items-center">
@@ -61,7 +60,7 @@ setSystemName();
       <div
         class="flex flex-row justify-between bg-white rounded-[1.25rem] p-5 gap-4 text-black vertical-center items-center col-span-1 sm:col-span-2">
         <p class="font-bold">Autor</p>
-        <p>© 2024 Branislav Juhás, všetky práva vyhradené</p>
+        <p>© 2024 - 2025 Branislav Juhás, všetky práva vyhradené</p>
       </div>
     </div>
 

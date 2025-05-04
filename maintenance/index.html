@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
+    <title>DN Cascade - Stránka je momentálne nedostupná</title>
+    <style>
+      :root {
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+
+        --delay: 0s;
+
+        font-size: 12px;
+
+        background-color: white;
+        font-family: "Epilogue", sans-serif;
+        font-weight: 400;
+        color: #000;
+
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100dvh;
+        width: 100dvw;
+      }
+
+      h1 {
+        font-size: 3rem;
+        font-weight: 700;
+        margin: 0;
+        margin-bottom: 0.5rem;
+        text-align: left;
+        padding: 0;
+      }
+
+      header {
+        height: 3.75rem;
+      }
+
+      footer {
+        height: 3.75rem;
+      }
+
+      p {
+        font-size: 1rem;
+        font-weight: 400;
+        margin: 0;
+        padding: 0;
+        text-align: left;
+      }
+
+      .container {
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        height: 100%;
+        width: 100%;
+      }
+
+      .content {
+        background-color: #21d46e;
+      }
+
+      .center-children {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0;
+        padding-left: 20px;
+        padding-right: 20px;
+      }
+
+      .center {
+        width: 100%;
+        max-width: 1320px;
+        height: 100%;
+      }
+
+      .total-center {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+      }
+
+      .page-content {
+        width: 100%;
+        height: 100%;
+        padding-top: 7rem;
+        display: flex;
+        flex-direction: column;
+        color: white;
+        gap: 0.25rem;
+      }
+
+      .page-content p {
+        font-size: 1.25rem;
+        text-align: justify;
+        line-height: 150%;
+      }
+
+      #logo {
+        height: 2rem;
+      }
+
+      @media (min-width: 1024px) {
+        :root {
+          font-size: 16px;
+        }
+      }
+    </style>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const url = window.location.href;
+
+        if (url.includes("barca.juhaas.eu")) {
+          const logo = document.getElementById("logo");
+
+          logo.src = "barca.svg";
+          logo.alt = "Barca";
+
+          document.title = "Barca - Stránka je momentálne nedostupná";
+        } else if (url.includes("debrief.sda.sk")) {
+          const logo = document.getElementById("logo");
+          const copyright = document.getElementById("copyright");
+
+          logo.src = "debrief.svg";
+          logo.alt = "DebRIEF";
+
+          copyright.textContent = "2024 - 2025 | Branislav Juhás";
+
+          document.title = "DebRIEF - Stránka je momentálne nedostupná";
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <header class="center-children">
+        <div class="center total-center">
+          <img id="logo" src="dn-cascade.svg" alt="DN Cascade" />
+        </div>
+      </header>
+      <div class="content center-children">
+        <div class="center page-content">
+          <h1>Stránka je momentálne nedostupná</h1>
+          <p>{{ MESSAGE }}</p>
+        </div>
+      </div>
+      <footer class="center-children">
+        <div class="center total-center">
+          <p id="copyright">2024 - 2025 | Branislav Juhás</p>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

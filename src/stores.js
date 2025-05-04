@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
-import { translateRole } from "./translate.js";
+import { translateRole } from "./helpers/translate.js";
+import { formatSlovakDate } from "./helpers/utilities.js";
 
 /**
  * User store definition.
@@ -21,6 +22,9 @@ export const useUserStore = defineStore("user", {
     supervisorEmail: null,
     seasons: [],
     awards: [],
+    clubManager: false,
+    dev: false,
+    cookies: null,
   }),
   getters: {
     /**
@@ -29,6 +33,9 @@ export const useUserStore = defineStore("user", {
      */
     fullName() {
       return this.uid ? `${this.name} ${this.surname}` : null;
+    },
+    formattedBirthdate() {
+      return this.birthdate ? formatSlovakDate(this.birthdate) : null;
     },
     /**
      * Get an array of additional user data.
@@ -41,7 +48,7 @@ export const useUserStore = defineStore("user", {
         { name: "club", value: this.club ? this.club.name : null },
         { name: "address", value: this.address },
         { name: "phone", value: this.phone },
-        { name: "birthdate", value: this.birthdate },
+        { name: "birthdate", value: this.formattedBirthdate },
       ].filter((item) => item.value !== null && item.value !== undefined);
     },
     /**
@@ -70,6 +77,30 @@ export const useUserStore = defineStore("user", {
         )
       );
     },
+    /**
+     * Get pure user data.
+     * @returns {Object} The user data.
+     */
+    userData() {
+      return {
+        uid: this.uid,
+        provider: this.provider,
+        name: this.name,
+        surname: this.surname,
+        email: this.email,
+        role: this.role,
+        club: this.club,
+        address: this.address,
+        phone: this.phone,
+        birthdate: this.birthdate,
+        supervisor: this.supervisor,
+        supervisorEmail: this.supervisorEmail,
+        seasons: this.seasons,
+        awards: this.awards,
+        clubManager: this.clubManager,
+        dev: this.dev,
+      };
+    },
   },
   actions: {
     /**
@@ -88,6 +119,8 @@ export const useUserStore = defineStore("user", {
      * @param {string} supervisorEmail - The supervisor email.
      * @param {Array} seasons - The seasons.
      * @param {Array} awards - The awards.
+     * @param {boolean} clubManager - The club manager status.
+     * @param {boolean} dev - The developer program status.
      */
     setUser(
       uid,
@@ -104,6 +137,9 @@ export const useUserStore = defineStore("user", {
       supervisorEmail,
       seasons,
       awards,
+      clubManager,
+      dev,
+      cookies,
     ) {
       this.uid = uid;
       this.provider = provider;
@@ -119,6 +155,20 @@ export const useUserStore = defineStore("user", {
       this.supervisorEmail = supervisorEmail || null;
       this.seasons = seasons || [];
       this.awards = awards || [];
+      this.clubManager = clubManager || false;
+      this.dev = dev || false;
+      this.cookies = cookies || null;
+    },
+    /**
+     * Update user data in the store.
+     * @param {Object} userData - Partial or full user data to update.
+     */
+    updateUser(userData) {
+      Object.keys(userData).forEach((key) => {
+        if (key in this) {
+          this[key] = userData[key];
+        }
+      });
     },
     /**
      * Log out the user.
@@ -136,6 +186,9 @@ export const useUserStore = defineStore("user", {
       this.birthdate = null;
       this.seasons = [];
       this.awards = [];
+      this.clubManager = false;
+      this.dev = false;
+      this.cookies = null;
     },
     /**
      * Add a season to the user's seasons.
@@ -184,6 +237,7 @@ export const useFeedStore = defineStore("feed", {
   state: () => ({
     initialized: false,
     messages: [],
+    headerMessage: null,
   }),
   getters: {
     /**
@@ -198,9 +252,53 @@ export const useFeedStore = defineStore("feed", {
     /**
      * Initialize the feed messages.
      */
-    initialize(messages) {
+    initialize(messages, headerMessage) {
       this.messages = messages;
       this.initialized = true;
+      this.headerMessage = headerMessage;
+    },
+    dismissHeaderMessage() {
+      this.headerMessage = null;
+    },
+  },
+});
+
+export const useEventsStore = defineStore("event", {
+  state: () => ({
+    initialized: false,
+    events: [],
+  }),
+  getters: {},
+  actions: {
+    /**
+     * Initialize the events.
+     */
+    initialize(events) {
+      this.events = events;
+      this.initialized = true;
+    },
+    /**
+     * Add an event to the events.
+     */
+    async addEvent(event) {
+      // Convert the thumbnail to a download URL
+      if (event.thumbnail) {
+        const { getThumbnail } = await import("./firebase/events.js");
+        event.originalThumbnail = event.thumbnail;
+        event.thumbnail = await getThumbnail(event.thumbnail);
+      }
+      this.events.push(event);
+      this.events.sort((a, b) => a.beginningDate - b.beginningDate);
+    },
+    async updateEvent(event) {
+      // Convert the thumbnail to a download URL
+      if (event.thumbnail) {
+        const { getThumbnail } = await import("./firebase/events.js");
+        event.originalThumbnail = event.thumbnail;
+        event.thumbnail = await getThumbnail(event.thumbnail);
+      }
+      this.events = this.events.map((e) => (e.id === event.id ? event : e));
+      this.events.sort((a, b) => a.beginningDate - b.beginningDate);
     },
   },
 });

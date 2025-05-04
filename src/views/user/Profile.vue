@@ -1,11 +1,14 @@
 <script setup>
 // Import necessary components and functions
 import { useUserStore } from "../../stores.js";
-import { translateKey } from "../../translate.js";
+import { translateKey } from "../../helpers/translate.js";
 import router from "../../router.js";
 
 // Get the user store
 const userStore = useUserStore();
+
+// Host of the current window
+const host = window.location.hostname;
 
 /**
  * This asynchronous function handles user logout.
@@ -30,7 +33,7 @@ const logout = async () => {
 
 <template>
   <div class="gap-4">
-    <h1 class="text-5xl font-bold mb-2">{{ userStore.fullName }}</h1>
+    <h1>{{ userStore.fullName }}</h1>
     <div
       class="flex flex-col justify-between w-full bg-white min-h-60 rounded-[1.25rem] p-5 gap-16 transition-all">
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -50,7 +53,7 @@ const logout = async () => {
         </router-link>
       </div>
       <div
-        class="grid grid-flow-col gap-4 items-center sm:grid-rows-1 sm:grid-cols-[1fr_auto_auto]">
+        class="grid grid-flow-col gap-4 items-center sm:grid-rows-1 sm:grid-cols-[1fr_auto]">
         <div class="col-start-1 w-full">
           <div
             v-if="
@@ -99,17 +102,28 @@ const logout = async () => {
             </router-link>
           </div>
         </div>
-        <button
-          v-if="userStore.provider === 'password'"
-          @click="router.push('/profile/edit')"
-          class="form-secondary vertical-center col-start-1 sm:col-start-2">
-          <span>Zmeniť heslo</span>
-        </button>
-        <button
-          @click="logout"
-          class="form-primary vertical-center col-start-1 sm:col-start-3">
-          <span>Odhlásiť sa</span>
-        </button>
+        <div
+          class="flex flex-col sm:flex-row col-start-1 sm:col-start-2 gap-4 items-center w-full sm:w-auto">
+          <button
+            v-if="
+              userStore.provider &&
+              userStore.provider.toLowerCase().includes('password')
+            "
+            class="form-secondary vertical-center max-sm:w-full"
+            @click="router.push('/users/me/reset')">
+            <span>Zmeniť heslo</span>
+          </button>
+          <router-link
+            to="/users/me/edit"
+            class="form-secondary vertical-center max-sm:w-full">
+            <span>Upraviť profil</span>
+          </router-link>
+          <button
+            class="form-primary vertical-center max-sm:w-full"
+            @click="logout">
+            <span>Odhlásiť sa</span>
+          </button>
+        </div>
       </div>
     </div>
     <router-link
@@ -118,12 +132,22 @@ const logout = async () => {
       class="alternative vertical-center w-full">
       <p>Prejsť na panel správy</p>
     </router-link>
+    <a
+      v-if="
+        userStore.dev === true &&
+        !(host.includes('dev') || host.includes('localhost'))
+      "
+      href="https://dev.debrief.sda.sk"
+      to="/manage"
+      class="alternative vertical-center w-full">
+      <p>Otvoriť najnovšiu verziu pre členov Vývojového programu DN Cascade</p>
+    </a>
   </div>
 </template>
 
 <style scoped>
 .alternative {
-  @apply flex flex-row items-center h-12 bg-white text-black rounded-[1.25rem] border-2 border-red border-opacity-0 font-bold px-5 duration-150 cursor-pointer hover:border-opacity-100;
+  @apply flex flex-row items-center min-h-12 py-2 bg-white text-black rounded-[1.25rem] border-2 border-red border-opacity-0 font-bold px-5 duration-150 cursor-pointer hover:border-opacity-100;
 }
 
 #legends {

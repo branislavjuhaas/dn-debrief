@@ -3,13 +3,13 @@
 // Importing necessary components and libraries
 import { onAuthStateChanged, getAuth } from "firebase/auth";
 import { useLoadingStore, useUserStore } from "./stores.js";
-import { nextTick, onMounted, watchEffect } from "vue";
+import { nextTick, onMounted, watchEffect, watch, computed } from "vue";
 import { googleOneTap } from "vue3-google-login";
 import Header from "./components/Header.vue";
 import Footer from "./components/Footer.vue";
 import router from "./router.js";
 import { logEvent } from "firebase/analytics";
-import { analytics } from "./main.js";
+import { analytics, initializeAnalytics } from "./main.js";
 
 const host = window.location.hostname;
 let title = "DN Cascade";
@@ -18,6 +18,8 @@ if (host === "debrief.sda.sk") {
   title = "DebRIEF";
 } else if (host === "barca.juhaas.eu") {
   title = "Barca";
+} else if (host.includes("dev") || host === "localhost") {
+  title = "DN Cascade Dev";
 }
 
 // Initializing user and loading stores
@@ -45,8 +47,17 @@ const handleUserCreation = async (user, userData) => {
 
   console.log(userData);
 
+  if (host.includes("dev") && !userData.dev) {
+    await router.push({ name: "Undev" });
+    logout();
+    return;
+  }
+
   // If userData is not provided, create a new user
   if (!userData) {
+    // Remove cookie 'cookies=true' if it exists
+    document.cookie = "cookies=true; max-age=0; path=/";
+
     // If the user is email password user, create from store
     if (user.providerData[0].providerId === "password") {
       createUser(user.uid, user.email, userStore.name, userStore.surname).catch(
@@ -81,10 +92,13 @@ const handleUserCreation = async (user, userData) => {
     // Set the user data
     userStore.setUser(
       user.uid,
-      user.providerData[0].providerId,
+      user.providerData.map((p) => p.providerId).join(":"),
       user.email,
       user.displayName.substring(0, user.displayName.lastIndexOf(" ")),
       user.displayName.substring(user.displayName.lastIndexOf(" ") + 1),
+      null,
+      null,
+      null,
       null,
       null,
       null,
@@ -99,7 +113,13 @@ const handleUserCreation = async (user, userData) => {
     loadingStore.loadingEnd();
 
     // Redirect to the Join page with a query parameter
-    await router.push({ name: "Join", query: { message: "Ak sa chceš zúčastniť našich podujatí, staň sa členom alebo členkou SDA!" } });
+    await router.push({
+      name: "Join",
+      query: {
+        message:
+          "Ak sa chceš zúčastniť našich podujatí, staň sa členom alebo členkou SDA!",
+      },
+    });
 
     return;
   }
@@ -107,11 +127,11 @@ const handleUserCreation = async (user, userData) => {
   // If userData is provided, set the user data
   userStore.setUser(
     user.uid,
-    user.providerData[0].providerId,
+    user.providerData.map((p) => p.providerId).join(":"),
     user.email,
     userData.name,
     userData.surname,
-    userData.role,
+    user.role,
     userData.club,
     userData.address,
     userData.phone,
@@ -120,7 +140,18 @@ const handleUserCreation = async (user, userData) => {
     userData.supervisorEmail,
     userData.seasons,
     userData.awards,
+    userData.clubManager,
+    userData.dev,
+    userData.cookies,
   );
+
+  // Set the cookie based on userData.cookies
+  if (!userData.cookies) {
+    document.cookie = "cookies=true; max-age=0; path=/";
+  } else {
+    document.cookie = "cookies=true; max-age=31536000; path=/";
+    initializeAnalytics();
+  }
 };
 
 /**
@@ -129,21 +160,35 @@ const handleUserCreation = async (user, userData) => {
  */
 const handleRedirection = async (authenticated) => {
   try {
+    console.log(
+      "Redirecting user based on route meta, which is: ",
+      router.currentRoute.value.name,
+    );
     // If the user is already on the home page, do nothing
-    if (router.currentRoute.value.name === "Home") {
+    if (
+      router.currentRoute.value.name === "Home" ||
+      router.currentRoute.value.name === "Undev"
+    ) {
       return;
     }
 
     const routeMeta = router.currentRoute.value.meta;
 
     // If the route's meta is anonymousOnly and user is logged in, redirect to home
-    if (routeMeta.anonymousOnly && authenticated) {
+    if (router.currentRoute.value.name === "Auth") {
+      const thenQuery = router.currentRoute.value.query.then;
+      await router.push(thenQuery ? thenQuery : { name: "Home" });
+    } else if (routeMeta.anonymousOnly && authenticated) {
       console.log("Redirecting to home");
       await router.push({ name: "Home" });
     }
     // If the route's meta requiresAuth and user is not logged in, redirect to auth
     else if (routeMeta.requiresAuth && !authenticated) {
-      await router.push({ name: "Auth" });
+      const currentRoute = router.currentRoute.value;
+      await router.push({
+        name: "Auth",
+        query: { then: currentRoute.fullPath },
+      });
     }
     // If the route's meta requires a specific role and user does not have it, redirect to unauthorized
     else if (routeMeta.roles && !routeMeta.roles.includes(userStore.role)) {
@@ -200,10 +245,15 @@ onMounted(() => {
     loadingStore.loadingStart();
     const { getUser } = await import("./firebase/auth.js");
     if (user) {
+      // Set the user role based on the ID token to ensure server-side accuracy
+      user.role = await user.getIdTokenResult().then((idTokenResult) => {
+        return idTokenResult.claims.role;
+      });
+
       // If the user does not exist, create it
       // Redirect the user to the home page
       // if google is defined
-      if (google.accounts.id) {
+      if (typeof google !== "undefined" && google.accounts.id) {
         google.accounts.id.cancel();
       }
 
@@ -222,9 +272,14 @@ onMounted(() => {
     // Router guard to protect routes based on authentication status
     router.beforeEach((to, from, next) => {
       if (to.meta.requiresAuth && !userStore.uid) {
-        next("/auth");
+        // Get the current route and redirect based on the route meta
+        const currentRoute = router.currentRoute.value;
+        next(
+          "/auth" +
+            (currentRoute.fullPath ? `?then=${currentRoute.fullPath}` : ""),
+        );
       } else if (to.meta.anonymousOnly && userStore.uid) {
-        next("/profile");
+        next("/users/me");
       } else if (to.meta.roles && !to.meta.roles.includes(userStore.role)) {
         next("/unauthorized");
       } else {
@@ -234,9 +289,11 @@ onMounted(() => {
   });
 });
 
-// Watch for loading state changes and prevent keyboard navigation when loading
-watchEffect(() => {
-  if (loadingStore.loading) {
+// Create a computed reference to ensure reactivity
+const isLoading = computed(() => loadingStore.loading);
+
+watch(isLoading, (value) => {
+  if (value) {
     window.addEventListener("keydown", preventKeyboardNavigation, false);
   } else {
     window.removeEventListener("keydown", preventKeyboardNavigation, false);
@@ -268,7 +325,7 @@ watchEffect(() => {
     <!-- Loading overlay -->
     <div
       v-if="loadingStore.loading"
-      class="absolute inset-0 bg-transparent"></div>
+      class="absolute inset-0 bg-transparent cursor-wait"></div>
   </div>
 </template>
 

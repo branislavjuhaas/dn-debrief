@@ -13,6 +13,7 @@ const Recipient = require("mailersend").Recipient;
 const EmailParams = require("mailersend").EmailParams;
 const MailerSend = require("mailersend").MailerSend;
 const { onSchedule } = require("firebase-functions/v2/scheduler");
+const { onDocumentCreated } = require("firebase-functions/v2/firestore");
 
 // All available logging functions
 const { logger } = require("firebase-functions/v2");
@@ -264,12 +265,16 @@ exports.sendRegistrationReminders = onSchedule(
       const usersToRemind = usersSnapshot.docs.filter((doc) => {
         const userData = doc.data();
         const hasCurrentYearSeason = userData.seasons?.some(
-          (season) => season.year === currentYear
+          (season) => season.year === currentYear,
         );
         const hasUnconfirmedCurrentYearSeason = userData.seasons?.some(
-          (season) => season.year === currentYear && !season.confirmed
+          (season) => season.year === currentYear && !season.confirmed,
         );
-        return hasCurrentYearSeason && hasUnconfirmedCurrentYearSeason && !userData.reminded;
+        return (
+          hasCurrentYearSeason &&
+          hasUnconfirmedCurrentYearSeason &&
+          !userData.reminded
+        );
       });
 
       for (const userDoc of usersToRemind) {
@@ -311,6 +316,90 @@ exports.sendRegistrationReminders = onSchedule(
       logger.info("Successfully sent registration reminders.");
     } catch (error) {
       logger.error("Error sending registration reminders:", error);
+    }
+  },
+);
+
+/**
+ * Sets the 'createdAt' field for a user document upon creation.
+ *
+ * @function setCreatedAt
+ */
+exports.setCreatedAt = onDocumentCreated("users/{userId}", async (event) => {
+  const userId = event.params.userId;
+  const userRef = admin.firestore().collection("users").doc(userId);
+  await userRef.set(
+    { createdAt: admin.firestore.FieldValue.serverTimestamp() },
+    { merge: true },
+  );
+});
+
+/**
+ * Sets the 'season' field for an event document upon creation based on its beginningDate.
+ *
+ * @function setEventSeason
+ */
+exports.setEventSeason = onDocumentCreated(
+  "events/{eventId}",
+  async (event) => {
+    const eventId = event.params.eventId;
+    const data = event.data.data();
+    if (!data || !data.beginningDate) {
+      logger.error("Missing beginningDate for event", eventId);
+      return;
+    }
+    const date = data.beginningDate.toDate();
+    const month = date.getMonth(); // 0-indexed (0 = January)
+    const year = date.getFullYear();
+    const season = month < 8 ? `${year - 1}/${year}` : `${year}/${year + 1}`;
+    await admin
+      .firestore()
+      .collection("events")
+      .doc(eventId)
+      .update({ season });
+  },
+);
+
+/**
+ * Callable function to set user's role by provided UID and role.
+ * Function writes the role to the user's custom claims and firestore user document.
+ * Function is protected by Firebase App Check and requires 'admin' or 'developer' role.
+ *
+ * @function setUserRole
+ * @param {Object} data - The request data object.
+ * @param {Object} request - The request object.
+ * @returns {Object} The response object indicating success.
+ * @throws {functions.https.HttpsError} If the user does not have the required permissions or if an error occurs during the execution
+ * of the function.
+ * @async
+ */
+exports.setUserRole = onCall(
+  { enforceAppCheck: true },
+  async (data, request) => {
+    const uid = data.data.uid;
+    const role = data.data.role;
+
+    if (
+      !data.auth.token.role ||
+      !["admin", "developer"].includes(data.auth.token.role)
+    ) {
+      throw new functions.https.HttpsError(
+        "permission-denied",
+        "Permission denied",
+      );
+    }
+
+    try {
+      await admin.auth().setCustomUserClaims(uid, { role });
+      await admin.firestore().collection("users").doc(uid).update({ role });
+      return { success: true };
+    } catch (error) {
+      logger.error("Error setting user role:", error);
+      throw new functions.https.HttpsError(
+        "internal",
+        "Internal server error",
+        error,
+      );
     }
   },
 );

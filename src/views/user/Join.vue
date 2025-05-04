@@ -1,44 +1,36 @@
 <script setup>
 // Importing necessary components and libraries
 import Field from "../../components/Field.vue";
-import Dropdown from "../../components/Dropdown.vue";
+import DropDown from "../../components/DropDown.vue";
 import { useUserStore } from "../../stores.js";
 import { onMounted, ref, computed, watch } from "vue";
 import { getClubs, joinAdultUser, joinUser } from "../../firebase/structure.js";
 import router from "../../router.js";
+import { formatISODate } from "../../helpers/utilities.js";
+
+const getAge = (birthd) => {
+  console.log("Birthdate:", birthd);
+  return (
+    (new Date().getTime() - new Date(birthd).getTime()) /
+    (1000 * 60 * 60 * 24 * 365.25)
+  );
+};
 
 // Initializing user store
 const userStore = useUserStore();
 
-// If the user was registered in previous season
-const wasRegistered = userStore.seasons.some(
-  (season) => season.year === (new Date().getFullYear() - 1).toString(),
-);
-
 // State variables
-const club = ref(userStore.club ? userStore.club.name : "");
-console.log(userStore.birthdate);
+const selectedClubId = ref(userStore.club ? userStore.club.id : "");
+const clubs = ref([]);
 const birthdate = ref(
-  userStore.birthdate
-    ? new Date(
-        userStore.birthdate.split(". ").reverse().join("-"),
-      ).toLocaleDateString("en-CA")
-    : "",
+  userStore.birthdate ? formatISODate(userStore.birthdate) : "",
 );
 console.log("Assigned birthdate:", birthdate.value);
 const address = ref(userStore.address || "");
 const phone = ref(userStore.phone || "");
 const adult = ref(true);
 const now = new Date();
-const birthdateDate = new Date(birthdate.value);
-let age = now.getFullYear() - birthdateDate.getFullYear();
-if (
-  now.getMonth() < birthdateDate.getMonth() ||
-  (now.getMonth() === birthdateDate.getMonth() &&
-    now.getDate() < birthdateDate.getDate())
-) {
-  age--;
-}
+let age = getAge(birthdate.value);
 adult.value = age >= 18;
 
 // State variables for non-adult users
@@ -49,19 +41,16 @@ console.log(userStore);
 const mail = ref(userStore.supervisorEmail || "");
 
 // Fetch clubs data on component mount
-let clubsData = ref([]);
 onMounted(async () => {
-  clubsData.value = await getClubs(true);
-  clubsData.value.sort((a, b) => a.name.localeCompare(b.name));
+  clubs.value = await getClubs(true);
+  clubs.value.sort((a, b) => a.name.localeCompare(b.name));
 });
-// Compute club names from clubs data
-const clubNames = computed(() => clubsData.value.map((club) => club.name));
 
 // Compute whether the form can be submitted
 const canSubmit = computed(() => {
   if (!adult.value) {
     return (
-      club.value &&
+      selectedClubId.value &&
       birthdate.value &&
       address.value &&
       supervisor.value &&
@@ -69,14 +58,10 @@ const canSubmit = computed(() => {
       phone.value
     );
   } else {
-    return club.value && birthdate.value && address.value && phone.value;
+    return (
+      selectedClubId.value && birthdate.value && address.value && phone.value
+    );
   }
-});
-
-// Watch for changes in club selection
-let selectedClub = null;
-watch(club, (newClubName) => {
-  selectedClub = clubsData.value.find((club) => club.name === newClubName);
 });
 
 const seasons =
@@ -86,16 +71,9 @@ const seasons =
 
 // Watch for changes in birthdate to determine if user is an adult
 watch(birthdate, (birthdate) => {
-  const birthdateDate = new Date(birthdate);
   const now = new Date();
-  let age = now.getFullYear() - birthdateDate.getFullYear();
-  if (
-    now.getMonth() < birthdateDate.getMonth() ||
-    (now.getMonth() === birthdateDate.getMonth() &&
-      now.getDate() < birthdateDate.getDate())
-  ) {
-    age--;
-  }
+  let age = getAge(birthdate);
+  console.log("Age:", age);
   adult.value = age >= 18;
 });
 
@@ -181,9 +159,6 @@ const sendVerificationEmail = async () => {
  * @returns {Promise<void>} - Promise to handle user registration
  */
 const register = async () => {
-  const birthdateDate = new Date(birthdate.value);
-  const birthdateString = `${birthdateDate.getDate()}. ${birthdateDate.getMonth() + 1}. ${birthdateDate.getFullYear()}`;
-
   // Only add new seasons to the user's seasons array
   const seasonsString = [
     ...userStore.seasons,
@@ -196,28 +171,28 @@ const register = async () => {
       ),
   );
 
-  userStore.club = club;
+  userStore.club = clubs.value.find((club) => club.id === selectedClubId.value);
   userStore.address = address;
   userStore.phone = phone;
-  userStore.birthdate = ref(birthdateString);
+  userStore.birthdate = new Date(birthdate.value);
   userStore.seasons = seasonsString;
 
   if (adult.value) {
     await joinAdultUser(
       userStore.uid,
-      selectedClub,
+      selectedClubId.value,
       address.value,
       phone.value,
-      birthdateString,
+      new Date(birthdate.value),
       seasonsString,
     );
   } else {
     await joinUser(
       userStore.uid,
-      selectedClub,
+      selectedClubId.value,
       address.value,
       phone.value,
-      birthdateString,
+      new Date(birthdate.value),
       seasonsString,
       supervisor.value,
       mail.value,
@@ -246,44 +221,43 @@ const message = route.query.message || "";
 
 <template>
   <div class="gap-4">
-    <h1 class="text-5xl font-bold mb-2">
+    <h1>
       {{ "Registrácia do SDA na sezónu " + seasons.join("/") }}
     </h1>
     <div
       class="flex flex-col justify-between w-full bg-white min-h-60 rounded-[1.25rem] p-5 gap-16">
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Dropdown
-          name="club"
-          v-model.trim="club"
-          label="Debatný klub"
-          type="dropdown"
-          :options="clubNames" />
+        <DropDown
+          v-model="selectedClubId"
+          :label="'Debatný klub'"
+          :options="clubs.map((club) => ({ text: club.name, value: club.id }))"
+          :disabled="false" />
         <Field
-          name="address"
           v-model.trim="address"
+          name="address"
           label="Adresa bydliska"
           type="text"
           placeholder="Ventúrska 5, 811 01 Bratislava" />
         <Field
-          name="birthdate"
           v-model.trim="birthdate"
+          name="birthdate"
           label="Dátum narodenia"
           type="date" />
         <Field
-          name="phoneNumber"
           v-model.trim="phone"
+          name="phoneNumber"
           label="Telefónne číslo"
           type="tel" />
         <Field
           v-if="!adult"
-          name="supervisor"
           v-model.trim="supervisor"
+          name="supervisor"
           label="Celé meno zákonného zástupcu"
           type="text" />
         <Field
           v-if="!adult"
-          name="mail"
           v-model.trim="mail"
+          name="mail"
           label="E-mail zákonného zástupcu"
           type="email" />
       </div>
@@ -294,8 +268,8 @@ const message = route.query.message || "";
         </div>
         <button
           :disabled="!canSubmit"
-          @click="register"
-          class="form-primary vertical-center col-start-1 sm:col-start-2 row-start-2 sm:row-start-1">
+          class="form-primary vertical-center col-start-1 sm:col-start-2 row-start-2 sm:row-start-1"
+          @click="register">
           <span>Registrovať</span>
         </button>
       </div>

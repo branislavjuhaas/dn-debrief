@@ -1,7 +1,14 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import { reevaluateMembersCount, createClub, createMessage, editClub, editMessage } from "../../firebase/structure.js";
+import {
+  reevaluateMembersCount,
+  createClub,
+  createMessage,
+  editClub,
+  editMessage,
+} from "../../firebase/structure.js";
 import { useRoute, useRouter } from "vue-router";
+import { version } from "../../../package.json";
 
 const command = ref("");
 const output = ref([]);
@@ -54,17 +61,26 @@ const commands = {
         arguments: [],
         example: "clear",
       },
+      ver: {
+        description: "Show the current version",
+        arguments: [],
+        example: "ver",
+      },
     };
 
     if (args.length === 0) {
       for (const cmd in availableCommands) {
-        output.value.push(`${cmd.toUpperCase()}   -   ${availableCommands[cmd].description}`);
+        output.value.push(
+          `${cmd.toUpperCase()}   -   ${availableCommands[cmd].description}`,
+        );
       }
     } else {
       const cmd = args[0];
       if (availableCommands[cmd]) {
         output.value.push(`${cmd}: ${availableCommands[cmd].description}`);
-        output.value.push(`Arguments: ${availableCommands[cmd].arguments.join(", ")}`);
+        output.value.push(
+          `Arguments: ${availableCommands[cmd].arguments.join(", ")}`,
+        );
         output.value.push(`Example: ${availableCommands[cmd].example}`);
       } else {
         output.value.push(`No help available for command: ${cmd}`);
@@ -111,6 +127,9 @@ const commands = {
   clear: () => {
     output.value = [];
   },
+  ver: () => {
+    output.value.push(`DN Cascade ${version} (Member of DN Family)`);
+  },
 };
 
 const executeCommand = () => {
@@ -152,40 +171,40 @@ onMounted(() => {
 
 <template>
   <div class="gap-4 h-full">
-    <h1 class="text-5xl font-bold mb-2">Terminál</h1>
+    <h1>Terminál</h1>
     <div
       class="flex flex-col w-full bg-black text-white min-h-60 rounded-[1.25rem] p-5 transition-all overflow-auto scrollbar-hidden">
       <div id="terminal-output">
-        <pre class="font-epilogue">{{ output.join("\n") }}</pre>
+        <pre class="font-epilogue tracking-wide">{{ output.join("\n") }}</pre>
       </div>
       <div class="flex flex-row w-full items-center">
         <p class="text-white">?</p>
         <input
           v-model="command"
+          class="text-white bg-black text-normal w-full px-2 border-0 focus-border-0"
           @keyup.enter="executeCommand()"
-          @keydown="handleKeyDown"
-          class="text-white bg-black text-normal w-full px-2 border-0 focus-border-0" />
+          @keydown="handleKeyDown" />
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-  .form-primary {
-    background-color: black;
-    color: white;
-    border: 2px solid white;
-    padding: 0.5rem 1rem;
-    border-radius: 0.25rem;
-    cursor: pointer;
-  }
+.form-primary {
+  background-color: black;
+  color: white;
+  border: 2px solid white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
 
-  .form-primary:hover {
-    background-color: white;
-    color: black;
-  }
+.form-primary:hover {
+  background-color: white;
+  color: black;
+}
 
-  .focus-border-0:focus {
-    outline: none;
-  }
+.focus-border-0:focus {
+  outline: none;
+}
 </style>

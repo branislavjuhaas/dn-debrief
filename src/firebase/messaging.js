@@ -15,13 +15,23 @@ import {
 import { useFeedStore, useUserStore } from "../stores.js";
 import { version } from "../../package.json";
 
+let system = "DN Cascade";
+
+if (window.location.hostname === "debrief.sda.sk") {
+  system = "DebRIEF";
+} else if (window.location.hostname === "barca.juhaas.eu") {
+  system = "Barca";
+}
+
 // Definujte správy
 const messages = {
   welcome: {
     id: "welcome",
-    title: "Predstavujeme DebRIEF {{Version}}",
+    title: "Predstavujeme " + system + " " + version,
     message:
-      "Vitaj v novej verzii autonónmneho systému DebRIEF, všetky chyby a návrhy funkcií ohlás, prosím, na debrief@sda.sk.",
+      "Vitaj v novej verzii autonónmneho systému " +
+      system +
+      ", všetky chyby a návrhy funkcií ohlás, prosím, na debrief@sda.sk.",
     link: "mailto:debrief@sda.sk?subject=[DebRIEF] Chyba alebo návrh funkcie",
     local: false,
   },
@@ -54,14 +64,14 @@ const messages = {
     title: "Pridaj všetky kluby",
     message:
       "Nezabudni pridať všetky kluby, aby sa mohli zaregistrovať ich členovia.",
-    link: "/manage/clubs",
+    link: "/clubs",
     local: true,
   },
   manageClub: {
     id: "manageClub",
     title: "Spravuj svoj klub",
     message: "Pozri sa na nových členov tvojho klubu a sleduj, ako rastie.",
-    link: "/manage/clubs/{{Id}}",
+    link: "/clubs/{{Id}}",
     local: true,
   },
   learnMore: {
@@ -75,6 +85,37 @@ const messages = {
 };
 
 /**
+ * Fetches one message from Firestore where header is true and active is true.
+ *
+ * @returns {Promise<Object>} - A promise that resolves to the header message object.
+ */
+export const getHeaderMessage = async () => {
+  // Get Firestore database instance
+  const db = getFirestore();
+
+  // Reference to the messages collection in Firestore
+  const headersCollection = collection(db, "headers");
+
+  // Create a Firestore query to fetch the header message
+  const q = query(headersCollection, where("active", "==", true));
+
+  // Execute the query and get the documents
+  const querySnapshot = await getDocs(q);
+
+  // Iterate through the query results and construct message objects
+  let headerMessage = null;
+  querySnapshot.forEach((doc) => {
+    const data = doc.data();
+    headerMessage = {
+      id: doc.id,
+      ...data,
+    };
+  });
+
+  return headerMessage; // Return the header message object
+};
+
+/**
  * Fetches cloud messages from Firestore based on user filters and updates the feed store.
  *
  * @returns {Promise<Array>} - A promise that resolves to an array of messages.
@@ -83,7 +124,10 @@ const getCloudMessages = async () => {
   // Check if the feed store is already initialized and return the existing messages if true
   if (useFeedStore().initialized) {
     console.log("Feed store already initialized");
-    return useFeedStore().feedMessages;
+    return {
+      feed: useFeedStore().feedMessages,
+      header: useFeedStore().headerMessage,
+    };
   }
 
   console.log("Fetching cloud messages");
@@ -131,9 +175,11 @@ const getCloudMessages = async () => {
     messages.push(message); // Add the message to the messages array
   });
 
+  const header = await getHeaderMessage(); // Fetch the header message
+
   // Update the feed store with the fetched messages
-  useFeedStore().initialize(messages);
-  return messages; // Return the fetched messages
+  useFeedStore().initialize(messages, header);
+  return { feed: messages, header: header };
 };
 
 /**
@@ -145,17 +191,16 @@ export const feed = async (user) => {
   let feedMessages = [];
 
   let welcomeMessage = { ...messages.welcome };
-  welcomeMessage.title = welcomeMessage.title.replace("{{Version}}", version);
   feedMessages.push(welcomeMessage);
 
   if (!user || !user.uid) {
     feedMessages.push(messages.auth);
-    return feedMessages;
+    return { feed: feedMessages, header: null };
   }
 
   if (!user.isJoining) {
     feedMessages.push(messages.join);
-    return feedMessages;
+    return { feed: feedMessages, header: null };
   }
 
   if (user.isJoining && !user.isMember) {
@@ -173,13 +218,15 @@ export const feed = async (user) => {
   }
 
   const cloudMessages = await getCloudMessages();
-  feedMessages = feedMessages.concat(cloudMessages);
+  feedMessages = feedMessages.concat(cloudMessages.feed);
 
   if (feedMessages.length <= 2) {
     feedMessages.push(messages.learnMore);
   }
 
-  return feedMessages;
+  console.log("Feed messages:", feedMessages);
+
+  return { feed: feedMessages, header: cloudMessages.header || null };
 };
 
 /**

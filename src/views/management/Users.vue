@@ -1,44 +1,27 @@
 <script setup>
-// Import necessary components and functions
-import { useLoadingStore, useUserStore } from "../../stores.js";
-import Dropdown from "../../components/Dropdown.vue";
-import { computed, onMounted, ref } from "vue";
-import {
-  getClubs,
-  getUsers,
-  fetchAllUsers,
-  fetchAllClubs,
-} from "../../firebase/structure.js";
-import { useRoute } from "vue-router";
-import { translateRole } from "../../translate.js";
-import Field from "../../components/Field.vue";
-import router from "../../router.js";
+import { ref, computed, onMounted } from "vue";
+import { getRecentUsers, getUserStatistics } from "../../firebase/structure.js";
+import { useLoadingStore } from "../../stores.js";
+import { translateRole } from "../../helpers/translate.js";
 
-// Define properties
-const props = defineProps(["filter"]);
-
-// Define user store
-const userStore = useUserStore();
-
-// Start loading
-useLoadingStore().loadingStart();
-
-// Define reactive variables
-const route = useRoute();
-const clubFilter = ref("");
-const quickFilter = ref("");
-const currentClub = ref("...");
-const clubsNames = ref([]);
-let clubs = [];
-const users = ref([]);
+const currentYear = new Date().getFullYear();
 const exported = ref(false);
-const registrationYearFilter = ref("");
-const years = Array.from({ length: new Date().getFullYear() - 2023 + (new Date().getMonth() >= 8 ? 1 : 0) }, (_, i) =>
-  (2024 + i).toString(),
-);
 
-// Function to get club name by id
-const getClubNameById = (id) => clubs.find((club) => club.id === id).name;
+const usersLoaded = ref(false);
+
+const totalUsers = ref(1);
+const registeredUsers = ref(0);
+const confirmedUsers = ref(0);
+
+const recentUsers = ref([]);
+
+const circumference = computed(() => Math.PI * 2 * 45);
+const offset = computed(
+  () => (totalUsers.value - registeredUsers.value) / totalUsers.value,
+);
+const confirmedOffset = computed(
+  () => (totalUsers.value - confirmedUsers.value) / totalUsers.value,
+);
 
 /**
  * Asynchronously exports all users.
@@ -48,6 +31,9 @@ const getClubNameById = (id) => clubs.find((club) => club.id === id).name;
  */
 const exportAll = async () => {
   const ExcelJS = await import("exceljs");
+  const { fetchAllUsers, fetchAllClubs } = await import(
+    "../../firebase/structure.js"
+  );
 
   useLoadingStore().loadingStart();
 
@@ -107,7 +93,7 @@ const exportAll = async () => {
 
   // Add table to the worksheet
   worksheet.addTable({
-    name: "UsersTable",
+    name: "Users",
     ref: "A1",
     headerRow: true,
     totalsRow: false,
@@ -134,6 +120,49 @@ const exportAll = async () => {
     column.width = maxLength + 2; // Add some padding to the width
   });
 
+  const clubsSheet = workbook.addWorksheet("Debatné kluby"); // Renamed from 'clubs'
+
+  const clubColumns = [
+    { header: "Názov", filterButton: true },
+    { header: "Aktívny", filterButton: true },
+    { header: "Počet členov", filterButton: true },
+  ];
+
+  const clubRows = clubsData.map((club) => [
+    club.name,
+    club.active ? "Áno" : "Nie",
+    {
+      formula: `COUNTIFS(Users[Debatný klub], "${club.name}", Users[Registrovaný člen], "Áno")`,
+    },
+  ]);
+
+  clubsSheet.addTable({
+    name: "Clubs",
+    ref: "A1",
+    headerRow: true,
+    totalsRow: false,
+    style: {
+      theme: "TableStyleMedium9",
+      showRowStripes: true,
+    },
+    columns: clubColumns.map((col) => ({
+      name: col.header,
+      filterButton: col.filterButton,
+    })),
+    rows: clubRows,
+  });
+
+  clubsSheet.columns.forEach((column, index) => {
+    let maxLength = 0;
+    column.eachCell({ includeEmpty: true }, (cell) => {
+      const columnLength = cell.value ? cell.value.toString().length : 10;
+      if (columnLength > maxLength) {
+        maxLength = columnLength;
+      }
+    });
+    column.width = maxLength + 2;
+  });
+
   // Create a Blob from the workbook and download it
   const buffer = await workbook.xlsx.writeBuffer();
   const blob = new Blob([buffer], {
@@ -153,175 +182,175 @@ const exportAll = async () => {
   useLoadingStore().loadingEnd();
 };
 
-// On component mount
 onMounted(async () => {
-  clubs = (await Promise.all([getClubs(false)]))[0];
-  // If filtered, get the club with params filter. filter param is a clubs id
-  if (props.filter) {
-    currentClub.value = clubs.find((club) => club.id === route.params.filter);
-    // If no club is found, redirect to homepage
-    if (!currentClub.value) {
-      useLoadingStore().loadingEnd();
-      router.push("/");
-      return;
-    }
+  try {
+    const {
+      totalUsers: total,
+      usersCurrentYear: registered,
+      usersCurrentYearConfirmed: confirmed,
+    } = await getUserStatistics();
+
+    console.log("STATS", total, registered, confirmed);
+
+    totalUsers.value = total;
+    registeredUsers.value = registered;
+    confirmedUsers.value = confirmed;
+
+    usersLoaded.value = true;
+  } catch (error) {
+    console.error("Failed to fetch user statistics:", error);
   }
 
-  clubsNames.value = clubs.map((club) => club.name);
-
-  const [usersData] = await Promise.all([getUsers(currentClub.value.id)]);
-  users.value = usersData;
-
-  useLoadingStore().loadingEnd();
-});
-
-// Computed property for filtered users
-const filteredUsers = computed(() => {
-  const currentYear = new Date().getFullYear().toString();
-  return users.value
-    .filter((user) => {
-      const isClubMatch = clubFilter.value
-        ? user.club && getClubNameById(user.club.id) === clubFilter.value
-        : true;
-
-      const isQuickMatch = quickFilter.value
-        ? (user.name.toLowerCase() + " " + user.surname.toLowerCase()).includes(
-            quickFilter.value.toLowerCase(),
-          ) ||
-          user.id.toLowerCase().includes(quickFilter.value.toLowerCase()) ||
-          (user.role
-            ? user.role.toLowerCase().includes(quickFilter.value.toLowerCase())
-            : false)
-        : true;
-
-      const isRegistrationYearMatch = registrationYearFilter.value
-        ? Array.isArray(user.seasons) &&
-          user.seasons.some(
-            (season) =>
-              season.year === registrationYearFilter.value && season.confirmed,
-          )
-        : true;
-
-      return isClubMatch && isQuickMatch && isRegistrationYearMatch;
-    })
-    .sort((a, b) => {
-      const aConfirmed = a.seasons?.some(
-        (season) => season.year === currentYear && season.confirmed,
-      );
-      const bConfirmed = b.seasons?.some(
-        (season) => season.year === currentYear && season.confirmed,
-      );
-
-      if (aConfirmed && !bConfirmed) return -1;
-      if (!aConfirmed && bConfirmed) return 1;
-      return 0;
-    });
+  recentUsers.value = await getRecentUsers();
+  console.log(recentUsers.value);
 });
 </script>
 
 <template>
   <div class="gap-4">
-    <h1 class="text-5xl font-bold mb-2">
-      {{
-        !props.filter
-          ? "Zoznam používateľov"
-          : "Debatný klub " + (currentClub ? currentClub.name : "")
-      }}
-    </h1>
+    <h1>Správa používateľov</h1>
     <div
-      class="flex flex-col w-full text-black bg-white min-h-60 rounded-[1.25rem] p-5 gap-8 transition-all">
-      <div v-if="props.filter" class="grid grid-cols-1">
-        <field label="Filter" v-model="quickFilter" />
-      </div>
-      <div v-else class="grid grid-cols-1 gap-4 sm:grid-cols-4">
-        <dropdown
-          label="Debatný klub"
-          :options="clubsNames"
-          v-model="clubFilter" />
-        <field label="Filter" v-model="quickFilter" />
-        <dropdown
-          label="Rok registrácie"
-          :options="years"
-          v-model="registrationYearFilter" />
+      class="grid sm:grid-cols-[auto_auto_1fr] w-full bg-white text-black min-h-80 h-fit rounded-[1.25rem] p-5 transition-all overflow-auto scrollbar-hidden gap-6">
+      <div class="flex flex-col gap-8 justify-between items-center">
+        <div class="w-80 h-80 relative justify-self-center">
+          <svg
+            width="100"
+            height="100"
+            viewBox="0 0 100 100"
+            class="w-full h-full">
+            <circle
+              cx="50"
+              cy="50"
+              r="45"
+              stroke-width="10"
+              stroke="#00C1F2"
+              fill="transparent"
+              :stroke-dasharray="circumference"
+              :stroke-dashoffset="circumference * offset"
+              stroke-linecap="round"
+              class="animated-circle" />
+            <circle
+              cx="50"
+              cy="50"
+              r="45"
+              stroke-width="10"
+              stroke="#E81525"
+              fill="transparent"
+              :stroke-dasharray="circumference"
+              :stroke-dashoffset="circumference * confirmedOffset"
+              stroke-linecap="round"
+              class="animated-circle" />
+          </svg>
+          <div
+            class="absolute flex flex-col top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center mt-2.5 items-center transition-all duration-300">
+            <div class="flex flex-row h-12">
+              <h2 class="text-5xl font-bold">
+                {{ usersLoaded ? totalUsers : "--" }}
+              </h2>
+              <img
+                src="./../../assets/icons/id.svg"
+                alt="verified"
+                class="h-12 -mt-1" />
+            </div>
+            <div v-if="usersLoaded" class="flex flex-row gap-2">
+              <div class="flex flex-row h-5 gap-1">
+                <p>{{ registeredUsers }}</p>
+                <img
+                  src="./../../assets/icons/unverified.svg"
+                  alt="verified"
+                  class="w-5" />
+              </div>
+              <p>|</p>
+              <div class="flex flex-row h-5 gap-1 font-bold">
+                <p>{{ confirmedUsers }}</p>
+                <img
+                  src="./../../assets/icons/verified.svg"
+                  alt="verified"
+                  class="w-5" />
+              </div>
+            </div>
+          </div>
+        </div>
         <button
-          @click="exportAll"
+          class="form-primary vertical-center w-full"
           :disabled="exported"
-          class="form-primary vertical-center">
-          <span>Exportovať všetko</span>
+          @click="exportAll">
+          <span>Exportovať všetkých</span>
         </button>
       </div>
-      <div class="flex flex-col gap-4">
-        <div
-          class="grid grid-rows-1 font-bold gap-4 items-center"
-          :class="props.filter ? 'grid-cols-3' : 'grid-cols-4'">
-          <p>UID</p>
-          <p>Meno a priezvisko</p>
-          <p>Rola</p>
-          <p v-if="!props.filter">Debatný klub</p>
+      <div class="w-[2px] h-full bg-black rounded-full hidden sm:flex" />
+      <div class="grid grid-rows-[auto_auto_1fr] h-auto gap-4">
+        <div class="grid grid-cols-3 gap-4 font-bold text-left truncate h-auto">
+          <p class="truncate">UID</p>
+          <p class="truncate">Meno a priezvisko</p>
+          <p class="truncate">Stav registrácie</p>
         </div>
         <div
-          v-if="
-            useUserStore().role !== 'admin' &&
-            useUserStore().role !== 'developer'
-          "
-          v-for="user in filteredUsers"
-          :key="user.id"
-          class="grid items-center gap-4 rounded-[1.25rem]"
-          :class="[
-            props.filter ? 'grid-cols-3' : 'grid-cols-4',
-            user.seasons?.some(
-              (season) =>
-                season.year === new Date().getFullYear().toString() &&
-                !season.confirmed,
-            )
-              ? 'text-gray'
-              : '',
-          ]">
-          <p class="truncate">{{ user.id }}</p>
-          <p class="overflow-hidden sm:truncate">
-            {{ user.name + " " + user.surname }}
-          </p>
-          <p class="overflow-hidden sm:truncate">
-            {{ translateRole(user.role) || "Používateľ/-ka" }}
-          </p>
-          <p class="overflow-hidden sm:truncate" v-if="!props.filter">
-            {{ user.club ? getClubNameById(user.club.id) : "Žiadny" }}
-          </p>
+          class="flex flex-col text-left truncate gap-4 w-full h-auto overflow-y-auto scrollbar-hidden">
+          <router-link
+            v-for="(user, index) in recentUsers"
+            :key="user.uid"
+            :to="`/users/${user.id}`"
+            :style="{ '--delay': index * 0.035 + 's' }"
+            class="grid grid-cols-3 gap-4 truncate fade-in fly-in opacity-0">
+            <p class="truncate">{{ user.id }}</p>
+            <p class="truncate">{{ user.name }} {{ user.surname }}</p>
+            <p class="truncate">
+              {{
+                !user.seasons
+                  ? "Chýba registrácia"
+                  : user.seasons.some(
+                        (season) =>
+                          season.year == currentYear && season.confirmed,
+                      )
+                    ? "Potvrdená"
+                    : user.seasons.some((season) => season.year == currentYear)
+                      ? "Nepotvrdená"
+                      : "Chýba registrácia"
+              }}
+            </p>
+          </router-link>
         </div>
-        <router-link
-          v-else
-          v-for="user in filteredUsers"
-          :to="'/profile/' + user.id"
-          :key="`${user.id}-a`"
-          class="grid items-center cursor-pointer gap-4 rounded-[1.25rem] duration-150 transition-all delay-300 hover:py-5 hover:text-red"
-          :class="[
-            props.filter ? 'grid-cols-3' : 'grid-cols-4',
-            user.seasons?.some(
-              (season) =>
-                season.year === new Date().getFullYear().toString() &&
-                !season.confirmed,
-            )
-              ? 'text-gray'
-              : '',
-          ]">
-          <p class="truncate">{{ user.id }}</p>
-          <p class="overflow-hidden sm:truncate">
-            {{ user.name + " " + user.surname }}
-          </p>
-          <p class="overflow-hidden sm:truncate">
-            {{ translateRole(user.role) || "Používateľ/-ka" }}
-          </p>
-          <p class="overflow-hidden sm:truncate" v-if="!props.filter">
-            {{ user.club ? getClubNameById(user.club.id) : "Žiadny" }}
-          </p>
-        </router-link>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.text-gray {
-  @apply text-grey;
+.animated-circle {
+  transition:
+    stroke-dashoffset 0.5s ease,
+    stroke-dasharray 0.5s ease;
+}
+
+/* New Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes flyIn {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in forwards;
+  animation-delay: var(--delay);
+}
+
+.fly-in {
+  animation: flyIn 0.5s ease-out forwards;
+  animation-delay: var(--delay);
 }
 </style>

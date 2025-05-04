@@ -64,7 +64,7 @@ onMounted(() => {
 
 <template>
   <div class="gap-4">
-    <h1 class="text-5xl font-bold mb-2">Ocenenia</h1>
+    <h1>Ocenenia</h1>
     <div
       class="flex flex-row flex-wrap justify-start shrink-0 items-center w-full text-black bg-white min-h-60 rounded-[1.25rem] p-5 gap-8 transition-all">
       <router-link

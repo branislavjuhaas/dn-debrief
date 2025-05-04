@@ -1,13 +1,18 @@
 <script setup>
 // Import the necessary Vue function
-import { defineProps } from "vue";
+import { defineProps, onMounted } from "vue";
 
 /**
  * Define the props for the component.
  * @type {Object} props - The props object.
  * @property {number} props.code - The error code.
  */
-const props = defineProps(["code"]);
+const props = defineProps({
+  code: {
+    type: Number,
+    required: true,
+  },
+});
 
 /**
  * The error message to be displayed.
@@ -29,6 +34,11 @@ let description;
  * For any other error code, it sets the message to "Nastala chyba".
  */
 switch (props.code) {
+  case 127:
+    message = "Neautorizovaný prístup";
+    description =
+      "Pre prístup musíte byť členom Vývojového programu DN Cascade.";
+    break;
   case 401:
     message = "Neautorizovaný prístup";
     description = "Nemáte dostatočné oprávnenia na zobrazenie tejto stránky.";
@@ -47,7 +57,7 @@ switch (props.code) {
 
 <template>
   <div>
-    <h1 class="text-5xl">
+    <h1>
       <b>{{ code + " - " + message }}</b>
     </h1>
     <p class="text-xl mt-2">{{ description }}</p>

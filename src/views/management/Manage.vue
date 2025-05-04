@@ -1,57 +1,97 @@
 <script setup>
 // Import necessary functions
 import { useUserStore } from "../../stores.js";
-import { translateRole } from "../../translate.js";
+import { translateRole } from "../../helpers/translate.js";
+import { watch, ref } from "vue";
 
 // Get the user store
 const userStore = useUserStore();
+const relevantLinks = ref([]);
 
-const club = userStore.club || { name: "neznámy", id: "unknown" };
+const club = userStore.club || { name: "", id: "" };
 
 // Define a list of links with their respective roles
 const links = [
   {
     name: "Správa používateľov",
-    link: "/manage/users",
+    link: "/users",
     roles: ["developer", "admin", "cap"],
   },
   {
     name: "Správa debatných klubov",
-    link: "/manage/clubs",
+    link: "/clubs",
     roles: ["developer", "admin"],
   },
   {
     name: `Správa debatného klubu ${club.name}`,
-    link: `/manage/clubs/${club.id}`,
+    link: `/clubs/${club.id}`,
     roles: ["coach"],
   },
   {
     name: "Presmerovanie na stránku",
-    link: "/manage/route",
+    link: "/route",
     roles: ["developer"],
   },
   {
     name: "Prepočítanie počtu členov",
-    link: "/manage/terminal?command=reevaluate --members",
+    link: "/terminal?command=reevaluate --members",
     roles: ["developer"],
   },
   {
     name: "Správa obsahu",
-    link: "/manage/messages",
+    link: "/feed",
     roles: ["developer", "admin"],
-  }
+  },
+  {
+    name: "Správa podujatí",
+    link: "/events",
+    roles: ["developer", "admin", "organizer", "junior"],
+  },
 ];
 
-// Filter the links based on the user's role
-const relevantLinks = links.filter((link) =>
-  link.roles.includes(userStore.role),
-);
+// Function to update relevant links
+const updateRelevantLinks = () => {
+  const club = userStore.club;
+
+  relevantLinks.value = links.filter((link) =>
+    link.roles.includes(userStore.role),
+  );
+
+  if (userStore.clubManager) {
+    relevantLinks.value.push({
+      name: `Správa debatného klubu ${club.name}`,
+      link: `/clubs/${club.id}`,
+      roles: ["coach"],
+    });
+
+    if (
+      relevantLinks.value.filter((link) => link.link === `/clubs/${club.id}`)
+        .length > 1
+    ) {
+      relevantLinks.value.splice(
+        relevantLinks.value.findIndex(
+          (link) => link.link === `/clubs/${club.id}`,
+        ),
+        1,
+      );
+    }
+  }
+};
+
+// Watch for changes in userStore and update relevant links
+watch(() => userStore.role, updateRelevantLinks);
+watch(() => userStore.clubManager, updateRelevantLinks);
+
+// Initialize relevant links
+updateRelevantLinks();
 </script>
 
 <template>
   <div class="gap-4">
-    <h1 class="text-5xl font-bold mb-2">
-      Panel správy - {{ translateRole(userStore.role) }}
+    <h1>
+      Panel správy{{
+        userStore.role ? " - " + translateRole(userStore.role) : ""
+      }}
     </h1>
     <div
       class="flex flex-col justify-between w-full bg-white min-h-60 rounded-[1.25rem] p-5 gap-16">
@@ -73,7 +113,7 @@ const relevantLinks = links.filter((link) =>
         {{
           relevantLinks.length === 0
             ? "Nemáte prístup k žiadnym nástrojom správy."
-            : "Ďakujeme za nadštandardnú prácu pre SDA!"
+            : "Tím pre vývoj DN Cascade ďakuje za nadštandardnú prácu pre SDA!"
         }}
       </p>
     </div>

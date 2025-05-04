@@ -21,6 +21,7 @@ import {
   getFirestore,
   query,
   setDoc,
+  updateDoc,
   where,
 } from "firebase/firestore";
 
@@ -124,7 +125,10 @@ export const getUser = async (uid) => {
   if (querySnapshot.empty) return null;
 
   const user = querySnapshot.docs[0].data();
-  console.log("User data: ", user);
+
+  if (user.birthdate) {
+    user.birthdate = user.birthdate.toDate();
+  }
 
   if (user.club) {
     const clubSnapshot = await getDoc(user.club);
@@ -191,6 +195,21 @@ export const createUser = async (uid, email, name, surname) => {
     });
   } catch (error) {
     console.error("Error adding document: ", error);
+    return error;
+  }
+};
+
+export const setCookies = async (cookies) => {
+  try {
+    const user = auth.currentUser;
+    if (user) {
+      const userRef = doc(db, "users", user.uid);
+      await updateDoc(userRef, {
+        cookies: cookies,
+      });
+    }
+  } catch (error) {
+    console.error("Error setting cookies: ", error);
     return error;
   }
 };

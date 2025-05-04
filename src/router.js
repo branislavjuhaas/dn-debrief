@@ -24,29 +24,57 @@ const routes = [
     path: "/auth/forgot",
     name: "Forgot",
     component: () => import("./views/user/Forgot.vue"),
-    meta: { title: "Obnovenie hesla", anonymousOnly: true },
+    meta: { title: "Obnovenie hesla" },
   },
   {
-    path: "/profile",
+    path: "/users/me",
     name: "Profile",
     component: () => import("./views/user/Profile.vue"),
     meta: { title: "Profil", requiresAuth: true },
   },
   {
-    path: "/profile/edit",
+    path: "/users/me/reset",
     name: "Edit",
     component: () => import("./views/user/Edit.vue"),
     meta: { title: "Zmena hesla", requiresAuth: true },
   },
   {
-    path: "/profile/:uid",
+    path: "/users/me/edit",
+    name: "EditUser",
+    component: () => import("./views/management/Form.vue"),
+    props: {
+      collection: "users",
+      id: "me",
+      edit: true,
+      title: "Upraviť profil",
+      fields: [
+        { name: "address", title: "Adresa", type: "text", required: true },
+        { name: "name", title: "Meno", type: "text", required: true },
+        { name: "surname", title: "Priezvisko", type: "text", required: true },
+        {
+          name: "phone",
+          title: "Telefónne číslo",
+          type: "text",
+          required: true,
+        },
+        {
+          name: "birthdate",
+          title: "Dátum narodenia",
+          type: "date",
+          required: true,
+        },
+      ],
+    },
+    meta: {
+      title: "Upraviť profil",
+      requiresAuth: true,
+    },
+  },
+  {
+    path: "/users/:uid",
     name: "User",
     component: () => import("./views/management/User.vue"),
-    meta: {
-      title: "Profil používateľa",
-      requiresAuth: true,
-      roles: ["developer", "admin"],
-    },
+    meta: { title: "Profil používateľa", requiresAuth: true },
   },
   {
     path: "/join",
@@ -67,10 +95,9 @@ const routes = [
     meta: { title: "Panel správy", requiresAuth: true },
   },
   {
-    path: "/manage/users",
+    path: "/users",
     name: "Users",
     component: () => import("./views/management/Users.vue"),
-    props: { filter: false },
     meta: {
       title: "Správa používateľov",
       requiresAuth: true,
@@ -78,18 +105,17 @@ const routes = [
     },
   },
   {
-    path: "/manage/clubs/:filter",
-    name: "UsersFilter",
-    component: () => import("./views/management/Users.vue"),
-    props: { filter: true },
+    path: "/clubs/:id",
+    name: "Club",
+    component: () => import("./views/management/Club.vue"),
     meta: {
-      title: "Správa používateľov",
+      title: "Správa debatného klubu",
       requiresAuth: true,
       roles: ["developer", "admin", "cap", "coach"],
     },
   },
   {
-    path: "/manage/clubs",
+    path: "/clubs",
     name: "Clubs",
     component: () => import("./views/management/Clubs.vue"),
     meta: {
@@ -99,9 +125,80 @@ const routes = [
     },
   },
   {
-    path: "/manage/route",
+    path: "/clubs/new",
+    name: "NewClub",
+    component: () => import("./views/management/Form.vue"),
+    props: {
+      collection: "clubs",
+      edit: false,
+      title: "Vytvoriť debatný klub",
+      fields: [
+        { name: "name", title: "Názov klubu", type: "text" },
+        {
+          name: "active",
+          title: "Aktívny",
+          type: "toggle",
+          optional: true,
+          defaultValue: true,
+        },
+        {
+          name: "zdp",
+          title: "ZDP",
+          optional: true,
+          type: "toggle",
+        },
+        {
+          name: "membersCount",
+          hidden: true,
+          defaultValue: 0,
+        },
+      ],
+    },
+    meta: {
+      title: "Vytvoriť debatný klub",
+      requiresAuth: true,
+      roles: ["developer", "admin"],
+    },
+  },
+  {
+    path: "/clubs/:id/edit",
+    name: "EditClub",
+    component: () => import("./views/management/Form.vue"),
+    props: {
+      collection: "clubs",
+      edit: true,
+      title: "Upraviť debatný klub",
+      fields: [
+        { name: "name", title: "Názov klubu", type: "text" },
+        {
+          name: "active",
+          title: "Aktívny",
+          type: "toggle",
+          optional: true,
+        },
+        {
+          name: "zdp",
+          title: "ZDP",
+          optional: true,
+          defaultValue: false,
+          type: "toggle",
+        },
+        {
+          name: "membersCount",
+          hidden: true,
+        },
+      ],
+    },
+    meta: {
+      title: "Upraviť debatný klub",
+      requiresAuth: true,
+      roles: ["developer", "admin"],
+    },
+  },
+  {
+    path: "/route",
     name: "Route",
-    component: () => import("./views/management/RouteManager.vue"),
+    component: () => import("./views/management/Route.vue"),
     meta: {
       title: "Presmerovanie na stránku",
       requiresAuth: true,
@@ -160,6 +257,13 @@ const routes = [
     meta: { title: "401 Neautorizovaný prístup" },
   },
   {
+    path: "/undev",
+    name: "Undev",
+    component: () => import("./views/Error.vue"),
+    props: { code: 127 },
+    meta: { title: "127 Neautorizovaný prístup" },
+  },
+  {
     path: "/about",
     name: "About",
     component: () => import("./views/About.vue"),
@@ -173,7 +277,7 @@ const routes = [
     },
   },
   {
-    path: "/manage/terminal",
+    path: "/terminal",
     name: "Terminal",
     component: () => import("./views/management/Terminal.vue"),
     meta: {
@@ -183,11 +287,63 @@ const routes = [
     },
   },
   {
-    path: "/manage/messages",
-    name: "Messages",
-    component: () => import("./views/management/Messages.vue"),
+    path: "/feed",
+    name: "Feed",
+    component: () => import("./views/management/Feed.vue"),
     meta: {
       title: "Správa obsahu",
+      requiresAuth: true,
+      roles: ["developer", "admin"],
+    },
+  },
+  {
+    path: "/feed/new",
+    name: "FeedCreate",
+    component: () => import("./views/management/Form.vue"),
+    props: {
+      collection: "messages",
+      edit: false,
+      title: "Vytvoriť príspevok",
+      fields: [
+        { name: "title", title: "Názov", type: "text" },
+        { name: "message", title: "Obsah", type: "text" },
+        { name: "link", title: "Odkaz", type: "text" },
+        { name: "local", title: "Lokálny", type: "toggle" },
+        {
+          name: "filters",
+          defaultValue: { club: "", member: true, role: null },
+          hidden: true,
+        },
+      ],
+    },
+    meta: {
+      title: "Vytvoriť príspevok",
+      requiresAuth: true,
+      roles: ["developer", "admin"],
+    },
+  },
+  {
+    path: "/feed/:id/edit",
+    name: "FeedEdit",
+    component: () => import("./views/management/Form.vue"),
+    props: {
+      collection: "messages",
+      edit: true,
+      title: "Upraviť príspevok",
+      fields: [
+        { name: "title", title: "Názov", type: "text" },
+        { name: "message", title: "Obsah", type: "text" },
+        { name: "link", title: "Odkaz", type: "text" },
+        { name: "local", title: "Lokálny", type: "toggle" },
+        {
+          name: "filters",
+          defaultValue: { club: "", member: true, role: null },
+          hidden: true,
+        },
+      ],
+    },
+    meta: {
+      title: "Upraviť príspevok",
       requiresAuth: true,
       roles: ["developer", "admin"],
     },
@@ -203,6 +359,60 @@ const routes = [
     name: "Award",
     component: () => import("./views/Award.vue"),
     meta: { title: "Detail ocenenia", requiresAuth: true },
+  },
+  {
+    path: "/events",
+    name: "Events",
+    component: () => import("./views/events/Manager.vue"),
+    meta: {
+      title: "Správa podujatí",
+      requiresAuth: true,
+      roles: ["developer", "admin", "cap", "organizer", "junior", "motions"],
+    },
+  },
+  {
+    path: "/events/new",
+    name: "NewEvent",
+    component: () => import("./views/events/Edit.vue"),
+    props: { edit: false },
+    meta: {
+      title: "Vytvoriť podujatie",
+      requiresAuth: true,
+      roles: ["developer", "admin", "organizer", "junior"],
+    },
+  },
+  {
+    path: "/events/rules",
+    name: "Rules",
+    component: () => import("./views/events/Rules.vue"),
+    meta: {
+      title:
+        "Pravidlá registrácie a účasti na podujatiach Slovenskej debatnej asociácie",
+    },
+  },
+  {
+    path: "/events/:id",
+    name: "Event",
+    component: () => import("./views/events/Event.vue"),
+    meta: { title: "Detail podujatia", requiresAuth: true },
+  },
+  {
+    path: "/events/:id/edit",
+    name: "EditEvent",
+    component: () => import("./views/events/Edit.vue"),
+    props: { edit: true },
+    meta: {
+      title: "Upraviť podujatie",
+      requiresAuth: true,
+      roles: ["developer", "admin", "organizer", "junior"],
+    },
+  },
+  {
+    path: "/not-found",
+    name: "NotFound",
+    component: () => import("./views/Error.vue"),
+    props: { code: 404 },
+    meta: { title: "404 Stránka nenájdená" },
   },
   {
     path: "/:pathMatch(.*)*", // 404

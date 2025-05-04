@@ -39,6 +39,12 @@ export const translateRole = (role) => {
       return "Vedúci/-a klubu";
     case "user":
       return "Používateľ/-ka";
+    case "organizer":
+      return "Organizátor/-ka";
+    case "junior":
+      return "Junior organizátor/-ka";
+    case "motion":
+      return "Tézový výbor";
     default:
       return role;
   }
@@ -61,6 +67,12 @@ export const reverseTranslateRole = (translatedRole) => {
       return "coach";
     case "Používateľ/-ka":
       return "user";
+    case "Organizátor/-ka":
+      return "organizer";
+    case "Junior organizátor/-ka":
+      return "junior";
+    case "Tézový výbor":
+      return "motion";
     default:
       return translatedRole;
   }

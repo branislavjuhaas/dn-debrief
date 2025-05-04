@@ -2,7 +2,18 @@
   "projects": {
     "default": "dn-cascade"
   },
-  "targets": {},
+  "targets": {
+    "dn-cascade": {
+      "hosting": {
+        "dev": [
+          "dev-dn-cascade"
+        ],
+        "prod": [
+          "dn-cascade"
+        ]
+      }
+    }
+  },
   "etags": {
     "dn-cascade": {
       "extensionInstances": {

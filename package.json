@@ -1,14 +1,22 @@
 {
   "name": "dn-cascade",
+  "description": "Comprehensive data management solution transforming organizational efficiency through intelligent technology.",
   "private": true,
-  "version": "2024.4.17",
+  "version": "2025.2.1",
   "type": "module",
+  "author": "Branislav Juhás",
   "scripts": {
     "dev": "vite",
     "build": "node scripts/increment-version.cjs && vite build",
-    "preview": "vite preview"
+    "dev-build": "node scripts/increment-version-dev.cjs && vite build",
+    "prod-deploy": "npm run build && firebase deploy --only hosting:prod && firebase deploy --only hosting:dev",
+    "dev-deploy": "npm run dev-build && firebase deploy --only hosting:dev",
+    "maintain": "node scripts/maintain.cjs && firebase deploy --only hosting && firebase deploy --only hosting:dev",
+    "preview": "vite preview",
+    "lint": "npx eslint --ext .js,.ts,.vue src --fix"
   },
   "dependencies": {
+    "algoliasearch": "^5.17.1",
     "exceljs": "^4.4.0",
     "firebase": "^10.12.4",
     "pinia": "^2.2.0",
@@ -19,10 +27,14 @@
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.5",
     "autoprefixer": "^10.4.19",
+    "eslint": "^9.25.1",
+    "eslint-config-prettier": "^10.1.2",
+    "eslint-plugin-vue": "^10.0.0",
+    "firebase-admin": "^13.0.2",
     "postcss": "^8.4.40",
     "prettier": "3.3.3",
     "tailwindcss": "^3.4.7",
-    "vite": "^5.3.4",
+    "vite": "^6.3.3",
     "vite-plugin-remove-console": "^2.2.0"
   }
 }

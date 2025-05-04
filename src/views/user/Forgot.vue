@@ -2,7 +2,7 @@
 // Import necessary components and functions
 import Field from "../../components/Field.vue";
 import { ref, watch } from "vue";
-import { translateError } from "../../translate.js";
+import { translateError } from "../../helpers/translate.js";
 import { useLoadingStore } from "../../stores.js";
 
 // Get the loading store
@@ -142,27 +142,27 @@ if (resetCode !== null) {
 
 <template>
   <div class="gap-4">
-    <h1 class="text-5xl font-bold mb-2">Obnovenie hesla</h1>
+    <h1>Obnovenie hesla</h1>
     <div
       class="flex flex-col justify-between w-full bg-white min-h-60 rounded-[1.25rem] p-5 gap-16">
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <field
           v-if="!resetCode"
-          name="email"
           v-model="email"
+          name="email"
           label="Email"
           type="text"
           class="col-span-1 sm:col-span-2" />
         <field
           v-if="resetCode"
-          name="newPassword"
           v-model="password"
+          name="newPassword"
           label="Nové heslo"
           type="password" />
         <field
           v-if="resetCode"
-          name="confirmPassword"
           v-model="confirm"
+          name="confirmPassword"
           label="Potvrdenie hesla"
           type="password" />
       </div>
@@ -175,8 +175,8 @@ if (resetCode !== null) {
         </p>
         <button
           :disabled="!canSubmit"
-          @click="handleReset"
-          class="form-primary vertical-center col-start-1 sm:col-start-2">
+          class="form-primary vertical-center col-start-1 sm:col-start-2"
+          @click="handleReset">
           <span>{{ resetCode ? "Obnoviť heslo" : "Odoslať email" }}</span>
         </button>
       </div>

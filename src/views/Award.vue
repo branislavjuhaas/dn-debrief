@@ -1,10 +1,10 @@
 <script setup>
 import { ref, onMounted, watch } from "vue";
 import { useRoute } from "vue-router";
-import { translateAwardCategory } from "../translate.js";
+import { translateAwardCategory } from "../helpers/translate.js";
 import { getAwardById } from "../firebase/awards.js";
 import { useUserStore } from "../stores.js";
-import Dropdown from "../components/Dropdown.vue";
+import DropDown from "../components/DropDown.vue";
 
 // State variables
 const award = ref(null);
@@ -45,7 +45,7 @@ onMounted(() => {
 
 <template>
   <div v-if="award" class="gap-4">
-    <h1 class="text-5xl font-bold mb-2">
+    <h1>
       {{ isLegendary ? award.legendary.title : award.regular.title }}
     </h1>
     <div
@@ -74,14 +74,17 @@ onMounted(() => {
           </p>
         </div>
         <div class="flex justify-end">
-          <Dropdown
+          <DropDown
             class="w-full"
             :name="'awardType'"
             :label="'Typ ocenenia'"
-            :options="['Obyčajné', 'Legendárne']"
-            :modelValue="isLegendary ? 'Legendárne' : 'Štandardné'"
-            @update:modelValue="
-              (value) => (isLegendary = value === 'Legendárne')
+            :options="[
+              { text: 'Štandardné', value: 'standard' },
+              { text: 'Legendárne', value: 'legendary' },
+            ]"
+            :model-value="isLegendary ? 'legendary' : 'standard'"
+            @update:model-value="
+              (value) => (isLegendary = value === 'legendary')
             " />
         </div>
       </div>

@@ -1,5 +1,6 @@
 # DN Cascade
-![Version](https://img.shields.io/badge/Version-2024.1.7-blue) ![License](https://img.shields.io/badge/License-All_Rights_Reserved-red) ![State](https://img.shields.io/badge/Development_State-Active-green) ![Framework](https://img.shields.io/badge/Framework-Vite_+_Vue-green)
+
+![Version](https://img.shields.io/badge/Version-2025.2.1-blue) ![License](https://img.shields.io/badge/License-All_Rights_Reserved-red) ![State](https://img.shields.io/badge/Development_State-Active-green) ![Framework](https://img.shields.io/badge/Framework-Vite_+_Vue-green)
 
 ![Cascade Banner](readme/cascade-banner.png)
 
@@ -40,4 +41,4 @@ The original intent of the author was to convey ownership of the software to the
 ---
 
 | Since its official integration into the [DN Family](https://dn.juhaas.eu) on May 9, 2024, the DN Cascade project has proudly embraced the organization's core values of openness, innovation, and philanthropy. This alignment signifies a shared commitment to fostering transparency, driving technological advancements, and contributing to the betterment of society. By becoming a part of the DN Family, the DN Cascade project gains access to a wealth of resources, expertise, and support, enabling it to further its mission of making data more accessible and valuable within SDA. | ![](readme/certificate-of-dn-membership.png) |
-|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------|
+| :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |

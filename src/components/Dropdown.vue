@@ -1,21 +1,48 @@
 <script setup>
 // Import necessary functions from Vue
-import { ref, watch } from "vue";
+import { ref, watch, computed } from "vue";
 
 // Define the props that this component accepts
-const props = defineProps([
-  "name",
-  "label",
-  "options",
-  "disabled",
-  "modelValue",
-]);
+const props = defineProps({
+  name: {
+    type: String,
+    default: "dropdown",
+  },
+  label: {
+    type: String,
+    default: "Label",
+  },
+  options: {
+    type: Array,
+    required: true,
+  },
+  disabled: Boolean,
+  modelValue: {
+    type: [String, Number],
+    default: "",
+  },
+});
 
 // Define a ref to control the dropdown expansion
 const expand = ref(false);
 
 // Define a ref to hold the current value of the dropdown
-const value = ref(props.modelValue);
+const value = ref(props.modelValue || "");
+
+// Computed property to get the display text
+const selectedText = computed(() => {
+  const selectedOption = Array.isArray(props.options)
+    ? props.options.find((option) => option.value === value.value)
+    : null;
+  return selectedOption ? selectedOption.text : "";
+});
+
+// Computed property to filter out hidden options
+const visibleOptions = computed(() => {
+  return Array.isArray(props.options)
+    ? props.options.filter((option) => !option.hidden)
+    : [];
+});
 
 // Define the events that this component emits
 const emit = defineEmits(["update:modelValue"]);
@@ -30,6 +57,15 @@ watch(
     }
   },
 );
+
+// Watch for changes in the modelValue prop
+watch(
+  () => props.modelValue,
+  () => {
+    // Update the value ref with the new modelValue
+    value.value = props.modelValue;
+  },
+);
 </script>
 
 <template>
@@ -40,7 +76,10 @@ watch(
     <p class="font-bold" :class="props.disabled ? 'text-grey' : ''">
       {{ props.label }}
     </p>
-    <p class="truncate" :class="props.disabled ? 'text-grey' : ''">{{ value }}</p>
+    <!-- Display the selected text instead of value -->
+    <p class="truncate" :class="props.disabled ? 'text-grey' : ''">
+      {{ selectedText }}
+    </p>
     <img
       src="./../assets/icons/down.svg"
       alt="expand"
@@ -48,12 +87,13 @@ watch(
     <div
       v-if="expand"
       class="flex flex-col max-h-96 overflow-y-auto scrollbar-hidden absolute bg-white border-2 border-black text-black rounded-[1.25rem] top-12 left-0 w-full z-10">
+      <!-- Iterate over visibleOptions instead of all options -->
       <p
-        v-for="option in props.options"
-        :key="option"
-        @click="value = option"
-        class="flex px-5 h-12 items-center cursor-pointer hover:text-red">
-        {{ option }}
+        v-for="option in visibleOptions"
+        :key="option.value"
+        class="flex px-5 h-12 items-center cursor-pointer hover:text-red"
+        @click="value = option.value">
+        {{ option.text }}
       </p>
     </div>
   </div>
