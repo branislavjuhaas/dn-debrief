@@ -18,6 +18,7 @@ import { translateKey, translateRole } from "../../translate.js";
 import { logEvent } from "firebase/analytics";
 import { analytics } from "../../main.js";
 import QuickEdit from "../../components/QuickEdit.vue";
+import { formatISODate } from "../../utilities.js";
 
 const route = useRoute();
 const userStore = useUserStore();
@@ -71,7 +72,7 @@ const formatUserData = (uid, user) =>
     { name: "phone", value: user.phone },
     { name: "email", value: user.email },
     { name: "address", value: user.address },
-    { name: "birthdate", value: user.birthdate },
+    { name: "birthdate", value: formatISODate(user.birthdate) },
     { name: "supervisor", value: user.supervisor },
     { name: "supervisorEmail", value: user.supervisorEmail },
   ]
@@ -90,6 +91,7 @@ const updateUserData = async () => {
   const userId = route.params.uid;
   try {
     const user = await getUser(userId);
+    console.log("US", user);
     userData.value = formatUserData(userId, user);
     actualRole = user.role || "user";
     userRole.value = actualRole;
@@ -388,6 +390,10 @@ const updateClubManagerStatus = async () => {
  * @param {any} value - The new value for the property.
  */
 const quickUpdateUserProperty = async (name, value) => {
+  if (name === "birthdate" && typeof value === "string") {
+    value = new Date(value) || null;
+  }
+
   try {
     await updateUserProperty(route.params.uid, name, value);
     // Update local state if necessary

@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { translateRole } from "./translate.js";
+import { formatSlovakDate } from "./utilities.js";
 
 /**
  * User store definition.
@@ -33,6 +34,9 @@ export const useUserStore = defineStore("user", {
     fullName() {
       return this.uid ? `${this.name} ${this.surname}` : null;
     },
+    formattedBirthdate() {
+      return this.birthdate ? formatSlovakDate(this.birthdate) : null;
+    },
     /**
      * Get an array of additional user data.
      * @returns {Array} An array of objects with name and value properties.
@@ -44,7 +48,7 @@ export const useUserStore = defineStore("user", {
         { name: "club", value: this.club ? this.club.name : null },
         { name: "address", value: this.address },
         { name: "phone", value: this.phone },
-        { name: "birthdate", value: this.birthdate },
+        { name: "birthdate", value: this.formattedBirthdate },
       ].filter((item) => item.value !== null && item.value !== undefined);
     },
     /**

@@ -342,6 +342,10 @@ export const getUser = async (uid) => {
   const user = querySnapshot.docs[0].data();
   console.log("User data: ", user);
 
+  if (user.birthdate) {
+    user.birthdate = user.birthdate.toDate();
+  }
+
   if (user.club) {
     const clubSnapshot = await getDoc(user.club);
     if (clubSnapshot.exists()) {

@@ -6,36 +6,27 @@ import { useUserStore } from "../../stores.js";
 import { onMounted, ref, computed, watch } from "vue";
 import { getClubs, joinAdultUser, joinUser } from "../../firebase/structure.js";
 import router from "../../router.js";
+import { formatISODate } from "../../utilities.js";
 
 // Initializing user store
 const userStore = useUserStore();
-
-// If the user was registered in previous season
-const wasRegistered = userStore.seasons.some(
-  (season) => season.year === (new Date().getFullYear() - 1).toString(),
-);
 
 // State variables
 const selectedClubId = ref(userStore.club ? userStore.club.id : "");
 const clubs = ref([]);
 const birthdate = ref(
-  userStore.birthdate
-    ? new Date(
-        userStore.birthdate.split(". ").reverse().join("-"),
-      ).toLocaleDateString("en-CA")
-    : "",
+  userStore.birthdate ? formatISODate(userStore.birthdate) : "",
 );
 console.log("Assigned birthdate:", birthdate.value);
 const address = ref(userStore.address || "");
 const phone = ref(userStore.phone || "");
 const adult = ref(true);
 const now = new Date();
-const birthdateDate = new Date(birthdate.value);
-let age = now.getFullYear() - birthdateDate.getFullYear();
+let age = now.getFullYear() - new Date(birthdate.value).getFullYear();
 if (
-  now.getMonth() < birthdateDate.getMonth() ||
-  (now.getMonth() === birthdateDate.getMonth() &&
-    now.getDate() < birthdateDate.getDate())
+  now.getMonth() < new Date(birthdate.value).getMonth() ||
+  (now.getMonth() === new Date(birthdate.value).getMonth() &&
+    now.getDate() < new Date(birthdate.value).getDate())
 ) {
   age--;
 }
@@ -79,13 +70,12 @@ const seasons =
 
 // Watch for changes in birthdate to determine if user is an adult
 watch(birthdate, (birthdate) => {
-  const birthdateDate = new Date(birthdate);
   const now = new Date();
-  let age = now.getFullYear() - birthdateDate.getFullYear();
+  let age = now.getFullYear() - new Date(birthdate.value).getFullYear();
   if (
-    now.getMonth() < birthdateDate.getMonth() ||
-    (now.getMonth() === birthdateDate.getMonth() &&
-      now.getDate() < birthdateDate.getDate())
+    now.getMonth() < new Date(birthdate.value).getMonth() ||
+    (now.getMonth() === new Date(birthdate.value).getMonth() &&
+      now.getDate() < new Date(birthdate.value).getDate())
   ) {
     age--;
   }
@@ -174,9 +164,6 @@ const sendVerificationEmail = async () => {
  * @returns {Promise<void>} - Promise to handle user registration
  */
 const register = async () => {
-  const birthdateDate = new Date(birthdate.value);
-  const birthdateString = `${birthdateDate.getDate()}. ${birthdateDate.getMonth() + 1}. ${birthdateDate.getFullYear()}`;
-
   // Only add new seasons to the user's seasons array
   const seasonsString = [
     ...userStore.seasons,
@@ -192,7 +179,7 @@ const register = async () => {
   userStore.club = clubs.value.find((club) => club.id === selectedClubId.value);
   userStore.address = address;
   userStore.phone = phone;
-  userStore.birthdate = ref(birthdateString);
+  userStore.birthdate = new Date(birthdate.value);
   userStore.seasons = seasonsString;
 
   if (adult.value) {
@@ -201,7 +188,7 @@ const register = async () => {
       selectedClubId.value,
       address.value,
       phone.value,
-      birthdateString,
+      new Date(birthdate.value),
       seasonsString,
     );
   } else {
@@ -210,7 +197,7 @@ const register = async () => {
       selectedClubId.value,
       address.value,
       phone.value,
-      birthdateString,
+      new Date(birthdate.value),
       seasonsString,
       supervisor.value,
       mail.value,
