@@ -61,9 +61,11 @@ const datesAggregate = (beginningDate, endDate) => {
 <template>
   <div class="flex flex-col w-full gap-2 text-black">
     <router-link
-      v-for="event in filteredEvents"
+      v-for="(event, index) in filteredEvents"
       :key="event.id"
-      class="relative w-full border-black border-2 rounded-[1.25rem] overflow-hidden"
+      class="relative w-full border-black border-2 rounded-[1.25rem] overflow-hidden fade-in opacity-0"
+      :class="event.draft ? 'border-dashed' : 'border-solid'"
+      :style="{ '--delay': index * 0.035 + 's' }"
       :to="{ name: 'EditEvent', params: { id: event.id } }">
       <div
         class="absolute w-[calc(100%+2rem)] h-[calc(100%+2rem)] top-[-1rem] left-[-1rem] opacity-15">
@@ -101,4 +103,18 @@ const datesAggregate = (beginningDate, endDate) => {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in forwards;
+  animation-delay: var(--delay);
+}
+</style>

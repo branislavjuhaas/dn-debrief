@@ -10,8 +10,8 @@ import Events from "./Events.vue";
 const filesErrorMessage = ref("");
 
 const mode = ref(window.location.hash.slice(1) || "events");
-const onlyMyEvents = ref(false);
-const onlyMyFiles = ref(false);
+const onlyMyEvents = ref(true);
+const onlyMyFiles = ref(true);
 const fromDate = ref(new Date().toISOString().split("T")[0]);
 const toDate = ref(new Date().toISOString().split("T")[0]);
 const region = ref("");

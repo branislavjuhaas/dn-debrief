@@ -80,11 +80,12 @@ const removeFile = (file) => {
 <template>
   <div class="flex flex-col w-full gap-10">
     <a
-      v-for="file in filteredFiles"
+      v-for="(file, index) in filteredFiles"
       :key="file.name"
       :href="file.downloadURL"
       target="_blank"
-      class="grid grid-cols-[1.25rem_5fr_2fr_0.7fr_auto] rounded-[1.25rem] px-5 gap-4">
+      class="grid grid-cols-[1.25rem_5fr_2fr_0.7fr_auto] rounded-[1.25rem] px-5 gap-4 fade-in opacity-0"
+      :style="{ '--delay': index * 0.035 + 's' }">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="20"
@@ -124,5 +125,19 @@ button:disabled {
 button:disabled * {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in forwards;
+  animation-delay: var(--delay);
 }
 </style>
