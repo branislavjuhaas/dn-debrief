@@ -8,8 +8,7 @@ import { googleOneTap } from "vue3-google-login";
 import Header from "./components/Header.vue";
 import Footer from "./components/Footer.vue";
 import router from "./router.js";
-import { logEvent } from "firebase/analytics";
-import { analytics, initializeAnalytics } from "./main.js";
+import { initializeAnalytics } from "./main.js";
 
 const host = window.location.hostname;
 let title = "DN Cascade";
@@ -213,16 +212,12 @@ const handleRedirection = async (authenticated) => {
  * @returns {Promise<void>} - Promise to handle Google One Tap login
  */
 const handleGoogleOneTapLogin = async () => {
-  logEvent(analytics, "one_tap_login_attempt", {
-    method: "Google One Tap Attempt",
-  });
   googleOneTap({ autoLogin: true, cancelOnTapOutside: true }).then(
     async (response) => {
       const { oneTapLogin } = await import("./firebase/auth.js");
       oneTapLogin(response.credential).catch((error) => {
         console.error("Error logging in with Google One Tap: ", error);
       });
-      logEvent(analytics, "one_tap_login", { method: "Google One Tap" });
     },
   );
 };

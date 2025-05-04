@@ -2,7 +2,7 @@
   "name": "dn-cascade",
   "description": "Comprehensive data management solution transforming organizational efficiency through intelligent technology.",
   "private": true,
-  "version": "2025.2.1",
+  "version": "2025.2.7 - DEV",
   "type": "module",
   "author": "Branislav Juhás",
   "scripts": {
@@ -35,6 +35,7 @@
     "prettier": "3.3.3",
     "tailwindcss": "^3.4.7",
     "vite": "^6.3.3",
+    "vite-plugin-pwa": "^1.0.0",
     "vite-plugin-remove-console": "^2.2.0"
   }
 }
