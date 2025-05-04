@@ -5,7 +5,7 @@ import { useRoute } from "vue-router";
 import { getClub, getUsers } from "../../firebase/structure.js";
 import { useLoadingStore, useUserStore } from "../../stores.js";
 import Field from "../../components/Field.vue";
-import { translateRole } from "../../translate.js";
+import { translateRole } from "../../helpers/translate.js";
 
 // Define reactive variables for club data, members, and filters
 const route = useRoute();

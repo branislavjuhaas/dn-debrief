@@ -1,7 +1,7 @@
 <script setup>
 // Import necessary functions
 import { useUserStore } from "../../stores.js";
-import { translateRole } from "../../translate.js";
+import { translateRole } from "../../helpers/translate.js";
 import { watch, ref } from "vue";
 
 // Get the user store

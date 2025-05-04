@@ -1,7 +1,7 @@
 <script setup>
 // Import necessary components and functions
 import { ref } from "vue";
-import { translateError } from "../../translate.js";
+import { translateError } from "../../helpers/translate.js";
 import Field from "../../components/Field.vue";
 import Toggle from "../../components/Toggle.vue";
 import { useLoadingStore } from "../../stores.js";

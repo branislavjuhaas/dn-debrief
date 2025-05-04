@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, watch } from "vue";
 import { useRoute } from "vue-router";
-import { translateAwardCategory } from "../translate.js";
+import { translateAwardCategory } from "../helpers/translate.js";
 import { getAwardById } from "../firebase/awards.js";
 import { useUserStore } from "../stores.js";
 import DropDown from "../components/DropDown.vue";

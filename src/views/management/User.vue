@@ -14,11 +14,11 @@ import router from "../../router.js";
 import DropDown from "../../components/DropDown.vue";
 import Toggle from "../../components/Toggle.vue";
 import { useUserStore } from "../../stores.js";
-import { translateKey, translateRole } from "../../translate.js";
+import { translateKey, translateRole } from "../../helpers/translate.js";
 import { logEvent } from "firebase/analytics";
 import { analytics } from "../../main.js";
 import QuickEdit from "../../components/QuickEdit.vue";
-import { formatISODate } from "../../utilities.js";
+import { formatISODate } from "../../helpers/utilities.js";
 
 const route = useRoute();
 const userStore = useUserStore();

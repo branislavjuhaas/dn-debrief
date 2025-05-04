@@ -3,7 +3,7 @@
 import Field from "../../components/Field.vue";
 import { ref, watch } from "vue";
 import { useUserStore } from "../../stores.js";
-import { translateError } from "../../translate.js";
+import { translateError } from "../../helpers/translate.js";
 import router from "../../router.js";
 
 // Define reactive variables

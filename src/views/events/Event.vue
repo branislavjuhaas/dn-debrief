@@ -10,7 +10,7 @@ import { computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { getEventById, getEventFile } from "../../firebase/events";
 import { useUserStore } from "../../stores.js";
-import { formatSlovakDate } from "../../utilities.js";
+import { formatSlovakDate } from "../../helpers/utilities.js";
 import router from "../../router.js";
 import ContactCard from "../../components/ContactCard.vue";
 import up from "../../assets/icons/up.svg";

@@ -1,6 +1,6 @@
 <script setup>
 import { ref, watch } from "vue";
-import { formatSlovakDate } from "../utilities";
+import { formatSlovakDate } from "../helpers/utilities";
 
 const props = defineProps({
   readonly: {

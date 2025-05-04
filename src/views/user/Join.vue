@@ -6,7 +6,7 @@ import { useUserStore } from "../../stores.js";
 import { onMounted, ref, computed, watch } from "vue";
 import { getClubs, joinAdultUser, joinUser } from "../../firebase/structure.js";
 import router from "../../router.js";
-import { formatISODate } from "../../utilities.js";
+import { formatISODate } from "../../helpers/utilities.js";
 
 // Initializing user store
 const userStore = useUserStore();

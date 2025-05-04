@@ -1,7 +1,7 @@
 <script setup>
 // Import necessary components and functions
 import { useUserStore } from "../../stores.js";
-import { translateKey } from "../../translate.js";
+import { translateKey } from "../../helpers/translate.js";
 import router from "../../router.js";
 
 // Get the user store

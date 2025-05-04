@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
-import { translateRole } from "./translate.js";
-import { formatSlovakDate } from "./utilities.js";
+import { translateRole } from "./helpers/translate.js";
+import { formatSlovakDate } from "./helpers/utilities.js";
 
 /**
  * User store definition.

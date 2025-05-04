@@ -2,7 +2,7 @@
 // Import necessary functions and assets from local files
 import { RouterLink } from "vue-router";
 import { useLoadingStore, useUserStore } from "../stores.js";
-import { translateRole } from "../translate.js";
+import { translateRole } from "../helpers/translate.js";
 import { initializeAnalytics } from "../main.js";
 
 // Initialize user and loading stores

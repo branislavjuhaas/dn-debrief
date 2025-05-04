@@ -2,7 +2,7 @@
 import { ref, computed, onMounted } from "vue";
 import { getRecentUsers, getUserStatistics } from "../../firebase/structure.js";
 import { useLoadingStore } from "../../stores.js";
-import { translateRole } from "../../translate.js";
+import { translateRole } from "../../helpers/translate.js";
 
 const currentYear = new Date().getFullYear();
 const exported = ref(false);

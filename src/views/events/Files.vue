@@ -1,7 +1,7 @@
 <script setup>
 import { computed, onMounted, ref } from "vue";
 import { deleteEventFile, listEventFiles } from "../../firebase/events.js";
-import { formatSlovakDate } from "../../utilities.js";
+import { formatSlovakDate } from "../../helpers/utilities.js";
 import { useUserStore } from "../../stores.js";
 
 const props = defineProps({
