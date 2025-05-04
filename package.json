@@ -2,11 +2,11 @@
   "name": "dn-cascade",
   "description": "Comprehensive data management solution transforming organizational efficiency through intelligent technology.",
   "private": true,
-  "version": "2025.2.7 - DEV",
+  "version": "2025.2.19 - DEV",
   "type": "module",
   "author": "Branislav Juhás",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "node scripts/increment-version.cjs && vite build",
     "dev-build": "node scripts/increment-version-dev.cjs && vite build",
     "prod-deploy": "npm run build && firebase deploy --only hosting:prod && firebase deploy --only hosting:dev",

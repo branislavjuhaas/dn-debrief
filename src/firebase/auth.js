@@ -213,3 +213,25 @@ export const setCookies = async (cookies) => {
     return error;
   }
 };
+
+/**
+ * Saves users FCM token to the database.
+ *
+ * @async
+ * @param {string} token - The FCM token to save.
+ * @returns {Promise<void>} - A promise that resolves when the token is saved.
+ */
+export const saveTokenToServer = async (token) => {
+  try {
+    const user = auth.currentUser;
+    if (user) {
+      const userRef = doc(db, "users", user.uid);
+      await updateDoc(userRef, {
+        fcmToken: token,
+      });
+    }
+  } catch (error) {
+    console.error("Error saving token to server: ", error);
+    return error;
+  }
+};
