@@ -79,15 +79,15 @@ const filesRef = ref(null);
     <div class="flex flex-col gap-[4px]">
       <div class="flex flex-row bg-white rounded-[1.25rem_1.25rem_0_0]">
         <button
-          @click="setMode('events')"
           class="tab-button"
-          :class="{ 'active-tab': mode === 'events' }">
+          :class="{ 'active-tab': mode === 'events' }"
+          @click="setMode('events')">
           Podujatia
         </button>
         <button
-          @click="setMode('files')"
           class="tab-button"
-          :class="{ 'active-tab': mode === 'files' }">
+          :class="{ 'active-tab': mode === 'files' }"
+          @click="setMode('files')">
           Súbory
         </button>
       </div>
@@ -98,8 +98,8 @@ const filesRef = ref(null);
         <div class="flex flex-col sm:flex-row gap-4 items-center">
           <template v-if="mode === 'events'">
             <toggle
-              class="header-control"
               v-model="onlyMyEvents"
+              class="header-control"
               label="Len moje podujatia" />
             <router-link
               to="events/new"
@@ -114,8 +114,8 @@ const filesRef = ref(null);
               type="text"
               class="header-control" />
             <toggle
-              class="header-control"
               v-model="onlyMyFiles"
+              class="header-control"
               label="Len mnou vytvorené" />
             <button
               class="form-primary vertical-center header-control"

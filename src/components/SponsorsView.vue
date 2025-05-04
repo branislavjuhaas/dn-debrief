@@ -154,10 +154,10 @@ const uploadFile = async () => {
         :file-path="sponsor.url"
         @remove="removeSponsor(sponsor)" />
       <div
-        role="button"
         ref="addButtonRef"
-        @click="togglePopup"
-        class="relative border-2 border-black rounded-[1.25rem] p-2 flex flex-col items-center justify-center gap-2">
+        role="button"
+        class="relative border-2 border-black rounded-[1.25rem] p-2 flex flex-col items-center justify-center gap-2"
+        @click="togglePopup">
         <div class="h-32 flex flex-col items-center justify-center">
           <img
             src="./../assets/icons/plus.svg"
@@ -167,8 +167,8 @@ const uploadFile = async () => {
         <p class="">Pridať sponzora</p>
         <div
           v-if="popupVisible"
-          ref="popupRef"
           id="popup"
+          ref="popupRef"
           class="absolute shadow-2xl bg-white rounded-[1.25rem_0.5rem_1.25rem_1.25rem] w-96 border-2 right-1/2 top-1/2 flex flex-col py-2 gap-2 items-center justify-center z-10">
           <template v-if="files.length > 0">
             <div class="flex flex-row gap-2 py-1 items-center w-full px-5">
@@ -188,10 +188,10 @@ const uploadFile = async () => {
               <p>Súbory nenájdené</p>
             </div>
             <div
-              class="flex flex-row gap-2 items-center w-full file"
               v-for="file in filteredFiles"
-              @click="addSponsor(file)"
-              :key="file.name">
+              :key="file.name"
+              class="flex flex-row gap-2 items-center w-full file"
+              @click="addSponsor(file)">
               <img
                 src="./../assets/icons/image.svg"
                 alt="Image Preview"

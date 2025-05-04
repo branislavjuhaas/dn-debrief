@@ -26,8 +26,8 @@ function handleRemove() {
       class="h-32 max-w-full object-contain" />
     <p>{{ props.fileName }}</p>
     <button
-      @click="handleRemove"
-      class="absolute cursor-pointer top-2 right-2 rounded-[0.75rem] bg-white m-0 p-2">
+      class="absolute cursor-pointer top-2 right-2 rounded-[0.75rem] bg-white m-0 p-2"
+      @click="handleRemove">
       <img
         src="./../assets/icons/trash.svg"
         alt="expand"
