@@ -106,8 +106,6 @@ const createClub = async () => {
           <p>Aktívny</p>
           <p>ZDP</p>
         </div>
-      </div>
-      <div class="flex flex-col gap-4">
         <router-link
           v-for="(club, index) in clubs"
           :key="club.id"
@@ -132,13 +130,23 @@ const createClub = async () => {
 
 <style scoped>
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes flyIn {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .fade-in {
