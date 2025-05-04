@@ -10,6 +10,7 @@ import {
   createComponent,
 } from "../../firebase/structure.js";
 import { useUserStore } from "../../stores.js";
+import { formatISODate } from "../../helpers/utilities.js";
 
 // Watch for changes in userstore.uid and load the document if it changes
 const userStore = useUserStore();
@@ -96,16 +97,25 @@ const loadEditedDocument = async () => {
 
   if (component) {
     props.fields.forEach((field) => {
+      let value = component[field.name];
+
+      // Convert Firestore Timestamp to Date and then to ISO format string
+      if (
+        field.type === "date" &&
+        value &&
+        typeof value.toDate === "function"
+      ) {
+        value = formatISODate(value.toDate());
+      } else if (field.type === "date" && value instanceof Date) {
+        value = formatISODate(value);
+      }
+
       if (!field.hidden) {
         fieldValues.value[field.name] =
-          component[field.name] !== undefined
-            ? component[field.name]
-            : field.defaultValue || "";
+          value !== undefined ? value : field.defaultValue || "";
       } else {
         fieldValues.value[field.name] =
-          component[field.name] !== undefined
-            ? component[field.name]
-            : field.defaultValue || null;
+          value !== undefined ? value : field.defaultValue || null;
       }
     });
   }
@@ -131,13 +141,23 @@ watch(
 
 // Handle form submission
 const handleSubmit = async () => {
+  // Create a copy of fieldValues to avoid modifying the reactive object directly
+  const processedValues = { ...fieldValues.value };
+
+  // Process date fields: convert ISO date strings to Date objects
+  props.fields.forEach((field) => {
+    if (field.type === "date" && processedValues[field.name]) {
+      processedValues[field.name] = new Date(processedValues[field.name]);
+    }
+  });
+
   if (props.edit) {
-    await updateComponent(props.collection, getCurrentId(), fieldValues.value);
+    await updateComponent(props.collection, getCurrentId(), processedValues);
 
     if (!(props.collection === "users" && props.id === "me")) return;
-    userStore.updateUser(fieldValues.value);
+    userStore.updateUser(processedValues);
   } else {
-    await createComponent(props.collection, fieldValues.value);
+    await createComponent(props.collection, processedValues);
   }
   router.go(-1) || router.push("/");
 };

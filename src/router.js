@@ -60,7 +60,7 @@ const routes = [
         {
           name: "birthdate",
           title: "Dátum narodenia",
-          type: "text",
+          type: "date",
           required: true,
         },
       ],
