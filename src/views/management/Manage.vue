@@ -113,7 +113,7 @@ updateRelevantLinks();
         {{
           relevantLinks.length === 0
             ? "Nemáte prístup k žiadnym nástrojom správy."
-            : "Ďakujeme za nadštandardnú prácu pre SDA!"
+            : "Tím pre vývoj DN Cascade ďakuje za nadštandardnú prácu pre SDA!"
         }}
       </p>
     </div>
