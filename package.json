@@ -6,7 +6,7 @@
   "type": "module",
   "author": "Branislav Juhás",
   "scripts": {
-    "dev": "vite --host",
+    "dev": "vite",
     "build": "node scripts/increment-version.cjs && vite build",
     "dev-build": "node scripts/increment-version-dev.cjs && vite build",
     "prod-deploy": "npm run build && firebase deploy --only hosting:prod && firebase deploy --only hosting:dev",
