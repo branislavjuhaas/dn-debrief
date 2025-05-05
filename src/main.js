@@ -1,5 +1,6 @@
 import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
 import { getAnalytics, logEvent } from "firebase/analytics";
+import { getMessaging, getToken, onMessage } from "firebase/messaging";
 import { getFunctions } from "firebase/functions";
 import vue3GoogleLogin from "vue3-google-login";
 import { initializeApp } from "firebase/app";
@@ -102,3 +103,60 @@ export const appCheck = initializeAppCheck(app, {
 });
 
 initCaching();
+
+// Get Firebase Cloud Messaging instance
+const messaging = getMessaging(app);
+
+/**
+ * Simple FCM initialization
+ * - Checks for permission only once
+ * - Registers the service worker
+ * - Gets an FCM token
+ * - No database storage
+ */
+export const initializeMessaging = async () => {
+  // Skip if notifications or service workers are not supported
+  if (!("serviceWorker" in navigator) || !("Notification" in window)) {
+    console.log("Notifications or service workers not supported");
+    return;
+  }
+
+  try {
+    // Register service worker first
+    const swReg = await navigator.serviceWorker.register(
+      "/firebase-messaging-sw.js",
+    );
+    console.log("Service worker registered successfully");
+
+    // Request permission only if not already granted or denied
+    if (Notification.permission === "default") {
+      const permission = await Notification.requestPermission();
+      console.log("Notification permission:", permission);
+    }
+
+    // Only proceed if permission is granted
+    if (Notification.permission === "granted") {
+      try {
+        // Get FCM token (but don't store it)
+        const token = await getToken(messaging, {
+          vapidKey:
+            "BJyctsnZOxfHeEpUPtuIrUjxICEnb9u3vXq9sFCjzFmMIRqy337vB4rWrXvBpS5zl_y8ZAjoRj1V3KdntgQEMws",
+          serviceWorkerRegistration: swReg,
+        });
+
+        if (token) {
+          console.log("FCM token received successfully");
+        } else {
+          console.log("No FCM token received");
+        }
+      } catch (error) {
+        console.error("Error getting FCM token:", error);
+      }
+    }
+  } catch (error) {
+    console.error("Error setting up notifications:", error);
+  }
+};
+
+// Start the messaging initialization process
+initializeMessaging();
