@@ -26,8 +26,8 @@ if (!props.message) {
   localTitle = urlParams.get("title");
   localMessage = urlParams.get("message");
   localButtons = [
-    { text: "Cancel", path: urlParams.get("cancel") },
-    { text: "OK", path: urlParams.get("ok") },
+    { text: "Cancel", path: urlParams.get("cancel") || "/" },
+    { text: "OK", path: urlParams.get("ok") || "/" },
   ];
 } else {
   localTitle = props.title;

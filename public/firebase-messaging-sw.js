@@ -6,7 +6,7 @@ importScripts(
   "https://www.gstatic.com/firebasejs/9.22.2/firebase-messaging-compat.js",
 );
 
-// Firebase configuration matching your main.js
+// Firebase configuration
 firebase.initializeApp({
   apiKey: "AIzaSyCG1YinvyCiYK2ppM6lNDoO1Jw8PXYToDE",
   authDomain: "dn-cascade.firebaseapp.com",
@@ -25,7 +25,7 @@ const messaging = firebase.messaging();
 // Handle background messages
 messaging.onBackgroundMessage((payload) => {
   console.log(
-    "[firebase-messaging-sw.js] Received background message ",
+    "[firebase-messaging-sw.js] Received background message",
     payload,
   );
 
@@ -34,86 +34,29 @@ messaging.onBackgroundMessage((payload) => {
     body: payload.notification.body || "",
     icon: "/icon.svg",
     badge: "/pwa/icon-192x192.png",
-    tag: payload.data?.tag || "default-tag", // Group similar notifications
-    renotify: true, // Notify even if using the same tag
-    actions: [],
-    // Android specific properties
-    requireInteraction: true, // Keep the notification until user interacts with it
-    // Pass both the direct path and any data from the payload
-    data: {
-      url: payload.data?.path || "/",
-      ...payload.data,
-    },
+    data: payload.data || {},
   };
-
-  // Check if we need to add actions
-  if (payload.data?.actionText && payload.data?.actionPath) {
-    notificationOptions.actions = [
-      {
-        action: "open-action",
-        title: payload.data.actionText,
-      },
-    ];
-  }
 
   self.registration.showNotification(notificationTitle, notificationOptions);
 });
 
-// Handle messages from the main app (foreground notifications)
-self.addEventListener("message", (event) => {
-  console.log(
-    "[firebase-messaging-sw.js] Message received from main script:",
-    event.data,
-  );
-
-  if (event.data && event.data.type === "SHOW_NOTIFICATION") {
-    const { title, options } = event.data.payload;
-
-    // Use the service worker's showNotification method
-    self.registration
-      .showNotification(title, options)
-      .then(() =>
-        console.log(
-          "[firebase-messaging-sw.js] Notification shown successfully",
-        ),
-      )
-      .catch((error) =>
-        console.error(
-          "[firebase-messaging-sw.js] Error showing notification:",
-          error,
-        ),
-      );
-  }
-});
-
 // Handle notification click
 self.addEventListener("notificationclick", (event) => {
-  console.log("[firebase-messaging-sw.js] Notification click: ", event);
+  console.log("[firebase-messaging-sw.js] Notification click:", event);
 
   event.notification.close();
 
-  // Check if a specific action was clicked
-  let targetPath = "/";
-  if (event.action === "open-action" && event.notification.data?.actionPath) {
-    targetPath = event.notification.data.actionPath;
-  } else {
-    // Use the standard path if no specific action was clicked
-    targetPath =
-      event.notification.data?.url || event.notification.data?.path || "/";
-  }
+  // Get the path to navigate to
+  const targetPath = event.notification.data?.path || "/";
 
   // Ensure the path starts with a forward slash
   const formattedPath = targetPath.startsWith("/")
     ? targetPath
     : `/${targetPath}`;
 
-  // Extract the base URL from current scope
+  // Get base URL from scope
   const baseUrl = self.registration.scope;
-
-  // Create the full URL to navigate to
   const urlToOpen = new URL(formattedPath, baseUrl).href;
-
-  console.log("[firebase-messaging-sw.js] Opening URL: ", urlToOpen);
 
   event.waitUntil(
     clients
@@ -122,37 +65,15 @@ self.addEventListener("notificationclick", (event) => {
         includeUncontrolled: true,
       })
       .then((clientList) => {
-        // Check if there's already a window/tab open with the target URL
-        const matchingClient = clientList.find(
-          (client) =>
-            // If the client URL starts with our base URL and contains our path
-            client.url.startsWith(baseUrl) &&
-            // Either we want the root path and the client is at the base URL with no path
-            ((formattedPath === "/" && new URL(client.url).pathname === "/") ||
-              // Or the client URL contains our target path
-              (formattedPath !== "/" && client.url.includes(formattedPath))),
-        );
-
-        // If we found a matching client, focus it
-        if (matchingClient && "focus" in matchingClient) {
-          return matchingClient.focus();
+        // Check for an existing window with the target URL
+        for (const client of clientList) {
+          if (client.url.includes(formattedPath) && "focus" in client) {
+            return client.focus();
+          }
         }
 
-        // Otherwise, open a new window
-        if (clients.openWindow) {
-          return clients.openWindow(urlToOpen);
-        }
+        // Open a new window if needed
+        return clients.openWindow(urlToOpen);
       }),
   );
-});
-
-// Self claim the service worker to ensure it's activated immediately
-self.addEventListener("install", function (event) {
-  console.log("[firebase-messaging-sw.js] Service worker installed");
-  event.waitUntil(self.skipWaiting());
-});
-
-self.addEventListener("activate", function (event) {
-  console.log("[firebase-messaging-sw.js] Service worker activated");
-  event.waitUntil(self.clients.claim());
 });

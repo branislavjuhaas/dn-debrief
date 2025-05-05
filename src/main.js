@@ -108,178 +108,55 @@ initCaching();
 const messaging = getMessaging(app);
 
 /**
- * Initialize Firebase Cloud Messaging and request permission for notifications.
- * This function handles the entire notification setup process.
- *
- * @async
- * @function initializeMessaging
- * @returns {Promise<void>}
+ * Simple FCM initialization
+ * - Checks for permission only once
+ * - Registers the service worker
+ * - Gets an FCM token
+ * - No database storage
  */
 export const initializeMessaging = async () => {
+  // Skip if notifications or service workers are not supported
+  if (!("serviceWorker" in navigator) || !("Notification" in window)) {
+    console.log("Notifications or service workers not supported");
+    return;
+  }
+
   try {
-    // Check if service workers are supported
-    if ("serviceWorker" in navigator) {
-      // Request notification permission
+    // Register service worker first
+    const swReg = await navigator.serviceWorker.register(
+      "/firebase-messaging-sw.js",
+    );
+    console.log("Service worker registered successfully");
+
+    // Request permission only if not already granted or denied
+    if (Notification.permission === "default") {
       const permission = await Notification.requestPermission();
+      console.log("Notification permission:", permission);
+    }
 
-      if (permission === "granted") {
-        console.log("Notification permission granted.");
-
-        // Register the service worker
-        const swRegistration = await navigator.serviceWorker.register(
-          "/firebase-messaging-sw.js",
-          {
-            scope: "/",
-          },
-        );
-
-        console.log("Service worker registered for notifications");
-
-        // Wait for the service worker to be ready
-        await navigator.serviceWorker.ready;
-
-        // Get previously stored token
-        const previousToken = localStorage.getItem("fcmToken");
-
-        // Get FCM token
-        const currentToken = await getToken(messaging, {
+    // Only proceed if permission is granted
+    if (Notification.permission === "granted") {
+      try {
+        // Get FCM token (but don't store it)
+        const token = await getToken(messaging, {
           vapidKey:
             "BJyctsnZOxfHeEpUPtuIrUjxICEnb9u3vXq9sFCjzFmMIRqy337vB4rWrXvBpS5zl_y8ZAjoRj1V3KdntgQEMws",
-          serviceWorkerRegistration: swRegistration,
+          serviceWorkerRegistration: swReg,
         });
 
-        if (currentToken) {
-          console.log("FCM token:", currentToken);
-
-          // Only save token if it's new or changed
-          if (currentToken !== previousToken) {
-            console.log("New FCM token generated");
-            saveTokenToServer(currentToken);
-            localStorage.setItem("fcmToken", currentToken);
-          } else {
-            console.log("Using existing FCM token");
-          }
+        if (token) {
+          console.log("FCM token received successfully");
         } else {
-          console.log(
-            "No registration token available. Request permission to generate one.",
-          );
+          console.log("No FCM token received");
         }
-
-        // Handle foreground messages with path navigation support
-        onMessage(messaging, (payload) => {
-          console.log("Message received in foreground:", payload);
-
-          // Create notification for foreground messages
-          if (payload.notification) {
-            const { title, body } = payload.notification;
-
-            if (!("Notification" in window)) {
-              console.log("This browser does not support desktop notification");
-              return;
-            }
-
-            // IMPORTANT: Use the service worker to show notifications, especially for Android
-            if (navigator.serviceWorker.controller) {
-              // If we have an active service worker, use it to show the notification
-              // This is the proper approach for Android
-              const path = payload.data?.path || "/";
-
-              // Send a message to the service worker to show the notification
-              navigator.serviceWorker.controller.postMessage({
-                type: "SHOW_NOTIFICATION",
-                payload: {
-                  title: title,
-                  options: {
-                    body: body,
-                    icon: "/icon.svg",
-                    badge: "/pwa/icon-192x192.png",
-                    tag: payload.data?.tag || "default-tag", // For notification grouping
-                    data: {
-                      url: path,
-                      ...payload.data,
-                    },
-                  },
-                },
-              });
-            } else {
-              // Fallback for browsers where we can use the Notification constructor
-              // This won't work on Android when in service worker context
-              try {
-                // Create a notification that will navigate when clicked
-                const notification = new Notification(title, {
-                  body: body,
-                  icon: "/icon.svg",
-                  data: payload.data || {},
-                });
-
-                // Handle click on the notification
-                notification.onclick = () => {
-                  notification.close();
-
-                  // Use router to navigate to the specified path if available
-                  const path = payload.data?.path || "/";
-                  const formattedPath = path.startsWith("/")
-                    ? path
-                    : `/${path}`;
-
-                  // Focus window if it's not in focus
-                  window.focus();
-
-                  // Use router to navigate
-                  if (typeof router !== "undefined" && router.push) {
-                    router.push(formattedPath);
-                  } else {
-                    // Fallback to direct navigation
-                    window.location.href = formattedPath;
-                  }
-                };
-              } catch (notificationError) {
-                console.error("Error showing notification:", notificationError);
-              }
-            }
-          }
-        });
-      } else {
-        console.log("Unable to get permission to notify.");
+      } catch (error) {
+        console.error("Error getting FCM token:", error);
       }
-    } else {
-      console.log("Service workers are not supported by this browser");
     }
   } catch (error) {
-    console.error("Error initializing messaging:", error);
+    console.error("Error setting up notifications:", error);
   }
 };
 
-// Optional test function to verify notifications are working
-function testNotification() {
-  if (Notification.permission === "granted") {
-    new Notification("Test Notification", {
-      body: "This is a test notification to verify notifications are working",
-      icon: "/icon.svg",
-    });
-  }
-}
-
-/**
- * Saves the FCM token to the server.
- * You can implement this to store the token in your database.
- *
- * @async
- * @function saveTokenToServer
- * @param {string} token - The FCM token
- * @returns {Promise<void>}
- */
-const saveTokenToServer = async (token) => {
-  const { saveTokenToServer } = await import("./firebase/auth.js");
-  try {
-    await saveTokenToServer(token);
-    console.log("Token saved to server successfully.");
-  } catch (error) {
-    console.error("Error saving token to server:", error);
-  }
-};
-
-// Initialize messaging when the application loads
+// Start the messaging initialization process
 initializeMessaging();
-
-testNotification();
