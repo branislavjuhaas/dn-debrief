@@ -5,7 +5,7 @@
  * @returns {string} The formatted date string in 'dd.mm.yyyy' format.
  */
 export const formatSlovakDate = (date) => {
-  if (!date) return null;
+  if (!date) return "Neplatný dátum";
 
   if (typeof date === "string") {
     date = new Date(date);
