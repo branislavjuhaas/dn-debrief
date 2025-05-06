@@ -187,17 +187,17 @@ watch(
         <p>{{ eventDates ? eventDates : "~~.~~.~~~~" }}</p>
       </div>
       <div class="info-card">
-        <img src="./../../assets/icons/deadline.svg" alt="calendar" />
+        <img src="./../../assets/icons/deadline.svg" alt="deadline" />
         <p>
           {{ event ? formatSlovakDate(event.deadline) : "~~.~~.~~~~" }}
         </p>
       </div>
       <div class="info-card">
-        <img src="./../../assets/icons/bills.svg" alt="calendar" />
+        <img src="./../../assets/icons/bills.svg" alt="bills" />
         <p>{{ event ? `${event.price}&euro;` : "~~&euro;" }}</p>
       </div>
       <div class="info-card">
-        <img src="./../../assets/icons/location.svg" alt="calendar" />
+        <img src="./../../assets/icons/location.svg" alt="location" />
         <p class="max-w-full xl:truncate text-nowrap">
           {{ event ? event.address : "" }}
         </p>
@@ -206,7 +206,7 @@ watch(
     <div
       v-if="event?.motion"
       class="flex flex-row gap-2 min-h-12 py-2 w-full items-center bg-white text-black font-bold px-5 rounded-[1.25rem]">
-      <img src="./../../assets/icons/cube.svg" alt="calendar" class="w-5" />
+      <img src="./../../assets/icons/quotes.svg" alt="quotes" class="w-5" />
       <p class="mt-1">{{ event.motion }}</p>
     </div>
     <div
