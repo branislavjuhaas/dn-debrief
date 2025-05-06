@@ -204,6 +204,7 @@ const datesAggregate = () => {
     <div
       class="thumbnail-controls flex absolute bottom-0 h-14 p-2 w-full opacity-0 items-centers gap-4 duration-300">
       <button
+        v-if="!props.disabled"
         class="flex w-full bg-red h-10 items-center px-4 vertical-center rounded-[0.75rem] border-2 border-black justify-center hover:bg-black duration-300"
         @click="$refs.fileInput.click()">
         <span>Nahrať náhľad</span>
