@@ -76,7 +76,12 @@ props.fields.forEach((field) => {
 // Compute whether the form can be submitted
 const canSubmit = computed(() => {
   return props.fields.every(
-    (field) => field.optional || field.hidden || fieldValues.value[field.name],
+    (field) =>
+      field.optional ||
+      field.hidden ||
+      (field.type === "toggle" &&
+        fieldValues.value[field.name] !== undefined) ||
+      fieldValues.value[field.name],
   );
 });
 
