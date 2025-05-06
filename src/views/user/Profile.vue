@@ -138,7 +138,6 @@ const logout = async () => {
         !(host.includes('dev') || host.includes('localhost'))
       "
       href="https://dev.debrief.sda.sk"
-      to="/manage"
       class="alternative vertical-center w-full">
       <p>Otvoriť najnovšiu verziu pre členov Vývojového programu DN Cascade</p>
     </a>
