@@ -454,7 +454,7 @@ export const assignAwardToUser = async (userId, awardId) => {
   try {
     const userRef = doc(db, "users", userId);
     await updateDoc(userRef, {
-      awards: arrayUnion({ award: doc(db, "awards", awardId), legend: false }),
+      awards: arrayUnion({ id: awardId, legend: false }),
     });
     console.log(`Award ${awardId} assigned to user ${userId}`);
   } catch (error) {
@@ -479,7 +479,7 @@ export const updateAwardLegendStatus = async (userId, awardId, isLegend) => {
 
       const awards = userDoc.data().awards || [];
       const updatedAwards = awards.map((award) => {
-        if (award.award.id === awardId) {
+        if (award.id === awardId) {
           return { ...award, legend: isLegend };
         }
         return award;
@@ -508,9 +508,7 @@ export const removeAwardFromUser = async (userId, awardId) => {
       }
 
       const awards = userDoc.data().awards || [];
-      const updatedAwards = awards.filter(
-        (award) => award.award.id !== awardId,
-      );
+      const updatedAwards = awards.filter((award) => award.id !== awardId);
 
       transaction.update(userRef, { awards: updatedAwards });
     });

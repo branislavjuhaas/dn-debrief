@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, watch } from "vue";
-import { getAllAwards } from "../firebase/awards.js";
+import { getAwards } from "../firebase/awards.js";
 import { useUserStore } from "../stores.js";
 
 // State variables
@@ -12,8 +12,8 @@ const userStore = useUserStore();
  * If the user is a developer, display all awards.
  * Otherwise, display awards with category 'program' or 'organization' or those owned by the user.
  */
-const fetchAwards = async () => {
-  awards.value = await getAllAwards();
+const fetchAwards = () => {
+  awards.value = getAwards();
 
   if (userStore.role !== "developer") {
     awards.value = awards.value.filter(
@@ -23,25 +23,6 @@ const fetchAwards = async () => {
         userStore.awards.some((userAward) => userAward.id === award.id),
     );
   }
-
-  // Update the symbol's background color based on award ownership
-  awards.value.forEach((award) => {
-    if (
-      userStore.awards.legend?.some((userAward) => userAward.id === award.id)
-    ) {
-      award.symbol = `
-        <defs>
-          <linearGradient id='legend-gradient' x1='0%' y1='0%' x2='100%' y2='0%'>
-            <stop offset='0%' style='stop-color:#ffd900;stop-opacity:1' />
-            <stop offset='100%' style='stop-color:#c3a601;stop-opacity:1' />
-          </linearGradient>
-        </defs>
-        <mask id='legend-mask'>${award.symbol}</mask>
-        <rect width='20' height='20' fill='url(#legend-gradient)' mask='url(#legend-mask)' />
-      `;
-      award.symbol = award.symbol.replaceAll("black", "white");
-    }
-  });
 };
 
 // Fetch awards on component mount or when user role is set

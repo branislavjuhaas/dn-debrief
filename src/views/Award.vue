@@ -2,7 +2,7 @@
 import { ref, onMounted, watch } from "vue";
 import { useRoute } from "vue-router";
 import { translateAwardCategory } from "../helpers/translate.js";
-import { getAwardById } from "../firebase/awards.js";
+import { getAward } from "../firebase/awards.js";
 import { useUserStore } from "../stores.js";
 import DropDown from "../components/DropDown.vue";
 
@@ -16,9 +16,9 @@ const route = useRoute();
  * Fetch the award details by ID and set the award state.
  * If the user has the legendary version of the award, set isLegendary to true.
  */
-const fetchAward = async () => {
+const fetchAward = () => {
   const awardId = route.params.id;
-  award.value = await getAwardById(awardId);
+  award.value = getAward(awardId);
 
   if (userStore.awards.legend.some((userAward) => userAward.id === awardId)) {
     isLegendary.value = true;
