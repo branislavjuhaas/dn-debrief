@@ -144,7 +144,7 @@ export const getUser = async (uid) => {
     }
   }
   // Map awards to with the getAwards function using id, but preserve legend property in the object
-  const awards = user.awards.map((award) => {
+  const awards = (user.awards || []).map((award) => {
     const awardData = getAward(award.id);
     if (awardData) {
       return {
