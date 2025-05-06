@@ -2,7 +2,8 @@
 // Import necessary modules and functions
 import { useUserStore } from "../stores.js";
 import { algoliasearch } from "algoliasearch";
-import { computed, ref } from "vue";
+import { computed, ref, onMounted } from "vue";
+import debounce from "lodash/debounce";
 
 // Define reactive variables
 const searchResults = ref([]);
@@ -28,8 +29,23 @@ const hideResults = () => {
   }, 100); // delay in milliseconds
 };
 
+// Add this near your other refs
+const debouncedSearch = ref(null);
+
+// Set up the debounced function during component initialization
+onMounted(() => {
+  debouncedSearch.value = debounce(() => {
+    if (query.value.trim().length >= 2) {
+      // Add minimum query length check
+      performSearch();
+    } else {
+      searchResults.value = [];
+    }
+  }, 300); // Wait 300ms after typing stops
+});
+
 // Function to perform search using Algolia
-const search = async () => {
+const performSearch = async () => {
   if (query.value.trim() === "") {
     searchResults.value = [];
     return;
@@ -117,7 +133,7 @@ const handleClick = (result) => {
       type="text"
       :placeholder="placeholder"
       class="w-full outline-none bg-transparent placeholder-black mt-1 h-auto disabled:placeholder-grey"
-      @input="search"
+      @input="debouncedSearch"
       @focusout="hideResults"
       @focus="active = true" />
     <div

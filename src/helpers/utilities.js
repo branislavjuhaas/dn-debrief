@@ -5,6 +5,8 @@
  * @returns {string} The formatted date string in 'dd.mm.yyyy' format.
  */
 export const formatSlovakDate = (date) => {
+  if (!date) return "Neplatný dátum";
+
   if (typeof date === "string") {
     date = new Date(date);
   }
@@ -22,6 +24,8 @@ export const formatSlovakDate = (date) => {
  * @returns {string} The formatted date string in 'yyyy-mm-dd' format.
  */
 export const formatISODate = (date) => {
+  if (!date) return null;
+
   const day = date.getDate().toString().padStart(2, "0");
   const month = (date.getMonth() + 1).toString().padStart(2, "0");
   const year = date.getFullYear();
