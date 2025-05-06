@@ -19,6 +19,7 @@
     "algoliasearch": "^5.17.1",
     "exceljs": "^4.4.0",
     "firebase": "^10.12.4",
+    "lodash.debounce": "^4.0.8",
     "pinia": "^2.2.0",
     "vue": "^3.4.31",
     "vue-router": "^4.4.0",
