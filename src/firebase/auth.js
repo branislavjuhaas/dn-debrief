@@ -24,6 +24,7 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
+import { getAward } from "./awards";
 
 const auth = getAuth();
 auth.languageCode = "sk";
@@ -142,24 +143,18 @@ export const getUser = async (uid) => {
       user.club = null;
     }
   }
-
-  if (user.awards && Array.isArray(user.awards)) {
-    const awardsPromises = user.awards.map(async (awardRef) => {
-      const awardSnapshot = await getDoc(awardRef.award);
-      if (awardSnapshot.exists()) {
-        return {
-          id: awardSnapshot.id,
-          legend: awardRef.legend,
-          ...awardSnapshot.data(),
-        };
-      } else {
-        console.error("Award document does not exist");
-        return null;
-      }
-    });
-
-    const awards = await Promise.all(awardsPromises);
-
+  // Map awards to with the getAwards function using id, but preserve legend property in the object
+  const awards = (user.awards || []).map((award) => {
+    const awardData = getAward(award.id);
+    if (awardData) {
+      return {
+        ...awardData,
+        legend: award.legend,
+      };
+    }
+    return null;
+  });
+  if (awards.length > 0) {
     const legendTrueAwards = awards.filter((award) => award && award.legend);
     const legendFalseAwards = awards.filter((award) => award && !award.legend);
 

@@ -19,6 +19,7 @@ import { logEvent } from "firebase/analytics";
 import { analytics } from "../../main.js";
 import QuickEdit from "../../components/QuickEdit.vue";
 import { formatISODate } from "../../helpers/utilities.js";
+import { getAward, getAwards } from "../../firebase/awards.js";
 
 const route = useRoute();
 const userStore = useUserStore();
@@ -106,9 +107,7 @@ const updateUserData = async () => {
     );
 
     userAwards.value = (user.awards || []).map((award) => {
-      const awardData = availableAwards.value.find(
-        (availableAward) => availableAward.id === award.award.id,
-      );
+      const awardData = getAward(award.id);
       return { ...awardData, legend: !!award.legend };
     });
 
@@ -121,14 +120,6 @@ const updateUserData = async () => {
       console.error(error);
     }
   }
-};
-
-/**
- * Fetches available awards.
- */
-const getAwards = async () => {
-  const { getAllAwards } = await import("../../firebase/awards.js");
-  availableAwards.value = await getAllAwards();
 };
 
 /**
@@ -375,7 +366,7 @@ const confirmRegistration = async () => {
 
 // Lifecycle hooks
 onMounted(() => {
-  getAwards();
+  availableAwards.value = getAwards();
   updateUserData();
   getClubs(false).then((data) => {
     clubs.value = data;

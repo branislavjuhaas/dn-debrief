@@ -124,7 +124,9 @@ export const translateAwardCategory = (category) => {
       return "Ocenenie organizáciou";
     case "program":
       return "Programové ocenenie";
+    case "unknown":
+      return "Neznáme ocenenie";
     default:
       return category;
   }
-}
+};
