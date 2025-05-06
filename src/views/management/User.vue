@@ -584,6 +584,16 @@ const updateUserDevStatus = async (newValue) => {
         Odstaniť
       </p>
     </div>
+    <a
+      v-if="userStore.role === 'developer'"
+      :href="
+        'https://console.firebase.google.com/u/0/project/dn-cascade/firestore/databases/-default-/data/~2Fusers~2F' +
+        route.params.uid
+      "
+      target="_blank"
+      class="alternative vertical-center w-full">
+      <p>Otvoriť v konzole Firebase</p>
+    </a>
   </div>
 </template>
 
