@@ -1,25 +1,19 @@
 <script setup lang="ts">
 import { defineProps } from "vue";
-/**
- * The error code to be displayed.
- * @type {Object}
- * @property {string} code - The error code.
- */
-const props = defineProps({
-  code: {
-    type: String,
-    default: "500",
-    required: true,
-  },
-});
+
+const props = defineProps<{
+  code: string;
+}>();
 
 /**
  * The error message to be displayed.
+ * @type {string}
  */
 let message = "";
 
 /**
  * The error description to be displayed.
+ * @type {string}
  */
 let description = "";
 
@@ -51,7 +45,7 @@ switch (props.code) {
 <template>
   <div>
     <h1>
-      <b>{{ code + " - " + message }}</b>
+      <b>{{ props.code + " - " + message }}</b>
     </h1>
     <p class="text-xl mt-2">{{ description }}</p>
   </div>
