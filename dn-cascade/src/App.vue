@@ -1,16 +1,24 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import AppHeader from "./views/components/AppHeader.vue";
+import AppFooter from "./views/components/AppFooter.vue";
+</script>
 
 <template>
-  <div class="bg-green">
-    <router-view
-      v-slot="{ Component }"
-      class="flex flex-col max-w-[1320px] w-full pt-28 text-white">
-      <!-- Transition wrapper for route changes -->
-      <transition name="slide-fade" mode="out-in">
-        <!-- Dynamic component based on current route -->
-        <component :is="Component" />
-      </transition>
-    </router-view>
+  <div class="grid grid-rows-[auto_1fr_auto] w-full h-full">
+    <app-header />
+    <div
+      class="flex h-full w-full items-center flex-col px-5 pb-5 bg-green text-white overflow-y-auto scrollbar-hidden print:overflow-visible">
+      <router-view
+        v-slot="{ Component }"
+        class="flex flex-col max-w-content w-full pt-28">
+        <!-- Transition wrapper for route changes -->
+        <transition name="slide-fade" mode="out-in">
+          <!-- Dynamic component based on current route -->
+          <component :is="Component" />
+        </transition>
+      </router-view>
+    </div>
+    <app-footer />
   </div>
 </template>
 
