@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import platform from '../../scripts/platform';
+
 const acceptCookies = () => {
   // TODO: Implement the logic to accept cookies
 };
@@ -12,7 +14,7 @@ const rejectCookies = () => {
   <div
     class="flex flex-col sm:flex-row justify-between items-center max-w-[1320px] h-full w-full">
     <p class="mt-1 max-sm:text-center max-sm:my-4 text-pretty">
-      Kvôli zlepšeniu našich služieb používa aplikácia {{ system }}
+      Kvôli zlepšeniu našich služieb používa aplikácia {{ platform.name }}
       <router-link to="/privacy" class="text-red hover:text-black underline">
         analytické cookies.
       </router-link>
