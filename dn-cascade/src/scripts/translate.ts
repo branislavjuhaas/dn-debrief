@@ -1,3 +1,5 @@
+import type { Role } from "../types/user.ts";
+
 /**
  * Translates the given error code into a human-readable message.
  * @param error - The error code to translate.
@@ -27,7 +29,7 @@ export const translateError = (error: string) => {
  * @param role - The role to translate.
  * @returns The translated role name.
  */
-export const translateRole = (role: string) => {
+export const translateRole = (role: Role) => {
   switch (role) {
     case "developer":
       return "Vývojár";
