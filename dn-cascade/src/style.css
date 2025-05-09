@@ -4,6 +4,8 @@
 @theme {
   --font-epilogue: "Epilogue", sans-serif;
 
+  --spacing-content: 1320px;
+
   --color-green: #21d46e;
   --color-black: #000000;
   --color-white: #ffffff;
