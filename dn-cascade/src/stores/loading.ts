@@ -5,7 +5,7 @@ export const useLoadingStore = defineStore("loading", {
     loadings: 0,
   }),
   getters: {
-    loading() {
+    loading(): boolean {
       return this.loadings > 0;
     },
   },
