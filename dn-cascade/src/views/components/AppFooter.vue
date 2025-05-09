@@ -32,7 +32,7 @@ const loading = useLoadingStore();
           {{ translateRole(user.role) + " - Správa" }}
         </router-link>
         <router-link
-          :to="user.uid != null ? '/users/me' : '/auth'"
+          :to="user.id ? '/users/me' : '/auth'"
           class="flex min-w-40 px-5 h-10 border-2 border-black rounded-[1.25rem] items-center justify-center duration-150 w-full sm:w-auto hover:bg-red hover:!text-white vertical-center">
           <p>
             {{ user.id ? user.fullName : "Prihlásiť" }}
