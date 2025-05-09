@@ -38,10 +38,31 @@ const name = (host: string) => {
 };
 
 /**
+ * Maps a host environment name to a user-friendly platform logo.
+ * @param host - The host environment name.
+ * @returns The user-friendly platform logo URL.
+ */
+const logo = (host: string) => {
+  switch (host) {
+    case "dn-cascade":
+      return "/logos/dn-cascade.svg";
+    case "dn-cascade-dev":
+      return "/logos/dn-cascade-dev.svg";
+    case "debrief":
+      return "/logos/debrief.svg";
+    case "barca":
+      return "/logos/barca.svg";
+    default:
+      return "/logos/dn-cascade.svg";
+  }
+};
+
+/**
  * Platform information including name and version.
  */
 const platform = {
   name: name(host()),
+  logo: logo(host()),
   version: version,
 };
 
