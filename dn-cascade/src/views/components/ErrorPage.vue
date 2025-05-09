@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { defineProps } from "vue";
 /**
  * The error code to be displayed.
@@ -15,15 +15,13 @@ const props = defineProps({
 
 /**
  * The error message to be displayed.
- * @type {string}
  */
-let message;
+let message = "";
 
 /**
  * The error description to be displayed.
- * @type {string}
  */
-let description;
+let description = "";
 
 /**
  * This function sets the error message and description based on the error code.
