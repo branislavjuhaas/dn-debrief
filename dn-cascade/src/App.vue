@@ -7,7 +7,7 @@ import AppFooter from "./views/components/AppFooter.vue";
   <div class="grid grid-rows-[auto_1fr_auto] w-full h-full">
     <app-header />
     <div
-      class="flex h-full w-full items-center flex-col px-5 pb-5 bg-green text-white overflow-y-auto scrollbar-hidden print:overflow-visible">
+      class="flex h-full w-full items-center flex-col px-5 pb-5 bg-green overflow-y-auto scrollbar-hidden print:overflow-visible">
       <router-view
         v-slot="{ Component }"
         class="flex flex-col max-w-content w-full pt-28">
