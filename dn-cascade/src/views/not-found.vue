@@ -14,7 +14,7 @@ import ErrorPage from "./components/ErrorPage.vue";
 </script>
 
 <template>
-    <error-page code="404" />
+  <error-page class="text-white" code="404" />
 </template>
 
 <style scoped></style>
