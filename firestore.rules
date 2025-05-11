@@ -1,0 +1,36 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      allow read: if request.auth != null
+        && (request.auth.uid == userId
+        || request.auth.token.role in ['admin', 'developer', 'cap', 'organizer', 'junior']
+        || (request.auth.token.role == 'coach' && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.club == resource.data.club)
+        || (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.clubManager == true && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.club == resource.data.club)
+      );
+      allow write: if (!('role' in request.resource.data) || request.resource.data.role == resource.data.role)
+        && (request.auth.uid == userId
+        && (!('awards' in request.resource.data) || request.resource.data.awards == resource.data.awards)
+        && (!('createdAt' in request.resource.data) || request.resource.data.createdAt == resource.data.createdAt)
+        && (!('dev' in request.resource.data) || request.resource.data.dev == resource.data.dev)
+        || request.auth.token.role in ['admin', 'developer']);
+    }
+    match /clubs/{clubId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth.token.role in ['admin', 'developer'];
+    }
+    match /messages/{messageId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth.token.role in ['admin', 'developer'];
+    }
+    match /headers/{headerId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+    match /events/{eventId} {
+      allow read: if true;
+      allow write: if request.auth.token.role in ['admin', 'developer'] || (request.auth.token.role in ['organizer', 'junior'] && (!exists(/databases/$(database)/documents/events/$(eventId)) || resource.data.organizers.hasAny([request.auth.uid])));
+    }
+  }
+}

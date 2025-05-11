@@ -1,0 +1,17 @@
+{
+  "projects": {
+    "default": "dn-cascade"
+  },
+  "targets": {
+    "dn-cascade": {
+      "hosting": {
+        "cascade": [
+          "dn-cascade"
+        ],
+        "fastballot": [
+          "fastballot-dn-cascade"
+        ]
+      }
+    }
+  }
+}

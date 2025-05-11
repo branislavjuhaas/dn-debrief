@@ -24,3 +24,7 @@ dist-ssr
 /.firebase/*
 
 **/key.json
+
+# Firebase
+.dataconnect
+dataconnect-generated

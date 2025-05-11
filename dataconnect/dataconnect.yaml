@@ -1,0 +1,12 @@
+specVersion: "v1"
+serviceId: "dn-cascade-service"
+location: "europe-central2"
+schema:
+  source: "./schema"
+  datasource:
+    postgresql:
+      database: "dn-cascade-database"
+      cloudSql:
+        instanceId: "dn-cascade-instance"
+      # schemaValidation: "COMPATIBLE"
+connectorDirs: ["./connector"]
