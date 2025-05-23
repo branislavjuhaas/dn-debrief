@@ -10,7 +10,6 @@ export default defineNuxtConfig({
       sessionCookie: true
     },
     appCheck: {
-      debug: process.env.NODE_ENV !== 'production',
       isTokenAutoRefreshEnabled: true,
       provider: 'ReCaptchaV3',
       key: '6Letq2oqAAAAAChut_Xa1Xg9AHu_n76VKWt9cTlo',
