@@ -24,4 +24,4 @@ logs
 !.env.example
 
 # Firebase
-firebase-key.json
+service-account.json
