@@ -1,9 +1,19 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
+import tailwindcss from "@tailwindcss/vite";
+
 export default defineNuxtConfig({
   compatibilityDate: "2025-05-15",
   devtools: { enabled: true },
-  modules: ["@nuxt/eslint", "nuxt-vuefire"],
-
+  modules: [
+    "@nuxt/eslint",
+    "nuxt-vuefire",
+    "@nuxtjs/google-fonts",
+  ],
+  vite: {
+    plugins: [
+      tailwindcss(),
+    ],
+  },
+  css: ["~/assets/css/main.css"],
   vuefire: {
     auth: {
       enabled: true,
@@ -24,6 +34,15 @@ export default defineNuxtConfig({
       messagingSenderId: "302805903197",
       appId: "1:302805903197:web:96d3607464b5d0ce38eab4",
       measurementId: "G-8WDZKR0VPT",
+    },
+  },
+  googleFonts: {
+    preload: true,
+    families: {
+      Epilogue: {
+        wght: "100..900",
+        ital: "100..900",
+      },
     },
   },
 });
