@@ -3,15 +3,15 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineNuxtConfig({
   compatibilityDate: "2025-05-15",
   devtools: { enabled: true },
-  modules: [
-    "@nuxt/eslint",
-    "nuxt-vuefire",
-    "@nuxtjs/google-fonts",
-  ],
+  modules: ["@nuxt/eslint", "nuxt-vuefire", "@nuxtjs/google-fonts"],
+  devServer: {
+    port: 7210,
+  },
+  app: {
+    baseURL: "/v2/",
+  },
   vite: {
-    plugins: [
-      tailwindcss(),
-    ],
+    plugins: [tailwindcss()],
   },
   css: ["~/assets/css/main.css"],
   vuefire: {
