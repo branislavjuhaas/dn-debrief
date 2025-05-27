@@ -9,6 +9,7 @@ export default defineNuxtConfig({
   },
   app: {
     baseURL: "/v2/",
+    pageTransition: { name: "slide-fade", mode: "out-in" },
   },
   vite: {
     plugins: [tailwindcss()],

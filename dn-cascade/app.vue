@@ -11,3 +11,23 @@
 </template>
 
 <script setup lang="ts"></script>
+
+<style scoped>
+.slide-fade-enter-active,
+.slide-fade-leave-active {
+  transition:
+    transform 0.21s,
+    opacity 0.21s ease;
+  position: relative;
+}
+.slide-fade-enter,
+.slide-fade-leave-to {
+  opacity: 0;
+  transform: translateY(5%);
+}
+.slide-fade-enter-from,
+.slide-fade-leave {
+  opacity: 0;
+  transform: translateY(0%);
+}
+</style>
