@@ -26,15 +26,11 @@
 
     font-size: 12px;
 
-    @apply bg-white text-black font-epilogue font-normal;
+    @apply bg-green text-black font-epilogue font-normal;
 }
 
 body {
-    @apply h-dvh w-dvw;
-}
-
-#app {
-    @apply h-full w-full;
+    @apply overflow-y-scroll;
 }
 
 a {
