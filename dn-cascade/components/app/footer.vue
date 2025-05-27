@@ -8,7 +8,7 @@
       v-else
       class="flex flex-row justify-between items-center max-w-[1320px] h-full w-full">
       <p class="hidden mt-1 sm:flex">
-        2024 - 2025&nbsp;&nbsp;&nbsp;Branislav Juhás
+        2024 - 2025&nbsp;&nbsp;&nbsp;&nbsp;Branislav Juhás
       </p>
 
       <div class="flex flex-row gap-14 items-center w-full sm:w-auto">
