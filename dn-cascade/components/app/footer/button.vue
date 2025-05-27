@@ -15,7 +15,7 @@ const emit = defineEmits<{
  * It emits a click event if the button is not disabled.
  * @param event - The click event.
  */
-const handle = (event: MouseEvent) => {
+const handle = (_event: MouseEvent) => {
   emit("click");
 };
 </script>
