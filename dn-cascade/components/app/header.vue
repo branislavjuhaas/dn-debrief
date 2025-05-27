@@ -9,7 +9,7 @@
         <img
           src="@/assets/logos/dn-debrief-v2.svg"
           alt="DN DebRIEF II"
-          class="h-8" />
+          class="h-8" >
       </nuxt-link>
     </div>
   </div>
