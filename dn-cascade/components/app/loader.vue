@@ -5,7 +5,7 @@ const loading = computed(() => isLoading.value);
 
 <template>
   <div v-if="loading" class="fixed top-[3.75rem] left-0 w-full h-[4px]">
-    <div class="h-full absolute bg-red rounded-b-[4px] animate-load"/>
+    <div class="h-full absolute bg-red rounded-b-[4px] animate-load" />
   </div>
 </template>
 
