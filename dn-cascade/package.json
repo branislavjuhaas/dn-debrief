@@ -12,20 +12,15 @@
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
-    "@firebase/app-types": "^0.9.3",
     "@nuxtjs/google-fonts": "^3.2.0",
+    "@nuxtjs/supabase": "^1.5.1",
     "@pinia/nuxt": "^0.11.0",
     "@tailwindcss/vite": "^4.1.7",
-    "firebase": "^11.8.1",
-    "firebase-admin": "^13.4.0",
-    "firebase-functions": "^6.3.2",
     "nuxt": "^3.17.4",
-    "nuxt-vuefire": "^1.0.5",
     "pinia": "^3.0.2",
     "tailwindcss": "^4.1.7",
     "vue": "^3.5.14",
-    "vue-router": "^4.5.1",
-    "vuefire": "^3.2.1"
+    "vue-router": "^4.5.1"
   },
   "devDependencies": {
     "@nuxt/eslint": "^1.4.1",
