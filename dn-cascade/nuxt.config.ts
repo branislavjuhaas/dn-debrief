@@ -8,6 +8,7 @@ export default defineNuxtConfig({
     "@nuxtjs/google-fonts",
     "@pinia/nuxt",
     "@nuxtjs/supabase",
+    "@nuxt/icon",
   ],
   devServer: {
     port: 7210,
@@ -22,6 +23,18 @@ export default defineNuxtConfig({
   css: ["~/assets/css/main.css"],
   supabase: {
     redirect: false,
+  },
+  icon: {
+    size: "1.25rem",
+    class: "icon",
+    mode: "css",
+    customCollections: [
+      {
+        prefix: "dn",
+        dir: "./assets/icons",
+      },
+    ],
+    cssLayer: "base",
   },
   googleFonts: {
     preload: true,
