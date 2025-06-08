@@ -44,8 +44,6 @@ create index ix_memberships_user_id on public.memberships (user_id);
 -- Allows any authenticated user to read data for clubs that are marked as active.
 create policy "Allow authenticated users to read active clubs" on "clubs" for select to authenticated using (active = true);
 
--- Allows users who are managers of a specific club to read that club's data.
-create policy "Allow club managers to read their clubs" on "clubs" for select to authenticated using (exists (select 1 from "club_managers" where "club_managers"."club_id" = "clubs".id and "club_managers"."user_id" = (select id from public.users where auth_id = (select auth.uid()))));
 -- Allows users who are managers of a specific club to update that club's data.
 create policy "Allow club managers to update their clubs" on "clubs" for update to authenticated using (exists (select 1 from "club_managers" where "club_managers"."club_id" = "clubs".id and "club_managers"."user_id" = (select id from public.users where auth_id = (select auth.uid()))));
 
@@ -59,11 +57,8 @@ create policy "Allow users with clubs.write to update clubs" on "clubs" for upda
 
 alter table public.clubs enable row level security;
 
--- Allows authenticated users to read club manager information if the associated club is active and the associated user's profile is public.
-create policy "Allow authenticated users to read club managers for active clubs and public users" on "club_managers" for select to authenticated using (
-  exists (select 1 from "clubs" where "clubs"."id" = "club_managers"."club_id" and "clubs"."active" = true) and
-  exists (select 1 from "users" where "users"."id" = "club_managers"."user_id" and "users"."public" = true)
-);
+-- Allows authenticated users to read club manager information without restrictions.
+create policy "Allow authenticated users to read club managers for active club" on "club_managers" for select to authenticated;
 
 -- Role-based policies for "club_managers" table.
 -- Allows users with the 'club_managers.read' permission to read club manager data.
