@@ -34,6 +34,7 @@ create table "memberships" (
   "user_id"     bigint not null references "users" ("id"),
   "club_id"     bigint not null references "clubs" ("id"),
   "year"        smallint not null,
+  "confirmed"   boolean not null default false,
   unique ("user_id", "club_id", "year")
 );
 comment on table "memberships" is 'Table for storing user memberships in clubs.';
