@@ -16,16 +16,19 @@ export const useUserStore = defineStore("user", {
 
       const { data, error } = await supabase
         .from("users")
-        .select("*, details(*), claims(*), memberships(*)")
+        .select(
+          "*, details(*), claims(*), memberships(*, club_name:club_id(name))",
+        )
         .eq("auth_id", authId)
         .single();
 
       if (error) {
         console.error("Error fetching user:", error);
         this.user = null;
-      } else {
-        this.user = data as User;
+        return;
       }
+
+      this.user = data as User;
     },
     async clearUserData() {
       this.user = null;
