@@ -8,7 +8,8 @@ export const useUserStore = defineStore("user", {
     isAuthenticated: (state) => !!state.user,
     userId: (state) => state.user?.id || null,
     authId: (state) => state.user?.auth_id || null,
-    fullName: (state) => `${state.user?.name} ${state.user?.surname}`.trim(),
+    fullName: (state) =>
+      state.user ? `${state.user?.name} ${state.user?.surname}`.trim() : null,
   },
   actions: {
     async fetchUserData(authId: string) {
