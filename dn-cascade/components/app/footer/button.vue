@@ -58,7 +58,7 @@ const handle = (_event: MouseEvent) => {
 @reference "~/assets/css/main.css";
 
 .button {
-  @apply flex min-w-40 px-5 h-10 border-2 border-black items-center justify-center hover:bg-red hover:!text-white;
+  @apply flex min-w-40 px-4 h-10 border-2 border-black items-center justify-center hover:bg-red hover:!text-white;
 }
 
 .button-left-alone {
