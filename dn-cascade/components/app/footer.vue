@@ -1,4 +1,6 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const userStore = useUserStore();
+</script>
 
 <template>
   <div
@@ -14,15 +16,20 @@
       <div class="flex flex-row gap-14 items-center w-full sm:w-auto">
         <nuxt-link to="/privacy" class="hidden mt-1 sm:flex">GDPR</nuxt-link>
         <!--          v-if="user.role && user.role !== 'user'"-->
-        <nuxt-link to="/manage" class="hidden mt-1 sm:flex">
-          {{ "Vývojár - Správa" }}
+        <nuxt-link to="/events" class="hidden mt-1 sm:flex">
+          Podujatia
         </nuxt-link>
-        <div class="w-full sm:w-auto flex flex-row gap-1 items-center">
-          <app-footer-button link="/auth" class="w-full" type="left-alone">
-            {{ "Prihlásiť sa" }}
+        <div
+          v-if="userStore.isAuthenticated"
+          class="w-full sm:w-auto flex flex-row gap-1 items-center">
+          <app-footer-button link="/me" class="w-full" type="left-alone">
+            {{ userStore.fullName || "Profil" }}
           </app-footer-button>
-          <app-footer-menu/>
+          <app-footer-menu />
         </div>
+        <app-footer-button v-else link="/login" class="w-full sm:w-auto">
+          Prihlásiť sa
+        </app-footer-button>
       </div>
     </div>
   </div>
