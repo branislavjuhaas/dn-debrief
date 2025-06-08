@@ -2,7 +2,7 @@
 
 <template>
   <div
-    class="flex flex-col bg-white overflow-hidden min-h-[3.75rem] items-center justify-center px-5 border-t-2 border-black">
+    class="flex flex-col bg-white min-h-[3.75rem] items-center justify-center px-5 border-t-2 border-black">
     <cookies-banner v-if="false" />
     <div
       v-else
@@ -17,9 +17,12 @@
         <nuxt-link to="/manage" class="hidden mt-1 sm:flex">
           {{ "Vývojár - Správa" }}
         </nuxt-link>
-        <app-footer-button link="/auth" class="w-full sm:w-auto">
-          {{ "Prihlásiť sa" }}
-        </app-footer-button>
+        <div class="w-full sm:w-auto flex flex-row gap-1 items-center">
+          <app-footer-button link="/auth" class="w-full" type="left-alone">
+            {{ "Prihlásiť sa" }}
+          </app-footer-button>
+          <app-footer-menu/>
+        </div>
       </div>
     </div>
   </div>
