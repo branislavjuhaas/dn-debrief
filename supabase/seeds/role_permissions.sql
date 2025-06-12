@@ -15,6 +15,14 @@ values
   ('developer', 'memberships.write'),
   ('developer', 'users.read'),
   ('developer', 'users.write'),
+  ('developer', 'messages.read'),
+  ('developer', 'messages.write'),
+  ('developer', 'invoices.read'),
+  ('developer', 'invoices.write'),
+  ('developer', 'payment_items.read'),
+  ('developer', 'payment_items.write'),
+  ('developer', 'supervisors.read'),
+  ('developer', 'supervisors.write'),
 
   -- Admin: All permissions
   ('admin', 'awards.read'),
@@ -31,6 +39,14 @@ values
   ('admin', 'memberships.write'),
   ('admin', 'users.read'),
   ('admin', 'users.write'),
+  ('admin', 'messages.read'),
+  ('admin', 'messages.write'),
+  ('admin', 'invoices.read'),
+  ('admin', 'invoices.write'),
+  ('admin', 'payment_items.read'),
+  ('admin', 'payment_items.write'),
+  ('admin', 'supervisors.read'),
+  ('admin', 'supervisors.write'),
 
   -- Cap: Specific read/write permissions
   ('cap', 'awards.read'),
@@ -39,6 +55,9 @@ values
   ('cap', 'details.read'),
   ('cap', 'memberships.read'),
   ('cap', 'users.read'),
+  ('cap', 'messages.read'),
+  ('cap', 'messages.write'),
+
 
   -- Junior Organizer: Specific read permissions
   ('junior_organizer', 'users.read'),
