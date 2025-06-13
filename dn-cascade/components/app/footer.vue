@@ -27,7 +27,7 @@ const userStore = useUserStore();
           </app-footer-button>
           <app-footer-menu />
         </div>
-        <app-footer-button v-else link="/login" class="w-full sm:w-auto">
+        <app-footer-button v-else link="/auth" class="w-full sm:w-auto">
           Prihlásiť sa
         </app-footer-button>
       </div>
