@@ -28,8 +28,7 @@ create index ix_payment_items_membership_id on public.payment_items (membership_
 create index ix_payment_items_created_at on public.payment_items (created_at);
 
 -- Policies for the "invoices" table
--- Allows any authenticated user to read their own invoice data.
-create policy "Allow authenticated users to read their own invoices" on "invoices" for select to authenticated using (auth.uid() = (select auth_id from public.users where id = user_id));
+create policy "Allow authenticated users to read their own invoices" on "invoices" for select to authenticated using (((select auth.jwt()->>'user_id')::bigint) = user_id);
 -- Allow users with the 'invoices.write' permission to update existing invoice data.
 create policy "Allow users with invoices.write to update invoices" on "invoices" for update to authenticated using (authorize('invoices.write'));
 -- Allow users with the 'invoices.read' permission to read invoice data.
@@ -41,8 +40,7 @@ create index ix_invoices_user_id on public.invoices (user_id);
 create index ix_invoices_status on public.invoices (status);
 
 -- Policies for the "payment_items" table
--- Allows any authenticated user to read their own payment item data.
-create policy "Allow authenticated users to read their own payment_items" on "payment_items" for select to authenticated using (auth.uid() = (select auth_id from public.users where id = user_id));
+create policy "Allow authenticated users to read their own payment_items" on "payment_items" for select to authenticated using (((select auth.jwt()->>'user_id')::bigint) = user_id);
 
 -- Allow users with the 'payment_items.write' permission to create new payment_items.
 create policy "Allow users with payment_items.write to create payment_items" on "payment_items" for insert to authenticated with check (authorize('payment_items.write'));
