@@ -1,5 +1,7 @@
 {
-  "name": "nuxt-app",
+  "name": "dn-debrief",
+  "displayName": "DN DebRIEF v2",
+  "version": "2025.1.0",
   "private": true,
   "type": "module",
   "scripts": {
