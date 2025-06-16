@@ -227,10 +227,8 @@ create policy "Allow user roles to delete awards" on public.awards as permissive
 alter table public.awards enable row level security;
 
 -- Policies for "claims" table
--- Allows public read access to user claims.
-create policy "Allow anyone to read user claims" on public.claims as permissive for select to public using (true);
--- Allows users with the 'claims.write' permission to update user claims.
-create policy "Allow user roles to update user claims" on public.claims as permissive for update to authenticated using (authorize('claims.write')) with check (authorize('claims.write'));
+-- Allows any authenticated user to read user claims.
+create policy "Allow authenticated users to read user claims" on public.claims as permissive for select to authenticated using (true);
 
 alter table public.claims enable row level security;
 
