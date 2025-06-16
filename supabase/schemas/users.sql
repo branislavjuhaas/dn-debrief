@@ -121,49 +121,46 @@ begin
 end;
 $$;
 
--- Custom JWT hook to add the user's application role to the access token claims.
 create or replace function public.custom_access_token_hook(event jsonb)
 returns jsonb
 language plpgsql
 stable
-security definer set search_path = ''
 as $$
-  declare
-    claims_from_event jsonb;
-    user_role public.app_role;
-    user_credential smallint;
-    user_additional jsonb;
-    db_user_id bigint;
-  begin
-    -- Fetches the user's information from the 'claims' table.
-    select c.role, c.credential, c.additional, u.id
+declare
+  claims jsonb;
+  user_role public.app_role;
+  user_credential smallint;
+  user_additional jsonb;
+  db_user_id bigint;
+begin
+  -- Initialize claims to the existing claims object from the event
+  claims := event->'claims';
+
+  -- Fetch the user's role, credentials, additional data, and db user id
+  select c.role, c.credential, c.additional, u.id
     into user_role, user_credential, user_additional, db_user_id
     from public.claims as c
     join public.users as u on c.user_id = u.id
     where u.auth_id = (event->>'user_id')::uuid;
 
-    claims_from_event := event->'claims';
+  -- Check if user data was found
+  if db_user_id is null then
+    raise notice 'User not found for auth_id: %', event->>'user_id';
+    -- Return an empty claims object instead of an error
+    return jsonb_build_object('error', 'User not found');
+  end if;
 
-    if user_role is not null then
-      -- Sets the claims in the JWT.
-      claims_from_event := jsonb_set(claims_from_event, '{user_role}', to_jsonb(user_role));
-      claims_from_event := jsonb_set(claims_from_event, '{user_credential}', to_jsonb(user_credential));
-      claims_from_event := jsonb_set(claims_from_event, '{user_additional}', user_additional);
-      claims_from_event := jsonb_set(claims_from_event, '{user_id}', to_jsonb(db_user_id));
-    else
-      -- Sets the claims to JSON null if not found.
-      claims_from_event := jsonb_set(claims_from_event, '{user_role}', to_jsonb(null::public.app_role));
-      claims_from_event := jsonb_set(claims_from_event, '{user_credential}', to_jsonb(null::smallint));
-      claims_from_event := jsonb_set(claims_from_event, '{user_additional}', to_jsonb(null::jsonb));
-      claims_from_event := jsonb_set(claims_from_event, '{user_id}', to_jsonb(null::bigint));
-    end if;
+  -- Append the user-specific claims to the existing claims object
+  claims := jsonb_set(claims, '{user_role}', to_jsonb(user_role));  -- No coalesce here
+  claims := jsonb_set(claims, '{user_credential}', to_jsonb(coalesce(user_credential, null)));  -- Use null directly
+  claims := jsonb_set(claims, '{user_additional}', coalesce(user_additional, '{}'::jsonb));
 
-    -- Updates the 'claims' object within the original event JSON.
-    event := jsonb_set(event, '{claims}', claims_from_event);
+  -- Update the 'claims' object in the original event
+  event := jsonb_set(event, '{claims}', claims);
 
-    -- Returns the modified event with the new claims.
-    return event;
-  end;
+  -- Return the modified event
+  return event;
+end;
 $$;
 
 -- Trigger that executes 'handle_new_user' after a new row is inserted into 'public.users'.
