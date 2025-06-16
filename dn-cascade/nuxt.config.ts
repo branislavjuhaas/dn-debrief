@@ -9,6 +9,7 @@ export default defineNuxtConfig({
     "@pinia/nuxt",
     "@nuxtjs/supabase",
     "@nuxt/icon",
+    "@nuxt/image",
   ],
   devServer: {
     port: 7210,

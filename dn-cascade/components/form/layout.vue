@@ -5,10 +5,20 @@
       <slot />
     </div>
     <div
-      class="max-md:hidden bg-[url('/images/dn-banner.png')] bg-center bg-no-repeat w-full h-full flex items-end justify-center relative">
-      <img
-        src="@/assets/images/form/dn-logo.svg"
+      class="max-md:hidden w-full h-full flex items-end justify-center relative bg-[#0f2544]">
+      <NuxtImg
+        src="/images/form/dn-banner.png"
+        alt="DN Cascade"
+        preload
+        width="1456"
+        height="816"
+        class="absolute w-auto h-auto object-none" />
+      <NuxtImg
+        src="/images/form/dn-logo.svg"
         alt="DN"
+        preload
+        width="120"
+        height="136"
         class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10" />
       <Transition name="fly-in" mode="out-in">
         <form-warning v-if="warnings.length > 0" :warning="warnings[0]" />
