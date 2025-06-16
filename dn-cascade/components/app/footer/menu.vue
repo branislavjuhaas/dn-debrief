@@ -112,7 +112,7 @@ onUnmounted(() => {
         v-if="expand"
         class="flex flex-col absolute px-5 py-4 bg-white border-black border-2 max-sm:border-b-0 max-sm:rounded-b-none bottom-0 sm:bottom-10.5 sm:right-0 max-sm:left-1/2 max-sm:-translate-x-1/2 rounded-2xl gap-2 z-50 max-sm:w-[calc(100vw-2.5rem+2px)] max-h-[calc(100vh - 4rem)]">
         <template v-for="(item, index) in filteredItems" :key="index">
-          <hr v-if="item.name === 'SEPARATOR'" class="border-black" >
+          <hr v-if="item.name === 'SEPARATOR'" class="border-black" />
           <nuxt-link
             v-else
             :to="item.link"
