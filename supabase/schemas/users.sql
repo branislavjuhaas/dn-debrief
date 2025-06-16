@@ -154,6 +154,7 @@ begin
   claims := jsonb_set(claims, '{user_role}', to_jsonb(user_role));  -- No coalesce here
   claims := jsonb_set(claims, '{user_credential}', to_jsonb(coalesce(user_credential, null)));  -- Use null directly
   claims := jsonb_set(claims, '{user_additional}', coalesce(user_additional, '{}'::jsonb));
+  claims := jsonb_set(claims, '{user_id}', to_jsonb(db_user_id));
 
   -- Update the 'claims' object in the original event
   event := jsonb_set(event, '{claims}', claims);
