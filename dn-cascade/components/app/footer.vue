@@ -5,9 +5,8 @@ const userStore = useUserStore();
 <template>
   <div
     class="flex flex-col bg-white min-h-[3.75rem] items-center justify-center px-5 border-t-2 border-black">
-    <cookies-banner v-if="false" />
+    <!-- <cookies-banner v-if="false" /> -->
     <div
-      v-else
       class="flex flex-row justify-between items-center max-w-[1320px] h-full w-full">
       <p class="hidden mt-1 sm:flex">
         2024 - 2025&nbsp;&nbsp;&nbsp;&nbsp;Branislav Juhás
