@@ -147,7 +147,7 @@ begin
   if db_user_id is null then
     raise notice 'User not found for auth_id: %', event->>'user_id';
     -- Return an empty claims object instead of an error
-    return jsonb_build_object('error', 'User not found');
+    return event;
   end if;
 
   -- Append the user-specific claims to the existing claims object
