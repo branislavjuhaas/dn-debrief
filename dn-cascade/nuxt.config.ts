@@ -10,6 +10,7 @@ export default defineNuxtConfig({
     "@nuxtjs/supabase",
     "@nuxt/icon",
     "@nuxt/image",
+    "@nuxt/ui",
   ],
   devServer: {
     port: 7210,

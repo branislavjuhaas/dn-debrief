@@ -56,6 +56,11 @@ const getUserRole = async (
  * @returns void or an error response object.
  */
 export default defineEventHandler(async (event) => {
+  // Skip if not an API route
+  if (!event.path.startsWith("/api/")) {
+    return;
+  }
+
   const key = `${event.method}:${event.path}`;
   const route = routeMap.get(key);
 
