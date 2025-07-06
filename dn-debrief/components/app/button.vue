@@ -56,8 +56,7 @@ const button = tv({
       primary: "bg-red text-white font-bold hover:bg-black",
       secondary: "text-black hover:bg-red hover:text-white",
       tertiary: "text-black bg-transparent border-dashed hover:border-solid",
-      ghost:
-        "bg-transparent text-black border-0 hover:text-dark-blue p-0! h-fit!",
+      ghost: "bg-transparent text-black border-0 hover:text-red p-0! h-fit!",
     },
     size: {
       default: "h-11 py-3",
