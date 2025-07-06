@@ -28,7 +28,13 @@ const userStore = {
           v-if="userStore.isAuthenticated"
           class="w-full sm:w-auto flex flex-row gap-1 items-center"
         >
-          <AppButton to="/profile" variant="secondary" size="header" right>
+          <AppButton
+            to="/profile"
+            variant="secondary"
+            size="header"
+            right
+            class="w-full"
+          >
             {{ userStore.fullName || "Profil" }}
           </AppButton>
           <AppFooterMenu />
