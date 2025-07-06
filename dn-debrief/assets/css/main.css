@@ -1,12 +1,9 @@
 @import "tailwindcss";
-@import "@nuxt/ui";
 
 @theme {
-  --font-epilogue: "Epilogue", sans-serif;
-
   --spacing-content: 1320px;
 
-  --radius-5: 1.25rem;
+  --radius-2.5xl: 1.25rem;
 
   --color-green: #21d46e;
   --color-black: #000000;
@@ -24,9 +21,49 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
+  font-family: "Epilogue", sans-serif;
+
   --delay: 0s;
 
   font-size: 12px;
 
-  @apply bg-green text-black font-epilogue font-normal;
+  @apply bg-green text-black font-normal;
+}
+
+body {
+  @apply overflow-y-auto;
+}
+
+h1 {
+  @apply font-bold text-5xl mb-2 text-left;
+}
+
+h2 {
+  @apply font-bold text-4xl mb-2 text-left;
+}
+
+h3 {
+  @apply font-bold text-3xl mb-2 text-left;
+}
+
+h4 {
+  @apply font-bold text-2xl mb-2 text-left;
+}
+
+h5 {
+  @apply font-bold text-xl mb-2 text-left;
+}
+
+h6 {
+  @apply font-bold text-base mb-2 text-left;
+}
+
+.icon {
+  @apply shrink-0;
+}
+
+@media (min-width: 1024px) {
+  :root {
+    font-size: 16px;
+  }
 }
