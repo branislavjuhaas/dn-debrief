@@ -14,6 +14,21 @@
   --color-red: #ff0000;
   --color-yellow: #ffd900;
   --color-transparent: transparent;
+
+  --shadow-dialog: 0px 0px 8px rgba(0, 0, 0, 0.5);
+
+  --animate-slide-up: slide-up 0.3s ease-in-out;
+
+  @keyframes slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(0.5rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 }
 
 :root {
