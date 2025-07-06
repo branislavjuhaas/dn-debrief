@@ -27,7 +27,7 @@
 
   font-size: 12px;
 
-  @apply bg-green text-black font-normal;
+  @apply bg-green text-white font-normal;
 }
 
 body {
