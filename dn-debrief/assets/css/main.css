@@ -10,6 +10,7 @@
   --color-white: #ffffff;
   --color-gray: #888888;
   --color-blue: #00e0ff;
+  --color-dark-blue: #1480c2;
   --color-red: #ff0000;
   --color-yellow: #ffd900;
   --color-transparent: transparent;
@@ -31,7 +32,7 @@
 }
 
 body {
-  @apply overflow-y-auto;
+  @apply overflow-y-scroll;
 }
 
 h1 {
