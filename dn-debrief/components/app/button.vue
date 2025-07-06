@@ -7,6 +7,8 @@
         variant: props.variant || 'primary',
         size: props.size || 'default',
         disabled: props.disabled,
+        left: props.left,
+        right: props.right,
       })
     "
     :disabled="props.disabled"
@@ -35,6 +37,8 @@ const props = defineProps<{
   disabled?: boolean;
   external?: boolean;
   to?: string;
+  left?: boolean;
+  right?: boolean;
 }>();
 
 const emit = defineEmits(["click"]);
@@ -50,7 +54,7 @@ const button = tv({
   variants: {
     variant: {
       primary: "bg-red text-white font-bold hover:bg-black",
-      secondary: "text-black font-bold hover:bg-red hover:text-white",
+      secondary: "text-black hover:bg-red hover:text-white",
       tertiary: "text-black bg-transparent border-dashed hover:border-solid",
       ghost:
         "bg-transparent text-black border-0 hover:text-dark-blue p-0! h-fit!",
@@ -63,6 +67,12 @@ const button = tv({
     disabled: {
       true: "bg-transparent text-gray cursor-not-allowed hover:bg-transparent hover:text-gray",
     },
+    left: {
+      true: "rounded-l-none",
+    },
+    right: {
+      true: "rounded-r-none",
+    },
   },
   compoundVariants: [
     {
@@ -74,6 +84,11 @@ const button = tv({
       variant: "tertiary",
       disabled: true,
       class: "hover:border-dashed",
+    },
+    {
+      variant: "secondary",
+      size: ["default", "dialog"],
+      class: "font-bold",
     },
   ],
   defaultVariants: {
