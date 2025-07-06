@@ -1,4 +1,10 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const userStore = {
+  isAuthenticated: true, // Example authentication state
+  fullName: "Branislav Juhás",
+  role: "user", // Example role, can be 'admin', 'user', etc.
+};
+</script>
 
 <template>
   <div
@@ -18,18 +24,18 @@
         <nuxt-link to="/events" class="hidden mt-1 sm:flex">
           Podujatia
         </nuxt-link>
-        <!-- <div
+        <div
           v-if="userStore.isAuthenticated"
           class="w-full sm:w-auto flex flex-row gap-1 items-center"
         >
-          <app-footer-button link="/me" class="w-full" type="left-alone">
+          <AppButton to="/profile" variant="secondary" size="header" right>
             {{ userStore.fullName || "Profil" }}
-          </app-footer-button>
-          <app-footer-menu />
+          </AppButton>
+          <AppFooterMenu />
         </div>
         <app-footer-button v-else link="/auth" class="w-full sm:w-auto">
           Prihlásiť sa
-        </app-footer-button> -->
+        </app-footer-button>
       </div>
     </div>
   </div>
