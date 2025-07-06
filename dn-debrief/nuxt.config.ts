@@ -9,6 +9,7 @@ export default defineNuxtConfig({
     "@nuxt/icon",
     "@nuxt/image",
     "@nuxtjs/tailwindcss",
+    "reka-ui/nuxt",
   ],
   app: {
     pageTransition: { name: "fade-slide", mode: "out-in" },
