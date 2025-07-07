@@ -8,11 +8,13 @@
       </DropdownMenuTrigger>
       <DropdownMenuPortal>
         <DropdownMenuContent
-          class="flex flex-col border-2 border-black bg-white text-black rounded-2xl px-5 pt-4 pb-3 shadow-dialog will-change-[opacity,transform] gap-2 animate-slide-up"
+          class="flex flex-col border-2 border-black bg-white text-black rounded-2xl px-5 pt-4 pb-3 shadow-dialog will-change-[opacity,transform] gap-2 animate-slide-up z-50"
           :side-offset="5"
           align="end"
         >
-          <template v-for="item in filteredNavigationItems">
+          <template
+            v-for="item in filteredNavigationItems.filter((i) => !i.drawerOnly)"
+          >
             <DropdownMenuSeparator
               v-if="item.separator"
               :class="item.class"
@@ -45,7 +47,7 @@
             class="w-full h-full fixed top-0 left-0 bg-black/30 backdrop-blur-[2px]"
           />
           <DrawerContent
-            class="fixed bottom-0 left-0 w-full flex flex-col border-t-2 border-black bg-white text-black px-5 py-4 shadow-dialog will-change-[opacity,transform] animate-slide-up h-min!"
+            class="fixed z-50 bottom-0 left-0 w-full flex flex-col border-t-2 border-black bg-white text-black px-5 py-4 shadow-dialog will-change-[opacity,transform]"
           >
             <div role="menu" class="flex flex-col gap-2">
               <template v-for="item in filteredNavigationItems">
@@ -137,7 +139,7 @@ const navigationItems = [
     title: "Vyhlásenie GDPR",
     to: "/privacy",
     icon: "ph:fingerprint-simple",
-    class: "sm:hidden",
+    drawerOnly: true,
   },
   {
     separator: true,
