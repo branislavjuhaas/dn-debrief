@@ -24,7 +24,7 @@
                 class="flex flex-row items-center gap-2 hover:text-red"
               >
                 <Icon :name="item.icon || 'ph:question'" />
-                <p :to="item.to" class="mt-1">
+                <p class="mt-1">
                   {{ item.title }}
                 </p></NuxtLink
               >
@@ -57,7 +57,7 @@
                   class="flex flex-row items-center gap-2 hover:text-red"
                 >
                   <Icon :name="item.icon || 'ph:question'" />
-                  <p :to="item.to" class="mt-1">
+                  <p class="mt-1">
                     {{ item.title }}
                   </p>
                 </NuxtLink>
