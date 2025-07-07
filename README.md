@@ -1,6 +1,6 @@
 # DN Cascade
 
-![Version](https://img.shields.io/badge/Version-2025.2.1-blue) ![License](https://img.shields.io/badge/License-All_Rights_Reserved-red) ![State](https://img.shields.io/badge/Development_State-Active-green) ![Framework](https://img.shields.io/badge/Framework-Vite_+_Vue-green)
+![Version](https://img.shields.io/badge/Version-2025.2.1-blue) ![License](https://img.shields.io/badge/License-All_Rights_Reserved-red) ![State](https://img.shields.io/badge/Development_State-Active-green) ![Framework](https://img.shields.io/badge/Framework-Vue_+_Tailwind-green)
 
 ![Cascade Banner](readme/cascade-banner.png)
 
