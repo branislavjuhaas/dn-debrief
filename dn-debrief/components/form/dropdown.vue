@@ -1,5 +1,38 @@
 <template>
-  <SelectRoot v-model="localValue" :disabled="props.disabled">
+  <ComboboxRoot
+    v-if="props.searchable"
+    v-model="localValue"
+    class="relative"
+    :disabled="props.disabled">
+    <ComboboxAnchor
+      :class="dropdown({ size: props.size, disabled: props.disabled })">
+      <ComboboxInput
+        class="w-full bg-transparent outline-none mt-0.5"
+        :placeholder="props.placeholder || 'Vyberte možnosť'" />
+      <Icon name="ph:caret-down" class="text-black" />
+    </ComboboxAnchor>
+    <ComboboxContent
+      :bodyLock="false"
+      :class="dropdownContent({ size: props.size })">
+      <ComboboxViewport>
+        <ComboboxEmpty class="px-2 py-1 text-gray">
+          Nenašla sa žiadna zhoda.
+        </ComboboxEmpty>
+        <ComboboxItem
+          v-for="option in props.options"
+          :key="option.value"
+          :value="option.label"
+          :disabled="option.disabled"
+          class="text-black hover:text-red focus:text-dark-blue focus:outline-0 rounded-lg px-2 py-1 cursor-pointer data-[disabled]:text-gray data-[disabled]:cursor-not-allowed data-[disabled]:hover:text-gray">
+          <div class="flex items-center gap-2">
+            <Icon v-if="props.icons" :name="option.icon || 'ph:question'" />
+            <span class="mt-1">{{ option.label }}</span>
+          </div>
+        </ComboboxItem>
+      </ComboboxViewport>
+    </ComboboxContent>
+  </ComboboxRoot>
+  <SelectRoot v-else v-model="localValue" :disabled="props.disabled">
     <SelectTrigger
       :class="dropdown({ size: props.size, disabled: props.disabled })">
       <SelectValue
@@ -60,7 +93,7 @@ const localValue = computed({
 });
 
 const dropdown = tv({
-  base: "flex flex-row w-full items-center justify-between px-5 gap-2 bg-white text-black border-2 border-black transition-colors duration-200 ease-in-out focus-within:border-red data-[placeholder]:text-gray",
+  base: "relative flex flex-row w-full items-center justify-between px-5 gap-2 bg-white text-black border-2 border-black transition-colors duration-200 ease-in-out focus-within:border-red data-[placeholder]:text-gray",
   variants: {
     size: {
       default: "h-11 rounded-2xl",
@@ -76,7 +109,7 @@ const dropdown = tv({
 });
 
 const dropdownContent = tv({
-  base: "px-3 py-2 shadow-dialog bg-white border-2 border-black will-change-[opacity,transform] z-[100]",
+  base: "absolute w-full px-3 py-2 shadow-dialog bg-white border-2 border-black will-change-[opacity,transform] z-40",
   variants: {
     size: {
       default: "rounded-2xl",
