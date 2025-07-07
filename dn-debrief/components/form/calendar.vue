@@ -1,6 +1,5 @@
 <template>
   <DatePickerRoot
-    id="birthday"
     locale="sk"
     :is-date-unavailable="(date) => {
       if (!date) return false;
