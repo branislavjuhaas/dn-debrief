@@ -80,6 +80,11 @@ const button = tv({
       class: "min-w-50",
     },
     {
+      variant: "secondary",
+      size: "header",
+      class: "min-w-50",
+    },
+    {
       variant: "tertiary",
       disabled: true,
       class: "hover:border-dashed",
