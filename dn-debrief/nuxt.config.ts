@@ -12,7 +12,7 @@ export default defineNuxtConfig({
     "reka-ui/nuxt",
   ],
   app: {
-    pageTransition: { name: "fade-slide", mode: "out-in" },
+    pageTransition: { name: "slide-fade", mode: "out-in" },
     layoutTransition: { name: "fade", mode: "out-in" },
     head: {
       charset: "utf-8",
