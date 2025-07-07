@@ -74,6 +74,17 @@ h6 {
   @apply font-bold text-base mb-2 text-left;
 }
 
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 .icon {
   @apply shrink-0;
 }
