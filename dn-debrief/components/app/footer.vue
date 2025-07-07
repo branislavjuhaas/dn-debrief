@@ -44,7 +44,7 @@ const userStore = {
           to="/auth"
           variant="secondary"
           size="header"
-          class="w-full sm:w-auto"
+          class="w-full min-w-50 sm:w-auto"
         >
           Prihlásiť sa
         </AppButton>
