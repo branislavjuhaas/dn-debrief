@@ -1,0 +1,92 @@
+<template>
+  <SelectRoot v-model="localValue" :disabled="props.disabled">
+    <SelectTrigger
+      :class="dropdown({ size: props.size, disabled: props.disabled })">
+      <SelectValue
+        class="mt-1"
+        :placeholder="props.placeholder || 'Vyberte možnosť'" />
+      <Icon name="ph:caret-down" class="text-black" />
+    </SelectTrigger>
+    <SelectPortal>
+      <SelectContent
+        :bodyLock="false"
+        :class="dropdownContent({ size: props.size })">
+        <SelectViewport>
+          <SelectItem
+            v-for="option in props.options"
+            :key="option.value"
+            :value="option.value"
+            :disabled="option.disabled"
+            class="text-black hover:text-red focus:text-dark-blue focus:outline-0 rounded-lg px-2 py-1 cursor-pointer data-[disabled]:text-gray data-[disabled]:cursor-not-allowed data-[disabled]:hover:text-gray">
+            <SelectItemText class="flex items-center gap-2">
+              <Icon v-if="props.icons" :name="option.icon || 'ph:question'" />
+              <span class="mt-1">{{ option.label }}</span>
+            </SelectItemText>
+          </SelectItem>
+        </SelectViewport>
+      </SelectContent>
+    </SelectPortal>
+  </SelectRoot>
+</template>
+
+<script setup lang="ts">
+import { tv } from "tailwind-variants";
+
+type Option = {
+  label: string;
+  value: string;
+  icon?: string;
+  disabled?: boolean;
+};
+
+const props = defineProps<{
+  modelValue?: string;
+  options?: Array<Option>;
+  searchable?: boolean;
+  disabled?: boolean;
+  icons?: boolean;
+  size?: "default" | "dialog";
+  placeholder?: string;
+}>();
+
+const emit = defineEmits(["update:modelValue", "select"]);
+
+const localValue = computed({
+  get: () => props.modelValue,
+  set: (value) => {
+    emit("update:modelValue", value);
+    emit("select", value);
+  },
+});
+
+const dropdown = tv({
+  base: "flex flex-row w-full items-center justify-between px-5 gap-2 bg-white text-black border-2 border-black transition-colors duration-200 ease-in-out focus-within:border-red data-[placeholder]:text-gray",
+  variants: {
+    size: {
+      default: "h-11 rounded-2xl",
+      dialog: "h-9 rounded-lg",
+    },
+    disabled: {
+      true: "cursor-not-allowed",
+    },
+  },
+  defaultVariants: {
+    size: "default",
+  },
+});
+
+const dropdownContent = tv({
+  base: "px-3 py-2 shadow-dialog bg-white border-2 border-black will-change-[opacity,transform] z-[100]",
+  variants: {
+    size: {
+      default: "rounded-2xl",
+      dialog: "rounded-lg",
+    },
+  },
+  defaultVariants: {
+    size: "default",
+  },
+});
+</script>
+
+<style scoped></style>
