@@ -8,7 +8,7 @@ const userStore = {
 
 <template>
   <div
-    class="fixed bottom-0 w-full flex flex-col bg-white text-black min-h-[3.75rem] items-center justify-center px-5 border-t-2 border-black"
+    class="fixed bottom-0 w-full flex flex-col bg-white text-black min-h-[3.75rem] items-center justify-center px-5 border-t-2 border-black z-40"
   >
     <!-- <cookies-banner v-if="false" /> -->
     <div
