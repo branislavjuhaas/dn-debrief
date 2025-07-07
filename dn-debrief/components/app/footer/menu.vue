@@ -11,9 +11,10 @@
           :side-offset="5"
           align="end">
           <template
-            v-for="item in filteredNavigationItems.filter(
-              (i) => !i.drawerOnly,
-            )">
+            v-for="(item, index) in filteredNavigationItems.filter(
+              (i) => !i.drawerOnly
+            )"
+            :key="index">
             <DropdownMenuSeparator
               v-if="item.separator"
               :class="item.class"
@@ -44,7 +45,9 @@
           <DrawerContent
             class="fixed z-50 bottom-0 left-0 w-full flex flex-col border-t-2 border-black bg-white text-black px-5 py-4 shadow-dialog will-change-[opacity,transform]">
             <div role="menu" class="flex flex-col gap-2">
-              <template v-for="item in filteredNavigationItems">
+              <template
+                v-for="(item, index) in filteredNavigationItems"
+                :key="index">
                 <NuxtLink
                   v-if="!item.separator"
                   :class="item.class"

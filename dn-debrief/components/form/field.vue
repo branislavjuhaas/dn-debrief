@@ -6,6 +6,7 @@
     <div class="relative w-full mt-1">
       <input
         :id="id"
+        v-model="localValue"
         :class="
           input({
             size: props.size,
@@ -17,17 +18,16 @@
         :type="inputType"
         :placeholder="props.placeholder"
         :disabled="props.disabled"
-        v-model="localValue"
         :aria-disabled="props.disabled"
-        :aria-label="props.label || props.placeholder" />
+        :aria-label="props.label || props.placeholder" >
       <button
         v-if="props.type === 'password'"
         type="button"
         :disabled="props.disabled"
         class="absolute right-0 top-0 h-full w-fit px-5 flex items-center text-black disabled:text-gray cursor-pointer"
-        @click="togglePasswordVisibility"
         :aria-pressed="isPasswordVisible"
-        :aria-label="isPasswordVisible ? 'Hide password' : 'Show password'">
+        :aria-label="isPasswordVisible ? 'Hide password' : 'Show password'"
+        @click="togglePasswordVisibility">
         <Icon :name="isPasswordVisible ? 'ph:eye-slash' : 'ph:eye'" />
       </button>
     </div>

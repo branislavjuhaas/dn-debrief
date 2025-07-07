@@ -1,5 +1,6 @@
 <template>
   <DatePickerRoot
+    v-model="value"
     locale="sk"
     :is-date-unavailable="(date) => {
       if (!date) return false;
@@ -98,6 +99,8 @@
 
 <script setup lang="ts">
 import { tv } from "tailwind-variants";
+import { computed } from "vue";
+import { parseDate } from "@internationalized/date";
 
 const props = defineProps<{
   modelValue?: Date | string;
@@ -111,6 +114,24 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits(["update:modelValue"]);
+
+const value = computed({
+  get: () => {
+    if (!props.modelValue) return undefined;
+    const date = new Date(props.modelValue);
+    return parseDate(date.toISOString().split("T")[0]);
+  },
+  set: (val: import("@internationalized/date").CalendarDate | undefined) => {
+    if (!val) {
+      emit("update:modelValue", undefined);
+      return;
+    }
+    const year = val.year;
+    const month = val.month.toString().padStart(2, "0");
+    const day = val.day.toString().padStart(2, "0");
+    emit("update:modelValue", `${year}-${month}-${day}`);
+  },
+});
 
 const calendar = tv({
   base: "flex flex-row w-full items-center justify-between px-5 gap-2 bg-white text-black border-2 border-black transition-colors duration-200 ease-in-out focus-within:border-red",

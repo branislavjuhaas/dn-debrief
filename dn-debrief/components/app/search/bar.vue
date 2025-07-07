@@ -1,19 +1,19 @@
 <template>
   <ComboboxRoot
-    class="sm:relative"
     v-model:open="expanded"
+    class="sm:relative"
     :disabled="!userStore.isAuthenticated">
     <ComboboxAnchor
       class="w-full flex items-center justify-between rounded-2xl border-2 border-black px-5 h-10 gap-3 bg-white data-[placeholder]:text-grey outline-none data-[disabled]:text-gray">
       <Icon name="ph:magnifying-glass" />
       <ComboboxInput
+        v-model="searchTerm"
         class="bg-transparent outline-none h-full w-full mt-0.5"
         :placeholder="
           !userStore.isAuthenticated
             ? 'Pre prístup k vyhľadávaniu sa prihláste'
             : 'Hľadať členov, kluby, podujatia a tímy'
-        "
-        v-model="searchTerm" />
+        " />
     </ComboboxAnchor>
 
     <ComboboxContent

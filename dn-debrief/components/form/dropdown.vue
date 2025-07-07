@@ -12,7 +12,7 @@
       <Icon name="ph:caret-down" class="text-black" />
     </ComboboxAnchor>
     <ComboboxContent
-      :bodyLock="false"
+      :body-lock="false"
       :class="dropdownContent({ size: props.size })">
       <ComboboxViewport>
         <ComboboxEmpty class="px-2 py-1 text-gray">
@@ -47,7 +47,7 @@
     </SelectTrigger>
     <SelectPortal>
       <SelectContent
-        :bodyLock="false"
+        :body-lock="false"
         :class="dropdownContent({ size: props.size })">
         <SelectViewport>
           <SelectItem
@@ -89,6 +89,9 @@ const props = withDefaults(
   }>(),
   {
     options: () => [],
+    modelValue: "",
+    size: "default",
+    placeholder: "",
   }
 );
 
