@@ -12,8 +12,7 @@
       })
     "
     :disabled="props.disabled"
-    @click="handleClick"
-  >
+    @click="handleClick">
     <Icon v-if="props.icon" :name="props.icon" />
     <span class="mt-1">
       <slot>

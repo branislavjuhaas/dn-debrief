@@ -16,7 +16,9 @@
 /* Slide fade transition used for page transitions */
 .slide-fade-enter-active,
 .slide-fade-leave-active {
-  transition: transform 0.21s, opacity 0.21s ease;
+  transition:
+    transform 0.21s,
+    opacity 0.21s ease;
   position: relative;
 }
 .slide-fade-enter,

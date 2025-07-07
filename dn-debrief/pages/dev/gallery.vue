@@ -76,8 +76,7 @@
       <FormField
         v-for="size in fieldSizes"
         :key="size + '-tel'"
-        :size="size as
-      any"
+        :size="size as any"
         type="tel"
         placeholder="Field (Tel)" />
     </div>

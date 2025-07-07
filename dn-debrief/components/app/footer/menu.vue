@@ -2,34 +2,31 @@
   <div>
     <DropdownMenuRoot v-model:open="toggleState" :modal="false">
       <DropdownMenuTrigger
-        class="flex-row px-5 border-2 h-10 items-center rounded-r-2xl hover:bg-red hover:text-white text-black border-black cursor-pointer transition-colors duration-200 ease-in-out hidden sm:flex"
-      >
+        class="flex-row px-5 border-2 h-10 items-center rounded-r-2xl hover:bg-red hover:text-white text-black border-black cursor-pointer transition-colors duration-200 ease-in-out hidden sm:flex">
         <Icon name="ph:sort-descending" />
       </DropdownMenuTrigger>
       <DropdownMenuPortal>
         <DropdownMenuContent
           class="flex flex-col border-2 border-black bg-white text-black rounded-2xl px-5 pt-4 pb-3 shadow-dialog will-change-[opacity,transform] gap-2 animate-slide-up z-50"
           :side-offset="5"
-          align="end"
-        >
+          align="end">
           <template
-            v-for="item in filteredNavigationItems.filter((i) => !i.drawerOnly)"
-          >
+            v-for="item in filteredNavigationItems.filter(
+              (i) => !i.drawerOnly,
+            )">
             <DropdownMenuSeparator
               v-if="item.separator"
               :class="item.class"
-              class="h-[1px] bg-black rounded-full"
-            />
+              class="h-[1px] bg-black rounded-full" />
             <DropdownMenuItem v-else :class="item.class">
               <NuxtLink
                 :to="item.to"
-                class="flex flex-row items-center gap-2 hover:text-red"
-              >
+                class="flex flex-row items-center gap-2 hover:text-red">
                 <Icon :name="item.icon || 'ph:question'" />
                 <p class="mt-1">
                   {{ item.title }}
-                </p></NuxtLink
-              >
+                </p>
+              </NuxtLink>
             </DropdownMenuItem>
           </template>
         </DropdownMenuContent>
@@ -37,18 +34,15 @@
     </DropdownMenuRoot>
     <DrawerRoot>
       <DrawerTrigger
-        class="flex flex-row px-5 border-2 h-10 items-center rounded-r-2xl hover:bg-red hover:text-white text-black border-black cursor-pointer transition-colors duration-200 ease-in-out w-fit sm:hidden"
-      >
+        class="flex flex-row px-5 border-2 h-10 items-center rounded-r-2xl hover:bg-red hover:text-white text-black border-black cursor-pointer transition-colors duration-200 ease-in-out w-fit sm:hidden">
         <Icon name="ph:sort-descending" />
       </DrawerTrigger>
       <ClientOnly>
         <DrawerPortal>
           <DrawerOverlay
-            class="w-full h-full fixed top-0 left-0 bg-black/30 backdrop-blur-[2px]"
-          />
+            class="w-full h-full fixed top-0 left-0 bg-black/30 backdrop-blur-[2px]" />
           <DrawerContent
-            class="fixed z-50 bottom-0 left-0 w-full flex flex-col border-t-2 border-black bg-white text-black px-5 py-4 shadow-dialog will-change-[opacity,transform]"
-          >
+            class="fixed z-50 bottom-0 left-0 w-full flex flex-col border-t-2 border-black bg-white text-black px-5 py-4 shadow-dialog will-change-[opacity,transform]">
             <div role="menu" class="flex flex-col gap-2">
               <template v-for="item in filteredNavigationItems">
                 <NuxtLink
@@ -56,8 +50,7 @@
                   :class="item.class"
                   role="menuitem"
                   :to="item.to"
-                  class="flex flex-row items-center gap-2 hover:text-red"
-                >
+                  class="flex flex-row items-center gap-2 hover:text-red">
                   <Icon :name="item.icon || 'ph:question'" />
                   <p class="mt-1">
                     {{ item.title }}
@@ -68,8 +61,7 @@
                   role="separator"
                   aria-orientation="horizontal"
                   :class="item.class"
-                  class="h-[1px] bg-black rounded-full"
-                />
+                  class="h-[1px] bg-black rounded-full" />
               </template>
             </div>
           </DrawerContent>

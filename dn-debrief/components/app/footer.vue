@@ -8,12 +8,10 @@ const userStore = {
 
 <template>
   <div
-    class="fixed bottom-0 w-full flex flex-col bg-white text-black min-h-[3.75rem] items-center justify-center px-5 border-t-2 border-black z-40"
-  >
+    class="fixed bottom-0 w-full flex flex-col bg-white text-black min-h-[3.75rem] items-center justify-center px-5 border-t-2 border-black z-40">
     <!-- <cookies-banner v-if="false" /> -->
     <div
-      class="flex flex-row justify-between items-center max-w-[1320px] h-full w-full"
-    >
+      class="flex flex-row justify-between items-center max-w-[1320px] h-full w-full">
       <p class="hidden mt-1 sm:flex">
         2024 - 2025&nbsp;&nbsp;&nbsp;&nbsp;Branislav Juhás
       </p>
@@ -26,15 +24,13 @@ const userStore = {
         </nuxt-link>
         <div
           v-if="userStore.isAuthenticated"
-          class="w-full sm:w-auto flex flex-row gap-1 items-center"
-        >
+          class="w-full sm:w-auto flex flex-row gap-1 items-center">
           <AppButton
             to="/profile"
             variant="secondary"
             size="header"
             right
-            class="w-full"
-          >
+            class="w-full">
             {{ userStore.fullName || "Profil" }}
           </AppButton>
           <AppFooterMenu />
@@ -44,8 +40,7 @@ const userStore = {
           to="/auth"
           variant="secondary"
           size="header"
-          class="w-full min-w-50 sm:w-auto"
-        >
+          class="w-full min-w-50 sm:w-auto">
           Prihlásiť sa
         </AppButton>
       </div>

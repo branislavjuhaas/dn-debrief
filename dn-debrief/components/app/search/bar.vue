@@ -2,11 +2,9 @@
   <ComboboxRoot
     class="sm:relative"
     v-model:open="expanded"
-    :disabled="!userStore.isAuthenticated"
-  >
+    :disabled="!userStore.isAuthenticated">
     <ComboboxAnchor
-      class="w-full flex items-center justify-between rounded-2xl border-2 border-black px-5 h-10 gap-3 bg-white data-[placeholder]:text-grey outline-none data-[disabled]:text-gray"
-    >
+      class="w-full flex items-center justify-between rounded-2xl border-2 border-black px-5 h-10 gap-3 bg-white data-[placeholder]:text-grey outline-none data-[disabled]:text-gray">
       <Icon name="ph:magnifying-glass" />
       <ComboboxInput
         class="bg-transparent outline-none h-full w-full mt-0.5"
@@ -15,13 +13,11 @@
             ? 'Pre prístup k vyhľadávaniu sa prihláste'
             : 'Hľadať členov, kluby, podujatia a tímy'
         "
-        v-model="searchTerm"
-      />
+        v-model="searchTerm" />
     </ComboboxAnchor>
 
     <ComboboxContent
-      class="absolute max-sm:left-5 z-10 w-[calc(100%-2.5rem)] sm:w-full mt-1 bg-white overflow-hidden rounded-2xl shadow-dialog border-2 border-black will-change-[opacity,transform]"
-    >
+      class="absolute max-sm:left-5 z-10 w-[calc(100%-2.5rem)] sm:w-full mt-1 bg-white overflow-hidden rounded-2xl shadow-dialog border-2 border-black will-change-[opacity,transform]">
       <ComboboxViewport class="px-5 py-4">
         <ComboboxEmpty class="pt-1 text-gray">
           Vyhľadávaniu nezodpovedá žiadna položka
@@ -31,16 +27,14 @@
           v-for="option in options"
           :key="option.name"
           :value="option.name"
-          @select.prevent
-        >
+          @select.prevent>
           <NuxtLink
             :to="`/search/${option.name}`"
             class="flex flex-row items-center gap-2 hover:text-red"
             @click="
               expanded = false;
               searchTerm = '';
-            "
-          >
+            ">
             <Icon :name="getIcon(option.type ?? 'ph:question')" />
             <p class="mt-1">
               {{ option.name }}
