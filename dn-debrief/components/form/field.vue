@@ -39,11 +39,11 @@ import { tv } from "tailwind-variants";
 import { ref, computed, watch, useId } from "vue";
 
 const props = defineProps<{
+  modelValue?: string | number;
   label?: string;
   size?: "default" | "dialog";
   type?: "text" | "number" | "password" | "email" | "tel" | "url";
   placeholder?: string;
-  modelValue?: string | number;
   disabled?: boolean;
   left?: boolean;
   right?: boolean;
@@ -53,9 +53,19 @@ const emit = defineEmits(["update:modelValue"]);
 
 const id = useId();
 
-const localValue = computed({
-  get: () => props.modelValue,
-  set: (value) => emit("update:modelValue", value),
+const localValue = ref(props.modelValue);
+
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    if (newValue !== localValue.value) {
+      localValue.value = newValue;
+    }
+  }
+);
+
+watch(localValue, (newValue) => {
+  emit("update:modelValue", newValue);
 });
 
 const isPasswordVisible = ref(false);
