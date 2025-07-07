@@ -80,6 +80,11 @@
         type="tel"
         placeholder="Field (Tel)" />
     </div>
+    <h1 class="text-2xl font-bold mb-4">Calendar</h1>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-center mb-12">
+      <FormCalendar />
+      <FormCalendar size="dialog" />
+    </div>
   </div>
 </template>
 
