@@ -1,7 +1,7 @@
 <template>
   <ComboboxRoot
     v-if="props.searchable"
-    v-model="localValue"
+    v-model="searchTerm"
     class="relative"
     :disabled="props.disabled">
     <ComboboxAnchor
@@ -23,7 +23,12 @@
           :key="option.value"
           :value="option.label"
           :disabled="option.disabled"
-          class="text-black hover:text-red focus:text-dark-blue focus:outline-0 rounded-lg px-2 py-1 cursor-pointer data-[disabled]:text-gray data-[disabled]:cursor-not-allowed data-[disabled]:hover:text-gray">
+          class="text-black hover:text-red focus:text-dark-blue focus:outline-0 rounded-lg px-2 py-1 cursor-pointer data-[disabled]:text-gray data-[disabled]:cursor-not-allowed data-[disabled]:hover:text-gray"
+          @select="
+            () => {
+              localValue = option.value;
+            }
+          ">
           <div class="flex items-center gap-2">
             <Icon v-if="props.icons" :name="option.icon || 'ph:question'" />
             <span class="mt-1">{{ option.label }}</span>
@@ -72,17 +77,28 @@ type Option = {
   disabled?: boolean;
 };
 
-const props = defineProps<{
-  modelValue?: string;
-  options?: Array<Option>;
-  searchable?: boolean;
-  disabled?: boolean;
-  icons?: boolean;
-  size?: "default" | "dialog";
-  placeholder?: string;
-}>();
+const props = withDefaults(
+  defineProps<{
+    modelValue?: string;
+    options?: Array<Option>;
+    searchable?: boolean;
+    disabled?: boolean;
+    icons?: boolean;
+    size?: "default" | "dialog";
+    placeholder?: string;
+  }>(),
+  {
+    options: () => [],
+  }
+);
 
+/**
+ * @emits update:modelValue - Emitted when the selected value changes.
+ * @emits select - Emitted when an option is selected.
+ */
 const emit = defineEmits(["update:modelValue", "select"]);
+
+const searchTerm = ref("");
 
 const localValue = computed({
   get: () => props.modelValue,
