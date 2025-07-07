@@ -45,11 +45,14 @@
             class="w-full h-full fixed top-0 left-0 bg-black/30 backdrop-blur-[2px]"
           />
           <DrawerContent
-            class="fixed bottom-0 left-0 w-full flex flex-col border-t-2 border-black bg-white text-black px-5 py-4 shadow-dialog will-change-[opacity,transform] gap-2 animate-slide-up h-min!"
+            class="fixed bottom-0 left-0 w-full flex flex-col border-t-2 border-black bg-white text-black px-5 py-4 shadow-dialog will-change-[opacity,transform] animate-slide-up h-min!"
           >
-            <template v-for="item in filteredNavigationItems">
-              <DrawerItem v-if="!item.separator" :class="item.class">
+            <div role="menu" class="flex flex-col gap-2">
+              <template v-for="item in filteredNavigationItems">
                 <NuxtLink
+                  v-if="!item.separator"
+                  :class="item.class"
+                  role="menuitem"
                   :to="item.to"
                   class="flex flex-row items-center gap-2 hover:text-red"
                 >
@@ -58,13 +61,15 @@
                     {{ item.title }}
                   </p>
                 </NuxtLink>
-              </DrawerItem>
-              <DrawerSeparator
-                v-else
-                :class="item.class"
-                class="h-[1px] bg-black rounded-full"
-              />
-            </template>
+                <div
+                  v-else
+                  role="separator"
+                  aria-orientation="horizontal"
+                  :class="item.class"
+                  class="h-[1px] bg-black rounded-full"
+                />
+              </template>
+            </div>
           </DrawerContent>
         </DrawerPortal>
       </ClientOnly>
