@@ -9,7 +9,9 @@
       <ComboboxInput
         class="w-full bg-transparent outline-none mt-0.5"
         :placeholder="props.placeholder || 'Vyberte možnosť'" />
-      <Icon name="ph:caret-down" class="text-black" />
+      <ComboboxTrigger class="cursor-pointer">
+        <Icon name="ph:caret-down" class="text-black" />
+      </ComboboxTrigger>
     </ComboboxAnchor>
     <ComboboxContent
       :body-lock="false"
@@ -23,12 +25,8 @@
           :key="option.value"
           :value="option.label"
           :disabled="option.disabled"
-          class="text-black hover:text-red focus:text-dark-blue focus:outline-0 rounded-lg px-2 py-1 cursor-pointer data-[disabled]:text-gray data-[disabled]:cursor-not-allowed data-[disabled]:hover:text-gray"
-          @select="
-            () => {
-              localValue = option.value;
-            }
-          ">
+          @select="updateModelValue(option.value)"
+          class="text-black hover:text-red focus:text-dark-blue focus:outline-0 rounded-lg px-2 py-1 cursor-pointer data-[disabled]:text-gray data-[disabled]:cursor-not-allowed data-[disabled]:hover:text-gray">
           <div class="flex items-center gap-2">
             <Icon v-if="props.icons" :name="option.icon || 'ph:question'" />
             <span class="mt-1">{{ option.label }}</span>
@@ -37,8 +35,12 @@
       </ComboboxViewport>
     </ComboboxContent>
   </ComboboxRoot>
-  <SelectRoot v-else v-model="localValue" :disabled="props.disabled">
+  <SelectRoot
+    v-else
+    v-model:model-value="localValue"
+    :disabled="props.disabled">
     <SelectTrigger
+      class="cursor-pointer"
       :class="dropdown({ size: props.size, disabled: props.disabled })">
       <SelectValue
         class="mt-1"
@@ -55,6 +57,7 @@
             :key="option.value"
             :value="option.value"
             :disabled="option.disabled"
+            @select="updateModelValue(option.value)"
             class="text-black hover:text-red focus:text-dark-blue focus:outline-0 rounded-lg px-2 py-1 cursor-pointer data-[disabled]:text-gray data-[disabled]:cursor-not-allowed data-[disabled]:hover:text-gray">
             <SelectItemText class="flex items-center gap-2">
               <Icon v-if="props.icons" :name="option.icon || 'ph:question'" />
@@ -101,15 +104,17 @@ const props = withDefaults(
  */
 const emit = defineEmits(["update:modelValue", "select"]);
 
-const searchTerm = ref("");
+// Ref the search term corresponding to selected model value
+const searchTerm = ref(
+  props.options.find((option) => option.value === props.modelValue)?.label || ""
+);
 
-const localValue = computed({
-  get: () => props.modelValue,
-  set: (value) => {
-    emit("update:modelValue", value);
-    emit("select", value);
-  },
-});
+const localValue = ref(props.modelValue);
+
+const updateModelValue = (value: string) => {
+  emit("update:modelValue", value);
+  emit("select", value);
+};
 
 const dropdown = tv({
   base: "relative flex flex-row w-full items-center justify-between px-5 gap-2 bg-white text-black border-2 border-black transition-colors duration-200 ease-in-out focus-within:border-red data-[placeholder]:text-gray",
