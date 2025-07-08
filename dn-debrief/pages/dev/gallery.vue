@@ -137,6 +137,17 @@
       <FormCheckbox
         label="This is a multiline checkbox label that should wrap to the next line if it is too long. This is a multiline checkbox label that should wrap to the." />
     </div>
+    <h1 class="text-2xl font-bold mb-4">Toasts</h1>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 items-center mb-12">
+      <AppButton @click="showInfoToast">Show Info Toast</AppButton>
+      <AppButton @click="showWarningToast">Show Warning Toast</AppButton>
+      <AppButton @click="showActionToast">Show Action Toast</AppButton>
+    </div>
+    <h1 class="text-2xl font-bold mb-4">Alerts</h1>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-center mb-12">
+      <AppButton @click="showInfoAlert">Show Info Alert</AppButton>
+      <AppButton @click="showCriticalAlert">Show Critical Alert</AppButton>
+    </div>
   </div>
 </template>
 
@@ -144,6 +155,75 @@
 const buttonVariants = ["primary", "secondary", "tertiary", "ghost"];
 const fieldSizes = ["default", "dialog"];
 const calendarValue = "2007-01-01";
+
+import { useToast } from "~/composables/useToast";
+import { useAlert } from "~/composables/useAlert";
+const { addToast } = useToast();
+const { showAlert } = useAlert();
+
+const showInfoToast = () => {
+  addToast({
+    text: "Účet bol vytvorený. Pre plný prístup k funkciám Platformy DN Cascade sa staň členom SDA.",
+    autoClose: false,
+    action: {
+      text: "Stať sa členom SDA",
+      onClick: () => {
+        console.log("Action clicked!");
+      },
+    },
+  });
+};
+
+const showWarningToast = () => {
+  addToast({
+    title: "Warning",
+    text: "This is a warning toast.",
+    variant: "warning",
+  });
+};
+
+const showActionToast = () => {
+  addToast({
+    title: "Action",
+    text: "This is a toast with an action.",
+    action: {
+      text: "Go to gallery",
+      to: "/dev/gallery",
+    },
+  });
+};
+
+const showInfoAlert = () => {
+  showAlert({
+    title: "Alert",
+    content: "This is an alert, would you like to continue?",
+    variant: "warning",
+    continueText: "Continue",
+    onContinue: () => {
+      alert("Alert continued!");
+    },
+    cancelText: "Cancel",
+    onCancel: () => {
+      alert("Alert cancelled!");
+    },
+  });
+};
+
+const showCriticalAlert = () => {
+  showAlert({
+    title: "Critical Alert",
+    content: "This is a critical alert, would you like to continue?",
+    variant: "critical",
+    continueText: "Continue",
+    cancelText: "Cancel",
+    onContinue: () => {
+      alert("Critical alert continued!");
+    },
+    onCancel: () => {
+      alert("Critical alert cancelled!");
+    },
+  });
+};
 </script>
 
 <style scoped></style>
