@@ -23,6 +23,8 @@
   --animate-swipe-out: swipe-out 0.15s cubic-bezier(0.16, 1, 0.3, 1);
   --animate-fade-out: fade-out 0.15s cubic-bezier(0.16, 1, 0.3, 1);
   --animate-hide: hide 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-overlay-show: overlay-show 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-content-show: content-show 0.15s cubic-bezier(0.16, 1, 0.3, 1);
 
   @keyframes slide-up {
     from {
@@ -81,6 +83,28 @@
       opacity: 0;
     }
   }
+
+  @keyframes overlay-show {
+    from {
+      opacity: 0;
+      backdrop-filter: blur(0);
+    }
+    to {
+      opacity: 1;
+      backdrop-filter: blur(4px);
+    }
+  }
+
+  @keyframes content-show {
+    from {
+      opacity: 0;
+      transform: translateY(-1rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 }
 
 :root {
@@ -99,7 +123,7 @@
 }
 
 body {
-  @apply overflow-y-scroll;
+  @apply overflow-y-scroll! p-0!;
 }
 
 h1 {

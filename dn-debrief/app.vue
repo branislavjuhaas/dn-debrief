@@ -10,6 +10,7 @@
     </main>
     <AppFooter />
     <AppToast />
+    <AppAlert />
   </div>
 </template>
 
