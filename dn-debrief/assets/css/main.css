@@ -19,6 +19,10 @@
 
   --animate-slide-up: slide-up 0.3s ease-in-out;
   --animate-slide-down: slide-down 0.3s ease-in-out;
+  --animate-slide-in: slide-in 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-swipe-out: swipe-out 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-fade-out: fade-out 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-hide: hide 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 
   @keyframes slide-up {
     from {
@@ -39,6 +43,42 @@
     to {
       opacity: 1;
       transform: translateY(0);
+    }
+  }
+
+  @keyframes slide-in {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes swipe-out {
+    from {
+      transform: translateX(var(--reka-toast-swipe-end-x));
+    }
+    to {
+      transform: translateX(100%);
+    }
+  }
+
+  @keyframes hide {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes fade-out {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
     }
   }
 }
