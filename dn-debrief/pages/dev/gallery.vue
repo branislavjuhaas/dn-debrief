@@ -94,6 +94,7 @@
           { label: 'Option 1', value: '1' },
           { label: 'Option 2', value: '2' },
         ]"
+        @select="(value) => console.log('Selected:', value)"
         placeholder="Select an option" />
       <FormDropdown
         :options="[
@@ -107,6 +108,8 @@
           { label: 'Option 1', value: '1' },
           { label: 'Option 2', value: '2' },
         ]"
+        @select="(value) => console.log('Selected:', value)"
+        v-model="dropdownValue"
         label="Title"
         searchable
         placeholder="Search options" />
@@ -155,6 +158,8 @@
 const buttonVariants = ["primary", "secondary", "tertiary", "ghost"];
 const fieldSizes = ["default", "dialog"];
 const calendarValue = "2007-01-01";
+
+const dropdownValue = ref("1");
 
 import { useToast } from "~/composables/useToast";
 import { useAlert } from "~/composables/useAlert";
