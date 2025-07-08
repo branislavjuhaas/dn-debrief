@@ -35,10 +35,7 @@
       </ComboboxViewport>
     </ComboboxContent>
   </ComboboxRoot>
-  <SelectRoot
-    v-else
-    v-model:model-value="localValue"
-    :disabled="props.disabled">
+  <SelectRoot v-else :disabled="props.disabled">
     <SelectTrigger
       class="cursor-pointer"
       :class="dropdown({ size: props.size, disabled: props.disabled })">
@@ -99,17 +96,26 @@ const props = withDefaults(
 );
 
 /**
- * @emits update:modelValue - Emitted when the selected value changes.
- * @emits select - Emitted when an option is selected.
+ * @emits update:modelValue (value: string) - Emitted when the selected value changes.
+ * @emits select (value: string) - Emitted when an option is selected.
  */
-const emit = defineEmits(["update:modelValue", "select"]);
+const emit = defineEmits<{
+  (e: "update:modelValue", value: string): void;
+  (e: "select", value: string): void;
+}>();
 
 // Ref the search term corresponding to selected model value
 const searchTerm = ref(
   props.options.find((option) => option.value === props.modelValue)?.label || ""
 );
 
-const localValue = ref(props.modelValue);
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    searchTerm.value =
+      props.options.find((option) => option.value === newValue)?.label || "";
+  }
+);
 
 const updateModelValue = (value: string) => {
   emit("update:modelValue", value);
