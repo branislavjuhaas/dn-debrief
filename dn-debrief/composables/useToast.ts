@@ -13,7 +13,6 @@ export interface Toast {
   title?: string;
   text: string;
   variant?: ToastVariant;
-  icon?: string;
   autoClose?: boolean;
   duration?: number;
   action?: ToastAction;
