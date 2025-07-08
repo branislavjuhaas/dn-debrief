@@ -99,8 +99,7 @@
 
 <script setup lang="ts">
 import { tv } from "tailwind-variants";
-import { computed } from "vue";
-import { parseDate } from "@internationalized/date";
+import { parseDate, type CalendarDate } from "@internationalized/date";
 
 const props = defineProps<{
   modelValue?: Date | string;
@@ -115,22 +114,34 @@ const props = defineProps<{
 
 const emit = defineEmits(["update:modelValue"]);
 
-const value = computed({
-  get: () => {
-    if (!props.modelValue) return undefined;
-    const date = new Date(props.modelValue);
-    return parseDate(date.toISOString().split("T")[0]);
-  },
-  set: (val: import("@internationalized/date").CalendarDate | undefined) => {
-    if (!val) {
-      emit("update:modelValue", undefined);
-      return;
+const value = ref<CalendarDate>();
+
+watch(
+  () => props.modelValue,
+  (modelValue) => {
+    if (modelValue) {
+      const date = new Date(modelValue);
+      value.value = parseDate(date.toISOString().split("T")[0]);
+    } else {
+      value.value = undefined;
     }
-    const year = val.year;
-    const month = val.month.toString().padStart(2, "0");
-    const day = val.day.toString().padStart(2, "0");
-    emit("update:modelValue", `${year}-${month}-${day}`);
   },
+  { immediate: true }
+);
+
+watch(value, (val) => {
+  if (!val) {
+    emit("update:modelValue", undefined);
+    return;
+  }
+  const year = val.year;
+  const month = val.month.toString().padStart(2, "0");
+  const day = val.day.toString().padStart(2, "0");
+  const newDate = `${year}-${month}-${day}`;
+
+  if (props.modelValue !== newDate) {
+    emit("update:modelValue", newDate);
+  }
 });
 
 const calendar = tv({
