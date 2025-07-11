@@ -156,6 +156,15 @@
       <FormNumber size="default" :min="0" :max="100" :step="1" />
       <FormNumber size="dialog" :min="0" :max="100" :step="1" />
     </div>
+    <h1 class="text-2xl font-bold mb-4">Editable</h1>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items center mb-12">
+      <FormEditable v-model="quick" />
+      <FormEditable
+        size="dialog"
+        default-value="Click to edit 'Reka UI'"
+        placeholder="Enter text..."
+        auto-resize />
+    </div>
   </div>
 </template>
 
@@ -165,6 +174,7 @@ const fieldSizes = ["default", "dialog"];
 const calendarValue = "2007-01-01";
 
 const dropdownValue = ref("1");
+const quick = ref("Edit me quickly");
 
 import { useToast } from "~/composables/useToast";
 import { useAlert } from "~/composables/useAlert";
