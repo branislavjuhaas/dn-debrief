@@ -175,13 +175,13 @@
     <h3 class="text-2xl font-bold mb-4">Interakcia pri prejdení</h3>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items center mb-12">
       <AppHoverable>
-        <AppButton>Ukáž na mňa</AppButton>
+        <AppButton>Ukáž na mňa kurzorom</AppButton>
         <template #content>
           <div class="text-black">Toto je obsah pri prejdení myšou.</div>
         </template>
       </AppHoverable>
       <AppHoverable>
-        <AppButton>Ukáž aj na mňa</AppButton>
+        <AppButton>Ukáž kurzorom aj na mňa</AppButton>
         <template #content>
           <div class="text-black">Toto je ďalší obsah pri prejdení myšou.</div>
         </template>
@@ -194,6 +194,57 @@
       <FormSectionTitle title="Sekcia 2" icon="ph:heart-fill" />
       <FormSectionTitle title="Sekcia 3" icon="ph:bell-fill" />
       <FormSectionTitle title="Sekcia 4" icon="ph:check-circle-fill" />
+    </div>
+    <h3 class="text-2xl font-bold mb-4">Dialóg s obsahom</h3>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-center mb-12">
+      <AppContentDialog title="Jednoduchý dialóg s obsahom">
+        <template #trigger>
+          <AppButton>Zobraziť jednoduchý dialóg</AppButton>
+        </template>
+        <span>Toto je obsah jednoduchého dialógu.</span>
+      </AppContentDialog>
+      <AppContentDialog
+        title="Dialóg s akciami"
+        action-text="Potvrdiť"
+        @action="onDialogAction">
+        <template #trigger>
+          <AppButton>Zobraziť dialóg s akciami</AppButton>
+        </template>
+        <span>Tento dialóg má akcie.</span>
+      </AppContentDialog>
+      <AppContentDialog
+        title="Dialóg s preventívnou akciou"
+        action-text="Potvrdiť"
+        @action="onPreventableDialogAction">
+        <template #trigger>
+          <AppButton>Zobraziť dialóg s preventívnou akciou</AppButton>
+        </template>
+        <span>Tento dialóg sa nezatvorí po kliknutí na tlačidlo akciu.</span>
+      </AppContentDialog>
+      <AppContentDialog
+        action-text="Potvrdiť"
+        title="Vytvoriť debatný klub"
+        icon="ph:plus-circle-fill"
+        @action="createClub"
+        @close="onClubDialogClose"
+        :disabled="!canSubmitClubCreation">
+        <template #trigger>
+          <AppButton>Zobraziť dynamický dialóg</AppButton>
+        </template>
+        <div class="flex flex-col w-full gap-4">
+          <FormWrapper title="Názov klubu">
+            <FormField v-model="club.name" size="dialog" placeholder="Sučany" />
+          </FormWrapper>
+          <FormWrapper title="Debatný program">
+            <FormDropdown
+              v-model="club.league"
+              :options="leagues"
+              size="dialog"
+              placeholder="Liga klubu"
+              label="Liga klubu" />
+          </FormWrapper>
+        </div>
+      </AppContentDialog>
     </div>
   </div>
 </template>
@@ -249,6 +300,36 @@ const showActionToast = () => {
   });
 };
 
+const club = ref({
+  name: "",
+  league: "senior",
+});
+
+const canSubmitClubCreation = computed(() => {
+  return club.value.name.trim() !== "" && club.value.league !== "";
+});
+
+const leagues = [
+  { label: "SDP", value: "senior" },
+  { label: "ZDP", value: "junior" },
+  { label: "VDP", value: "university" },
+];
+
+const createClub = ({ preventClose }: { preventClose: () => void }) => {
+  if (club.value.name.trim() !== "" && club.value.league !== "") {
+    addToast({
+      title: "Klub vytvorený",
+      text: `Klub ${club.value.name} bol úspešne vytvorený v lige ${club.value.league}.`,
+      variant: "info",
+    });
+
+    club.value.name = "";
+    club.value.league = "senior";
+  } else {
+    preventClose(); // Prevent dialog from closing when form is incomplete
+  }
+};
+
 const showInfoAlert = () => {
   showAlert({
     title: "Upozornenie",
@@ -279,6 +360,24 @@ const showCriticalAlert = () => {
       alert("Kritické upozornenie zrušené!");
     },
   });
+};
+
+const onDialogAction = () => {
+  alert("Akcia dialógu bola kliknutá!");
+};
+
+const onPreventableDialogAction = ({
+  preventClose,
+}: {
+  preventClose: () => void;
+}) => {
+  preventClose();
+  alert("Akcia bola kliknutá, ale dialóg sa nezatvoril!");
+};
+
+const onClubDialogClose = () => {
+  club.value.name = "";
+  club.value.league = "senior";
 };
 </script>
 
