@@ -250,6 +250,11 @@
 </template>
 
 <script setup lang="ts">
+// ------------------- IMPORTS -------------------
+import { useToast } from "~/composables/useToast";
+import { useAlert } from "~/composables/useAlert";
+
+// ------------------- BUTTONS -------------------
 const buttonVariants = ["primary", "secondary", "tertiary", "ghost"];
 const buttonVariantTranslations: Record<string, string> = {
   primary: "Primárne",
@@ -257,16 +262,21 @@ const buttonVariantTranslations: Record<string, string> = {
   tertiary: "Terciárne",
   ghost: "Duch",
 };
+
+// ------------------- FIELDS -------------------
 const fieldSizes = ["default", "dialog"];
+
+// ------------------- CALENDAR -------------------
 const calendarValue = "2007-01-01";
 
+// ------------------- DROPDOWN -------------------
 const dropdownValue = ref("1");
+
+// ------------------- EDITABLE -------------------
 const quick = ref("Uprav ma rýchlo");
 
-import { useToast } from "~/composables/useToast";
-import { useAlert } from "~/composables/useAlert";
+// ------------------- TOASTS (NOTIFIKÁCIE) -------------------
 const { addToast } = useToast();
-const { showAlert } = useAlert();
 
 const showInfoToast = () => {
   addToast({
@@ -300,35 +310,8 @@ const showActionToast = () => {
   });
 };
 
-const club = ref({
-  name: "",
-  league: "senior",
-});
-
-const canSubmitClubCreation = computed(() => {
-  return club.value.name.trim() !== "" && club.value.league !== "";
-});
-
-const leagues = [
-  { label: "SDP", value: "senior" },
-  { label: "ZDP", value: "junior" },
-  { label: "VDP", value: "university" },
-];
-
-const createClub = ({ preventClose }: { preventClose: () => void }) => {
-  if (club.value.name.trim() !== "" && club.value.league !== "") {
-    addToast({
-      title: "Klub vytvorený",
-      text: `Klub ${club.value.name} bol úspešne vytvorený v lige ${club.value.league}.`,
-      variant: "info",
-    });
-
-    club.value.name = "";
-    club.value.league = "senior";
-  } else {
-    preventClose(); // Prevent dialog from closing when form is incomplete
-  }
-};
+// ------------------- ALERTS (UPOZORNENIA) -------------------
+const { showAlert } = useAlert();
 
 const showInfoAlert = () => {
   showAlert({
@@ -362,6 +345,7 @@ const showCriticalAlert = () => {
   });
 };
 
+// ------------------- CONTENT DIALOG -------------------
 const onDialogAction = () => {
   alert("Akcia dialógu bola kliknutá!");
 };
@@ -373,6 +357,36 @@ const onPreventableDialogAction = ({
 }) => {
   preventClose();
   alert("Akcia bola kliknutá, ale dialóg sa nezatvoril!");
+};
+
+const club = ref({
+  name: "",
+  league: "senior",
+});
+
+const canSubmitClubCreation = computed(() => {
+  return club.value.name.trim() !== "" && club.value.league !== "";
+});
+
+const leagues = [
+  { label: "SDP", value: "senior" },
+  { label: "ZDP", value: "junior" },
+  { label: "VDP", value: "university" },
+];
+
+const createClub = ({ preventClose }: { preventClose: () => void }) => {
+  if (club.value.name.trim() !== "" && club.value.league !== "") {
+    addToast({
+      title: "Klub vytvorený",
+      text: `Klub ${club.value.name} bol úspešne vytvorený v lige ${club.value.league}.`,
+      variant: "info",
+    });
+
+    club.value.name = "";
+    club.value.league = "senior";
+  } else {
+    preventClose(); // Prevent dialog from closing when form is incomplete
+  }
 };
 
 const onClubDialogClose = () => {
