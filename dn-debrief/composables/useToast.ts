@@ -1,7 +1,5 @@
 import { ref, readonly } from "vue";
 
-export type ToastVariant = "info" | "warning";
-
 export interface ToastAction {
   text: string;
   to?: string;
@@ -12,7 +10,7 @@ export interface Toast {
   id: number;
   title?: string;
   text: string;
-  variant?: ToastVariant;
+  variant?: "info" | "warning";
   autoClose?: boolean;
   duration?: number;
   action?: ToastAction;
