@@ -27,9 +27,16 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   (e: "action", payload: { preventClose: () => void }): void;
+  (e: "close"): void;
 }>();
 
 const open = ref(false);
+
+watch(open, (isOpen, wasOpen) => {
+  if (wasOpen && !isOpen) {
+    emit("close");
+  }
+});
 
 function handleAction() {
   let shouldClose = true;
