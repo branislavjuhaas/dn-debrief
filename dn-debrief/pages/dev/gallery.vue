@@ -1,6 +1,7 @@
 <template>
   <div class="flex flex-col w-full">
-    <h1 class="text-2xl font-bold mb-4">Buttons</h1>
+    <h1 class="text-3xl font-bold mb-6">Components Gallery</h1>
+    <h3 class="text-2xl font-bold mb-4">Buttons</h3>
     <div
       id="buttons"
       class="grid grid-cols-1 lg:grid-cols-4 gap-4 items-center mb-12">
@@ -46,7 +47,7 @@
         {{ variant.charAt(0).toUpperCase() + variant.slice(1) }} - Dialog
       </AppButton>
     </div>
-    <h1 class="text-2xl font-bold mb-4">Fields</h1>
+    <h3 class="text-2xl font-bold mb-4">Fields</h3>
     <div
       id="fields"
       class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-center mb-12">
@@ -80,14 +81,14 @@
         type="tel"
         placeholder="Field (Tel)" />
     </div>
-    <h1 class="text-2xl font-bold mb-4">Calendar</h1>
+    <h3 class="text-2xl font-bold mb-4">Calendar</h3>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-center mb-12">
       <FormCalendar
         v-model:model-value="calendarValue"
         @update:model-value="(value) => console.log('Selected date:', value)" />
       <FormCalendar size="dialog" />
     </div>
-    <h1 class="text-2xl font-bold mb-4">Dropdown</h1>
+    <h3 class="text-2xl font-bold mb-4">Dropdown</h3>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-center mb-12">
       <FormDropdown
         :options="[
@@ -125,7 +126,7 @@
         placeholder="Search options"
         @select="(value) => console.log('Selected:', value)" />
     </div>
-    <h1 class="text-2xl font-bold mb-4">Wrapper</h1>
+    <h3 class="text-2xl font-bold mb-4">Wrapper</h3>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-center mb-12">
       <FormWrapper title="Title" hint="This is a hint">
         <FormField placeholder="Wrapped Field" />
@@ -134,29 +135,29 @@
         <FormField size="dialog" placeholder="Wrapped Field" />
       </FormWrapper>
     </div>
-    <h1 class="text-2xl font-bold mb-4">Checkbox</h1>
+    <h3 class="text-2xl font-bold mb-4">Checkbox</h3>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items center mb-12">
       <FormCheckbox label="Checkbox 1" />
       <FormCheckbox
         label="This is a multiline checkbox label that should wrap to the next line if it is too long. This is a multiline checkbox label that should wrap to the." />
     </div>
-    <h1 class="text-2xl font-bold mb-4">Toasts</h1>
+    <h3 class="text-2xl font-bold mb-4">Toasts</h3>
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 items-center mb-12">
       <AppButton @click="showInfoToast">Show Info Toast</AppButton>
       <AppButton @click="showWarningToast">Show Warning Toast</AppButton>
       <AppButton @click="showActionToast">Show Action Toast</AppButton>
     </div>
-    <h1 class="text-2xl font-bold mb-4">Alerts</h1>
+    <h3 class="text-2xl font-bold mb-4">Alerts</h3>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-center mb-12">
       <AppButton @click="showInfoAlert">Show Info Alert</AppButton>
       <AppButton @click="showCriticalAlert">Show Critical Alert</AppButton>
     </div>
-    <h1 class="text-2xl font-bold mb-4">Number Field</h1>
+    <h3 class="text-2xl font-bold mb-4">Number Field</h3>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items center mb-12">
       <FormNumber size="default" :min="0" :max="100" :step="1" />
       <FormNumber size="dialog" :min="0" :max="100" :step="1" />
     </div>
-    <h1 class="text-2xl font-bold mb-4">Editable</h1>
+    <h3 class="text-2xl font-bold mb-4">Editable</h3>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items center mb-12">
       <FormEditable v-model="quick" />
       <FormEditable
@@ -165,7 +166,7 @@
         placeholder="Enter text..."
         auto-resize />
     </div>
-    <h1 class="text-2xl font-bold mb-4">Hoverable</h1>
+    <h3 class="text-2xl font-bold mb-4">Hoverable</h3>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items center mb-12">
       <AppHoverable>
         <AppButton>Hover me</AppButton>
@@ -179,6 +180,14 @@
           <div class="text-black">This is another hoverable content.</div>
         </template>
       </AppHoverable>
+    </div>
+    <h3 class="text-2xl font-bold mb-4">Section Title</h3>
+    <div
+      class="grid grid-cols-1 lg:grid-cols-2 gap-4 items center mb-12 text-black">
+      <FormSectionTitle title="Section 1" icon="ph:star-fill" />
+      <FormSectionTitle title="Section 2" icon="ph:heart-fill" />
+      <FormSectionTitle title="Section 3" icon="ph:bell-fill" />
+      <FormSectionTitle title="Section 4" icon="ph:check-circle-fill" />
     </div>
   </div>
 </template>
