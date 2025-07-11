@@ -2,7 +2,7 @@
   <div>
     <NuxtRouteAnnouncer />
     <AppHeader />
-    <main class="flex-1 pt-[3.75rem] pb-[3.75rem] relative">
+    <main class="flex-1 pt-15 pb-15 relative">
       <AppLoader />
       <NuxtLayout>
         <NuxtPage />
