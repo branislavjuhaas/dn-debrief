@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col w-full">
-    <h1 class="text-3xl font-bold mb-6">Components Gallery</h1>
-    <h3 class="text-2xl font-bold mb-4">Buttons</h3>
+    <h1 class="text-3xl font-bold mb-6">Galéria Komponentov</h1>
+    <h3 class="text-2xl font-bold mb-4">Tlačidlá</h3>
     <div
       id="buttons"
       class="grid grid-cols-1 lg:grid-cols-4 gap-4 items-center mb-12">
@@ -9,45 +9,45 @@
         v-for="variant in buttonVariants"
         :key="variant"
         :variant="variant as any">
-        {{ variant.charAt(0).toUpperCase() + variant.slice(1) }}
+        {{ buttonVariantTranslations[variant] }}
       </AppButton>
       <AppButton
         v-for="variant in buttonVariants"
         :key="variant"
         icon="ph:nut"
         :variant="variant as any">
-        {{ variant.charAt(0).toUpperCase() + variant.slice(1) }} - Icon
+        {{ buttonVariantTranslations[variant] }} - Ikona
       </AppButton>
       <AppButton
         v-for="variant in buttonVariants"
         :key="variant"
         external
         :variant="variant as any">
-        {{ variant.charAt(0).toUpperCase() + variant.slice(1) }} - External
+        {{ buttonVariantTranslations[variant] }} - Externý
       </AppButton>
       <AppButton
         v-for="variant in buttonVariants"
         :key="variant"
         disabled
         :variant="variant as any">
-        {{ variant.charAt(0).toUpperCase() + variant.slice(1) }} - Disabled
+        {{ buttonVariantTranslations[variant] }} - Znefunkčnený
       </AppButton>
       <AppButton
         v-for="variant in buttonVariants"
         :key="variant"
         size="header"
         :variant="variant as any">
-        {{ variant.charAt(0).toUpperCase() + variant.slice(1) }} - Header
+        {{ buttonVariantTranslations[variant] }} - Hlavička
       </AppButton>
       <AppButton
         v-for="variant in buttonVariants"
         :key="variant"
         size="dialog"
         :variant="variant as any">
-        {{ variant.charAt(0).toUpperCase() + variant.slice(1) }} - Dialog
+        {{ buttonVariantTranslations[variant] }} - Dialóg
       </AppButton>
     </div>
-    <h3 class="text-2xl font-bold mb-4">Fields</h3>
+    <h3 class="text-2xl font-bold mb-4">Polia</h3>
     <div
       id="fields"
       class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-center mb-12">
@@ -55,150 +55,162 @@
         v-for="size in fieldSizes"
         :key="size"
         :size="size as any"
-        placeholder="Field (Text)" />
+        placeholder="Pole (Text)" />
       <FormField
         v-for="size in fieldSizes"
         :key="size + '-number'"
         :size="size as any"
         type="number"
-        placeholder="Field (Number)" />
+        placeholder="Pole (Číslo)" />
       <FormField
         v-for="size in fieldSizes"
         :key="size + '-password'"
         :size="size as any"
         type="password"
-        placeholder="Field (Password)" />
+        placeholder="Pole (Heslo)" />
       <FormField
         v-for="size in fieldSizes"
         :key="size + '-email'"
         :size="size as any"
         type="email"
-        placeholder="Field (Email)" />
+        placeholder="Pole (Email)" />
       <FormField
         v-for="size in fieldSizes"
         :key="size + '-tel'"
         :size="size as any"
         type="tel"
-        placeholder="Field (Tel)" />
+        placeholder="Pole (Telefón)" />
     </div>
-    <h3 class="text-2xl font-bold mb-4">Calendar</h3>
+    <h3 class="text-2xl font-bold mb-4">Kalendár</h3>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-center mb-12">
       <FormCalendar
         v-model:model-value="calendarValue"
         @update:model-value="(value) => console.log('Selected date:', value)" />
       <FormCalendar size="dialog" />
     </div>
-    <h3 class="text-2xl font-bold mb-4">Dropdown</h3>
+    <h3 class="text-2xl font-bold mb-4">Rozbaľovacia ponuka</h3>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-center mb-12">
       <FormDropdown
         :options="[
-          { label: 'Option 1', value: '1' },
-          { label: 'Option 2', value: '2' },
+          { label: 'Možnosť 1', value: '1' },
+          { label: 'Možnosť 2', value: '2' },
         ]"
         @select="(value) => console.log('Selected:', value)"
-        placeholder="Select an option" />
+        placeholder="Vyberte možnosť" />
       <FormDropdown
         :options="[
-          { label: 'Option 1', value: '1' },
-          { label: 'Option 2', value: '2' },
+          { label: 'Možnosť 1', value: '1' },
+          { label: 'Možnosť 2', value: '2' },
         ]"
         size="dialog"
-        placeholder="Select an option" />
+        placeholder="Vyberte možnosť" />
       <FormDropdown
         :options="[
-          { label: 'Option 1', value: '1' },
-          { label: 'Option 2', value: '2' },
+          { label: 'Možnosť 1', value: '1' },
+          { label: 'Možnosť 2', value: '2' },
         ]"
         @select="(value) => console.log('Selected:', value)"
         v-model="dropdownValue"
-        label="Title"
+        label="Názov"
         searchable
-        placeholder="Search options" />
+        placeholder="Hľadať možnosti" />
       <FormDropdown
         icons
         :options="[
-          { label: 'Option 1', value: '1', disabled: true, icon: 'ph:nut' },
-          { label: 'Option 2', value: '2', icon: 'ph:gear' },
-          { label: 'Option 3', value: '3', icon: 'ph:star' },
+          { label: 'Možnosť 1', value: '1', disabled: true, icon: 'ph:nut' },
+          { label: 'Možnosť 2', value: '2', icon: 'ph:gear' },
+          { label: 'Možnosť 3', value: '3', icon: 'ph:star' },
         ]"
         size="dialog"
         searchable
-        placeholder="Search options"
+        placeholder="Hľadať možnosti"
         @select="(value) => console.log('Selected:', value)" />
     </div>
-    <h3 class="text-2xl font-bold mb-4">Wrapper</h3>
+    <h3 class="text-2xl font-bold mb-4">Obal</h3>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-center mb-12">
-      <FormWrapper title="Title" hint="This is a hint">
-        <FormField placeholder="Wrapped Field" />
+      <FormWrapper title="Názov" hint="Toto je nápoveda">
+        <FormField placeholder="Zabalené pole" />
       </FormWrapper>
-      <FormWrapper title="Title" size="dialog" hint="This is a hint">
-        <FormField size="dialog" placeholder="Wrapped Field" />
+      <FormWrapper title="Názov" size="dialog" hint="Toto je nápoveda">
+        <FormField size="dialog" placeholder="Zabalené pole" />
       </FormWrapper>
     </div>
-    <h3 class="text-2xl font-bold mb-4">Checkbox</h3>
+    <h3 class="text-2xl font-bold mb-4">Zaškrtávacie políčko</h3>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items center mb-12">
-      <FormCheckbox label="Checkbox 1" />
+      <FormCheckbox label="Zaškrtávacie políčko 1" />
       <FormCheckbox
-        label="This is a multiline checkbox label that should wrap to the next line if it is too long. This is a multiline checkbox label that should wrap to the." />
+        label="Toto je viacriadkový popis zaškrtávacieho políčka, ktorý by sa mal zalomiť na ďalší riadok, ak je príliš dlhý. Toto je viacriadkový popis zaškrtávacieho políčka, ktorý by sa mal zalomiť na." />
     </div>
-    <h3 class="text-2xl font-bold mb-4">Toasts</h3>
+    <h3 class="text-2xl font-bold mb-4">Notifikácie</h3>
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 items-center mb-12">
-      <AppButton @click="showInfoToast">Show Info Toast</AppButton>
-      <AppButton @click="showWarningToast">Show Warning Toast</AppButton>
-      <AppButton @click="showActionToast">Show Action Toast</AppButton>
+      <AppButton @click="showInfoToast">
+        Zobraziť informačnú notifikáciu
+      </AppButton>
+      <AppButton @click="showWarningToast">
+        Zobraziť varovnú notifikáciu
+      </AppButton>
+      <AppButton @click="showActionToast">
+        Zobraziť notifikáciu s akciou
+      </AppButton>
     </div>
-    <h3 class="text-2xl font-bold mb-4">Alerts</h3>
+    <h3 class="text-2xl font-bold mb-4">Upozornenia</h3>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-center mb-12">
-      <AppButton @click="showInfoAlert">Show Info Alert</AppButton>
-      <AppButton @click="showCriticalAlert">Show Critical Alert</AppButton>
+      <AppButton @click="showInfoAlert">
+        Zobraziť informačné upozornenie
+      </AppButton>
+      <AppButton @click="showCriticalAlert">
+        Zobraziť kritické upozornenie
+      </AppButton>
     </div>
-    <h3 class="text-2xl font-bold mb-4">Number Field</h3>
+    <h3 class="text-2xl font-bold mb-4">Číselné pole</h3>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items center mb-12">
       <FormNumber size="default" :min="0" :max="100" :step="1" />
       <FormNumber size="dialog" :min="0" :max="100" :step="1" />
     </div>
-    <h3 class="text-2xl font-bold mb-4">Editable</h3>
+    <h3 class="text-2xl font-bold mb-4">Upravovateľné pole</h3>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items center mb-12">
       <FormEditable v-model="quick" />
-      <FormEditable
-        size="dialog"
-        default-value="Click to edit 'Reka UI'"
-        placeholder="Enter text..."
-        auto-resize />
+      <FormEditable size="dialog" placeholder="Zadajte text..." auto-resize />
     </div>
-    <h3 class="text-2xl font-bold mb-4">Hoverable</h3>
+    <h3 class="text-2xl font-bold mb-4">Interakcia pri prejdení</h3>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items center mb-12">
       <AppHoverable>
-        <AppButton>Hover me</AppButton>
+        <AppButton>Ukáž na mňa</AppButton>
         <template #content>
-          <div class="text-black">This is a hoverable content.</div>
+          <div class="text-black">Toto je obsah pri prejdení myšou.</div>
         </template>
       </AppHoverable>
       <AppHoverable>
-        <AppButton>Hover me too</AppButton>
+        <AppButton>Ukáž aj na mňa</AppButton>
         <template #content>
-          <div class="text-black">This is another hoverable content.</div>
+          <div class="text-black">Toto je ďalší obsah pri prejdení myšou.</div>
         </template>
       </AppHoverable>
     </div>
-    <h3 class="text-2xl font-bold mb-4">Section Title</h3>
+    <h3 class="text-2xl font-bold mb-4">Názov sekcie</h3>
     <div
       class="grid grid-cols-1 lg:grid-cols-2 gap-4 items center mb-12 text-black">
-      <FormSectionTitle title="Section 1" icon="ph:star-fill" />
-      <FormSectionTitle title="Section 2" icon="ph:heart-fill" />
-      <FormSectionTitle title="Section 3" icon="ph:bell-fill" />
-      <FormSectionTitle title="Section 4" icon="ph:check-circle-fill" />
+      <FormSectionTitle title="Sekcia 1" icon="ph:star-fill" />
+      <FormSectionTitle title="Sekcia 2" icon="ph:heart-fill" />
+      <FormSectionTitle title="Sekcia 3" icon="ph:bell-fill" />
+      <FormSectionTitle title="Sekcia 4" icon="ph:check-circle-fill" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 const buttonVariants = ["primary", "secondary", "tertiary", "ghost"];
+const buttonVariantTranslations: Record<string, string> = {
+  primary: "Primárne",
+  secondary: "Sekundárne",
+  tertiary: "Terciárne",
+  ghost: "Duch",
+};
 const fieldSizes = ["default", "dialog"];
 const calendarValue = "2007-01-01";
 
 const dropdownValue = ref("1");
-const quick = ref("Edit me quickly");
+const quick = ref("Uprav ma rýchlo");
 
 import { useToast } from "~/composables/useToast";
 import { useAlert } from "~/composables/useAlert";
@@ -220,18 +232,18 @@ const showInfoToast = () => {
 
 const showWarningToast = () => {
   addToast({
-    title: "Warning",
-    text: "This is a warning toast.",
+    title: "Varovanie",
+    text: "Toto je varovná notifikácia.",
     variant: "warning",
   });
 };
 
 const showActionToast = () => {
   addToast({
-    title: "Action",
-    text: "This is a toast with an action.",
+    title: "Akcia",
+    text: "Toto je notifikácia s akciou.",
     action: {
-      text: "Go to gallery",
+      text: "Prejsť do galérie",
       to: "/dev/gallery",
     },
   });
@@ -239,32 +251,32 @@ const showActionToast = () => {
 
 const showInfoAlert = () => {
   showAlert({
-    title: "Alert",
-    content: "This is an alert, would you like to continue?",
+    title: "Upozornenie",
+    content: "Toto je upozornenie, prajete si pokračovať?",
     variant: "warning",
-    continueText: "Continue",
+    continueText: "Pokračovať",
     onContinue: () => {
-      alert("Alert continued!");
+      alert("Upozornenie pokračovalo!");
     },
-    cancelText: "Cancel",
+    cancelText: "Zrušiť",
     onCancel: () => {
-      alert("Alert cancelled!");
+      alert("Upozornenie zrušené!");
     },
   });
 };
 
 const showCriticalAlert = () => {
   showAlert({
-    title: "Critical Alert",
-    content: "This is a critical alert, would you like to continue?",
+    title: "Kritické upozornenie",
+    content: "Toto je kritické upozornenie, prajete si pokračovať?",
     variant: "critical",
-    continueText: "Continue",
-    cancelText: "Cancel",
+    continueText: "Pokračovať",
+    cancelText: "Zrušiť",
     onContinue: () => {
-      alert("Critical alert continued!");
+      alert("Kritické upozornenie pokračovalo!");
     },
     onCancel: () => {
-      alert("Critical alert cancelled!");
+      alert("Kritické upozornenie zrušené!");
     },
   });
 };
