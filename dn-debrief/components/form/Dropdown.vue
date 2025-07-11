@@ -37,7 +37,11 @@
       </ComboboxViewport>
     </ComboboxContent>
   </ComboboxRoot>
-  <SelectRoot v-else :disabled="props.disabled">
+  <SelectRoot
+    v-else
+    :disabled="props.disabled"
+    :model-value="props.modelValue"
+    @update:model-value="updateModelValue">
     <SelectTrigger
       class="cursor-pointer"
       :class="dropdown({ size: props.size, disabled: props.disabled })">
@@ -56,7 +60,6 @@
             :key="option.value"
             :value="option.value"
             :disabled="option.disabled"
-            @select="updateModelValue(option.value)"
             class="text-black hover:text-red focus:text-dark-blue focus:outline-0 rounded-lg px-2 py-1 cursor-pointer data-[disabled]:text-gray data-[disabled]:cursor-not-allowed data-[disabled]:hover:text-gray">
             <SelectItemText class="flex items-center gap-2">
               <Icon v-if="props.icons" :name="option.icon || 'ph:question'" />
@@ -122,6 +125,7 @@ watch(
 );
 
 const updateModelValue = (value: string) => {
+  if (!value) return;
   emit("update:modelValue", value);
   emit("select", value);
 };
