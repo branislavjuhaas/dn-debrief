@@ -1,36 +1,31 @@
 <template>
-  <div class="w-full">
-    <label v-if="props.label" :for="id" class="text-sm font-medium text-black">
-      {{ props.label }}
-    </label>
-    <div class="relative w-full mt-1">
-      <input
-        :id="id"
-        v-model="localValue"
-        :class="
-          input({
-            size: props.size,
-            disabled: props.disabled,
-            left: props.left,
-            right: props.right,
-          })
-        "
-        :type="inputType"
-        :placeholder="props.placeholder"
-        :disabled="props.disabled"
-        :aria-disabled="props.disabled"
-        :aria-label="props.label || props.placeholder" >
-      <button
-        v-if="props.type === 'password'"
-        type="button"
-        :disabled="props.disabled"
-        class="absolute right-0 top-0 h-full w-fit px-5 flex items-center text-black disabled:text-gray cursor-pointer"
-        :aria-pressed="isPasswordVisible"
-        :aria-label="isPasswordVisible ? 'Hide password' : 'Show password'"
-        @click="togglePasswordVisibility">
-        <Icon :name="isPasswordVisible ? 'ph:eye-slash' : 'ph:eye'" />
-      </button>
-    </div>
+  <div class="relative w-full mt-1">
+    <input
+      :id="id"
+      v-model="localValue"
+      :class="
+        input({
+          size: props.size,
+          disabled: props.disabled,
+          left: props.left,
+          right: props.right,
+        })
+      "
+      :type="inputType"
+      :placeholder="props.placeholder"
+      :disabled="props.disabled"
+      :aria-disabled="props.disabled"
+      :aria-label="props.label || props.placeholder" />
+    <button
+      v-if="props.type === 'password'"
+      type="button"
+      :disabled="props.disabled"
+      class="absolute right-0 top-0 h-full w-fit px-5 flex items-center text-black disabled:text-gray cursor-pointer"
+      :aria-pressed="isPasswordVisible"
+      :aria-label="isPasswordVisible ? 'Hide password' : 'Show password'"
+      @click="togglePasswordVisibility">
+      <Icon :name="isPasswordVisible ? 'ph:eye-slash' : 'ph:eye'" />
+    </button>
   </div>
 </template>
 
@@ -40,7 +35,6 @@ import { ref, computed, watch, useId } from "vue";
 
 const props = defineProps<{
   modelValue?: string | number;
-  label?: string;
   size?: "default" | "dialog";
   type?: "text" | "number" | "password" | "email" | "tel" | "url";
   placeholder?: string;
