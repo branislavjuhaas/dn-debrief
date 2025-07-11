@@ -2,10 +2,11 @@
   <ComboboxRoot
     v-if="props.searchable"
     v-model="searchTerm"
-    class="relative"
-    :disabled="props.disabled">
+    v-model:open="isOpen"
+    class="relative">
     <ComboboxAnchor
-      :class="dropdown({ size: props.size, disabled: props.disabled })">
+      :class="dropdown({ size: props.size, disabled: props.disabled })"
+      @click="isOpen = true">
       <ComboboxInput
         class="w-full bg-transparent outline-none mt-0.5"
         :placeholder="props.placeholder || 'Vyberte možnosť'" />
@@ -95,6 +96,8 @@ const props = withDefaults(
   }
 );
 
+const isOpen = ref(false);
+
 /**
  * @emits update:modelValue (value: string) - Emitted when the selected value changes.
  * @emits select (value: string) - Emitted when an option is selected.
@@ -123,7 +126,7 @@ const updateModelValue = (value: string) => {
 };
 
 const dropdown = tv({
-  base: "relative flex flex-row w-full items-center justify-between px-5 gap-2 bg-white text-black border-2 border-black transition-colors duration-200 ease-in-out focus-within:border-red data-[placeholder]:text-gray",
+  base: "relative flex flex-row w-full items-center justify-between px-5 gap-2 bg-white cursor-pointer text-black border-2 border-black transition-colors duration-200 ease-in-out focus-within:border-red data-[placeholder]:text-gray",
   variants: {
     size: {
       default: "h-11 rounded-2xl",
