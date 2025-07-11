@@ -1,4 +1,5 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
+import type { NuxtPage } from "nuxt/schema";
+
 export default defineNuxtConfig({
   compatibilityDate: "2025-05-15",
   devtools: { enabled: true },
@@ -38,5 +39,16 @@ export default defineNuxtConfig({
         provider: "google",
       },
     ],
+  },
+  hooks: {
+    "pages:extend"(pages) {
+      function setLayout(page: NuxtPage) {
+        if (page.name?.startsWith("management")) {
+          page.meta ||= {};
+          page.meta.layout = "management";
+        }
+      }
+      pages.forEach(setLayout);
+    },
   },
 });
