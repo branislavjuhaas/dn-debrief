@@ -151,6 +151,11 @@
       <AppButton @click="showInfoAlert">Show Info Alert</AppButton>
       <AppButton @click="showCriticalAlert">Show Critical Alert</AppButton>
     </div>
+    <h1 class="text-2xl font-bold mb-4">Number Field</h1>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items center mb-12">
+      <FormNumber size="default" :min="0" :max="100" :step="1" />
+      <FormNumber size="dialog" :min="0" :max="100" :step="1" />
+    </div>
   </div>
 </template>
 
