@@ -165,6 +165,21 @@
         placeholder="Enter text..."
         auto-resize />
     </div>
+    <h1 class="text-2xl font-bold mb-4">Hoverable</h1>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items center mb-12">
+      <AppHoverable>
+        <AppButton>Hover me</AppButton>
+        <template #content>
+          <div class="text-black">This is a hoverable content.</div>
+        </template>
+      </AppHoverable>
+      <AppHoverable>
+        <AppButton>Hover me too</AppButton>
+        <template #content>
+          <div class="text-black">This is another hoverable content.</div>
+        </template>
+      </AppHoverable>
+    </div>
   </div>
 </template>
 
