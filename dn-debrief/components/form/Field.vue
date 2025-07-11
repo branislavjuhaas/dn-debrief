@@ -15,7 +15,7 @@
       :placeholder="props.placeholder"
       :disabled="props.disabled"
       :aria-disabled="props.disabled"
-      :aria-label="props.label || props.placeholder" />
+      :aria-label="props.placeholder" />
     <button
       v-if="props.type === 'password'"
       type="button"
