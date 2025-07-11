@@ -16,6 +16,7 @@
     </ComboboxAnchor>
     <ComboboxContent
       :body-lock="false"
+      :collision-padding="{ bottom: 60, top: 60 }"
       :class="dropdownContent({ size: props.size })">
       <ComboboxViewport>
         <ComboboxEmpty class="px-2 py-1 text-gray">
