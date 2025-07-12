@@ -1,11 +1,11 @@
 <template>
   <div class="flex flex-col w-full pl-0 pr-5 items-start">
     <div
-      class="flex flex-col max-w-[calc(50%+660px+0.625rem)] w-full pt-18 gap-16"
-      :class="open ? 'md:pl-67.5' : 'md:pl-20'">
+      class="flex flex-col max-w-[calc(50%+660px+0.625rem)] w-full pt-18 pl-20 gap-16 transition-all duration-300"
+      :class="open ? 'md:pl-67.5' : ''">
       <div
-        class="fixed left-0 top-0 flex flex-col h-full justify-between gap-4 bg-white border-r-2 text-black pt-25 pb-20 px-5 overflow-hidden"
-        :class="open ? 'md:w-62.5' : 'md:w-15'">
+        class="fixed left-0 top-0 flex flex-col h-full justify-between gap-4 bg-white border-r-2 text-black pt-25 pb-20 px-5 overflow-hidden transition-all duration-300 w-15"
+        :class="open ? 'md:w-62.5' : ''">
         <div class="flex flex-col gap-8">
           <button
             @click="open = !open"
@@ -13,15 +13,15 @@
             <div class="flex flex-row items-center gap-2">
               <Icon name="ph:nut-fill" />
               <span
-                class="hidden text-base font-bold -mb-1 uppercase"
-                :class="open ? 'sm:block' : ''">
+                class="hidden text-base font-bold -mb-1 uppercase text-nowrap"
+                :class="open ? 'md:block' : ''">
                 Panel správy
               </span>
             </div>
             <Icon
               name="ph:text-outdent"
               class="hidden"
-              :class="open ? 'sm:block' : ''" />
+              :class="open ? 'md:block' : ''" />
           </button>
           <div class="flex flex-col gap-3">
             <div class="h-[1px] bg-black rounded-full" />
@@ -90,6 +90,11 @@ const navigationItems = [
     label: "Správa podujatí",
     icon: "ph:globe-hemisphere-west",
     to: "/management/events",
+  },
+  {
+    label: "Rozhodovanie",
+    icon: "ph:gavel",
+    to: "/management/adjudicators",
   },
   {
     label: "Modul SP",
