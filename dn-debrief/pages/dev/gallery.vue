@@ -174,18 +174,33 @@
     </div>
     <h3 class="text-2xl font-bold mb-4">Interakcia pri prejdení</h3>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items center mb-12">
-      <AppHoverable>
-        <AppButton>Ukáž na mňa kurzorom</AppButton>
-        <template #content>
-          <div class="text-black">Toto je obsah pri prejdení myšou.</div>
-        </template>
-      </AppHoverable>
-      <AppHoverable>
-        <AppButton>Ukáž kurzorom aj na mňa</AppButton>
-        <template #content>
-          <div class="text-black">Toto je ďalší obsah pri prejdení myšou.</div>
-        </template>
-      </AppHoverable>
+      <ClientOnly>
+        <AppHoverable>
+          <AppButton>Ukáž na mňa kurzorom</AppButton>
+          <template #content>
+            <div class="text-black">Toto je obsah pri prejdení myšou.</div>
+          </template>
+        </AppHoverable>
+        <AppHoverable>
+          <AppButton>Ukáž kurzorom aj na mňa</AppButton>
+          <template #content>
+            <div class="text-black">
+              Toto je ďalší obsah pri prejdení myšou.
+            </div>
+          </template>
+        </AppHoverable>
+      </ClientOnly>
+    </div>
+    <h3 class="text-2xl font-bold mb-4">Tooltip</h3>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items center mb-12">
+      <ClientOnly>
+        <AppTooltip content="Toto je tooltip.">
+          <AppButton>Tooltip</AppButton>
+        </AppTooltip>
+        <AppTooltip content="Toto je ďalší tooltip.">
+          <span>Text s tooltipom</span>
+        </AppTooltip>
+      </ClientOnly>
     </div>
     <h3 class="text-2xl font-bold mb-4">Názov sekcie</h3>
     <div
@@ -197,54 +212,59 @@
     </div>
     <h3 class="text-2xl font-bold mb-4">Dialóg s obsahom</h3>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-center mb-12">
-      <AppContentDialog title="Jednoduchý dialóg s obsahom">
-        <template #trigger>
-          <AppButton>Zobraziť jednoduchý dialóg</AppButton>
-        </template>
-        <span>Toto je obsah jednoduchého dialógu.</span>
-      </AppContentDialog>
-      <AppContentDialog
-        title="Dialóg s akciami"
-        action-text="Potvrdiť"
-        @action="onDialogAction">
-        <template #trigger>
-          <AppButton>Zobraziť dialóg s akciami</AppButton>
-        </template>
-        <span>Tento dialóg má akcie.</span>
-      </AppContentDialog>
-      <AppContentDialog
-        title="Dialóg s preventívnou akciou"
-        action-text="Potvrdiť"
-        @action="onPreventableDialogAction">
-        <template #trigger>
-          <AppButton>Zobraziť dialóg s preventívnou akciou</AppButton>
-        </template>
-        <span>Tento dialóg sa nezatvorí po kliknutí na tlačidlo akciu.</span>
-      </AppContentDialog>
-      <AppContentDialog
-        action-text="Potvrdiť"
-        title="Vytvoriť debatný klub"
-        icon="ph:plus-circle-fill"
-        @action="createClub"
-        @close="onClubDialogClose"
-        :disabled="!canSubmitClubCreation">
-        <template #trigger>
-          <AppButton>Zobraziť dynamický dialóg</AppButton>
-        </template>
-        <div class="flex flex-col w-full gap-4">
-          <FormWrapper title="Názov klubu">
-            <FormField v-model="club.name" size="dialog" placeholder="Sučany" />
-          </FormWrapper>
-          <FormWrapper title="Debatný program">
-            <FormDropdown
-              v-model="club.league"
-              :options="leagues"
-              size="dialog"
-              placeholder="Liga klubu"
-              label="Liga klubu" />
-          </FormWrapper>
-        </div>
-      </AppContentDialog>
+      <ClientOnly>
+        <AppContentDialog title="Jednoduchý dialóg s obsahom">
+          <template #trigger>
+            <AppButton>Zobraziť jednoduchý dialóg</AppButton>
+          </template>
+          <span>Toto je obsah jednoduchého dialógu.</span>
+        </AppContentDialog>
+        <AppContentDialog
+          title="Dialóg s akciami"
+          action-text="Potvrdiť"
+          @action="onDialogAction">
+          <template #trigger>
+            <AppButton>Zobraziť dialóg s akciami</AppButton>
+          </template>
+          <span>Tento dialóg má akcie.</span>
+        </AppContentDialog>
+        <AppContentDialog
+          title="Dialóg s preventívnou akciou"
+          action-text="Potvrdiť"
+          @action="onPreventableDialogAction">
+          <template #trigger>
+            <AppButton>Zobraziť dialóg s preventívnou akciou</AppButton>
+          </template>
+          <span>Tento dialóg sa nezatvorí po kliknutí na tlačidlo akciu.</span>
+        </AppContentDialog>
+        <AppContentDialog
+          action-text="Potvrdiť"
+          title="Vytvoriť debatný klub"
+          icon="ph:plus-circle-fill"
+          @action="createClub"
+          @close="onClubDialogClose"
+          :disabled="!canSubmitClubCreation">
+          <template #trigger>
+            <AppButton>Zobraziť dynamický dialóg</AppButton>
+          </template>
+          <div class="flex flex-col w-full gap-4">
+            <FormWrapper title="Názov klubu">
+              <FormField
+                v-model="club.name"
+                size="dialog"
+                placeholder="Sučany" />
+            </FormWrapper>
+            <FormWrapper title="Debatný program">
+              <FormDropdown
+                v-model="club.league"
+                :options="leagues"
+                size="dialog"
+                placeholder="Liga klubu"
+                label="Liga klubu" />
+            </FormWrapper>
+          </div>
+        </AppContentDialog>
+      </ClientOnly>
     </div>
   </div>
 </template>
@@ -253,6 +273,10 @@
 // ------------------- IMPORTS -------------------
 import { useToast } from "~/composables/useToast";
 import { useAlert } from "~/composables/useAlert";
+
+definePageMeta({
+  layout: "management",
+});
 
 // ------------------- BUTTONS -------------------
 const buttonVariants = ["primary", "secondary", "tertiary", "ghost"];
