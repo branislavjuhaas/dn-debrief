@@ -266,6 +266,24 @@
         </AppContentDialog>
       </ClientOnly>
     </div>
+    <h3 class="text-2xl font-bold mb-4">Editor</h3>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-center mb-12">
+      <AppEditor
+        content="<h3>Plný editor</h3><p>Tu môžete písať a formátovať text.</p>
+<p>Podporované formátovanie:</p>
+<ul>
+  <li><b>Tučné písmo</b></li>
+  <li><i>Kurzíva</i></li>
+  <li><u>Podčiarknuté</u></li>
+</ul>" />
+      <AppEditor
+        layout="minimal"
+        ref="editor"
+        content="<h3>Tento editor je minimalizovaný.</h3>
+        <p>Je určený na použitia ako samostatný komponent na stránke.</p>">
+        <AppButton size="dialog" @click="saveContent">Uložiť</AppButton>
+      </AppEditor>
+    </div>
   </div>
 </template>
 
@@ -416,6 +434,14 @@ const createClub = ({ preventClose }: { preventClose: () => void }) => {
 const onClubDialogClose = () => {
   club.value.name = "";
   club.value.league = "senior";
+};
+
+// ------------------- EDITOR -------------------
+const editor = ref<any>(null);
+
+const saveContent = () => {
+  const content = editor.value?.getContent();
+  alert(content);
 };
 </script>
 
