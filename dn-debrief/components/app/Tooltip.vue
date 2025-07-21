@@ -23,7 +23,6 @@
 
 <script setup lang="ts">
 import {
-  TooltipArrow,
   TooltipContent,
   TooltipPortal,
   TooltipProvider,

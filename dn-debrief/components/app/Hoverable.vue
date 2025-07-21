@@ -19,7 +19,6 @@
 
 <script setup lang="ts">
 import {
-  HoverCardArrow,
   HoverCardContent,
   HoverCardPortal,
   HoverCardRoot,

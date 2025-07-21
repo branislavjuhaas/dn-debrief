@@ -107,8 +107,7 @@ const isOpen = ref(false);
  * @emits select (value: string) - Emitted when an option is selected.
  */
 const emit = defineEmits<{
-  (e: "update:modelValue", value: string): void;
-  (e: "select", value: string): void;
+  (e: "update:modelValue" | "select", value: string): void;
 }>();
 
 // Ref the search term corresponding to selected model value

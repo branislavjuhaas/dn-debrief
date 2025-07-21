@@ -6,16 +6,16 @@
           v-if="editor"
           class="overflow-hidden gap-0.5 flex flex-row items-center">
           <button
-            @click="editor.chain().focus().undo().run()"
-            :disabled="!editor.can().chain().focus().undo().run()">
+            :disabled="!editor.can().chain().focus().undo().run()"
+            @click="editor.chain().focus().undo().run()">
             <Icon name="ph:arrow-u-up-left" />
           </button>
           <button
-            @click="editor.chain().focus().redo().run()"
-            :disabled="!editor.can().chain().focus().redo().run()">
+            :disabled="!editor.can().chain().focus().redo().run()"
+            @click="editor.chain().focus().redo().run()">
             <Icon name="ph:arrow-u-up-right" />
           </button>
-          <div class="separator" data-orientation="vertical" role="none"></div>
+          <div class="separator" data-orientation="vertical" role="none" />
           <DropdownMenuRoot>
             <DropdownMenuTrigger class="flex items-center">
               <Icon
@@ -29,81 +29,82 @@
                 align="start">
                 <DropdownMenuItem
                   class="heading"
-                  @click="editor.chain().focus().setParagraph().run()"
-                  :class="{ 'is-active': editor.isActive('paragraph') }">
+                  :class="{ 'is-active': editor.isActive('paragraph') }"
+                  @click="editor.chain().focus().setParagraph().run()">
                   <Icon name="ph:text-t" />
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   class="heading"
-                  @click="
-                    editor.chain().focus().toggleHeading({ level: 3 }).run()
-                  "
                   :class="{
                     'is-active': editor.isActive('heading', { level: 3 }),
-                  }">
+                  }"
+                  @click="
+                    editor.chain().focus().toggleHeading({ level: 3 }).run()
+                  ">
                   <Icon name="ph:text-h-one" />
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   class="heading"
-                  @click="
-                    editor.chain().focus().toggleHeading({ level: 4 }).run()
-                  "
                   :class="{
                     'is-active': editor.isActive('heading', { level: 4 }),
-                  }">
+                  }"
+                  @click="
+                    editor.chain().focus().toggleHeading({ level: 4 }).run()
+                  ">
                   <Icon name="ph:text-h-two" />
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   class="heading"
-                  @click="
-                    editor.chain().focus().toggleHeading({ level: 5 }).run()
-                  "
                   :class="{
                     'is-active': editor.isActive('heading', { level: 5 }),
-                  }">
+                  }"
+                  @click="
+                    editor.chain().focus().toggleHeading({ level: 5 }).run()
+                  ">
                   <Icon name="ph:text-h-three" />
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenuPortal>
           </DropdownMenuRoot>
-          <div class="separator" data-orientation="vertical" role="none"></div>
+          <div class="separator" data-orientation="vertical" role="none" />
           <button
-            @click="editor.chain().focus().toggleBold().run()"
             :disabled="!editor.can().chain().focus().toggleBold().run()"
-            :class="{ 'is-active': editor.isActive('bold') }">
+            :class="{ 'is-active': editor.isActive('bold') }"
+            @click="editor.chain().focus().toggleBold().run()">
             <Icon name="ph:text-b" />
           </button>
           <button
-            @click="editor.chain().focus().toggleItalic().run()"
             :disabled="!editor.can().chain().focus().toggleItalic().run()"
-            :class="{ 'is-active': editor.isActive('italic') }">
+            :class="{ 'is-active': editor.isActive('italic') }"
+            @click="editor.chain().focus().toggleItalic().run()">
             <Icon name="ph:text-italic" />
           </button>
           <button
-            @click="editor.chain().focus().toggleStrike().run()"
             :disabled="!editor.can().chain().focus().toggleStrike().run()"
-            :class="{ 'is-active': editor.isActive('strike') }">
+            :class="{ 'is-active': editor.isActive('strike') }"
+            @click="editor.chain().focus().toggleStrike().run()">
             <Icon name="ph:text-strikethrough" />
           </button>
-          <div class="separator" data-orientation="vertical" role="none"></div>
+          <div class="separator" data-orientation="vertical" role="none" />
           <button
-            @click="editor.chain().focus().toggleBulletList().run()"
-            :class="{ 'is-active': editor.isActive('bulletList') }">
+            :class="{ 'is-active': editor.isActive('bulletList') }"
+            @click="editor.chain().focus().toggleBulletList().run()">
             <Icon name="ph:list-bullets" />
           </button>
           <button
-            @click="editor.chain().focus().toggleOrderedList().run()"
-            :class="{ 'is-active': editor.isActive('orderedList') }">
+            :class="{ 'is-active': editor.isActive('orderedList') }"
+            @click="editor.chain().focus().toggleOrderedList().run()">
             <Icon name="ph:list-numbers" />
           </button>
           <button
-            @click="editor.chain().focus().toggleBlockquote().run()"
-            :class="{ 'is-active': editor.isActive('blockquote') }">
+            :class="{ 'is-active': editor.isActive('blockquote') }"
+            @click="editor.chain().focus().toggleBlockquote().run()">
             <Icon name="ph:quotes" />
           </button>
           <!-- Link that converts selection to link if any text is selected -->
-          <div class="separator" data-orientation="vertical" role="none"></div>
+          <div class="separator" data-orientation="vertical" role="none" />
           <button
+            :class="{ 'is-active': editor.isActive('link') }"
             @click="
               editor.isActive('link')
                 ? editor.chain().focus().unsetLink().run()
@@ -117,8 +118,7 @@
                       ),
                     })
                     .run()
-            "
-            :class="{ 'is-active': editor.isActive('link') }">
+            ">
             <Icon name="ph:link" />
           </button>
         </div>
@@ -161,15 +161,17 @@ const toolbar = tv({
 });
 
 const getContent = (as: "html" | "text" = "html") => {
-  return as === "html" ? editor?.getHTML() : editor?.getText();
+  return as === "html" ? editor.value?.getHTML() : editor.value?.getText();
 };
 
 defineExpose({
   getContent,
 });
 
+const editor = ref<Editor | null>(null);
+
 onMounted(() => {
-  editor = new Editor({
+  editor.value = new Editor({
     editorProps: {
       attributes: {
         class: "focus:outline-none",
@@ -180,10 +182,8 @@ onMounted(() => {
   });
 });
 
-let editor = <Editor | null>null;
-
 onBeforeUnmount(() => {
-  unref(editor)?.destroy();
+  editor.value?.destroy();
 });
 
 const iconForHeading = (level: number) => {

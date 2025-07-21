@@ -66,7 +66,7 @@ function handleAction() {
           class="m-0 px-4 py-2 border-b-2 border-black text-base! font-bold flex items-center gap-2 justify-between bg-yellow">
           <div class="flex flex-row items-center gap-2">
             <Icon :name="icon" />
-            <span class="mt-1">{{ title }}</span>
+            <span class="mt-1">{{ props.title }}</span>
           </div>
           <DialogClose
             as-child
@@ -81,16 +81,16 @@ function handleAction() {
           <div class="flex flex-row w-full gap-4">
             <DialogClose as-child>
               <AppButton variant="secondary" size="dialog" class="w-full">
-                {{ cancelText }}
+                {{ props.cancelText }}
               </AppButton>
             </DialogClose>
             <AppButton
               variant="primary"
               size="dialog"
               class="w-full"
-              :disabled="disabled"
+              :disabled="props.disabled"
               @click="handleAction">
-              {{ actionText }}
+              {{ props.actionText }}
             </AppButton>
           </div>
         </div>

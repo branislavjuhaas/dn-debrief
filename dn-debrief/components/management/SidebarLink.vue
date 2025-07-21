@@ -27,7 +27,13 @@
 
 <script setup lang="ts">
 defineProps<{
-  item: any;
+  item: {
+    label: string;
+    to: string;
+    icon?: string;
+    external?: boolean;
+    separator?: boolean;
+  };
   open: boolean;
 }>();
 </script>
