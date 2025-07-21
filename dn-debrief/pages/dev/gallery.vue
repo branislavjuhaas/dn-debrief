@@ -95,8 +95,8 @@
           { label: 'Možnosť 1', value: '1' },
           { label: 'Možnosť 2', value: '2' },
         ]"
-        @select="(value) => console.log('Selected:', value)"
-        placeholder="Vyberte možnosť" />
+        placeholder="Vyberte možnosť"
+        @select="(value) => console.log('Selected:', value)" />
       <FormDropdown
         :options="[
           { label: 'Možnosť 1', value: '1' },
@@ -105,15 +105,15 @@
         size="dialog"
         placeholder="Vyberte možnosť" />
       <FormDropdown
+        v-model="dropdownValue"
         :options="[
           { label: 'Možnosť 1', value: '1' },
           { label: 'Možnosť 2', value: '2' },
         ]"
-        @select="(value) => console.log('Selected:', value)"
-        v-model="dropdownValue"
         label="Názov"
         searchable
-        placeholder="Hľadať možnosti" />
+        placeholder="Hľadať možnosti"
+        @select="(value) => console.log('Selected:', value)" />
       <FormDropdown
         icons
         :options="[
@@ -241,9 +241,9 @@
           action-text="Potvrdiť"
           title="Vytvoriť debatný klub"
           icon="ph:plus-circle-fill"
+          :disabled="!canSubmitClubCreation"
           @action="createClub"
-          @close="onClubDialogClose"
-          :disabled="!canSubmitClubCreation">
+          @close="onClubDialogClose">
           <template #trigger>
             <AppButton>Zobraziť dynamický dialóg</AppButton>
           </template>
@@ -277,8 +277,8 @@
   <li><u>Podčiarknuté</u></li>
 </ul>" />
       <AppEditor
-        layout="minimal"
         ref="editor"
+        layout="minimal"
         content="<h3>Tento editor je minimalizovaný.</h3>
         <p>Je určený na použitia ako samostatný komponent na stránke.</p>">
         <AppButton size="dialog" @click="saveContent">Uložiť</AppButton>

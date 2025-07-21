@@ -1,8 +1,8 @@
 <template>
   <EditableRoot
     v-slot="{ isEditing }"
-    :placeholder="props.placeholder"
     v-model="localValue"
+    :placeholder="props.placeholder"
     default-value=""
     submit-mode="enter"
     auto-resize

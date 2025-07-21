@@ -16,7 +16,7 @@ import { NuxtLink } from "#components";
           alt="DN DebRIEF II logo"
           class="h-8"
           role="img"
-          aria-label="DN DebRIEF II logo" />
+          aria-label="DN DebRIEF II logo" >
       </NuxtLink>
       <AppSearchBar />
     </div>

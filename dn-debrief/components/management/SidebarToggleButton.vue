@@ -1,7 +1,7 @@
 <template>
   <button
-    @click="$emit('toggle')"
-    class="flex flex-row items-center justify-between gap-2">
+    class="flex flex-row items-center justify-between gap-2"
+    @click="$emit('toggle')">
     <div class="flex flex-row items-center gap-2">
       <Icon name="ph:nut-fill" />
       <span
