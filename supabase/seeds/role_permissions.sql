@@ -19,6 +19,14 @@ values
   ('developer', 'payments.write'),
   ('developer', 'supervisors.read'),
   ('developer', 'supervisors.write'),
+  ('developer', 'events.read'),
+  ('developer', 'events.write'),
+  ('developer', 'motions.read'),
+  ('developer', 'motions.write'),
+  ('developer', 'teams.read'),
+  ('developer', 'teams.write'),
+  ('developer', 'results.read'),
+  ('developer', 'results.write'),
 
   -- Admin: All permissions
   ('admin', 'awards.write'),
@@ -39,6 +47,14 @@ values
   ('admin', 'payments.write'),
   ('admin', 'supervisors.read'),
   ('admin', 'supervisors.write'),
+  ('admin', 'events.read'),
+  ('admin', 'events.write'),
+  ('admin', 'motions.read'),
+  ('admin', 'motions.write'),
+  ('admin', 'teams.read'),
+  ('admin', 'teams.write'),
+  ('admin', 'results.read'),
+  ('admin', 'results.write'),
 
   -- Cap: Specific read/write permissions
   ('cap', 'awards.write'),
@@ -46,12 +62,36 @@ values
   ('cap', 'memberships.read'),
   ('cap', 'messages.read'),
   ('cap', 'messages.write'),
+  ('cap', 'events.read'),
+  ('cap', 'events.write'),
+  ('cap', 'motions.read'),
+  ('cap', 'motions.write'),
+  ('cap', 'teams.read'),
+  ('cap', 'teams.write'),
+  ('cap', 'results.read'),
+  ('cap', 'results.write'),
 
 
   -- Junior Organizer: Specific read permissions
   ('junior_organizer', 'details.read'),
   ('junior_organizer', 'memberships.read'),
+  ('junior_organizer', 'events.read'),
+  ('junior_organizer', 'events.write'),
+  ('junior_organizer', 'teams.read'),
+  ('junior_organizer', 'teams.write'),
 
   -- Senior Organizer: Specific read permissions
   ('senior_organizer', 'details.read'),
-  ('senior_organizer', 'memberships.read')
+  ('senior_organizer', 'memberships.read'),
+  ('senior_organizer', 'events.read'),
+  ('senior_organizer', 'events.write'),
+  ('senior_organizer', 'motions.read'),
+  ('senior_organizer', 'teams.read'),
+  ('senior_organizer', 'teams.write'),
+  ('senior_organizer', 'results.read'),
+
+  -- Motions Committee Member: Specific read/write permissions
+  ('mc_member', 'events.read'),
+  ('mc_member', 'events.write'),
+  ('mc_member', 'motions.read'),
+  ('mc_member', 'motions.write')

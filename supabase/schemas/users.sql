@@ -38,7 +38,15 @@ create type public.app_permission as enum (
   'payments.read',
   'payments.write',
   'supervisors.read',
-  'supervisors.write'
+  'supervisors.write',
+  'events.read',
+  'events.write',
+  'motions.read',
+  'motions.write',
+  'teams.read',
+  'teams.write',
+  'results.read',
+  'results.write'
 );
 
 create table "users" (
