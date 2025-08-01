@@ -27,11 +27,13 @@ create index ix_payments_invoice_id on public.payments (invoice_id);
 create index ix_payments_created_at on public.payments (created_at);
 
 -- Policies for the "invoices" table
-create policy "Allow authenticated users to read their own invoices" on "invoices" for select to authenticated using (((select (auth.jwt()->>'user_id'))::bigint) = user_id);
+-- Allows authenticated users to read their own invoices, or users with 'invoices.read' to read any invoice.
+create policy "Allow read access to invoices" on "invoices" for select to authenticated using (
+  ((select (auth.jwt()->>'user_id'))::bigint) = user_id
+  or authorize('invoices.read')
+);
 -- Allow users with the 'invoices.write' permission to update existing invoice data.
 create policy "Allow users with invoices.write to update invoices" on "invoices" for update to authenticated using (authorize('invoices.write'));
--- Allow users with the 'invoices.read' permission to read invoice data.
-create policy "Allow users with invoices.read to read invoices" on "invoices" for select to authenticated using (authorize('invoices.read'));
 
 alter table public.invoices enable row level security;
 
@@ -39,7 +41,11 @@ create index ix_invoices_user_id on public.invoices (user_id);
 create index ix_invoices_status on public.invoices (status);
 
 -- Policies for the "payments" table
-create policy "Allow authenticated users to read their own payments" on "payments" for select to authenticated using (((select (auth.jwt()->>'user_id'))::bigint) = user_id);
+-- Allows authenticated users to read their own payments, or users with 'payments.read' to read any payment.
+create policy "Allow read access to payments" on "payments" for select to authenticated using (
+  ((select (auth.jwt()->>'user_id'))::bigint) = user_id
+  or authorize('payments.read')
+);
 
 -- Allow users with the 'payments.write' permission to create new payments.
 create policy "Allow users with payments.write to create payments" on "payments" for insert to authenticated with check (authorize('payments.write'));
