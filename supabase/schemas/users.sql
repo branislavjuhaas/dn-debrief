@@ -1,11 +1,14 @@
-create extension unaccent;
+-- install the unaccent extension into the extensions schema
+create extension if not exists unaccent with schema extensions;
 
-create function public.create_search(text)  
-returns text as
-$$
-  set search_path = '';
-  select regexp_replace(unaccent($1), '[^a-zA-Z0-9]', '', 'g')
-$$ language sql IMMUTABLE;
+create function public.create_search(text)
+returns text
+language sql
+set search_path = ''
+immutable
+as $$
+  select regexp_replace(extensions.unaccent($1), '[^a-zA-Z0-9]', '', 'g');
+$$;
 
 create type public.app_role as enum (
   'developer',
@@ -196,8 +199,8 @@ end;
 $$ language plpgsql stable security definer set search_path = '';
 
 -- Policies for "users" table
-create policy "Allow users to create their own data" on public.users as permissive for insert to authenticated with check ((select auth.uid()) = auth_id);
-create policy "Allow users to update their own data" on public.users as permissive for update to authenticated using (((select auth.jwt()->>'user_id')::bigint) = id) with check ((select auth.uid()) = auth_id);
+create policy "Allow users to create their own data" on public.users as permissive for insert to authenticated with check (((select auth.uid())) = auth_id);
+create policy "Allow users to update their own data" on public.users as permissive for update to authenticated using (((select (auth.jwt()->>'user_id'))::bigint) = id) with check (((select auth.uid())) = auth_id);
 -- Allows all authenticated users to read user data
 create policy "Allow authenticated users to read user data" on public.users as permissive for select to authenticated using (true);
 -- Allows users with specific roles to read or update user data based on 'users.write' permissions. Deletion is not directly allowed by these policies.
@@ -222,8 +225,8 @@ create policy "Allow authenticated users to read user claims" on public.claims a
 alter table public.claims enable row level security;
 
 -- Policies for "details" table
-create policy "Allow users to read their own details" on public.details as permissive for select to authenticated using (((select auth.jwt()->>'user_id')::bigint) = user_id);
-create policy "Allow users to update their own details" on public.details as permissive for update to authenticated using (((select auth.jwt()->>'user_id')::bigint) = user_id) with check (((select auth.jwt()->>'user_id')::bigint) = user_id);
+create policy "Allow users to read their own details" on public.details as permissive for select to authenticated using (((select (auth.jwt()->>'user_id'))::bigint) = user_id);
+create policy "Allow users to update their own details" on public.details as permissive for update to authenticated using (((select (auth.jwt()->>'user_id'))::bigint) = user_id) with check (((select (auth.jwt()->>'user_id'))::bigint) = user_id);
 -- Policies for role-based access to user details.
 -- Allows users with the 'details.read' permission to read user details.
 create policy "Allow user roles to read details" on public.details as permissive for select to authenticated using (authorize('details.read'));
@@ -233,9 +236,9 @@ create policy "Allow user roles to update details" on public.details as permissi
 alter table public.details enable row level security;
 
 -- Policies for "supervisors" table
-create policy "Allow users to read their own supervisor information" on public.supervisors as permissive for select to authenticated using (((select auth.jwt()->>'user_id')::bigint) = user_id);
-create policy "Allow users to create their own supervisor information" on public.supervisors as permissive for insert to authenticated with check (((select auth.jwt()->>'user_id')::bigint) = user_id);
-create policy "Allow users to update their own supervisor information" on public.supervisors as permissive for update to authenticated using (((select auth.jwt()->>'user_id')::bigint) = user_id) with check (((select auth.jwt()->>'user_id')::bigint) = user_id);
+create policy "Allow users to read their own supervisor information" on public.supervisors as permissive for select to authenticated using (((select (auth.jwt()->>'user_id'))::bigint) = user_id);
+create policy "Allow users to create their own supervisor information" on public.supervisors as permissive for insert to authenticated with check (((select (auth.jwt()->>'user_id'))::bigint) = user_id);
+create policy "Allow users to update their own supervisor information" on public.supervisors as permissive for update to authenticated using (((select (auth.jwt()->>'user_id'))::bigint) = user_id) with check (((select (auth.jwt()->>'user_id'))::bigint) = user_id);
 -- Allow users with the 'supervisors.read' permission to read supervisor information.
 create policy "Allow user roles to read supervisors" on public.supervisors as permissive for select to authenticated using (authorize('supervisors.read'));
 -- Allow users with the 'supervisors.write' permission to create supervisor information.

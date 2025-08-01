@@ -85,16 +85,16 @@ create policy "Allow users with club_managers.write to delete club managers" on 
 -- Allows current club managers to create new club manager assignments for their own clubs.
 create policy "Club managers can add managers to their own clubs" on "club_managers" for insert to authenticated with check (
   exists (
-    select 1 from "club_managers"
-    where "club_managers"."club_id" = club_managers.club_id 
-    and "club_managers"."user_id" = ((select (auth.jwt()->>'user_id'))::bigint)
+    select 1 from club_managers
+    where club_managers.club_id = club_managers.club_id
+    and club_managers.user_id = ((select (auth.jwt()->>'user_id'))::bigint)
   )
 );
 
 alter table public.club_managers enable row level security;
 
 -- Policies for "memberships" table
-create policy "Allow users to create their own memberships" on public.memberships as permissive for insert to authenticated with check (((select auth.jwt()->>'user_id')::bigint) = user_id);
+create policy "Allow users to create their own memberships" on public.memberships as permissive for insert to authenticated with check (((select (auth.jwt()->>'user_id'))::bigint) = user_id);
 -- Allows all authenticated users to read a user's memberships
 create policy "Allow authenticated users to read memberships" on public.memberships as permissive for select to authenticated using (true);
 -- Policies for role-based access to memberships.
