@@ -39,14 +39,13 @@ create table "memberships" (
   "club_id"     bigint not null references "clubs" ("id") on delete cascade,
   "year"        smallint not null,
   "confirmed"   boolean not null default false,
-  "payment_id" bigint references "payments" ("id") on delete set null,
   unique ("user_id", "club_id", "year")
 );
 comment on table "memberships" is 'Table for storing user memberships in clubs.';
 
 create index ix_memberships_club_id on public.memberships (club_id);
 create index ix_memberships_user_id on public.memberships (user_id);
-create index  ix_memberships_confirmed on public.memberships (confirmed);
+create index ix_memberships_confirmed on public.memberships (confirmed);
 
 -- Allows authenticated users to read active clubs, or users with 'clubs.read' permission to read any club.
 create policy "Allow read access to clubs" on "clubs" for select to authenticated using (active = true or authorize('clubs.read'));
@@ -98,29 +97,3 @@ create policy "Allow user roles to read memberships" on public.memberships as pe
 create policy "Allow user roles to update memberships" on public.memberships as permissive for update to authenticated using (authorize('memberships.write')) with check (authorize('memberships.write'));
 
 alter table public.memberships enable row level security;
-
-create or replace function create_membership_payment_item()
-returns trigger
-language plpgsql
-security definer
-set search_path = ''
-as $$
-begin
-  if new.payment_id is null then
-    insert into payments (user_id, amount, comment, invoice_id)
-    values (
-      new.user_id,
-      0,
-      'Membership payment for club ' || new.club_id || ' for year ' || new.year,
-      null
-    )
-    returning id into new.payment_id;
-  end if;
-  return new;
-end;
-$$;
-
-create trigger trg_create_membership_payment_item
-before insert on memberships
-for each row
-execute procedure create_membership_payment_item();
