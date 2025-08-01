@@ -48,6 +48,7 @@ max_client_conn = 100
 [db.migrations]
 schema_paths = [
   "./schemas/users.sql",
+  "./schemas/payments.sql",
   "./schemas/*.sql",
 ]
 

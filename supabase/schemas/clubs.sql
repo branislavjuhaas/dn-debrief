@@ -12,7 +12,7 @@ create table "clubs" (
   "description" text,
   "active" boolean not null default true,
   "league" club_league not null default 'senior'::club_league,
-  "search_index" text generated always as (immutable_unaccent(lower(name))) stored,
+  "search_index" text generated always as (public.create_search(lower(name))) stored,
   unique ("name", "league")
 );
 comment on table "clubs" is 'Stores information about clubs.';
@@ -39,6 +39,7 @@ create table "memberships" (
   "club_id"     bigint not null references "clubs" ("id") on delete cascade,
   "year"        smallint not null,
   "confirmed"   boolean not null default false,
+  "payment_id" bigint references "payments" ("id") on delete set null,
   unique ("user_id", "club_id", "year")
 );
 comment on table "memberships" is 'Table for storing user memberships in clubs.';
@@ -86,17 +87,16 @@ create policy "Club managers can add managers to their own clubs" on "club_manag
   exists (
     select 1 from "club_managers"
     where "club_managers"."club_id" = club_managers.club_id 
-    and "club_managers"."user_id" = ((select auth.jwt()->>'user_id')::bigint)
+    and "club_managers"."user_id" = ((select (auth.jwt()->>'user_id'))::bigint)
   )
 );
 
 alter table public.club_managers enable row level security;
 
 -- Policies for "memberships" table
-create policy "Allow users to read their own memberships" on public.memberships as permissive for select to authenticated using (((select auth.jwt()->>'user_id')::bigint) = user_id);
 create policy "Allow users to create their own memberships" on public.memberships as permissive for insert to authenticated with check (((select auth.jwt()->>'user_id')::bigint) = user_id);
--- Allows all authenticated users to read a user's memberships if that user's profile is public.
-create policy "Allow authenticated users to read public memberships" on public.memberships as permissive for select to authenticated using (exists (select 1 from public.users where id = memberships.user_id and public = true));
+-- Allows all authenticated users to read a user's memberships
+create policy "Allow authenticated users to read memberships" on public.memberships as permissive for select to authenticated using (true);
 -- Policies for role-based access to memberships.
 -- Allows users with the 'memberships.read' permission to read memberships.
 create policy "Allow user roles to read memberships" on public.memberships as permissive for select to authenticated using (authorize('memberships.read'));
@@ -104,3 +104,29 @@ create policy "Allow user roles to read memberships" on public.memberships as pe
 create policy "Allow user roles to update memberships" on public.memberships as permissive for update to authenticated using (authorize('memberships.write')) with check (authorize('memberships.write'));
 
 alter table public.memberships enable row level security;
+
+create or replace function create_membership_payment_item()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  if new.payment_id is null then
+    insert into payments (user_id, amount, comment, invoice_id)
+    values (
+      new.user_id,
+      0,
+      'Membership payment for club ' || new.club_id || ' for year ' || new.year,
+      null
+    )
+    returning id into new.payment_id;
+  end if;
+  return new;
+end;
+$$;
+
+create trigger trg_create_membership_payment_item
+before insert on memberships
+for each row
+execute procedure create_membership_payment_item();
