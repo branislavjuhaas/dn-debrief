@@ -2,7 +2,7 @@
   "name": "dn-cascade",
   "description": "Comprehensive data management solution transforming organizational efficiency through intelligent technology.",
   "private": true,
-  "version": "2025.3.6",
+  "version": "2025.3.8",
   "type": "module",
   "author": "Branislav Juhás",
   "scripts": {

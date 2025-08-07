@@ -173,7 +173,7 @@ export const canSubmitEvent = (event, potentialOrganizers) => {
     event.beginning &&
     event.city &&
     event.address &&
-    event.price &&
+    event.price !== null &&
     event.deadline &&
     (event.tournament ? event.motion : true) &&
     event.schedule.days.length > 0 &&

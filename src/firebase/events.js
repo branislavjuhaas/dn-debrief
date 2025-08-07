@@ -7,6 +7,7 @@ import {
   doc,
   setDoc,
   getDoc,
+  updateDoc
 } from "firebase/firestore";
 
 import {
