@@ -78,7 +78,7 @@ const exportAll = async () => {
     user.club ? clubMap.get(user.club.id) || "Žiadny" : "Žiadny",
     user.email,
     user.phone,
-    user.birthdate,
+    user.birthdate ? new Date(user.birthdate.seconds ? user.birthdate.seconds * 1000 : user.birthdate).toLocaleDateString('sk-SK') : '',
     user.address,
     (user.seasons || [])
       .filter((season) => season.confirmed)
