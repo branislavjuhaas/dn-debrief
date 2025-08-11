@@ -28,3 +28,6 @@ dist-ssr
 # Firebase
 .dataconnect
 dataconnect-generated
+
+# Env file
+.env

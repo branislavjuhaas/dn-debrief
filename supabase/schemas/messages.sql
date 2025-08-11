@@ -28,11 +28,7 @@ create index ix_messages_type on public.messages (type);
 -- Allow all authenticated users to read messages.
 create policy "Allow authenticated users to read messages" on "messages" for select to authenticated using (true);
 
--- Allow users with the 'messages.write' permission to create new messages.
-create policy "Allow users with messages.write to create messages" on "messages" for insert to authenticated with check (authorize('messages.write'));
--- Allow users with the 'messages.write' permission to update existing messages.
-create policy "Allow users with messages.write to update messages" on "messages" for update to authenticated using (authorize('messages.write'));
--- Allow users with the 'messages.write' permission to delete messages.
-create policy "Allow users with messages.write to delete messages" on "messages" for delete to authenticated using (authorize('messages.write'));
+-- Allow users with the 'messages.write' permission to create, update, or delete messages.
+create policy "Allow users with messages.write to manage messages" on "messages" for all to authenticated using (authorize('messages.write')) with check (authorize('messages.write'));
 
 alter table public.messages enable row level security;

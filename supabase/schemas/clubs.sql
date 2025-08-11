@@ -12,7 +12,7 @@ create table "clubs" (
   "description" text,
   "active" boolean not null default true,
   "league" club_league not null default 'senior'::club_league,
-  "search_index" text generated always as (immutable_unaccent(lower(name))) stored,
+  "search_index" text generated always as (public.create_search(lower(name))) stored,
   unique ("name", "league")
 );
 comment on table "clubs" is 'Stores information about clubs.';
@@ -45,36 +45,30 @@ comment on table "memberships" is 'Table for storing user memberships in clubs.'
 
 create index ix_memberships_club_id on public.memberships (club_id);
 create index ix_memberships_user_id on public.memberships (user_id);
-create index  ix_memberships_confirmed on public.memberships (confirmed);
+create index ix_memberships_confirmed on public.memberships (confirmed);
 
--- Allows any authenticated user to read data for clubs that are marked as active.
-create policy "Allow authenticated users to read active clubs" on "clubs" for select to authenticated using (active = true);
+-- Allows authenticated users to read active clubs, or users with 'clubs.read' permission to read any club.
+create policy "Allow read access to clubs" on "clubs" for select to authenticated using (active = true or authorize('clubs.read'));
 
--- Allows users who are managers of a specific club to update that club's data.
-create policy "Allow club managers to update their clubs" on "clubs" for update to authenticated using (exists (
+-- Allows club managers to update their own clubs, or users with 'clubs.write' permission to update any club.
+create policy "Allow update access to clubs" on "clubs" for update to authenticated using (
+  exists (
     select 1 from "club_managers" 
     where "club_managers"."club_id" = "clubs".id 
-    and "club_managers"."user_id" = (
-        select id from public.users where auth_id = (select auth.uid())
-    )
-));
+    and "club_managers"."user_id" = (select id from public.users where auth_id = (select auth.uid()))
+  )
+  or authorize('clubs.write')
+);
 
--- Role-based policies for "clubs" table.
--- Allows users with the 'clubs.read' permission to read club data.
-create policy "Allow users with clubs.read to read clubs" on "clubs" for select to authenticated using (authorize('clubs.read'));
 -- Allows users with the 'clubs.write' permission to create new clubs.
 create policy "Allow users with clubs.write to create clubs" on "clubs" for insert to authenticated with check (authorize('clubs.write'));
--- Allows users with the 'clubs.write' permission to update existing club data.
-create policy "Allow users with clubs.write to update clubs" on "clubs" for update to authenticated using (authorize('clubs.write'));
 
 alter table public.clubs enable row level security;
 
--- Allows authenticated users to read club manager information without restrictions.
-create policy "Allow authenticated users to read club managers for active club" on "club_managers" for select to authenticated;
+-- Allows any authenticated user to read club manager information.
+create policy "Allow authenticated users to read club managers" on "club_managers" for select to authenticated using (true);
 
 -- Role-based policies for "club_managers" table.
--- Allows users with the 'club_managers.read' permission to read club manager data.
-create policy "Allow users with club_managers.read to read club managers" on "club_managers" for select to authenticated using (authorize('club_managers.read'));
 -- Allows users with the 'club_managers.write' permission to create club manager assignments.
 create policy "Allow users with club_managers.write to create club managers" on "club_managers" for insert to authenticated with check (authorize('club_managers.write'));
 -- Allows users with the 'club_managers.write' permission to update club manager assignments.
@@ -84,19 +78,18 @@ create policy "Allow users with club_managers.write to delete club managers" on 
 -- Allows current club managers to create new club manager assignments for their own clubs.
 create policy "Club managers can add managers to their own clubs" on "club_managers" for insert to authenticated with check (
   exists (
-    select 1 from "club_managers"
-    where "club_managers"."club_id" = club_managers.club_id 
-    and "club_managers"."user_id" = ((select auth.jwt()->>'user_id')::bigint)
+    select 1 from club_managers
+    where club_managers.club_id = club_managers.club_id
+    and club_managers.user_id = ((select (auth.jwt()->>'user_id'))::bigint)
   )
 );
 
 alter table public.club_managers enable row level security;
 
 -- Policies for "memberships" table
-create policy "Allow users to read their own memberships" on public.memberships as permissive for select to authenticated using (((select auth.jwt()->>'user_id')::bigint) = user_id);
-create policy "Allow users to create their own memberships" on public.memberships as permissive for insert to authenticated with check (((select auth.jwt()->>'user_id')::bigint) = user_id);
--- Allows all authenticated users to read a user's memberships if that user's profile is public.
-create policy "Allow authenticated users to read public memberships" on public.memberships as permissive for select to authenticated using (exists (select 1 from public.users where id = memberships.user_id and public = true));
+create policy "Allow users to create their own memberships" on public.memberships as permissive for insert to authenticated with check (((select (auth.jwt()->>'user_id'))::bigint) = user_id);
+-- Allows all authenticated users to read a user's memberships
+create policy "Allow authenticated users to read memberships" on public.memberships as permissive for select to authenticated using (true);
 -- Policies for role-based access to memberships.
 -- Allows users with the 'memberships.read' permission to read memberships.
 create policy "Allow user roles to read memberships" on public.memberships as permissive for select to authenticated using (authorize('memberships.read'));
