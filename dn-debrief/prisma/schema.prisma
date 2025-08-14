@@ -1,0 +1,177 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ENUMS (collected at top) ---------------------------------------------------
+
+// From users.prisma
+enum Role {
+  DEVELOPER
+  ADMIN
+  CHIEF_ADJUDICATOR
+  JUNIOR_ORGANIZER
+  SENIOR_ORGANIZER
+  MC_MEMBER
+  USER
+}
+
+// From clubs.prisma
+enum League {
+  JUNIOR
+  SENIOR
+  UNIVERSITY
+}
+
+// From clubs.prisma
+enum Region {
+  WEST
+  CENTRAL
+  EAST
+}
+
+// From messages.prisma
+enum MessageType {
+  TEXT
+  IMAGE
+  VIDEO
+}
+
+// USERS.PRISMA ----------------------------------------------------------
+
+model User {
+  id            Int         @id @default(autoincrement())
+  createdAt     DateTime    @default(now())
+  lastLogin     DateTime?
+
+  email         String      @unique
+  password      String?
+  verified      Boolean     @default(false)
+  role          Role        @default(USER)
+  credential    Int         @default(0)
+
+  name          String
+  surname       String
+  search        String
+
+  birthdate     String?
+  phone         String?
+  address       String?
+
+  cookies       Boolean?
+  claims        Json?
+
+  supervisors   Supervisor[]
+  awards        Award[]     @relation("AwardsReceived")
+  awarded       Award[]     @relation("AwardsAwarded")
+
+  memberships   Membership[]
+
+  blogs         Blog[]
+
+  @@map("users")
+  @@index(fields: [email, search])
+}
+
+model Supervisor {
+  id            Int         @id @default(autoincrement())
+  createdAt     DateTime    @default(now())
+
+  name          String?
+  surname       String?
+  email         String      @unique
+
+  userId        Int         @unique
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("supervisors")
+  @@index(fields: [email])
+}
+
+model Award {
+  id            Int         @id @default(autoincrement())
+  createdAt     DateTime    @default(now())
+
+  award         String
+  level         Int
+
+  awardedById   Int?
+  awardedBy     User?       @relation("AwardsAwarded", fields: [awardedById], references: [id], onDelete: Cascade)
+  userId        Int
+  user          User        @relation("AwardsReceived", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("awards")
+  @@index(fields: [userId, awardedById, award, level])
+  @@unique([userId, award, level])
+}
+
+// CLUBS.PRISMA ----------------------------------------------------------
+
+model Club {
+  id            Int         @id @default(autoincrement())
+  createdAt     DateTime    @default(now())
+
+  name          String
+  description   String?
+  search        String      @unique
+
+  active        Boolean     @default(true)
+  league        League      @default(SENIOR)
+  region        Region?
+
+  memberships   Membership[]
+
+  @@map("clubs")
+  @@index(fields: [search, region, league])
+}
+
+model Membership {
+  id            Int         @id @default(autoincrement())
+  createdAt     DateTime    @default(now())
+
+  userId        Int
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  clubId        Int
+  club          Club        @relation(fields: [clubId], references: [id], onDelete: Cascade)
+
+  year          Int
+  confirmed     Boolean     @default(false)
+
+  @@map("memberships")
+  @@unique([userId, clubId, year])
+  @@index(fields: [userId, clubId, year])
+}
+
+// MESSAGES.PRISMA ----------------------------------------------------------
+
+model Message {
+  id            Int         @id @default(autoincrement())
+  createdAt     DateTime    @default(now())
+
+  type         MessageType  @default(TEXT)
+  content      Json
+  link         String?
+
+  @@map("messages")
+}
+
+model Blog {
+  id            Int         @id @default(autoincrement())
+  createdAt     DateTime    @default(now())
+
+  title         String
+  content       String
+  authorId      Int
+  author        User        @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@map("blogs")
+  @@index(fields: [title])
+}
