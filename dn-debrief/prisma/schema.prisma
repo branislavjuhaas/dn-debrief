@@ -44,6 +44,13 @@ enum MessageType {
   VIDEO
 }
 
+// From events.prisma
+enum EventType {
+  TOURNAMENT
+  SEMINAR
+  OTHER
+}
+
 // USERS.PRISMA ----------------------------------------------------------
 
 model User {
@@ -53,13 +60,14 @@ model User {
 
   email         String      @unique
   password      String?
-  verified      Boolean     @default(false)
-  role          Role        @default(USER)
-  credential    Int         @default(0)
 
   name          String
   surname       String
   search        String
+
+  verified      Boolean     @default(false)
+  role          Role        @default(USER)
+  credential    Int         @default(0)
 
   birthdate     String?
   phone         String?
@@ -75,6 +83,8 @@ model User {
   memberships   Membership[]
 
   blogs         Blog[]
+  events        Event[]     @relation("EventOrganizers")
+  registrations Registration[]
 
   @@map("users")
   @@index(fields: [email, search])
@@ -103,7 +113,7 @@ model Award {
   level         Int
 
   awardedById   Int?
-  awardedBy     User?       @relation("AwardsAwarded", fields: [awardedById], references: [id], onDelete: Cascade)
+  awardedBy     User?       @relation("AwardsAwarded", fields: [awardedById], references: [id], onDelete: SetNull)
   userId        Int
   user          User        @relation("AwardsReceived", fields: [userId], references: [id], onDelete: Cascade)
 
@@ -174,4 +184,56 @@ model Blog {
 
   @@map("blogs")
   @@index(fields: [title])
+}
+
+// EVENTS.PRISMA ----------------------------------------------------------
+
+model Event {
+  id            Int         @id @default(autoincrement())
+  createdAt     DateTime    @default(now())
+
+  draft         Boolean     @default(false)
+
+  name          String
+  description   String?
+  type          EventType   @default(TOURNAMENT)
+
+  code          String      @unique
+  season        String
+  search        String
+
+  external      Boolean     @default(false)
+  location      String?
+
+  beginning     DateTime
+  end           DateTime
+
+  deadline      DateTime
+  exceptions    Json
+
+  data          Json
+  registration  Json
+
+  organizers    User[]      @relation("EventOrganizers")
+  registrations Registration[]
+
+  @@map("events")
+  @@index(fields: [code, search, beginning, end])
+}
+
+model Registration {
+  id            Int         @id @default(autoincrement())
+  createdAt     DateTime    @default(now())
+
+  userId        Int?
+  user          User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userData      Json?       // In case, user is external
+
+  eventId       Int
+  event         Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  data          Json
+
+  @@map("registrations")
+  @@index(fields: [userId, eventId])
 }

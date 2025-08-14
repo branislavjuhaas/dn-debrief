@@ -31,3 +31,6 @@ dataconnect-generated
 
 # Env file
 .env
+
+# Database files
+.db
