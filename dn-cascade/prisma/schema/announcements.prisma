@@ -1,0 +1,46 @@
+/// Types of announcement messages supported by the platform.
+enum MessageType {
+  /// Plain text message
+  TEXT
+  /// Image content (URL and metadata in content)
+  IMAGE
+  /// Video content (URL and metadata in content)
+  VIDEO
+}
+
+/// Broadcast message or announcement.
+model Message {
+  /// Primary key
+  id            Int         @id @default(autoincrement())
+  /// Creation timestamp
+  createdAt     DateTime    @default(now())
+
+  /// Message content type
+  type         MessageType  @default(TEXT)
+  /// Message payload; schema depends on type
+  content      Json
+  /// Optional external link (e.g., read more)
+  link         String?
+
+  @@map("messages")
+}
+
+/// A blog post authored by a user.
+model Blog {
+  /// Primary key
+  id            Int         @id @default(autoincrement())
+  /// Creation timestamp
+  createdAt     DateTime    @default(now())
+
+  /// Blog title
+  title         String
+  /// Blog content/body (markdown or HTML)
+  content       String
+  /// Author id
+  authorId      Int
+  /// Author relation
+  author        User        @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@map("blogs")
+  @@index(fields: [title])
+}

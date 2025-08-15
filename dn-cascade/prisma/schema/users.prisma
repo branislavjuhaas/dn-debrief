@@ -1,0 +1,144 @@
+/// System/user roles controlling permissions.
+enum UserRole {
+  /// Has full access in development
+  DEVELOPER
+  /// Platform administrator
+  ADMIN
+  /// Chief adjudicator role
+  CHIEF_ADJUDICATOR
+  /// Junior organizer role
+  JUNIOR_ORGANIZER
+  /// Senior organizer role
+  SENIOR_ORGANIZER
+  /// Member of management committee
+  MC_MEMBER
+  /// Default end user
+  USER
+}
+
+/// A registered user of the system.
+model User {
+  id            Int           @id @default(autoincrement())
+  createdAt     DateTime      @default(now())
+  /// Last login timestamp
+  lastLogin     DateTime?
+
+  /// Unique email used for login/communication
+  email         String        @unique
+  /// Password hash (nullable for SSO/external accounts)
+  password      String?
+  /// Unique salt used when hashing password
+  salt          String?
+
+  /// First name
+  name          String
+  /// Last name
+  surname       String
+  /// Normalized search key (e.g., lowercased name/email)
+  search        String
+
+  /// Whether the email/account has been verified
+  verified      Boolean       @default(false)
+  /// Access role
+  role          UserRole      @default(USER)
+  /// Credential score/level for internal use
+  credential    Int           @default(0)
+
+  /// Optional date of birth (string format)
+  birthdate     String?
+  /// Contact phone
+  phone         String?
+  /// Mailing address
+  address       String?
+
+  /// Cookie consent
+  cookies       Boolean?
+  /// Arbitrary claims/attributes for the user
+  claims        Json?
+
+  /// Supervisor linkage if the user is supervised
+  supervisors   Supervisor[]
+  /// Awards received by the user
+  awards        Award[]       @relation("AwardsReceived")
+  /// Awards the user has granted to others
+  awarded       Award[]       @relation("AwardsAwarded")
+
+  /// Club memberships
+  memberships   Membership[]
+  /// Clubs this user manages
+  clubsManaged  Club[]        @relation("ClubManagers")
+
+  /// Blog posts authored by the user
+  blogs         Blog[]
+  /// Events this user organizes
+  events        Event[]       @relation("EventOrganizers")
+  /// Registrations by this user for events
+  registrations Registration[]
+
+  /// Refresh tokens issued for this user
+  refreshTokens RefreshToken[]
+
+  @@map("users")
+  @@index(fields: [email, search])
+}
+
+/// Refresh token for session management.
+model RefreshToken {
+  id            Int           @id @default(autoincrement())
+  createdAt     DateTime      @default(now())
+
+  /// The raw token value (unique)
+  token         String        @unique
+  /// Token owner id
+  userId        Int
+  /// Token owner
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+  @@index(fields: [token, userId])
+}
+
+/// Supervisor contact/info mapping to a user.
+model Supervisor {
+  id            Int           @id @default(autoincrement())
+  createdAt     DateTime      @default(now())
+
+  /// First name of the supervisor
+  name          String?
+  /// Last name of the supervisor
+  surname       String?
+  /// Contact email (unique)
+  email         String        @unique
+
+  /// The supervised user's id
+  userId        Int           @unique
+  /// The supervised user
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("supervisors")
+  @@index(fields: [email])
+}
+
+/// Award granted to a user, possibly by another user.
+model Award {
+  id            Int           @id @default(autoincrement())
+  createdAt     DateTime      @default(now())
+
+  /// Name of the award (e.g., Best Speaker)
+  award         String
+  /// Award level/rank (e.g., 1 for gold)
+  level         Int
+
+  /// The awarding user's id (nullable)
+  awardedById   Int?
+  /// The awarding user (nullable)
+  awardedBy     User?         @relation("AwardsAwarded", fields: [awardedById], references: [id], onDelete: SetNull)
+  /// The recipient user's id
+  userId        Int
+  /// The recipient user
+  user          User          @relation("AwardsReceived", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("awards")
+  @@index(fields: [userId, awardedById, award, level])
+  @@unique([userId, award, level])
+}

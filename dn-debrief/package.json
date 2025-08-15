@@ -14,6 +14,7 @@
     "@prisma/nuxt": "^0.3.0",
     "@sidebase/nuxt-auth": "^1.0.1",
     "eslint": "^9.33.0",
+    "firebase-scrypt": "^2.2.0",
     "next-auth": "~4.21.1",
     "nuxt": "^4.0.3",
     "vue": "^3.5.18",

@@ -60,6 +60,7 @@ model User {
 
   email         String      @unique
   password      String?
+  salt          String?
 
   name          String
   surname       String
