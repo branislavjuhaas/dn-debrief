@@ -111,7 +111,6 @@ const routes = [
     meta: {
       title: "Správa debatného klubu",
       requiresAuth: true,
-      roles: ["developer", "admin", "cap", "coach"],
     },
   },
   {
