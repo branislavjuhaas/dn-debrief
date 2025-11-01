@@ -104,10 +104,7 @@ export const account = mysqlTable(
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
   },
-  (table) => [
-    index("account_user_id_idx").on(table.userId),
-    index("account_provider_idx").on(table.providerId, table.accountId),
-  ],
+  (table) => [index("account_user_id_idx").on(table.userId)],
 );
 
 export const accountRelations = relations(account, ({ one }) => ({
@@ -120,18 +117,14 @@ export const accountRelations = relations(account, ({ one }) => ({
 
 // VERIFICATION
 
-export const verification = mysqlTable(
-  "verification",
-  {
-    id: int("id").primaryKey().autoincrement(),
-    identifier: text("identifier").notNull(),
-    value: text("value").notNull(),
-    expiresAt: timestamp("expires_at", { fsp: 3 }).notNull(),
-    createdAt: timestamp("created_at", { fsp: 3 }).defaultNow().notNull(),
-    updatedAt: timestamp("updated_at", { fsp: 3 })
-      .defaultNow()
-      .$onUpdate(() => /* @__PURE__ */ new Date())
-      .notNull(),
-  },
-  (table) => [index("verification_identifier_idx").on(table.identifier)],
-);
+export const verification = mysqlTable("verification", {
+  id: int("id").primaryKey().autoincrement(),
+  identifier: text("identifier").notNull(),
+  value: text("value").notNull(),
+  expiresAt: timestamp("expires_at", { fsp: 3 }).notNull(),
+  createdAt: timestamp("created_at", { fsp: 3 }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { fsp: 3 })
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
+});

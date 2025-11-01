@@ -15,6 +15,7 @@
   "packageManager": "pnpm@10.20.0",
   "devDependencies": {
     "@types/node": "latest",
+    "drizzle-kit": "^0.31.6",
     "prettier": "^3.6.2",
     "tslib": "^2.8.1",
     "turbo": "latest"
