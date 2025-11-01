@@ -14,12 +14,13 @@
   ],
   "scripts": {
     "build": "tsc",
-    "dev": "tsc --watch"
+    "dev": "tsc --watch --preserveWatchOutput"
   },
   "dependencies": {
     "minio": "^8.0.6"
   },
   "devDependencies": {
+    "@repo/tsconfig": "workspace:*",
     "@types/node": "latest",
     "typescript": "latest"
   }

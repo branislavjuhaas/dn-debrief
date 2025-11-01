@@ -14,13 +14,15 @@
   ],
   "scripts": {
     "build": "tsc",
-    "dev": "tsc --watch"
+    "dev": "tsc --watch --preserveWatchOutput"
   },
   "dependencies": {
     "drizzle-orm": "^0.44.7",
-    "mysql2": "^3.15.3"
+    "mysql2": "^3.15.3",
+    "dotenv": "latest"
   },
   "devDependencies": {
+    "@repo/tsconfig": "workspace:*",
     "@types/node": "latest",
     "typescript": "latest"
   }

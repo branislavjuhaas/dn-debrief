@@ -1,10 +1,9 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "packageManager": "pnpm",
-  "pipeline": {
+  "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".nuxt/**", ".output/**", "dist/**"]
+      "outputs": [".nuxt/**", "dist/**"]
     },
     "dev": {
       "cache": false,
