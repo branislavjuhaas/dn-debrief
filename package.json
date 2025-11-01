@@ -8,8 +8,8 @@
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
-    "db:generate": "turbo run db:generate",
-    "db:migrate": "turbo run db:migrate"
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate"
   },
   "license": "MIT",
   "packageManager": "pnpm@10.20.0",
