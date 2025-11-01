@@ -1,0 +1,19 @@
+{
+  "name": "dn-cascade",
+  "version": "2.25.0.1",
+  "author": "Branislav Juhás",
+  "private": true,
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "db:generate": "turbo run db:generate",
+    "db:migrate": "turbo run db:migrate"
+  },
+  "license": "MIT",
+  "packageManager": "pnpm@10.20.0",
+  "devDependencies": {
+    "turbo": "latest"
+  }
+}

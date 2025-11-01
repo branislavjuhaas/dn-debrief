@@ -1,0 +1,20 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "packageManager": "pnpm",
+  "pipeline": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": [".nuxt/**", ".output/**", "dist/**"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "db:generate": {
+      "cache": false
+    },
+    "db:migrate": {
+      "cache": false
+    }
+  }
+}
