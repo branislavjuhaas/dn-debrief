@@ -1,6 +1,10 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
 
+@theme static {
+
+}
+
 h1 {
     @apply text-4xl font-bold;
 }
