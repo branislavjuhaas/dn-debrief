@@ -9,9 +9,10 @@ import { db } from "@repo/db";
  * - Removes diacritics/accents.
  * - Removes any non-alphanumeric characters.
  * - Returns an empty string for `undefined`.
+ * - Truncates to a maximum of 36 characters.
  *
  * @param name - The name to normalize.
- * @returns A search-friendly string.
+ * @returns A search-friendly string (max 36 chars).
  */
 const generateSearchParam = (name: string | undefined): string =>
   name
@@ -20,6 +21,7 @@ const generateSearchParam = (name: string | undefined): string =>
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "") // Remove accents
         .replace(/[^a-z0-9]/g, "") // Remove non-alphanumeric
+        .slice(0, 36)
     : "";
 
 export const auth = betterAuth({
