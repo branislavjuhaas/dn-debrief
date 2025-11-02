@@ -10,6 +10,8 @@ import {
   index,
 } from "drizzle-orm/mysql-core";
 import { relations } from "drizzle-orm";
+import { clubManager, clubMembership } from "./club";
+import { invoice, payment } from "./payment";
 
 // USER
 
@@ -51,6 +53,12 @@ export const user = mysqlTable(
 export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session, { relationName: "user_sessions" }),
   accounts: many(account, { relationName: "user_accounts" }),
+  clubMemberships: many(clubMembership, {
+    relationName: "user_club_memberships",
+  }),
+  clubManagements: many(clubManager, { relationName: "user_club_managements" }),
+  userPayments: many(payment, { relationName: "user_payments" }),
+  userInvoices: many(invoice, { relationName: "user_invoices" }),
 }));
 
 // SESSION
@@ -67,7 +75,7 @@ export const session = mysqlTable(
       .notNull(),
     ipAddress: text("ip_address"),
     userAgent: text("user_agent"),
-    userId: int("id")
+    userId: int("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
   },
