@@ -2,6 +2,26 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "@repo/db";
 
+/**
+ * Generate a normalized search string from a user's name.
+ *
+ * - Converts to lowercase.
+ * - Removes diacritics/accents.
+ * - Removes any non-alphanumeric characters.
+ * - Returns an empty string for `undefined`.
+ *
+ * @param name - The name to normalize.
+ * @returns A search-friendly string.
+ */
+const generateSearchParam = (name: string | undefined): string =>
+  name
+    ? name
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "") // Remove accents
+        .replace(/[^a-z0-9]/g, "") // Remove non-alphanumeric
+    : "";
+
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "mysql",
@@ -21,6 +41,11 @@ export const auth = betterAuth({
   },
   user: {
     additionalFields: {
+      search: {
+        type: "string",
+        required: true,
+        input: false, // don't allow user to set search
+      },
       role: {
         type: "string",
         required: true,
@@ -42,6 +67,30 @@ export const auth = betterAuth({
         type: "string",
         required: false,
         input: true,
+      },
+    },
+  },
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (user, ctx) => {
+          return {
+            data: {
+              ...user,
+              search: generateSearchParam(user.name),
+            },
+          };
+        },
+      },
+      update: {
+        before: async (data, ctx) => {
+          return {
+            data: {
+              ...data,
+              search: generateSearchParam(data.name),
+            },
+          };
+        },
       },
     },
   },

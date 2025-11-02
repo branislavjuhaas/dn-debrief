@@ -18,6 +18,7 @@ export const user = mysqlTable(
   {
     id: int("id").primaryKey().autoincrement(),
     name: text("name").notNull(),
+    search: text("search").notNull(),
     email: varchar("email", { length: 255 }).notNull().unique(),
     role: mysqlEnum("role", [
       "user",
@@ -41,7 +42,10 @@ export const user = mysqlTable(
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
   },
-  (table) => [index("user_email_idx").on(table.email)],
+  (table) => [
+    index("user_email_idx").on(table.email),
+    index("user_search_idx").on(table.search),
+  ],
 );
 
 export const userRelations = relations(user, ({ many }) => ({
