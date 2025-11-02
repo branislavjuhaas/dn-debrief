@@ -73,7 +73,7 @@ export const auth = betterAuth({
   databaseHooks: {
     user: {
       create: {
-        before: async (user, ctx) => {
+        before: async (user, _ctx) => {
           return {
             data: {
               ...user,
@@ -83,7 +83,7 @@ export const auth = betterAuth({
         },
       },
       update: {
-        before: async (data, ctx) => {
+        before: async (data, _ctx) => {
           return {
             data: {
               ...data,
