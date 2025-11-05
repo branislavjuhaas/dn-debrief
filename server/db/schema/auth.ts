@@ -14,11 +14,6 @@ export const users = mysqlTable("users", {
   email: varchar("email", { length: 255 }).notNull().unique(),
   emailVerified: boolean("email_verified").default(false).notNull(),
   image: text("image"),
-  createdAt: timestamp("created_at", { fsp: 3 }).defaultNow().notNull(),
-  updatedAt: timestamp("updated_at", { fsp: 3 })
-    .defaultNow()
-    .$onUpdate(() => /* @__PURE__ */ new Date())
-    .notNull(),
   search: text("search").notNull(),
   role: mysqlEnum("role", [
     "user",
@@ -34,6 +29,11 @@ export const users = mysqlTable("users", {
   credential: int("credential").default(0).notNull(),
   birthdate: timestamp("birthdate", { fsp: 3 }),
   address: text("address"),
+  createdAt: timestamp("created_at", { fsp: 3 }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { fsp: 3 })
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
 });
 
 export const sessions = mysqlTable("sessions", {
