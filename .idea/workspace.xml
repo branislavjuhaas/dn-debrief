@@ -4,7 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d4cc1df9-ad00-4ded-af2d-7ea9f25f0f27" name="Changes" comment="feat: update workspace configuration to reflect new app structure and layout components" />
+    <list default="true" id="d4cc1df9-ad00-4ded-af2d-7ea9f25f0f27" name="Changes" comment="feat: change breakpoint on navigation search">
+      <change afterPath="$PROJECT_DIR$/app/components/dialog/AppDialog.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/components/dialog/DialogHeader.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/pages/auth/index.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/public/images/sunlake.webp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/components/header/AppNav.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/components/header/AppNav.vue" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -13,8 +20,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Vue Composition API Component" />
         <option value="TypeScript File" />
+        <option value="Vue Composition API Component" />
       </list>
     </option>
   </component>
@@ -78,6 +85,7 @@
       <recent name="C:\Users\juhas\source\repos\dn-cascade" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\juhas\source\repos\dn-cascade\public\images" />
       <recent name="C:\Users\juhas\source\repos\dn-cascade\server\db\schema" />
       <recent name="C:\Users\juhas\source\repos\dn-cascade\server\auth" />
     </key>
@@ -113,7 +121,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1762330855208</updated>
-      <workItem from="1762330856488" duration="19051000" />
+      <workItem from="1762330856488" duration="25847000" />
     </task>
     <task id="LOCAL-00001" summary="feat: remove all monorepo project files">
       <option name="closed" value="true" />
@@ -251,7 +259,23 @@
       <option name="project" value="LOCAL" />
       <updated>1762429680403</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="feat: update workspace configuration and task summaries for improved project structure">
+      <option name="closed" value="true" />
+      <created>1762429969107</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1762429969107</updated>
+    </task>
+    <task id="LOCAL-00019" summary="feat: update workspace configuration and task summaries for improved project structure">
+      <option name="closed" value="true" />
+      <created>1762429974463</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1762429974463</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -285,6 +309,8 @@
     <MESSAGE value="feat: add AppNav component and integrate user authentication in AppHeader" />
     <MESSAGE value="feat: set locale and color scheme for UApp component" />
     <MESSAGE value="feat: update workspace configuration to reflect new app structure and layout components" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: update workspace configuration to reflect new app structure and layout components" />
+    <MESSAGE value="feat: change breakpoint on navigation search" />
+    <MESSAGE value="feat: change breakpoint on navigation search" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: change breakpoint on navigation search" />
   </component>
 </project>
