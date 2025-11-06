@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import AppLogo from "~/components/header/AppLogo.vue";
+import AppNav from "~/components/header/AppNav.vue";
+
+const userStore = useUserStore();
 </script>
 
 <template>
@@ -8,6 +11,13 @@ import AppLogo from "~/components/header/AppLogo.vue";
       <NuxtLink to="/">
         <AppLogo class="h-12" />
       </NuxtLink>
+    </template>
+    <UDashboardSearchButton
+      :disabled="!userStore.isAuthenticated"
+      icon="ph:magnifying-glass"
+      class="w-96" />
+    <template #right>
+      <AppNav />
     </template>
   </UHeader>
 </template>
