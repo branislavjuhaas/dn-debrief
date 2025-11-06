@@ -2,7 +2,9 @@
 
 <template>
   <UPage>
-    <slot />
+    <UMain>
+      <slot />
+    </UMain>
   </UPage>
 </template>
 
