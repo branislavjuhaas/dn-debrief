@@ -1,8 +1,39 @@
 <script setup lang="ts">
+import { createAuthClient } from "better-auth/vue";
 import AppDialog from "~/components/dialog/AppDialog.vue";
 
-const loginGoogle = () => {};
-const loginGithub = () => {};
+const authClient = createAuthClient();
+const userStore = useUserStore();
+
+const authError = ref("");
+
+const loginGithub = async () => {
+  await authClient.signIn.social(
+    { provider: "github" },
+    {
+      onSuccess: (ctx) => {
+        userStore.set(ctx.data.user);
+      },
+      onError: (err) => {
+        authError.value = err.error.message || "Social login failed";
+      },
+    },
+  );
+};
+
+const loginGoogle = async () => {
+  await authClient.signIn.social(
+    { provider: "google" },
+    {
+      onSuccess: (ctx) => {
+        userStore.set(ctx.data.user);
+      },
+      onError: (err) => {
+        authError.value = err.error.message || "Social login failed";
+      },
+    },
+  );
+};
 </script>
 
 <template>
@@ -17,6 +48,7 @@ const loginGithub = () => {};
       </DialogHeader>
       <div class="flex flex-row gap-3 w-full">
         <UButton
+          @click="loginGoogle"
           variant="subtle"
           color="neutral"
           icon="ph:google-logo"
@@ -25,6 +57,7 @@ const loginGithub = () => {};
           Google
         </UButton>
         <UButton
+          @click="loginGithub"
           variant="subtle"
           color="neutral"
           icon="ph:github-logo"
