@@ -4,13 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d4cc1df9-ad00-4ded-af2d-7ea9f25f0f27" name="Changes" comment="feat: change breakpoint on navigation search">
-      <change afterPath="$PROJECT_DIR$/app/components/dialog/AppDialog.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/components/dialog/DialogHeader.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/pages/auth/index.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/images/sunlake.webp" afterDir="false" />
+    <list default="true" id="d4cc1df9-ad00-4ded-af2d-7ea9f25f0f27" name="Changes" comment="feat: add login dialog with Google and GitHub authentication options">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/components/header/AppNav.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/components/header/AppNav.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/app.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/app.config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/pages/auth/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/pages/auth/index.vue" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -121,7 +118,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1762330855208</updated>
-      <workItem from="1762330856488" duration="25847000" />
+      <workItem from="1762330856488" duration="28163000" />
     </task>
     <task id="LOCAL-00001" summary="feat: remove all monorepo project files">
       <option name="closed" value="true" />
@@ -275,7 +272,55 @@
       <option name="project" value="LOCAL" />
       <updated>1762429974463</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="feat: add AppDialog component for enhanced UI layout">
+      <option name="closed" value="true" />
+      <created>1762453182180</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1762453182180</updated>
+    </task>
+    <task id="LOCAL-00021" summary="feat: add DialogHeader component for structured UI presentation">
+      <option name="closed" value="true" />
+      <created>1762453191944</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1762453191944</updated>
+    </task>
+    <task id="LOCAL-00022" summary="feat: add navigation dropdown menu with user profile and logout functionality">
+      <option name="closed" value="true" />
+      <created>1762453202647</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1762453202647</updated>
+    </task>
+    <task id="LOCAL-00023" summary="feat: add sunlake graphics">
+      <option name="closed" value="true" />
+      <created>1762453226467</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1762453226467</updated>
+    </task>
+    <task id="LOCAL-00024" summary="feat: update workspace configuration for improved project structure and task summaries">
+      <option name="closed" value="true" />
+      <created>1762453232062</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1762453232062</updated>
+    </task>
+    <task id="LOCAL-00025" summary="feat: add login dialog with Google and GitHub authentication options">
+      <option name="closed" value="true" />
+      <created>1762462125354</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1762462125354</updated>
+    </task>
+    <option name="localTasksCounter" value="26" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -311,6 +356,12 @@
     <MESSAGE value="feat: update workspace configuration to reflect new app structure and layout components" />
     <MESSAGE value="feat: change breakpoint on navigation search" />
     <MESSAGE value="feat: change breakpoint on navigation search" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: change breakpoint on navigation search" />
+    <MESSAGE value="feat: add AppDialog component for enhanced UI layout" />
+    <MESSAGE value="feat: add DialogHeader component for structured UI presentation" />
+    <MESSAGE value="feat: add navigation dropdown menu with user profile and logout functionality" />
+    <MESSAGE value="feat: add sunlake graphics" />
+    <MESSAGE value="feat: update workspace configuration for improved project structure and task summaries" />
+    <MESSAGE value="feat: add login dialog with Google and GitHub authentication options" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: add login dialog with Google and GitHub authentication options" />
   </component>
 </project>
