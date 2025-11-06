@@ -4,18 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d4cc1df9-ad00-4ded-af2d-7ea9f25f0f27" name="Changes" comment="feat: wrap slot in UMain component for improved layout structure">
-      <change afterPath="$PROJECT_DIR$/app/components/header/AppNav.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/plugins/auth.server.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/stores/user.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/app.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/app.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/components/header/AppHeader.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/components/header/AppHeader.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nuxt.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/nuxt.config.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pnpm-lock.yaml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pnpm-workspace.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pnpm-workspace.yaml" afterDir="false" />
-    </list>
+    <list default="true" id="d4cc1df9-ad00-4ded-af2d-7ea9f25f0f27" name="Changes" comment="feat: update workspace configuration to reflect new app structure and layout components" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -124,7 +113,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1762330855208</updated>
-      <workItem from="1762330856488" duration="18380000" />
+      <workItem from="1762330856488" duration="19051000" />
     </task>
     <task id="LOCAL-00001" summary="feat: remove all monorepo project files">
       <option name="closed" value="true" />
@@ -206,11 +195,78 @@
       <option name="project" value="LOCAL" />
       <updated>1762406408613</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="feat: add additional built dependencies to pnpm-workspace.yaml">
+      <option name="closed" value="true" />
+      <created>1762429118519</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1762429118520</updated>
+    </task>
+    <task id="LOCAL-00012" summary="feat: add Pinia for state management and create user store">
+      <option name="closed" value="true" />
+      <created>1762429150968</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1762429150968</updated>
+    </task>
+    <task id="LOCAL-00013" summary="feat: generate pnpm-lock">
+      <option name="closed" value="true" />
+      <created>1762429173995</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1762429173995</updated>
+    </task>
+    <task id="LOCAL-00014" summary="feat: generate pnpm-lock">
+      <option name="closed" value="true" />
+      <created>1762429178536</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1762429178536</updated>
+    </task>
+    <task id="LOCAL-00015" summary="feat: add AppNav component and integrate user authentication in AppHeader">
+      <option name="closed" value="true" />
+      <created>1762429260588</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1762429260588</updated>
+    </task>
+    <task id="LOCAL-00016" summary="feat: set locale and color scheme for UApp component">
+      <option name="closed" value="true" />
+      <created>1762429663317</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1762429663317</updated>
+    </task>
+    <task id="LOCAL-00017" summary="feat: update workspace configuration to reflect new app structure and layout components">
+      <option name="closed" value="true" />
+      <created>1762429680403</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1762429680403</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="feat: remove all monorepo project files" />
@@ -220,9 +276,15 @@
     <MESSAGE value="feat: add initial app structure with configuration and layout components" />
     <MESSAGE value="feat: add AppFooter component with footer links and project information" />
     <MESSAGE value="feat: remove unused fill attribute from AppLogo component and clean up content.config.ts imports" />
-    <MESSAGE value="feat: update workspace configuration to reflect new app structure and layout components" />
     <MESSAGE value="feat: add AppFooter component to app.vue for improved layout" />
     <MESSAGE value="feat: wrap slot in UMain component for improved layout structure" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: wrap slot in UMain component for improved layout structure" />
+    <MESSAGE value="feat: add additional built dependencies to pnpm-workspace.yaml" />
+    <MESSAGE value="feat: add Pinia for state management and create user store" />
+    <MESSAGE value="feat: create authentication plugin" />
+    <MESSAGE value="feat: create authentication plugin" />
+    <MESSAGE value="feat: add AppNav component and integrate user authentication in AppHeader" />
+    <MESSAGE value="feat: set locale and color scheme for UApp component" />
+    <MESSAGE value="feat: update workspace configuration to reflect new app structure and layout components" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: update workspace configuration to reflect new app structure and layout components" />
   </component>
 </project>
