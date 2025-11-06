@@ -5,7 +5,7 @@ const userStore = useUserStore();
 <template>
   <UDashboardSearchButton
     :disabled="!userStore.isAuthenticated"
-    class="md:hidden"
+    class="lg:hidden"
     collapsed
     icon="ph:magnifying-glass" />
   <UFieldGroup v-if="userStore.isAuthenticated">
