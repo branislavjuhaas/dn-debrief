@@ -4,17 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d4cc1df9-ad00-4ded-af2d-7ea9f25f0f27" name="Changes" comment="feat: update workspace configuration for initial project structure and settings">
-      <change afterPath="$PROJECT_DIR$/app/app.config.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/components/header/AppHeader.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/components/header/AppLogo.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/layouts/default.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/pages/index.vue" afterDir="false" />
+    <list default="true" id="d4cc1df9-ad00-4ded-af2d-7ea9f25f0f27" name="Changes" comment="feat: add initial app structure with configuration and layout components">
+      <change afterPath="$PROJECT_DIR$/app/components/footer/AppFooter.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/app.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/app.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nuxt.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/nuxt.config.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pnpm-lock.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pnpm-lock.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/layouts/default.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/layouts/default.vue" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -121,7 +115,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1762330855208</updated>
-      <workItem from="1762330856488" duration="10230000" />
+      <workItem from="1762330856488" duration="12488000" />
     </task>
     <task id="LOCAL-00001" summary="feat: remove all monorepo project files">
       <option name="closed" value="true" />
@@ -155,7 +149,15 @@
       <option name="project" value="LOCAL" />
       <updated>1762361578696</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="feat: add initial app structure with configuration and layout components">
+      <option name="closed" value="true" />
+      <created>1762363100940</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1762363100940</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -166,6 +168,7 @@
     <MESSAGE value="feat: add initial project structure with configuration files and database schema" />
     <MESSAGE value="feat: reorder createdAt and updatedAt fields in auth table definition" />
     <MESSAGE value="feat: update workspace configuration for initial project structure and settings" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: update workspace configuration for initial project structure and settings" />
+    <MESSAGE value="feat: add initial app structure with configuration and layout components" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: add initial app structure with configuration and layout components" />
   </component>
 </project>
