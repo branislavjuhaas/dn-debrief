@@ -2,6 +2,10 @@
 import { createAuthClient } from "better-auth/vue";
 import AppDialog from "~/components/dialog/AppDialog.vue";
 
+definePageMeta({
+  guest: true,
+});
+
 const authClient = createAuthClient();
 const userStore = useUserStore();
 
