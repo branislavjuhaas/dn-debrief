@@ -12,4 +12,12 @@ export default defineNuxtConfig({
     "@pinia/nuxt",
   ],
   css: ["~/assets/css/main.css"],
+  app: {
+    head: {
+      charset: "utf-8",
+      viewport: "width=device-width, initial-scale=1, maximum-scale=1",
+      titleTemplate: "%s | DebRIEF II",
+      title: "DN",
+    },
+  },
 });
