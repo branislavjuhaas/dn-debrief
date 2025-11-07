@@ -5,6 +5,9 @@ import AppDialog from "~/components/dialog/AppDialog.vue";
 definePageMeta({
   guest: true,
 });
+useSeoMeta({
+  title: "Prihlásenie",
+});
 
 const authClient = createAuthClient();
 const userStore = useUserStore();

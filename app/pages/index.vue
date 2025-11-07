@@ -1,4 +1,8 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+useSeoMeta({
+  title: "Domov",
+});
+</script>
 
 <template>
   <UPageSection>
