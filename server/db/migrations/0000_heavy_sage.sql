@@ -34,13 +34,13 @@ CREATE TABLE `users` (
 	`email` varchar(255) NOT NULL,
 	`email_verified` boolean NOT NULL DEFAULT false,
 	`image` text,
-	`created_at` timestamp(3) NOT NULL DEFAULT (now()),
-	`updated_at` timestamp(3) NOT NULL DEFAULT (now()),
 	`search` text NOT NULL,
 	`role` enum('user','organizer','junior_organizer','chief_adjudicator','motion_committee_member','admin','developer') NOT NULL DEFAULT 'user',
 	`credential` int NOT NULL DEFAULT 0,
-	`birthdate` timestamp(3),
+	`birthdate` date,
 	`address` text,
+	`created_at` timestamp(3) NOT NULL DEFAULT (now()),
+	`updated_at` timestamp(3) NOT NULL DEFAULT (now()),
 	CONSTRAINT `users_id` PRIMARY KEY(`id`),
 	CONSTRAINT `users_email_unique` UNIQUE(`email`)
 );
