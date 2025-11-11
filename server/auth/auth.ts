@@ -49,6 +49,7 @@ export const auth = betterAuth({
       search: {
         type: "string",
         required: true,
+        defaultValue: "",
         input: false, // don't allow user to set search
       },
       role: {
