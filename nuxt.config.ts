@@ -20,4 +20,22 @@ export default defineNuxtConfig({
       title: "DN",
     },
   },
+  fonts: {
+    defaults: {
+      weights: [400, 700],
+      styles: ["normal", "italic"],
+      subsets: ["latin"],
+    },
+    provider: "google",
+    families: [
+      {
+        name: "DM Sans",
+        weights: ["100 900"],
+        styles: ["normal", "italic"],
+        subsets: ["latin"],
+        preload: true,
+        provider: "google",
+      },
+    ],
+  },
 });
