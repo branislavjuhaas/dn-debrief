@@ -93,28 +93,25 @@ const userState = reactive<Partial<UserSchema>>({
 
 const submitRegistration = async (event: FormSubmitEvent<UserSchema>) => {
   if (route.query.collection === "true") {
-    authClient
-      .updateUser({
+    try {
+      await authClient.updateUser({
         name: `${event.data.name} ${event.data.surname}`,
         birthdate: event.data.birthdate.toString(),
         address: event.data.address,
-      } as any)
-      .catch((err) => {
-        regError.value = useAuthError(err.code);
-      })
-      .then(() => {
-        currentStep.value = 2;
-      });
-
+      } as any);
+      currentStep.value = 2;
+    } catch (err: any) {
+      regError.value = useAuthError(err.code);
+    }
     return;
   }
 
-  // if there is a undefined, null, false or empty in accountState, show error and return
   if (
     Object.values(accountState).some(
       (v) => v == undefined || null || "" || false,
     )
   ) {
+    regError.value = "Neplatné údaje používateľského účtu";
     return;
   }
 
