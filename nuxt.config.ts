@@ -12,6 +12,9 @@ export default defineNuxtConfig({
     "@pinia/nuxt",
   ],
   css: ["~/assets/css/main.css"],
+  ui: {
+    colorMode: false,
+  },
   app: {
     head: {
       charset: "utf-8",
