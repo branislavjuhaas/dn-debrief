@@ -12,6 +12,7 @@
     "db:migrate": "drizzle-kit migrate"
   },
   "dependencies": {
+    "@aws-sdk/client-ses": "^3.929.0",
     "@nuxt/content": "^3.8.0",
     "@nuxt/eslint": "1.10.0",
     "@nuxt/image": "1.11.0",
