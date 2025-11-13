@@ -2,7 +2,7 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "~~/server/db/db";
 import * as schema from "~~/server/db/schema/auth";
-import { sendEmail } from "~~/server/utils/send-email";
+import { sendEmail, generateEmailTemplate } from "~~/server/utils/send-email";
 
 /**
  * Generate a normalized search string from a user's name.
@@ -110,11 +110,17 @@ export const auth = betterAuth({
   },
   emailVerification: {
     sendOnSignUp: true,
-    sendVerificationEmail: async ({ user, url, token }, request) => {
+    sendVerificationEmail: async ({ user, token }, request) => {
       await sendEmail({
         to: [user.email],
-        subject: "Verify your email address",
-        html: `Click the link to verify your email: ${url}`,
+        subject: "Potvrďte svoju emailovú adresu",
+        html: generateEmailTemplate({
+          title: "Potvrďte, že ste to vy!",
+          text: "Pre potvrdenie autenticity vášho účtu kliknite, prosím, na nasledujúci odkaz:",
+          icon: "https://www.sda.sk/wp-content/uploads/2025/11/question_mark.png",
+          linkText: "Potvrdiť emailovú adresu",
+          link: `${process.env.BETTER_AUTH_URL}/auth/verify?token=${token}`,
+        }),
       });
     },
   },
