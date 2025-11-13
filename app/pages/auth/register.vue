@@ -36,7 +36,9 @@ const items = [
   },
 ] satisfies StepperItem[];
 
-const currentStep = ref<number>(route.query.collection === "true" ? 1 : 0);
+const currentStep = ref<number>(
+  route.query.collection === "true" ? 1 : route.query.verify ? 2 : 0,
+);
 const verification = ref<boolean>(false);
 const regError = ref<string>("");
 
@@ -139,6 +141,32 @@ const submitRegistration = async (event: FormSubmitEvent<UserSchema>) => {
 
   verification.value = true;
 };
+
+onMounted(async () => {
+  if (route.query.verify !== "true") {
+    console.log("no verification needed");
+    return;
+  }
+
+  const toast = useToast();
+
+  toast.add({
+    title: "Overenie identity úspešné",
+    description: "Váš email bol úspešne overený. Môžete sa prihlásiť.",
+    icon: "ph:check-circle-fill",
+    color: "success",
+    actions: [
+      {
+        label: "Prihlásiť sa",
+        color: "primary",
+        block: true,
+        onClick: (toast) => {
+          navigateTo("/auth");
+        },
+      },
+    ],
+  });
+});
 </script>
 
 <template>
@@ -274,7 +302,13 @@ const submitRegistration = async (event: FormSubmitEvent<UserSchema>) => {
           Váš účet bol úspešne vytvorený. Pre získanie prístupu ku všetkým
           podujatiam sa, prosím, registrujte do SDA.
         </DialogHeader>
-        <UButton block>Registrovať sa do SDA</UButton>
+
+        <UAlert
+          v-if="route.query.verify === 'false'"
+          color="error"
+          icon="ph:warning-octagon-fill"
+          title="Váš účet sa nepodarilo overiť. Skúste to, prosím, znova." />
+        <UButton v-else block>Registrovať sa do SDA</UButton>
       </template>
 
       <USeparator />
