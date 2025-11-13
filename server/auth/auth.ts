@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "~~/server/db/db";
 import * as schema from "~~/server/db/schema/auth";
+import { sendEmail } from "~~/server/utils/send-email";
 
 /**
  * Generate a normalized search string from a user's name.
@@ -33,6 +34,7 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
+    requireEmailVerification: true,
   },
   socialProviders: {
     google: {
@@ -104,6 +106,16 @@ export const auth = betterAuth({
     database: {
       generateId: false,
       useNumberIds: true,
+    },
+  },
+  emailVerification: {
+    sendOnSignUp: true,
+    sendVerificationEmail: async ({ user, url, token }, request) => {
+      await sendEmail({
+        to: [user.email],
+        subject: "Verify your email address",
+        html: `Click the link to verify your email: ${url}`,
+      });
     },
   },
 });
