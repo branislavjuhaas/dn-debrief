@@ -5,16 +5,34 @@ import type { FormSubmitEvent, AuthFormField } from "@nuxt/ui";
 import * as z from "zod";
 import useAuthError from "~/utils/use-auth-error";
 
+/**
+ * Defines page metadata for the login route.
+ * `guest: true` ensures this page is only accessible to unauthenticated users.
+ */
 definePageMeta({
   guest: true,
 });
+
+/**
+ * Sets SEO metadata for the login page.
+ */
 useSeoMeta({
   title: "Prihlásenie",
 });
 
+/**
+ * Auth client instance for handling authentication operations.
+ */
 const authClient = createAuthClient();
+
+/**
+ * The user store for managing user state.
+ */
 const userStore = useUserStore();
 
+/**
+ * Defines the fields for the authentication form.
+ */
 const fields: AuthFormField[] = [
   {
     name: "email",
@@ -37,15 +55,29 @@ const fields: AuthFormField[] = [
   },
 ];
 
+/**
+ * Zod schema for login form validation.
+ */
 const schema = z.object({
   email: z.email("Neplatná emailová adresa"),
   password: z.string("Heslo je povinné"),
   remember: z.boolean().optional(),
 });
+/**
+ * Type definition for the login form schema.
+ */
 type Schema = z.output<typeof schema>;
 
+/**
+ * A ref to store authentication error messages.
+ */
 const authError = ref<string>("");
 
+/**
+ * Handles the GitHub social login flow.
+ * On success, it updates the user store with the user data.
+ * On error, it sets an appropriate error message.
+ */
 const loginGithub = async () => {
   await authClient.signIn.social(
     { provider: "github" },
@@ -60,6 +92,11 @@ const loginGithub = async () => {
   );
 };
 
+/**
+ * Handles the Google social login flow.
+ * On success, it updates the user store with the user data.
+ * On error, it sets an appropriate error message.
+ */
 const loginGoogle = async () => {
   await authClient.signIn.social(
     { provider: "google" },
@@ -74,6 +111,10 @@ const loginGoogle = async () => {
   );
 };
 
+/**
+ * Handles the email and password login flow.
+ * @param {FormSubmitEvent<Schema>} payload - The form submission event data.
+ */
 const loginPassword = async (payload: FormSubmitEvent<Schema>) => {
   const { data, error } = await authClient.signIn.email({
     email: payload.data.email,
