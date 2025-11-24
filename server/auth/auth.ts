@@ -1,5 +1,6 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { openAPI } from "better-auth/plugins";
 import { db } from "~~/server/db/db";
 import * as schema from "~~/server/db/schema/auth";
 import { sendEmail, generateEmailTemplate } from "~~/server/utils/send-email";
@@ -32,6 +33,11 @@ export const auth = betterAuth({
     usePlural: true,
     schema: schema,
   }),
+  plugins: [
+    openAPI({
+      path: "/api/docs/auth",
+    }),
+  ],
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
