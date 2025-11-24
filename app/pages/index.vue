@@ -2,11 +2,13 @@
 useSeoMeta({
   title: "Domov",
 });
+
+const userStore = useUserStore();
 </script>
 
 <template>
   <UPageSection>
-    <ProseH1>Hello</ProseH1>
+    <ProseH1>{{ useGreeting(userStore.user) }}</ProseH1>
   </UPageSection>
 </template>
 
