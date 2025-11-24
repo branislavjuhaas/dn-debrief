@@ -5,34 +5,20 @@ import type { FormSubmitEvent, AuthFormField } from "@nuxt/ui";
 import * as z from "zod";
 import useAuthError from "~/utils/use-auth-error";
 
-/**
- * Defines page metadata for the login route.
- * `guest: true` ensures this page is only accessible to unauthenticated users.
- */
+/** Gate the route to unauthenticated visitors. */
 definePageMeta({
   guest: true,
 });
 
-/**
- * Sets SEO metadata for the login page.
- */
+/** Basic SEO metadata for the login screen. */
 useSeoMeta({
   title: "Prihlásenie",
 });
 
-/**
- * Auth client instance for handling authentication operations.
- */
 const authClient = createAuthClient();
-
-/**
- * The user store for managing user state.
- */
 const userStore = useUserStore();
 
-/**
- * Defines the fields for the authentication form.
- */
+/** Field configuration consumed by `UAuthForm`. */
 const fields: AuthFormField[] = [
   {
     name: "email",
@@ -55,27 +41,21 @@ const fields: AuthFormField[] = [
   },
 ];
 
-/**
- * Zod schema for login form validation.
- */
+/** Validation schema for the login payload. */
 const schema = z.object({
   email: z.email("Neplatná emailová adresa"),
   password: z.string("Heslo je povinné"),
   remember: z.boolean().optional(),
 });
-/**
- * Type definition for the login form schema.
- */
+/** Output type inferred from `schema`. */
 type Schema = z.output<typeof schema>;
 
-/**
- * A ref to store authentication error messages.
- */
+/** Reactive error message piped into the alert. */
 const authError = ref<string>("");
 
 /**
  * Handles the GitHub social login flow.
- * On success, it updates the user store with the user data.
+ * In success, it updates the user store with the user data.
  * On error, it sets an appropriate error message.
  */
 const loginGithub = async () => {
@@ -94,7 +74,7 @@ const loginGithub = async () => {
 
 /**
  * Handles the Google social login flow.
- * On success, it updates the user store with the user data.
+ * In success, it updates the user store with the user data.
  * On error, it sets an appropriate error message.
  */
 const loginGoogle = async () => {

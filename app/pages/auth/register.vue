@@ -6,18 +6,21 @@ import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
 import { createAuthClient } from "better-auth/vue";
 
+/** Sets SEO meta-tags so the register page stays share-friendly */
 useSeoMeta({
   title: "Registrácia",
 });
 
+/** Formatter used to preview the selected birthdate in Slovak locale */
 const df = new DateFormatter("sk-SK", {
   dateStyle: "medium",
 });
 
 const route = useRoute();
-const userStore = useUserStore();
 const authClient = createAuthClient();
+const userStore = useUserStore();
 
+/** Three-step wizard definition rendered by the stepper */
 const items = [
   {
     title: "Tvorba účtu",
@@ -36,12 +39,16 @@ const items = [
   },
 ] satisfies StepperItem[];
 
+/** Tracks wizard progress based on query params and form completion */
 const currentStep = ref<number>(
   route.query.collection === "true" ? 1 : route.query.verify ? 2 : 0,
 );
+/** True when signup finished, but email verification is still pending */
 const verification = ref<boolean>(false);
+/** Supports surfacing backend validation issues to the user */
 const regError = ref<string>("");
 
+/** Validates credentials and consent in the first step */
 const accountSchema = z
   .object({
     email: z.email("Neplatný email"),
@@ -63,6 +70,7 @@ const accountSchema = z
     }
   });
 
+/** Validates personal information captured during data collection */
 const userSchema = z.object({
   name: z.string("Meno je povinné").min(2, "Meno musí mať aspoň 2 znaky"),
   surname: z
@@ -79,6 +87,7 @@ const userSchema = z.object({
 type AccountSchema = z.output<typeof accountSchema>;
 type UserSchema = z.output<typeof userSchema>;
 
+/** Holds transient credentials before the API call */
 const accountState = reactive<Partial<AccountSchema>>({
   email: undefined,
   password: undefined,
@@ -86,6 +95,7 @@ const accountState = reactive<Partial<AccountSchema>>({
   agreeToTerms: undefined,
 });
 
+/** Holds personal info values for the collection step */
 const userState = reactive<Partial<UserSchema>>({
   name: undefined,
   surname: undefined,
@@ -93,6 +103,11 @@ const userState = reactive<Partial<UserSchema>>({
   address: undefined,
 });
 
+/**
+ * Submits the personal details form, updating the flow depending on query flags.
+ * - In collection mode, only user profile data is patched.
+ * - Otherwise, both account and identity data are validated before signup.
+ */
 const submitRegistration = async (event: FormSubmitEvent<UserSchema>) => {
   if (route.query.collection === "true") {
     try {
@@ -142,6 +157,7 @@ const submitRegistration = async (event: FormSubmitEvent<UserSchema>) => {
   verification.value = true;
 };
 
+/** Shows a success toast when the verify flag confirms email completion */
 onMounted(async () => {
   if (route.query.verify !== "true") {
     console.log("no verification needed");
@@ -160,7 +176,7 @@ onMounted(async () => {
         label: "Prihlásiť sa",
         color: "primary",
         block: true,
-        onClick: (toast) => {
+        onClick: () => {
           navigateTo("/auth");
         },
       },
@@ -173,6 +189,7 @@ onMounted(async () => {
   <UPageSection>
     <ProseH1>Registrácia na platformu DN Cascade</ProseH1>
     <AppDialog>
+      <!-- EMAIL VERIFICATION notice -->
       <DialogHeader
         v-if="verification"
         title="Čakáme na overenie"
@@ -180,6 +197,7 @@ onMounted(async () => {
         Na vami zadaný email sme poslali overenie účtu. Pre pokračovanie v
         registrácii, kliknite, prosím, na odkaz v maily.
       </DialogHeader>
+      <!-- STEP 0: account creation form -->
       <template v-else-if="currentStep === 0">
         <DialogHeader title="Vitajte na platforme">
           Máte už účet?
@@ -223,15 +241,15 @@ onMounted(async () => {
               </NuxtLink>
               a
               <NuxtLink to="/terms-of-service" class="underline">
-                podmienkami používania
+                podmienkami používania.
               </NuxtLink>
-              .
             </template>
           </UCheckbox>
 
           <UButton type="submit" block>Pokračovať</UButton>
         </UForm>
       </template>
+      <!-- STEP 1: personal information collection -->
       <template v-else-if="currentStep === 1">
         <DialogHeader
           title="Už sme skoro hotoví "
@@ -297,6 +315,7 @@ onMounted(async () => {
           </UButton>
         </UForm>
       </template>
+      <!-- STEP 2: registration completion and SDA CTA -->
       <template v-else>
         <DialogHeader title="Už sme skoro hotoví" icon="ph:fingerprint-simple">
           Váš účet bol úspešne vytvorený. Pre získanie prístupu ku všetkým
