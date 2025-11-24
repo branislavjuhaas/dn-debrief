@@ -28,7 +28,7 @@ export const clubs = mysqlTable(
     search: varchar("search", { length: 32 }).notNull(),
     isActive: boolean("is_active").default(true).notNull(),
     league: league.default("senior").notNull(),
-    region: region.default("west"),
+    region: region.default("central"),
     createdAt: timestamp("created_at", { fsp: 3 }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { fsp: 3 })
       .defaultNow()
