@@ -62,8 +62,8 @@ const loginGithub = async () => {
   await authClient.signIn.social(
     { provider: "github" },
     {
-      onSuccess: (ctx) => {
-        userStore.set(ctx.data.user);
+      onSuccess: (_ctx) => {
+        userStore.set();
       },
       onError: (_err) => {
         authError.value = "Prihlásenie pomocou GitHub zlyhalo";
@@ -81,8 +81,8 @@ const loginGoogle = async () => {
   await authClient.signIn.social(
     { provider: "google" },
     {
-      onSuccess: (ctx) => {
-        userStore.set(ctx.data.user);
+      onSuccess: (_ctx) => {
+        userStore.set();
       },
       onError: (_err) => {
         authError.value = "Prihlásenie pomocou Google zlyhalo";
@@ -108,7 +108,7 @@ const loginPassword = async (payload: FormSubmitEvent<Schema>) => {
     return;
   }
 
-  userStore.set(data.user);
+  await userStore.set();
 };
 </script>
 

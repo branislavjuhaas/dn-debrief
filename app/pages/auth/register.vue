@@ -148,7 +148,7 @@ const submitRegistration = async (event: FormSubmitEvent<UserSchema>) => {
   }
 
   if (data.user.emailVerified) {
-    userStore.set(data.user);
+    await userStore.set();
     currentStep.value = 2;
 
     return;
