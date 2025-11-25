@@ -11,10 +11,23 @@ export const useUserStore = defineStore("user", {
         (field) => field !== undefined && field !== null,
       ),
     firstName: (state) => state.user?.name?.split(" ")[0] ?? "",
+    isMember: (state) =>
+      state.user?.clubMemberships?.some(
+        (membership) =>
+          membership.season === new Date().getFullYear().toString() &&
+          membership.confirmed,
+      ),
+    isMemberCandidate: (state) =>
+      state.user?.clubMemberships?.some(
+        (membership) =>
+          membership.season === new Date().getFullYear().toString() &&
+          !membership.confirmed,
+      ),
   },
   actions: {
-    set(user: User | null) {
-      this.user = user;
+    async set() {
+      const { data } = await useFetch<User>("api/users/me");
+      this.user = (data?.value ?? null) as User | null;
     },
     clear() {
       console.log("Clearing user");

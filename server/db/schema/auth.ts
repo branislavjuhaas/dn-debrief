@@ -56,6 +56,37 @@ export const usersRelations = relations(users, ({ many }) => ({
   clubManagements: many(clubManagers, {
     relationName: "user_club_managements",
   }),
+  supervisors: many(supervisors, {
+    relationName: "user_supervisors",
+  }),
+}));
+
+// SUPERVISORS
+
+export const supervisors = mysqlTable(
+  "supervisors",
+  {
+    id: int("id").primaryKey().autoincrement(),
+    name: text("name").notNull(),
+    email: varchar("email", { length: 255 }).notNull().unique(),
+    userId: int("user_id")
+      .references(() => users.id, { onDelete: "cascade" })
+      .notNull(),
+    createdAt: timestamp("created_at", { fsp: 3 }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { fsp: 3 })
+      .defaultNow()
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
+  },
+  (table) => [index("supervisors_user_idx").on(table.userId)],
+);
+
+export const supervisorsRelations = relations(supervisors, ({ one }) => ({
+  user: one(users, {
+    relationName: "supervisor_user",
+    fields: [supervisors.userId],
+    references: [users.id],
+  }),
 }));
 
 // SESSIONS
