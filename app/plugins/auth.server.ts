@@ -12,5 +12,5 @@ export default defineNuxtPlugin(async (nuxtApp) => {
     return;
   }
 
-  await userStore.set();
+  await userStore.set(headers);
 });
