@@ -28,6 +28,17 @@ CREATE TABLE `sessions` (
 	CONSTRAINT `sessions_token_unique` UNIQUE(`token`)
 );
 --> statement-breakpoint
+CREATE TABLE `supervisors` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`name` text NOT NULL,
+	`email` varchar(255) NOT NULL,
+	`user_id` int NOT NULL,
+	`created_at` timestamp(3) NOT NULL DEFAULT (now()),
+	`updated_at` timestamp(3) NOT NULL DEFAULT (now()),
+	CONSTRAINT `supervisors_id` PRIMARY KEY(`id`),
+	CONSTRAINT `supervisors_email_unique` UNIQUE(`email`)
+);
+--> statement-breakpoint
 CREATE TABLE `users` (
 	`id` int AUTO_INCREMENT NOT NULL,
 	`name` text NOT NULL,
@@ -128,6 +139,7 @@ CREATE TABLE `events` (
 --> statement-breakpoint
 ALTER TABLE `accounts` ADD CONSTRAINT `accounts_user_id_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE `sessions` ADD CONSTRAINT `sessions_user_id_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE `supervisors` ADD CONSTRAINT `supervisors_user_id_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE `club_managers` ADD CONSTRAINT `club_managers_club_id_clubs_id_fk` FOREIGN KEY (`club_id`) REFERENCES `clubs`(`id`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE `club_managers` ADD CONSTRAINT `club_managers_user_id_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE `club_memberships` ADD CONSTRAINT `club_memberships_club_id_clubs_id_fk` FOREIGN KEY (`club_id`) REFERENCES `clubs`(`id`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
@@ -139,6 +151,7 @@ ALTER TABLE `event_registrations` ADD CONSTRAINT `event_registrations_user_id_us
 CREATE INDEX `accounts_user_idx` ON `accounts` (`user_id`);--> statement-breakpoint
 CREATE INDEX `sessions_user_idx` ON `sessions` (`user_id`);--> statement-breakpoint
 CREATE INDEX `sessions_expires_at_idx` ON `sessions` (`expires_at`);--> statement-breakpoint
+CREATE INDEX `supervisors_user_idx` ON `supervisors` (`user_id`);--> statement-breakpoint
 CREATE INDEX `users_search_idx` ON `users` (`search`);--> statement-breakpoint
 CREATE INDEX `users_role_idx` ON `users` (`role`);--> statement-breakpoint
 CREATE INDEX `club_managers_user_idx` ON `club_managers` (`user_id`);--> statement-breakpoint
