@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import type { User } from "#shared/types/user";
+import type { ApiResponse } from "#shared/types/response";
 
 export const useUserStore = defineStore("user", {
   state: (): { user: User | null } => ({ user: null }),
@@ -25,9 +26,12 @@ export const useUserStore = defineStore("user", {
       ),
   },
   actions: {
-    async set() {
-      const { data } = await useFetch<User>("api/users/me");
-      this.user = (data?.value ?? null) as User | null;
+    async set(headers?: HeadersInit) {
+      const { data } = await $fetch<ApiResponse<User>>("/api/users/me", {
+        headers,
+        credentials: "include",
+      });
+      this.user = data ?? null;
     },
     clear() {
       console.log("Clearing user");
