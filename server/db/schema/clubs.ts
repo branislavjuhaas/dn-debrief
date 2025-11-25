@@ -50,7 +50,7 @@ export const clubMemberships = mysqlTable(
   {
     id: int("id").primaryKey().autoincrement(),
     clubId: int("club_id")
-      .references(() => clubs.id, { onDelete: "cascade" })
+      .references(() => clubs.id)
       .notNull(),
     userId: int("user_id")
       .references(() => users.id, { onDelete: "cascade" })
@@ -98,7 +98,7 @@ export const clubManagers = mysqlTable(
   {
     id: int("id").primaryKey().autoincrement(),
     clubId: int("club_id")
-      .references(() => clubs.id, { onDelete: "cascade" })
+      .references(() => clubs.id)
       .notNull(),
     userId: int("user_id")
       .references(() => users.id, { onDelete: "cascade" })
