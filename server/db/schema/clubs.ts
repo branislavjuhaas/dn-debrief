@@ -10,7 +10,7 @@ import {
 } from "drizzle-orm/mysql-core";
 import { mysqlEnum } from "drizzle-orm/mysql-core/columns/enum";
 import { relations } from "drizzle-orm";
-import { users } from "~~/server/db/schema/auth";
+import { users } from "./auth";
 
 // ENUMS
 

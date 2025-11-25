@@ -11,7 +11,7 @@ import {
 } from "drizzle-orm/mysql-core";
 import { relations } from "drizzle-orm";
 import { league, region } from "./clubs";
-import { users } from "~~/server/db/schema/auth";
+import { users } from "./auth";
 
 // EVENTS TABLE JSON TYPES
 export type Happening = {
@@ -155,9 +155,7 @@ export const eventRegistrations = mysqlTable(
   {
     id: int("id").primaryKey().autoincrement(),
     eventId: int("event_id")
-      .references(() => events.id, {
-        onDelete: "set null",
-      })
+      .references(() => events.id)
       .notNull(),
     userId: int("user_id").references(() => users.id, { onDelete: "cascade" }),
     data: json("data").$type<RegistrationData>().notNull(),
