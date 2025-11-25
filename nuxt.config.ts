@@ -11,6 +11,24 @@ export default defineNuxtConfig({
     "@nuxt/content",
     "@pinia/nuxt",
   ],
+  nitro: {
+    experimental: { openAPI: true },
+    openAPI: {
+      production: "prerender",
+      meta: {
+        title: "DN Cascade API Docs",
+        description: "API documentation for DN Cascade",
+        version: "2.25.0.1",
+      },
+      route: "/api/docs/openapi.json",
+      ui: {
+        scalar: {
+          route: "/api/docs",
+        },
+        swagger: false,
+      },
+    },
+  },
   css: ["~/assets/css/main.css"],
   ui: {
     colorMode: false,
