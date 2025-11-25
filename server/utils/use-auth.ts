@@ -1,4 +1,4 @@
-import { Role } from "#shared/types/user";
+import { User, Role } from "#shared/types/user";
 import { auth } from "~~/server/auth/auth";
 import { H3Event } from "h3";
 
@@ -15,5 +15,5 @@ export const useAuth = async (event: H3Event, roles: Role[] | null = null) => {
     throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
   }
 
-  return session.user;
+  return session.user as unknown as User;
 };
