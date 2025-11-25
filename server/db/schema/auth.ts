@@ -11,6 +11,7 @@ import {
 } from "drizzle-orm/mysql-core";
 import { relations } from "drizzle-orm";
 import { clubMemberships, clubManagers } from "./clubs";
+import { eventOrganizers, eventRegistrations } from "./events";
 
 // USERS
 
@@ -56,9 +57,13 @@ export const usersRelations = relations(users, ({ many }) => ({
   clubManagements: many(clubManagers, {
     relationName: "user_club_managements",
   }),
-  supervisors: many(supervisors, {
-    relationName: "user_supervisors",
+  eventOrganizations: many(eventOrganizers, {
+    relationName: "user_event_organizers",
   }),
+  eventRegistrations: many(eventRegistrations, {
+    relationName: "user_event_registrations",
+  }),
+  supervisors: many(supervisors),
 }));
 
 // SUPERVISORS
@@ -83,7 +88,6 @@ export const supervisors = mysqlTable(
 
 export const supervisorsRelations = relations(supervisors, ({ one }) => ({
   user: one(users, {
-    relationName: "supervisor_user",
     fields: [supervisors.userId],
     references: [users.id],
   }),
