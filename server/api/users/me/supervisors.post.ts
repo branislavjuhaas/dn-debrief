@@ -48,7 +48,7 @@ defineRouteMeta({
             },
             examples: {
               success: {
-                value: { success: true, statusCode: 201, data: [1] },
+                value: { success: true, statusCode: 201, data: { id: 1 } },
               },
             },
           },
@@ -86,5 +86,5 @@ export default defineEventHandler(async (event) => {
     .values({ ...body, userId: user.id })
     .$returningId();
 
-  return { success: true, statusCode: 201, data };
+  return { success: true, statusCode: 201, data: data[0] };
 });
