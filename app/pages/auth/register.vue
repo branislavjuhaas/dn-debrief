@@ -3,13 +3,24 @@ import AppDialog from "~/components/dialog/AppDialog.vue";
 import { DateFormatter, getLocalTimeZone } from "@internationalized/date";
 import type { StepperItem } from "@nuxt/ui";
 import * as z from "zod";
-import type { FormSubmitEvent } from "@nuxt/ui";
 import { createAuthClient } from "better-auth/vue";
+
+/** Gate the route to unauthenticated visitors. */
+definePageMeta({
+  halfguest: true,
+});
 
 /** Sets SEO meta-tags so the register page stays share-friendly */
 useSeoMeta({
   title: "Registrácia",
 });
+
+type Step =
+  | "account"
+  | "collection"
+  | "supervisors"
+  | "verification"
+  | "complete";
 
 /** Formatter used to preview the selected birthdate in Slovak locale */
 const df = new DateFormatter("sk-SK", {
@@ -40,11 +51,14 @@ const items = [
 ] satisfies StepperItem[];
 
 /** Tracks wizard progress based on query params and form completion */
-const currentStep = ref<number>(
-  route.query.collection === "true" ? 1 : route.query.verify ? 2 : 0,
+const currentStep = ref<Step>(
+  route.query.collection === "true"
+    ? "collection"
+    : route.query.verify
+      ? "complete"
+      : "account",
 );
-/** True when signup finished, but email verification is still pending */
-const verification = ref<boolean>(false);
+
 /** Supports surfacing backend validation issues to the user */
 const regError = ref<string>("");
 
@@ -84,8 +98,15 @@ const userSchema = z.object({
     .regex(/^.+,\s*\d{5}\s+.+$/, "Neplatný formát adresy"),
 });
 
+/** Validates information about supervisors during data collection */
+const supervisorSchema = z.object({
+  name: z.string("Meno je povinné").min(2, "Meno musí mať aspoň 2 znaky"),
+  email: z.email("Neplatný email"),
+});
+
 type AccountSchema = z.output<typeof accountSchema>;
 type UserSchema = z.output<typeof userSchema>;
+type SupervisorSchema = z.output<typeof supervisorSchema>;
 
 /** Holds transient credentials before the API call */
 const accountState = reactive<Partial<AccountSchema>>({
@@ -97,26 +118,50 @@ const accountState = reactive<Partial<AccountSchema>>({
 
 /** Holds personal info values for the collection step */
 const userState = reactive<Partial<UserSchema>>({
-  name: undefined,
-  surname: undefined,
+  name: userStore?.user?.name.split(" ")[0] || undefined,
+  surname: userStore?.user?.name.split(" ")[1] || undefined,
   birthdate: undefined,
   address: undefined,
 });
+
+/** Holds info about supervisor */
+const supervisorState = reactive<Partial<SupervisorSchema>>({
+  name: undefined,
+  email: undefined,
+});
+
+/**
+ * Creates supervisor records for underage users.
+ * @param supervisor Supervisor details to create
+ */
+const createSupervisors = async (supervisor: Partial<SupervisorSchema>) => {
+  if (!supervisor.name || !supervisor.email) {
+    return;
+  }
+
+  await useFetch("/api/users/me/supervisors", {
+    method: "POST",
+    body: supervisor,
+  });
+};
 
 /**
  * Submits the personal details form, updating the flow depending on query flags.
  * - In collection mode, only user profile data is patched.
  * - Otherwise, both account and identity data are validated before signup.
  */
-const submitRegistration = async (event: FormSubmitEvent<UserSchema>) => {
+const submitRegistration = async () => {
   if (route.query.collection === "true") {
     try {
       await authClient.updateUser({
-        name: `${event.data.name} ${event.data.surname}`,
-        birthdate: event.data.birthdate.toString(),
-        address: event.data.address,
+        name: `${userState.name} ${userState.surname}`,
+        birthdate: userState.birthdate.toString(),
+        address: userState.address,
       } as any);
-      currentStep.value = 2;
+
+      await createSupervisors(supervisorState);
+
+      currentStep.value = "complete";
     } catch (err: any) {
       regError.value = useAuthError(err.code);
     }
@@ -132,29 +177,37 @@ const submitRegistration = async (event: FormSubmitEvent<UserSchema>) => {
     return;
   }
 
-  console.log(event.data.birthdate.toString());
+  console.log("submitting registration");
 
   const { data, error } = await authClient.signUp.email({
     email: accountState.email,
     password: accountState.password,
-    name: `${event.data.name} ${event.data.surname}`,
-    birthdate: event.data.birthdate.toString(),
-    address: event.data.address,
+    name: `${userState.name} ${userState.surname}`,
+    birthdate: userState.birthdate.toString(),
+    address: userState.address,
+    supervisor:
+      useAge(userState.birthdate.toString()) < 18
+        ? {
+            name: supervisorState.name,
+            email: supervisorState.email,
+          }
+        : undefined,
   } as any);
 
   if (error || !data) {
-    regError.value = useAuthError(error.code);
+    console.log(error, data);
+    regError.value = useAuthError((error as any).code || "UNKNOWN_ERROR");
     return;
   }
 
-  if (data.user.emailVerified) {
+  if ((data as any).emailVerified) {
     await userStore.set();
-    currentStep.value = 2;
+    currentStep.value = "complete";
 
     return;
   }
 
-  verification.value = true;
+  currentStep.value = "verification";
 };
 
 /** Shows a success toast when the verify flag confirms email completion */
@@ -183,22 +236,37 @@ onMounted(async () => {
     ],
   });
 });
+
+const currentStepperStep = computed(() => {
+  switch (currentStep.value) {
+    case "account":
+      return 0;
+    case "collection":
+    case "supervisors":
+      return 1;
+    case "verification":
+    case "complete":
+      return 2;
+    default:
+      return 0;
+  }
+});
 </script>
 
 <template>
   <UPageSection>
     <ProseH1>Registrácia na platformu DN Cascade</ProseH1>
     <AppDialog>
-      <!-- EMAIL VERIFICATION notice -->
+      <!-- EMAIL VERIFICATION NOTICE -->
       <DialogHeader
-        v-if="verification"
+        v-if="currentStep === 'verification'"
         title="Čakáme na overenie"
         icon="ph:mailbox">
         Na vami zadaný email sme poslali overenie účtu. Pre pokračovanie v
         registrácii, kliknite, prosím, na odkaz v maily.
       </DialogHeader>
-      <!-- STEP 0: account creation form -->
-      <template v-else-if="currentStep === 0">
+      <!-- ACCOUNT CREATION -->
+      <template v-else-if="currentStep === 'account'">
         <DialogHeader title="Vitajte na platforme">
           Máte už účet?
           <NuxtLink to="/auth" class="text-secondary font-medium">
@@ -210,7 +278,7 @@ onMounted(async () => {
           :schema="accountSchema"
           :state="accountState"
           class="space-y-4 w-full"
-          @submit="currentStep = 1">
+          @submit="currentStep = 'collection'">
           <UFormField label="Email" name="email" required>
             <UInput
               v-model="accountState.email"
@@ -249,17 +317,21 @@ onMounted(async () => {
           <UButton type="submit" block>Pokračovať</UButton>
         </UForm>
       </template>
-      <!-- STEP 1: personal information collection -->
-      <template v-else-if="currentStep === 1">
+      <!-- PERSONAL INFORMATION COLLECTION -->
+      <template v-else-if="currentStep === 'collection'">
         <DialogHeader
-          title="Už sme skoro hotoví "
+          title="Už sme skoro hotoví"
           description="Pre jeho dokončenie vyplňte, prosím, osobné údaje" />
         <USeparator />
         <UForm
           :schema="userSchema"
           :state="userState"
           class="space-y-4 w-full"
-          @submit="submitRegistration">
+          @submit="
+            useAge(userState.birthdate.toString()) >= 18
+              ? submitRegistration()
+              : (currentStep = 'supervisors')
+          ">
           <UFormField label="Meno" name="name" required>
             <UInput
               v-model="userState.name"
@@ -306,16 +378,43 @@ onMounted(async () => {
             icon="ph:warning-octagon-fill"
             :title="regError" />
 
-          <UButton type="submit" block>
-            {{
-              route.query.collection === "true"
-                ? "Dokončiť registráciu"
-                : "Vytvoriť účet"
-            }}
-          </UButton>
+          <UButton type="submit" block>Pokračovať</UButton>
         </UForm>
       </template>
-      <!-- STEP 2: registration completion and SDA CTA -->
+      <!-- SUPERVISOR INFORMATION COLLECTION -->
+      <template v-else-if="currentStep === 'supervisors'">
+        <DialogHeader
+          title="Ešte pár informácií"
+          description="Uveďte údaje o vašom zákonnom zástupcovi" />
+        <USeparator />
+        <UForm
+          :schema="supervisorSchema"
+          :state="supervisorState"
+          class="space-y-4 w-full"
+          @submit="submitRegistration">
+          <UFormField label="Meno zákonného zástupcu" name="name" required>
+            <UInput
+              v-model="supervisorState.name"
+              placeholder="Zadajte meno zákonného zástupcu"
+              class="w-full" />
+          </UFormField>
+          <UFormField label="Email zákonného zástupcu" name="email" required>
+            <UInput
+              v-model="supervisorState.email"
+              placeholder="Zadajte email zákonného zástupcu"
+              class="w-full" />
+          </UFormField>
+
+          <UAlert
+            v-if="regError != ''"
+            color="error"
+            icon="ph:warning-octagon-fill"
+            :title="regError" />
+
+          <UButton type="submit" block>Pokračovať</UButton>
+        </UForm>
+      </template>
+      <!-- COMPLETION OF REGISTRATION -->
       <template v-else>
         <DialogHeader title="Už sme skoro hotoví" icon="ph:fingerprint-simple">
           Váš účet bol úspešne vytvorený. Pre získanie prístupu ku všetkým
@@ -331,7 +430,11 @@ onMounted(async () => {
       </template>
 
       <USeparator />
-      <UStepper :items="items" class="w-full" disabled v-model="currentStep" />
+      <UStepper
+        :items="items"
+        class="w-full"
+        disabled
+        v-model="currentStepperStep" />
     </AppDialog>
   </UPageSection>
 </template>
