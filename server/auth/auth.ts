@@ -1,9 +1,11 @@
 import { betterAuth } from "better-auth";
+import { createAuthMiddleware } from "better-auth/api";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { openAPI } from "better-auth/plugins";
 import { db } from "~~/server/db/db";
 import * as schema from "~~/server/db/schema/auth";
 import { sendEmail, generateEmailTemplate } from "~~/server/utils/send-email";
+import { supervisors } from "~~/server/db/schema/auth";
 
 /**
  * Generate a normalized search string from a user's name.
@@ -95,6 +97,21 @@ export const auth = betterAuth({
               search: generateSearchParam(user.name),
             },
           };
+        },
+        after: async (user, ctx) => {
+          const userId = user.id;
+          const body = ctx?.body;
+
+          const supervisor = body?.supervisor;
+
+          if (supervisor) {
+            try {
+              await db.insert(supervisors).values({
+                ...supervisor,
+                userId,
+              });
+            } catch (error) {}
+          }
         },
       },
       update: {
