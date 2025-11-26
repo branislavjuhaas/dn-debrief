@@ -32,7 +32,8 @@ defineRouteMeta({
     },
     responses: {
       201: {
-        description: "Supervisor created. Returns inserted id(s).",
+        description:
+          "Supervisor created. Returns the created supervisor object.",
         content: {
           "application/json": {
             schema: {
@@ -41,14 +42,29 @@ defineRouteMeta({
                 success: { type: "boolean" },
                 statusCode: { type: "number" },
                 data: {
-                  type: "array",
-                  items: { type: "number" },
+                  type: "object",
+                  properties: {
+                    id: { type: "number" },
+                    name: { type: "string" },
+                    email: { type: "string", format: "email" },
+                    userId: { type: "number" },
+                  },
+                  required: ["id", "name", "email", "userId"],
                 },
               },
             },
             examples: {
               success: {
-                value: { success: true, statusCode: 201, data: { id: 1 } },
+                value: {
+                  success: true,
+                  statusCode: 201,
+                  data: {
+                    id: 1,
+                    name: "John Doe",
+                    email: "john@example.com",
+                    userId: 42,
+                  },
+                },
               },
             },
           },
@@ -73,7 +89,7 @@ defineRouteMeta({
  *  - { name: string, email: string }
  *
  * Returns:
- *  - { success: boolean, statusCode: number, data: number[] } (inserted id(s))
+ *  - { success: boolean, statusCode: number, data: object } (created supervisor object)
  */
 export default defineEventHandler(async (event) => {
   const user = await useAuth(event);
@@ -84,7 +100,7 @@ export default defineEventHandler(async (event) => {
   const data = await db
     .insert(supervisors)
     .values({ ...body, userId: user.id })
-    .$returningId();
+    .returning();
 
   return { success: true, statusCode: 201, data: data[0] };
 });

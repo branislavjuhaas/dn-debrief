@@ -52,7 +52,7 @@ defineRouteMeta({
     },
     responses: {
       201: {
-        description: "Club created. Returns inserted id(s).",
+        description: "Club created. Returns the created club object.",
         content: {
           "application/json": {
             schema: {
@@ -60,12 +60,41 @@ defineRouteMeta({
               properties: {
                 success: { type: "boolean" },
                 statusCode: { type: "number" },
-                data: { type: "array", items: { type: "number" } },
+                data: {
+                  type: "object",
+                  properties: {
+                    id: { type: "number" },
+                    name: { type: "string" },
+                    description: { type: "string" },
+                    isActive: { type: "boolean" },
+                    league: {
+                      type: "string",
+                      enum: ["junior", "senior", "university"],
+                    },
+                    region: {
+                      type: "string",
+                      enum: ["east", "west", "central"],
+                    },
+                  },
+                  required: ["id", "name"],
+                },
               },
             },
             examples: {
               success: {
-                value: { success: true, statusCode: 201, data: { id: 1 } },
+                value: {
+                  success: true,
+                  statusCode: 201,
+                  data: {
+                    id: 1,
+                    name: "Sučany",
+                    description:
+                      "The oldest and the most successful debate club in Slovakia",
+                    isActive: true,
+                    league: "senior",
+                    region: "central",
+                  },
+                },
               },
             },
           },
@@ -83,10 +112,10 @@ defineRouteMeta({
  * Creates a new club (admin/developer).
  *
  * Request body:
- *  - { name: string, description?: string, isActive?: boolean, league?: 'junior'|'senior', region?: 'east'|'west'|'central' }
+ *  - { name: string, description?: string, isActive?: boolean, league?: 'junior'|'senior'|'university', region?: 'east'|'west'|'central' }
  *
  * Returns:
- *  - { success: boolean, statusCode: number, data: number[] } (inserted id(s))
+ *  - { success: boolean, statusCode: number, data: object } (created club object)
  */
 export default defineEventHandler(async (event) => {
   await useAuth(event, ["admin", "developer"]);
@@ -96,7 +125,7 @@ export default defineEventHandler(async (event) => {
   const data = await db
     .insert(clubs)
     .values({ ...body, search: useSearch(body.name) })
-    .$returningId();
+    .returning();
 
   return { success: true, statusCode: 201, data: data[0] };
 });
