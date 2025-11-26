@@ -1,14 +1,15 @@
 import {
+  pgTable,
   boolean,
-  int,
-  mysqlTable,
+  integer,
+  serial,
   text,
   timestamp,
   varchar,
-  json,
+  jsonb,
   index,
-  unique,
-} from "drizzle-orm/mysql-core";
+  uniqueIndex,
+} from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { league, region } from "./clubs";
 import { users } from "./auth";
@@ -67,22 +68,22 @@ export type RegistrationDetails = {
 
 // EVENTS
 
-export const events = mysqlTable(
+export const events = pgTable(
   "events",
   {
-    id: int("id").primaryKey().autoincrement(),
+    id: serial("id").primaryKey(),
     season: varchar("season", { length: 9 }).notNull(),
     name: text("name").notNull(),
-    league: league.default("senior").notNull(),
-    region: region.default("central"),
+    league: league("league").default("senior").notNull(),
+    region: region("region").default("central"),
     search: varchar("search", { length: 32 }).notNull(),
     draft: boolean("draft").default(false).notNull(),
-    beginning: timestamp("beginning", { fsp: 3 }).notNull(),
-    end: timestamp("end", { fsp: 3 }).notNull(),
-    details: json("details").$type<EventDetails>().notNull(),
-    registration: json("registration").$type<RegistrationDetails>().notNull(),
-    createdAt: timestamp("created_at", { fsp: 3 }).defaultNow().notNull(),
-    updatedAt: timestamp("updated_at", { fsp: 3 })
+    beginning: timestamp("beginning").notNull(),
+    end: timestamp("end").notNull(),
+    details: jsonb("details").$type<EventDetails>().notNull(),
+    registration: jsonb("registration").$type<RegistrationDetails>().notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
       .defaultNow()
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
@@ -96,34 +97,37 @@ export const events = mysqlTable(
 );
 
 export const eventsRelations = relations(events, ({ many }) => ({
-  organizers: many(eventOrganizers, { relationName: "event_organizers" }),
+  organizers: many(eventOrganizers, { relationName: "eventOrganizers" }),
   registrations: many(eventRegistrations, {
-    relationName: "event_registrations",
+    relationName: "eventRegistrations",
   }),
 }));
 
 // EVENT ORGANIZERS
 
-export const eventOrganizers = mysqlTable(
+export const eventOrganizers = pgTable(
   "event_organizers",
   {
-    id: int("id").primaryKey().autoincrement(),
-    eventId: int("event_id")
+    id: serial("id").primaryKey(),
+    eventId: integer("event_id")
       .references(() => events.id)
       .notNull(),
-    userId: int("user_id")
+    userId: integer("user_id")
       .references(() => users.id, { onDelete: "cascade" })
       .notNull(),
-    createdAt: timestamp("created_at", { fsp: 3 }).defaultNow().notNull(),
-    updatedAt: timestamp("updated_at", { fsp: 3 })
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
       .defaultNow()
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
   },
   (table) => [
-    unique().on(table.eventId, table.userId),
-    index("event_organizers_event_idx").on(table.eventId),
-    index("event_organizers_user_idx").on(table.userId),
+    uniqueIndex("event_organizers_eventId_userId_unique").on(
+      table.eventId,
+      table.userId,
+    ),
+    index("event_organizers_eventId_idx").on(table.eventId),
+    index("event_organizers_userId_idx").on(table.userId),
   ],
 );
 
@@ -133,7 +137,7 @@ export const eventOrganizersRelations = relations(
     event: one(events, {
       fields: [eventOrganizers.eventId],
       references: [events.id],
-      relationName: "event_organizers",
+      relationName: "eventOrganizers",
     }),
     user: one(users, {
       fields: [eventOrganizers.userId],
@@ -150,20 +154,25 @@ export type RegistrationData = {
 
 // EVENT REGISTRATIONS
 
-export const eventRegistrations = mysqlTable(
+export const eventRegistrations = pgTable(
   "event_registrations",
   {
-    id: int("id").primaryKey().autoincrement(),
-    eventId: int("event_id")
+    id: serial("id").primaryKey(),
+    eventId: integer("event_id")
       .references(() => events.id)
       .notNull(),
-    userId: int("user_id").references(() => users.id, { onDelete: "cascade" }),
-    data: json("data").$type<RegistrationData>().notNull(),
+    userId: integer("user_id").references(() => users.id, {
+      onDelete: "cascade",
+    }),
+    data: jsonb("data").$type<RegistrationData>().notNull(),
   },
   (table) => [
-    unique().on(table.eventId, table.userId),
-    index("event_registrations_event_idx").on(table.eventId),
-    index("event_registrations_user_idx").on(table.userId),
+    uniqueIndex("event_registrations_eventId_userId_unique").on(
+      table.eventId,
+      table.userId,
+    ),
+    index("event_registrations_eventId_idx").on(table.eventId),
+    index("event_registrations_userId_idx").on(table.userId),
   ],
 );
 
@@ -173,7 +182,7 @@ export const eventRegistrationsRelations = relations(
     event: one(events, {
       fields: [eventRegistrations.eventId],
       references: [events.id],
-      relationName: "event_registrations",
+      relationName: "eventRegistrations",
     }),
     user: one(users, {
       fields: [eventRegistrations.userId],

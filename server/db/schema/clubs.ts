@@ -1,36 +1,37 @@
 import {
+  pgEnum,
+  pgTable,
   boolean,
-  int,
-  mysqlTable,
+  integer,
+  serial,
   text,
   timestamp,
   varchar,
   index,
-  unique,
-} from "drizzle-orm/mysql-core";
-import { mysqlEnum } from "drizzle-orm/mysql-core/columns/enum";
+  uniqueIndex,
+} from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { users } from "./auth";
 
 // ENUMS
 
-export const league = mysqlEnum("league", ["junior", "senior", "university"]);
-export const region = mysqlEnum("region", ["west", "central", "east"]);
+export const league = pgEnum("league", ["junior", "senior", "university"]);
+export const region = pgEnum("region", ["west", "central", "east"]);
 
 // CLUBS
 
-export const clubs = mysqlTable(
+export const clubs = pgTable(
   "clubs",
   {
-    id: int("id").primaryKey().autoincrement(),
+    id: serial("id").primaryKey(),
     name: text("name").notNull(),
     description: text("description"),
     search: varchar("search", { length: 32 }).notNull(),
     isActive: boolean("is_active").default(true).notNull(),
-    league: league.default("senior").notNull(),
-    region: region.default("central"),
-    createdAt: timestamp("created_at", { fsp: 3 }).defaultNow().notNull(),
-    updatedAt: timestamp("updated_at", { fsp: 3 })
+    league: league("league").default("senior").notNull(),
+    region: region("region").default("central"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
       .defaultNow()
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
@@ -39,35 +40,38 @@ export const clubs = mysqlTable(
 );
 
 export const clubsRelations = relations(clubs, ({ many }) => ({
-  memberships: many(clubMemberships, { relationName: "club_memberships" }),
-  managers: many(clubManagers, { relationName: "club_managers" }),
+  memberships: many(clubMemberships, { relationName: "clubMemberships" }),
+  managers: many(clubManagers, { relationName: "clubManagers" }),
 }));
 
 // CLUB MEMBERSHIPS
 
-export const clubMemberships = mysqlTable(
+export const clubMemberships = pgTable(
   "club_memberships",
   {
-    id: int("id").primaryKey().autoincrement(),
-    clubId: int("club_id")
+    id: serial("id").primaryKey(),
+    clubId: integer("club_id")
       .references(() => clubs.id)
       .notNull(),
-    userId: int("user_id")
+    userId: integer("user_id")
       .references(() => users.id, { onDelete: "cascade" })
       .notNull(),
     season: varchar("season", { length: 4 }).notNull(),
     confirmed: boolean("confirmed").default(false).notNull(),
-    createdAt: timestamp("created_at", { fsp: 3 }).defaultNow().notNull(),
-    updatedAt: timestamp("updated_at", { fsp: 3 })
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
       .defaultNow()
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
   },
   (table) => [
-    unique().on(table.userId, table.season),
-    index("club_memberships_user_idx").on(table.userId),
-    index("club_memberships_user_season_idx").on(table.userId, table.season),
-    index("club_memberships_club_season_confirmed_idx").on(
+    uniqueIndex("club_memberships_userId_season_unique").on(
+      table.userId,
+      table.season,
+    ),
+    index("club_memberships_userId_idx").on(table.userId),
+    index("club_memberships_userId_season_idx").on(table.userId, table.season),
+    index("club_memberships_clubId_season_confirmed_idx").on(
       table.clubId,
       table.season,
       table.confirmed,
@@ -81,7 +85,7 @@ export const clubMembershipsRelations = relations(
     club: one(clubs, {
       fields: [clubMemberships.clubId],
       references: [clubs.id],
-      relationName: "club_memberships",
+      relationName: "clubMemberships",
     }),
     user: one(users, {
       fields: [clubMemberships.userId],
@@ -93,26 +97,29 @@ export const clubMembershipsRelations = relations(
 
 // CLUB MANAGERS
 
-export const clubManagers = mysqlTable(
+export const clubManagers = pgTable(
   "club_managers",
   {
-    id: int("id").primaryKey().autoincrement(),
-    clubId: int("club_id")
+    id: serial("id").primaryKey(),
+    clubId: integer("club_id")
       .references(() => clubs.id)
       .notNull(),
-    userId: int("user_id")
+    userId: integer("user_id")
       .references(() => users.id, { onDelete: "cascade" })
       .notNull(),
-    createdAt: timestamp("created_at", { fsp: 3 }).defaultNow().notNull(),
-    updatedAt: timestamp("updated_at", { fsp: 3 })
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
       .defaultNow()
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
   },
   (table) => [
-    unique().on(table.userId, table.clubId),
-    index("club_managers_user_idx").on(table.userId),
-    index("club_managers_club_idx").on(table.clubId),
+    uniqueIndex("club_managers_userId_clubId_unique").on(
+      table.userId,
+      table.clubId,
+    ),
+    index("club_managers_userId_idx").on(table.userId),
+    index("club_managers_clubId_idx").on(table.clubId),
   ],
 );
 
@@ -120,7 +127,7 @@ export const clubManagersRelations = relations(clubManagers, ({ one }) => ({
   club: one(clubs, {
     fields: [clubManagers.clubId],
     references: [clubs.id],
-    relationName: "club_managers",
+    relationName: "clubManagers",
   }),
   user: one(users, {
     fields: [clubManagers.userId],
