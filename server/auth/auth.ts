@@ -28,8 +28,9 @@ const generateSearchParam = (name: string | undefined): string =>
     : "";
 
 export const auth = betterAuth({
+  experimental: { joins: true },
   database: drizzleAdapter(db, {
-    provider: "mysql",
+    provider: "pg",
     usePlural: true,
     schema: schema,
   }),
