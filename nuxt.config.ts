@@ -28,6 +28,7 @@ export default defineNuxtConfig({
         swagger: false,
       },
     },
+    storage: true,
   },
   css: ["~/assets/css/main.css"],
   ui: {
