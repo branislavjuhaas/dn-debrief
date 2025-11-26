@@ -321,7 +321,7 @@ const currentStepperStep = computed(() => {
       <template v-else-if="currentStep === 'collection'">
         <DialogHeader
           title="Už sme skoro hotoví"
-          description="Pre jeho dokončenie vyplňte, prosím, osobné údaje" />
+          description="Pre dokončenie účtu vyplňte, prosím, osobné údaje" />
         <USeparator />
         <UForm
           :schema="userSchema"
