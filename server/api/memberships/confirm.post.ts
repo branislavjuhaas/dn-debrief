@@ -61,16 +61,23 @@ defineRouteMeta({
  *  - { success: boolean, statusCode: number, data: UpdateResult }
  */
 export default defineEventHandler(async (event) => {
-  // Validate and deobfuscate the confirmation token.
   const query = await getValidatedQuery(event, (data) =>
     confirmSchema.parse(data),
   );
 
-  // Apply confirmation flag to every membership owned by the token’s user.
-  const data = db
+  const userId = deobfuscate(query.token);
+  const data = await db
     .update(clubMemberships)
     .set({ confirmed: true })
-    .where(eq(clubMemberships.userId, deobfuscate(query.token)));
+    .where(eq(clubMemberships.userId, userId))
+    .returning();
 
-  return { success: true, statusCode: 201, data };
+  if (data.length === 0) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: "Memberships to confirm not found.",
+    });
+  }
+
+  return { success: true, statusCode: 200, data };
 });
