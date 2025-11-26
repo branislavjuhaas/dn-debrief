@@ -46,7 +46,7 @@ defineRouteMeta({
     },
     responses: {
       201: {
-        description: "Club updated.",
+        description: "Club updated. Returns the updated club object(s).",
         content: {
           "application/json": {
             schema: {
@@ -54,10 +54,47 @@ defineRouteMeta({
               properties: {
                 success: { type: "boolean" },
                 statusCode: { type: "number" },
+                data: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      id: { type: "number" },
+                      name: { type: "string" },
+                      description: { type: "string" },
+                      isActive: { type: "boolean" },
+                      league: {
+                        type: "string",
+                        enum: ["junior", "senior", "university"],
+                      },
+                      region: {
+                        type: "string",
+                        enum: ["east", "west", "central"],
+                      },
+                    },
+                    required: ["id", "name"],
+                  },
+                },
               },
             },
             examples: {
-              success: { value: { success: true, statusCode: 201 } },
+              success: {
+                value: {
+                  success: true,
+                  statusCode: 201,
+                  data: [
+                    {
+                      id: 1,
+                      name: "Sučany",
+                      description:
+                        "The oldest and the most successful debate club in Slovakia",
+                      isActive: true,
+                      league: "senior",
+                      region: "central",
+                    },
+                  ],
+                },
+              },
             },
           },
         },
@@ -75,7 +112,7 @@ defineRouteMeta({
  * Requires admin/developer role and updates the specified club using any provided fields from the request body.
  *
  * Returns:
- *  - { success: boolean, statusCode: number }
+ *  - { success: boolean, statusCode: number, data: object[] } (updated club object(s))
  */
 export default defineEventHandler(async (event) => {
   await useAuth(event, ["admin", "developer"]);
@@ -89,7 +126,8 @@ export default defineEventHandler(async (event) => {
       ...body,
       ...(body.name ? { search: useSearch(body.name) } : {}),
     })
-    .where(eq(clubs.id, id));
+    .where(eq(clubs.id, id))
+    .returning();
 
-  return { success: true, statusCode: 201 };
+  return { success: true, statusCode: 201, data };
 });
