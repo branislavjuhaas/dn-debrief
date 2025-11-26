@@ -1,6 +1,6 @@
 import { db } from "~~/server/db/db";
 import * as z from "zod";
-import { clubMemberships, clubs } from "~~/server/db/schema/clubs";
+import { clubMemberships } from "~~/server/db/schema/clubs";
 import { eq } from "drizzle-orm";
 import { deobfuscate } from "#shared/utils/obfuscation";
 

@@ -2,7 +2,7 @@ import { db } from "~~/server/db/db";
 import { clubs, clubMemberships } from "~~/server/db/schema/clubs";
 import { eq } from "drizzle-orm";
 import useAge from "#shared/utils/use-age";
-import { deobfuscate, obfuscate } from "#shared/utils/obfuscation";
+import { obfuscate } from "#shared/utils/obfuscation";
 import { supervisors } from "~~/server/db/schema/auth";
 
 defineRouteMeta({
