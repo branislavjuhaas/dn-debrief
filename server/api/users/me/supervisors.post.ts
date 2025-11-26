@@ -102,5 +102,6 @@ export default defineEventHandler(async (event) => {
     .values({ ...body, userId: user.id })
     .returning();
 
+  setResponseStatus(event, 201);
   return { success: true, statusCode: 201, data: data[0] };
 });

@@ -45,7 +45,7 @@ defineRouteMeta({
       },
     },
     responses: {
-      201: {
+      200: {
         description: "Club updated. Returns the updated club object(s).",
         content: {
           "application/json": {
@@ -81,7 +81,7 @@ defineRouteMeta({
               success: {
                 value: {
                   success: true,
-                  statusCode: 201,
+                  statusCode: 200,
                   data: [
                     {
                       id: 1,
@@ -129,5 +129,5 @@ export default defineEventHandler(async (event) => {
     .where(eq(clubs.id, id))
     .returning();
 
-  return { success: true, statusCode: 201, data };
+  return { success: true, statusCode: 200, data };
 });

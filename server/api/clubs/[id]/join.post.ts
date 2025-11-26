@@ -148,5 +148,6 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  setResponseStatus(event, 201);
   return { success: true, statusCode: 201, data };
 });

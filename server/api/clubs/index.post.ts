@@ -127,5 +127,6 @@ export default defineEventHandler(async (event) => {
     .values({ ...body, search: useSearch(body.name) })
     .returning();
 
+  setResponseStatus(event, 201);
   return { success: true, statusCode: 201, data: data[0] };
 });

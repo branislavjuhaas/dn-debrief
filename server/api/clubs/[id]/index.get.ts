@@ -79,7 +79,7 @@ export default defineEventHandler(async (event) => {
   );
   const id = Number.parseInt(event.context.params?.id as string);
 
-  // Conditionallly include memberships based on the query flag.
+  // Conditionally include memberships based on the query flag.
   const data = query.memberships
     ? await db.query.clubs.findFirst({
         where: eq(clubs.id, id),
@@ -152,5 +152,5 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
   }
 
-  return { success: true, statusCode: 201, data };
+  return { success: true, statusCode: 200, data };
 });
