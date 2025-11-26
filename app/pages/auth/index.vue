@@ -62,8 +62,11 @@ const loginGithub = async () => {
   await authClient.signIn.social(
     { provider: "github" },
     {
-      onSuccess: (_ctx) => {
+      onSuccess: (ctx) => {
         userStore.set();
+        if (!ctx.data.user?.birthdate) {
+          navigateTo("/auth/register?collection=true");
+        }
       },
       onError: (_err) => {
         authError.value = "Prihlásenie pomocou GitHub zlyhalo";
@@ -81,8 +84,11 @@ const loginGoogle = async () => {
   await authClient.signIn.social(
     { provider: "google" },
     {
-      onSuccess: (_ctx) => {
+      onSuccess: (ctx) => {
         userStore.set();
+        if (!ctx.data.user?.birthdate) {
+          navigateTo("/auth/register?collection=true");
+        }
       },
       onError: (_err) => {
         authError.value = "Prihlásenie pomocou Google zlyhalo";
