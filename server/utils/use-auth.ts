@@ -15,5 +15,5 @@ export const useAuth = async (event: H3Event, roles: Role[] | null = null) => {
     throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
   }
 
-  return session.user as unknown as User;
+  return { ...session.user, id: Number(session.user.id) } as unknown as User;
 };
