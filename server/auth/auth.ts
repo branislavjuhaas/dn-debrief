@@ -61,7 +61,7 @@ export const auth = betterAuth({
       mapProfileToUser: (profile) => {
         return {
           name: profile.name.split(" ").slice(0, -1).join(" "),
-          surname: profile.name.split(" ")[-1],
+          surname: profile.name.split(" ").slice(-1)[0],
         };
       },
     },
