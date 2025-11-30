@@ -4,17 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d4cc1df9-ad00-4ded-af2d-7ea9f25f0f27" name="Changes" comment="chore: Remove storage option from nuxt.config.ts">
+    <list default="true" id="d4cc1df9-ad00-4ded-af2d-7ea9f25f0f27" name="Changes" comment="chore: Replace search fields with tsvector indexing for improved text search in auth, clubs, and events">
+      <change afterPath="$PROJECT_DIR$/server/auth/permissions.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/app.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/app.config.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/app.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/app.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/layouts/default.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/layouts/default.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/pages/auth/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/pages/auth/index.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/pages/auth/register.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/pages/auth/register.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/pages/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/pages/index.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/db/migrations/0000_greedy_domino.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/db/migrations/meta/0000_snapshot.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/db/migrations/meta/_journal.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/auth/auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/auth/auth.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/db/migrations/0000_install-extensions.sql" beforeDir="false" afterPath="$PROJECT_DIR$/server/db/migrations/0000_install-extensions.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/db/migrations/meta/_journal.json" beforeDir="false" afterPath="$PROJECT_DIR$/server/db/migrations/meta/_journal.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/db/schema/auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/db/schema/auth.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/db/schema/clubs.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/db/schema/clubs.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/db/schema/events.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/db/schema/events.ts" afterDir="false" />
@@ -27,8 +22,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="TypeScript File" />
         <option value="Vue Composition API Component" />
+        <option value="TypeScript File" />
       </list>
     </option>
   </component>
@@ -79,36 +74,38 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;sunlake&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/juhas/source/repos/dn-cascade&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;pnpm&quot;,
-    &quot;npm.db:migrate.executor&quot;: &quot;Run&quot;,
-    &quot;npm.dev.executor&quot;: &quot;Run&quot;,
-    &quot;prettierjs.PrettierConfiguration.Package&quot;: &quot;C:\\Users\\juhas\\source\\repos\\dn-cascade\\node_modules\\prettier&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;settings.javascript.prettier&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\juhas\\source\\repos\\dn-cascade\\node_modules\\typescript\\lib&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "sunlake",
+    "last_opened_file_path": "C:/Users/juhas/source/repos/dn-cascade",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "pnpm",
+    "npm.db:generate.executor": "Run",
+    "npm.db:migrate.executor": "Run",
+    "npm.dev.executor": "Run",
+    "npm.generate.executor": "Run",
+    "prettierjs.PrettierConfiguration.Package": "C:\\Users\\juhas\\source\\repos\\dn-cascade\\node_modules\\prettier",
+    "settings.editor.selected.configurable": "settings.javascript.prettier",
+    "ts.external.directory.path": "C:\\Users\\juhas\\source\\repos\\dn-cascade\\node_modules\\typescript\\lib",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;DatabaseDriversLRU&quot;: [
-      &quot;postgresql&quot;,
-      &quot;mysql&quot;
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "postgresql",
+      "mysql"
     ],
-    &quot;vue.recent.templates&quot;: [
-      &quot;Vue Composition API Component&quot;
+    "vue.recent.templates": [
+      "Vue Composition API Component"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\juhas\source\repos\dn-cascade" />
@@ -120,6 +117,16 @@
     </key>
   </component>
   <component name="RunManager" selected="npm.dev">
+    <configuration name="db:generate" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="db:generate" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
     <configuration name="db:migrate" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
@@ -140,10 +147,22 @@
       <envs />
       <method v="2" />
     </configuration>
+    <configuration name="generate" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="generate" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
         <item itemvalue="npm.dev" />
         <item itemvalue="npm.db:migrate" />
+        <item itemvalue="npm.db:generate" />
+        <item itemvalue="npm.generate" />
       </list>
     </recent_temporary>
   </component>
@@ -166,7 +185,7 @@
       <workItem from="1764315240193" duration="1937000" />
       <workItem from="1764336778959" duration="575000" />
       <workItem from="1764337646317" duration="19000" />
-      <workItem from="1764496845092" duration="2218000" />
+      <workItem from="1764496845092" duration="4597000" />
     </task>
     <task id="LOCAL-00001" summary="feat: remove all monorepo project files">
       <option name="closed" value="true" />
@@ -376,7 +395,55 @@
       <option name="project" value="LOCAL" />
       <updated>1764262061038</updated>
     </task>
-    <option name="localTasksCounter" value="27" />
+    <task id="LOCAL-00027" summary="chore: Add SQL extensions for unaccent and pg_trgm support">
+      <option name="closed" value="true" />
+      <created>1764499351918</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1764499351918</updated>
+    </task>
+    <task id="LOCAL-00028" summary="chore: Add base margin to page body in app configuration">
+      <option name="closed" value="true" />
+      <created>1764499388644</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1764499388644</updated>
+    </task>
+    <task id="LOCAL-00029" summary="chore: Refactor layout components in app.vue and default.vue">
+      <option name="closed" value="true" />
+      <created>1764499403370</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1764499403370</updated>
+    </task>
+    <task id="LOCAL-00030" summary="chore: Replace UPageSection with UPageBody in index.vue and register.vue">
+      <option name="closed" value="true" />
+      <created>1764499417285</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1764499417285</updated>
+    </task>
+    <task id="LOCAL-00031" summary="chore: Update workspace configuration and remove unnecessary options">
+      <option name="closed" value="true" />
+      <created>1764499603912</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1764499603912</updated>
+    </task>
+    <task id="LOCAL-00032" summary="chore: Replace search fields with tsvector indexing for improved text search in auth, clubs, and events">
+      <option name="closed" value="true" />
+      <created>1764499655023</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1764499655023</updated>
+    </task>
+    <option name="localTasksCounter" value="33" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -394,12 +461,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: remove all monorepo project files" />
-    <MESSAGE value="feat: add initial project structure with configuration files and database schema" />
-    <MESSAGE value="feat: reorder createdAt and updatedAt fields in auth table definition" />
-    <MESSAGE value="feat: update workspace configuration for initial project structure and settings" />
-    <MESSAGE value="feat: add initial app structure with configuration and layout components" />
-    <MESSAGE value="feat: add AppFooter component with footer links and project information" />
     <MESSAGE value="feat: remove unused fill attribute from AppLogo component and clean up content.config.ts imports" />
     <MESSAGE value="feat: add AppFooter component to app.vue for improved layout" />
     <MESSAGE value="feat: wrap slot in UMain component for improved layout structure" />
@@ -419,7 +480,13 @@
     <MESSAGE value="feat: update workspace configuration for improved project structure and task summaries" />
     <MESSAGE value="feat: add login dialog with Google and GitHub authentication options" />
     <MESSAGE value="chore: Remove storage option from nuxt.config.ts" />
-    <option name="LAST_COMMIT_MESSAGE" value="chore: Remove storage option from nuxt.config.ts" />
+    <MESSAGE value="chore: Add SQL extensions for unaccent and pg_trgm support" />
+    <MESSAGE value="chore: Add base margin to page body in app configuration" />
+    <MESSAGE value="chore: Refactor layout components in app.vue and default.vue" />
+    <MESSAGE value="chore: Replace UPageSection with UPageBody in index.vue and register.vue" />
+    <MESSAGE value="chore: Update workspace configuration and remove unnecessary options" />
+    <MESSAGE value="chore: Replace search fields with tsvector indexing for improved text search in auth, clubs, and events" />
+    <option name="LAST_COMMIT_MESSAGE" value="chore: Replace search fields with tsvector indexing for improved text search in auth, clubs, and events" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>
