@@ -129,12 +129,12 @@ const loginPassword = async (payload: FormSubmitEvent<Schema>) => {
       </DialogHeader>
       <div class="flex flex-row gap-3 w-full">
         <UButton
-          @click="loginGoogle"
           variant="subtle"
-          color="neutral"
-          icon="ph:google-logo"
+          class="cursor-pointer"
           block
-          class="cursor-pointer">
+          icon="ph:google-logo"
+          color="neutral"
+          @click="loginGoogle">
           Google
         </UButton>
         <UButton

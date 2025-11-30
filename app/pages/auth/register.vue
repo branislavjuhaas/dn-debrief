@@ -117,8 +117,8 @@ const accountState = reactive<Partial<AccountSchema>>({
 
 /** Holds personal info values for the collection step */
 const userState = reactive<Partial<UserSchema>>({
-  name: userStore?.user?.name.split(" ")[0] || undefined,
-  surname: userStore?.user?.name.split(" ")[1] || undefined,
+  name: userStore?.user?.name,
+  surname: userStore?.user?.surname,
   birthdate: undefined,
   address: undefined,
 });
@@ -153,7 +153,8 @@ const submitRegistration = async () => {
   if (route.query.collection === "true") {
     try {
       await authClient.updateUser({
-        name: `${userState.name} ${userState.surname}`,
+        name: userState.name,
+        surname: userState.surname,
         birthdate: userState.birthdate.toString(),
         address: userState.address,
       } as any);
@@ -161,8 +162,8 @@ const submitRegistration = async () => {
       await createSupervisors(supervisorState);
 
       currentStep.value = "complete";
-    } catch (err: any) {
-      regError.value = useAuthError(err.code);
+    } catch (err) {
+      regError.value = useAuthError((err as any).code);
     }
     return;
   }
@@ -181,7 +182,8 @@ const submitRegistration = async () => {
   const { data, error } = await authClient.signUp.email({
     email: accountState.email,
     password: accountState.password,
-    name: `${userState.name} ${userState.surname}`,
+    name: userState.name,
+    surname: userState.surname,
     birthdate: userState.birthdate.toString(),
     address: userState.address,
     supervisor:
@@ -195,11 +197,11 @@ const submitRegistration = async () => {
 
   if (error || !data) {
     console.log(error, data);
-    regError.value = useAuthError((error as any).code || "UNKNOWN_ERROR");
+    regError.value = useAuthError(error.code || "UNKNOWN_ERROR");
     return;
   }
 
-  if ((data as any).emailVerified) {
+  if (data.emailVerified) {
     await userStore.set();
     currentStep.value = "complete";
 
@@ -430,10 +432,10 @@ const currentStepperStep = computed(() => {
 
       <USeparator />
       <UStepper
+        v-model="currentStepperStep"
         :items="items"
         class="w-full"
-        disabled
-        v-model="currentStepperStep" />
+        disabled />
     </AppDialog>
   </UPageBody>
 </template>
