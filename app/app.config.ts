@@ -15,5 +15,8 @@ export default defineAppConfig({
         spacing: "collapse",
       },
     },
+    pageBody: {
+      base: "mt-32",
+    },
   },
 });
