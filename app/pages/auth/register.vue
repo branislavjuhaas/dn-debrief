@@ -3,7 +3,6 @@ import AppDialog from "~/components/dialog/AppDialog.vue";
 import { DateFormatter, getLocalTimeZone } from "@internationalized/date";
 import type { StepperItem } from "@nuxt/ui";
 import * as z from "zod";
-import { createAuthClient } from "better-auth/vue";
 
 /** Gate the route to unauthenticated visitors. */
 definePageMeta({
@@ -28,7 +27,7 @@ const df = new DateFormatter("sk-SK", {
 });
 
 const route = useRoute();
-const authClient = createAuthClient();
+const authClient = useAuthClient();
 const userStore = useUserStore();
 
 /** Three-step wizard definition rendered by the stepper */

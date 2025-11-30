@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { createAuthClient } from "better-auth/vue";
-
-const authClient = createAuthClient();
+const authClient = useAuthClient();
 const userStore = useUserStore();
 
 const logout = async () => {

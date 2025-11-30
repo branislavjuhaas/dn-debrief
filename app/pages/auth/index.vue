@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { createAuthClient } from "better-auth/vue";
 import AppDialog from "~/components/dialog/AppDialog.vue";
 import type { FormSubmitEvent, AuthFormField } from "@nuxt/ui";
 import * as z from "zod";
@@ -15,7 +14,7 @@ useSeoMeta({
   title: "Prihlásenie",
 });
 
-const authClient = createAuthClient();
+const authClient = useAuthClient();
 const userStore = useUserStore();
 
 /** Field configuration consumed by `UAuthForm`. */
