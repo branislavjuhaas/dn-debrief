@@ -27,4 +27,27 @@ export default () =>
         },
       }),
     ],
+    additionalFields: {
+      surname: {
+        type: "string",
+        required: true,
+        input: true,
+      },
+      credential: {
+        type: "number",
+        required: true,
+        defaultValue: 0,
+        input: false, // don't allow user to set credential
+      },
+      birthdate: {
+        type: "date",
+        required: false,
+        input: true,
+      },
+      address: {
+        type: "string",
+        required: false,
+        input: true,
+      },
+    },
   });
