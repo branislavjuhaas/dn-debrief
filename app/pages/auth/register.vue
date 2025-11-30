@@ -254,7 +254,7 @@ const currentStepperStep = computed(() => {
 </script>
 
 <template>
-  <UPageSection>
+  <UPageBody>
     <ProseH1>Registrácia na platformu DN Cascade</ProseH1>
     <AppDialog>
       <!-- EMAIL VERIFICATION NOTICE -->
@@ -436,7 +436,7 @@ const currentStepperStep = computed(() => {
         disabled
         v-model="currentStepperStep" />
     </AppDialog>
-  </UPageSection>
+  </UPageBody>
 </template>
 
 <style scoped></style>

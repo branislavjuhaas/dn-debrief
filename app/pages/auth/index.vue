@@ -119,7 +119,7 @@ const loginPassword = async (payload: FormSubmitEvent<Schema>) => {
 </script>
 
 <template>
-  <UPageSection>
+  <UPageBody>
     <ProseH1>Prihlásenie na platformu DN Cascade</ProseH1>
     <AppDialog>
       <DialogHeader title="Vitajte späť!">
@@ -139,12 +139,12 @@ const loginPassword = async (payload: FormSubmitEvent<Schema>) => {
           Google
         </UButton>
         <UButton
-          @click="loginGithub"
           variant="subtle"
           color="neutral"
           icon="ph:github-logo"
           block
-          class="cursor-pointer">
+          class="cursor-pointer"
+          @click="loginGithub">
           GitHub
         </UButton>
       </div>
@@ -164,7 +164,7 @@ const loginPassword = async (payload: FormSubmitEvent<Schema>) => {
         </template>
       </UAuthForm>
     </AppDialog>
-  </UPageSection>
+  </UPageBody>
 </template>
 
 <style scoped></style>
