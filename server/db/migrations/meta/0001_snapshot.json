@@ -1,5 +1,5 @@
 {
-  "id": "37970d58-f37b-4138-8925-a01f7e6d57e3",
+  "id": "fc9c4c3e-89b3-4671-8d84-0dc237ebe04c",
   "prevId": "103dfd07-7f42-4efb-88d8-73ff92661510",
   "version": "7",
   "dialect": "postgresql",
@@ -337,6 +337,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "surname": {
+          "name": "surname",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
         "email": {
           "name": "email",
           "type": "varchar(255)",
@@ -437,7 +443,7 @@
           "name": "users_name_search_idx",
           "columns": [
             {
-              "expression": "(to_tsvector('simple', public.immutable_unaccent(regexp_replace(\"name\", '[^a-zA-Z0-9]', '', 'g'))))",
+              "expression": "(to_tsvector('simple', public.immutable_unaccent(regexp_replace(\"name\" || ' ' || \"surname\", '[^a-zA-Z0-9]', '', 'g'))))",
               "asc": true,
               "isExpression": true,
               "nulls": "last"

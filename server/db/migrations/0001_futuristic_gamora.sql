@@ -43,6 +43,7 @@ CREATE TABLE "supervisors" (
 CREATE TABLE "users" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"name" text NOT NULL,
+	"surname" text NOT NULL,
 	"email" varchar(255) NOT NULL,
 	"email_verified" boolean DEFAULT false NOT NULL,
 	"image" text,
@@ -141,7 +142,7 @@ CREATE INDEX "accounts_userId_idx" ON "accounts" USING btree ("user_id");--> sta
 CREATE INDEX "sessions_userId_idx" ON "sessions" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "supervisors_userId_idx" ON "supervisors" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "users_role_idx" ON "users" USING btree ("role");--> statement-breakpoint
-CREATE INDEX "users_name_search_idx" ON "users" USING gin ((to_tsvector('simple', public.immutable_unaccent(regexp_replace("name", '[^a-zA-Z0-9]', '', 'g')))));--> statement-breakpoint
+CREATE INDEX "users_name_search_idx" ON "users" USING gin ((to_tsvector('simple', public.immutable_unaccent(regexp_replace("name" || ' ' || "surname", '[^a-zA-Z0-9]', '', 'g')))));--> statement-breakpoint
 CREATE INDEX "verifications_identifier_idx" ON "verifications" USING btree ("identifier");--> statement-breakpoint
 CREATE UNIQUE INDEX "club_managers_userId_clubId_unique" ON "club_managers" USING btree ("user_id","club_id");--> statement-breakpoint
 CREATE INDEX "club_managers_userId_idx" ON "club_managers" USING btree ("user_id");--> statement-breakpoint
