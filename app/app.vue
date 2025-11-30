@@ -3,9 +3,11 @@
     <NuxtRouteAnnouncer />
     <AppHeader />
     <NuxtLoadingIndicator color="var(--ui-primary)" />
-    <NuxtLayout>
-      <NuxtPage />
-    </NuxtLayout>
+    <UMain>
+      <NuxtLayout>
+        <NuxtPage />
+      </NuxtLayout>
+    </UMain>
     <AppFooter />
   </UApp>
 </template>
