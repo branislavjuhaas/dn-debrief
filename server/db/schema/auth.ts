@@ -9,21 +9,10 @@ import {
   integer,
   index,
   serial,
-  customType,
 } from "drizzle-orm/pg-core";
 import { relations, sql } from "drizzle-orm";
 import { clubMemberships, clubManagers } from "./clubs";
 import { eventOrganizers, eventRegistrations } from "./events";
-
-// TSVECTOR TYPE
-
-export const tsvector = customType<{
-  data: string;
-}>({
-  dataType() {
-    return `tsvector`;
-  },
-});
 
 // USERS
 
@@ -49,6 +38,9 @@ export const users = pgTable(
     credential: integer("credential").default(0).notNull(),
     birthdate: date("birthdate"),
     address: text("address"),
+    banned: boolean("banned").default(false).notNull(),
+    banReason: text("ban_reason"),
+    banExpires: timestamp("ban_expires"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
@@ -59,7 +51,7 @@ export const users = pgTable(
     index("users_role_idx").on(table.role),
     index("users_name_search_idx").using(
       "gin",
-      sql`(to_tsvector('simple', unaccent(regexp_replace(${table.name}, '[^a-zA-Z0-9]', '', 'g'))))`,
+      sql`(to_tsvector('simple', public.immutable_unaccent(regexp_replace(${table.name}, '[^a-zA-Z0-9]', '', 'g'))))`,
     ),
   ],
 );
@@ -117,15 +109,16 @@ export const sessions = pgTable(
     id: serial("id").primaryKey(),
     expiresAt: timestamp("expires_at").notNull(),
     token: text("token").notNull().unique(),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-    updatedAt: timestamp("updated_at")
-      .$onUpdate(() => /* @__PURE__ */ new Date())
-      .notNull(),
     ipAddress: text("ip_address"),
     userAgent: text("user_agent"),
     userId: integer("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
+    impersonatedBy: text("impersonated_by"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
   },
   (table) => [index("sessions_userId_idx").on(table.userId)],
 );

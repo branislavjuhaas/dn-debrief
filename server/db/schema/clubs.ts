@@ -38,7 +38,7 @@ export const clubs = pgTable(
   (table) => [
     index("clubs_name_search_idx").using(
       "gin",
-      sql`(to_tsvector('simple', unaccent(regexp_replace(${table.name}, '[^a-zA-Z0-9]', '', 'g'))))`,
+      sql`(to_tsvector('simple', public.immutable_unaccent(regexp_replace(${table.name}, '[^a-zA-Z0-9]', '', 'g'))))`,
     ),
   ],
 );
