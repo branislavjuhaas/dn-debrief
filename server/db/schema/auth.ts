@@ -31,6 +31,7 @@ export const users = pgTable(
   {
     id: serial("id").primaryKey(),
     name: text("name").notNull(),
+    surname: text("surname").notNull(),
     email: varchar("email", { length: 255 }).notNull().unique(),
     emailVerified: boolean("email_verified").default(false).notNull(),
     image: text("image"),
@@ -51,7 +52,7 @@ export const users = pgTable(
     index("users_role_idx").on(table.role),
     index("users_name_search_idx").using(
       "gin",
-      sql`(to_tsvector('simple', public.immutable_unaccent(regexp_replace(${table.name}, '[^a-zA-Z0-9]', '', 'g'))))`,
+      sql`(to_tsvector('simple', public.immutable_unaccent(regexp_replace(${table.name} || ' ' || ${table.surname}, '[^a-zA-Z0-9]', '', 'g'))))`,
     ),
   ],
 );

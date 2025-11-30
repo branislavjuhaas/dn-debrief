@@ -70,14 +70,31 @@ export const auth = betterAuth({
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      mapProfileToUser: (profile) => {
+        return {
+          name: profile.given_name,
+          surname: profile.family_name,
+        };
+      },
     },
     github: {
       clientId: process.env.GITHUB_CLIENT_ID as string,
       clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
+      mapProfileToUser: (profile) => {
+        return {
+          name: profile.name.split(" ").slice(0, -1).join(" "),
+          surname: profile.name.split(" ")[-1],
+        };
+      },
     },
   },
   user: {
     additionalFields: {
+      surname: {
+        type: "string",
+        required: true,
+        input: true,
+      },
       credential: {
         type: "number",
         required: true,
