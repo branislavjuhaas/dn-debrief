@@ -13,13 +13,13 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    const result = await auth.api.verifyEmail({
+    await auth.api.verifyEmail({
       query: {
         token: data.token,
       },
     });
     await sendRedirect(event, "/auth/register?verify=true", 302);
-  } catch (error) {
+  } catch {
     return sendRedirect(event, "/auth/register?verify=false", 302);
   }
 

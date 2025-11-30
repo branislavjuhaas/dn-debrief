@@ -1,6 +1,4 @@
-<script setup lang="ts">
-import { string } from "better-auth";
-</script>
+<script setup lang="ts"></script>
 
 <template>
   <UCard :ui="{ body: 'p-0 sm:p-0 grid grid-cols-1 lg:grid-cols-2' }">

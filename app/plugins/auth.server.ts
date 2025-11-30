@@ -1,6 +1,6 @@
 import { auth } from "~~/server/auth/auth";
 
-export default defineNuxtPlugin(async (nuxtApp) => {
+export default defineNuxtPlugin(async (_nuxtApp) => {
   const userStore = useUserStore();
   const headers = useRequestHeaders(["cookie"]);
 

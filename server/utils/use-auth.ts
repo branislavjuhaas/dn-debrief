@@ -1,6 +1,6 @@
-import { User, Role } from "#shared/types/user";
+import type { User, Role } from "#shared/types/user";
 import { auth } from "~~/server/auth/auth";
-import { H3Event } from "h3";
+import type { H3Event } from "h3";
 
 export const useAuth = async (event: H3Event, roles: Role[] | null = null) => {
   const session = await auth.api.getSession({

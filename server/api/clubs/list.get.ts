@@ -51,7 +51,7 @@ defineRouteMeta({
  * Returns:
  *  - An object: { success: boolean, statusCode: number, data: Array<{id:number, name:string}> }
  */
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (_event) => {
   const data = await db
     .select({ id: clubs.id, name: clubs.name })
     .from(clubs)

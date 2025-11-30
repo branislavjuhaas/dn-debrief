@@ -16,28 +16,6 @@ import {
   user,
 } from "~~/server/auth/permissions";
 
-/**
- * Generate a normalized search string from a user's name.
- *
- * - Converts to lowercase.
- * - Removes diacritics/accents.
- * - Removes any non-alphanumeric characters.
- * - Returns an empty string for `undefined`.
- * - Truncates to a maximum of 36 characters.
- *
- * @param name - The name to normalize.
- * @returns A search-friendly string (max 36 chars).
- */
-const generateSearchParam = (name: string | undefined): string =>
-  name
-    ? name
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "") // Remove accents
-        .replace(/[^a-z0-9]/g, "") // Remove non-alphanumeric
-        .slice(0, 36)
-    : "";
-
 export const auth = betterAuth({
   experimental: { joins: true },
   database: drizzleAdapter(db, {
@@ -144,7 +122,7 @@ export const auth = betterAuth({
   },
   emailVerification: {
     sendOnSignUp: true,
-    sendVerificationEmail: async ({ user, token }, request) => {
+    sendVerificationEmail: async ({ user, token }, _request) => {
       await sendEmail({
         to: [user.email],
         subject: "Potvrďte svoju emailovú adresu",
