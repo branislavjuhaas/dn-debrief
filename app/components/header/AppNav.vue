@@ -59,9 +59,10 @@ const navItems = ref([
       variant="outline"
       :avatar="{
         src: `${userStore.user?.image}`,
-        alt: `${userStore.user?.name}`,
+        alt: `${userStore.fullName}`,
+        chip: userStore.impersonation ? { color: 'info', inset: true } : false,
       }">
-      {{ userStore.user?.name }}
+      {{ userStore.fullName }}
     </UButton>
     <UDropdownMenu
       :items="navItems"
