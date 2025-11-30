@@ -10,7 +10,7 @@ import {
   index,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import { league, region } from "./clubs";
 import { users } from "./auth";
 
@@ -76,7 +76,6 @@ export const events = pgTable(
     name: text("name").notNull(),
     league: league("league").default("senior").notNull(),
     region: region("region").default("central"),
-    search: varchar("search", { length: 32 }).notNull(),
     draft: boolean("draft").default(false).notNull(),
     beginning: timestamp("beginning").notNull(),
     end: timestamp("end").notNull(),
@@ -89,7 +88,11 @@ export const events = pgTable(
       .notNull(),
   },
   (table) => [
-    index("events_search_idx").on(table.search),
+    index("events_name_search_idx").using(
+      "gin",
+      sql`(to_tsvector('simple', unaccent(regexp_replace(${table.name}, '[^a-zA-Z0-9]', '', 'g'))))`,
+    ),
+    index("events_league_idx").on(table.league),
     index("events_region_idx").on(table.region),
     index("events_season_idx").on(table.season),
     index("events_end_draft_idx").on(table.end, table.draft),

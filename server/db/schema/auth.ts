@@ -9,10 +9,21 @@ import {
   integer,
   index,
   serial,
+  customType,
 } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import { clubMemberships, clubManagers } from "./clubs";
 import { eventOrganizers, eventRegistrations } from "./events";
+
+// TSVECTOR TYPE
+
+export const tsvector = customType<{
+  data: string;
+}>({
+  dataType() {
+    return `tsvector`;
+  },
+});
 
 // USERS
 
@@ -34,7 +45,6 @@ export const users = pgTable(
     email: varchar("email", { length: 255 }).notNull().unique(),
     emailVerified: boolean("email_verified").default(false).notNull(),
     image: text("image"),
-    search: varchar("search", { length: 32 }).notNull(),
     role: userRoleEnum("role").default("user").notNull(),
     credential: integer("credential").default(0).notNull(),
     birthdate: date("birthdate"),
@@ -46,8 +56,11 @@ export const users = pgTable(
       .notNull(),
   },
   (table) => [
-    index("users_search_idx").on(table.search),
     index("users_role_idx").on(table.role),
+    index("users_name_search_idx").using(
+      "gin",
+      sql`(to_tsvector('simple', unaccent(regexp_replace(${table.name}, '[^a-zA-Z0-9]', '', 'g'))))`,
+    ),
   ],
 );
 
