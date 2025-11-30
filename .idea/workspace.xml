@@ -4,10 +4,20 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d4cc1df9-ad00-4ded-af2d-7ea9f25f0f27" name="Changes" comment="feat: add login dialog with Google and GitHub authentication options">
+    <list default="true" id="d4cc1df9-ad00-4ded-af2d-7ea9f25f0f27" name="Changes" comment="chore: Remove storage option from nuxt.config.ts">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/app.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/app.config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/app.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/app.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/layouts/default.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/layouts/default.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/pages/auth/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/pages/auth/index.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/pages/auth/register.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/pages/auth/register.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/pages/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/pages/index.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/db/migrations/0000_greedy_domino.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/db/migrations/meta/0000_snapshot.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/db/migrations/meta/_journal.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/db/schema/auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/db/schema/auth.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/db/schema/clubs.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/db/schema/clubs.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/db/schema/events.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/db/schema/events.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,60 +33,82 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="sunlake" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "branislavjuhaas"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;history&quot;: [
+    {
+      &quot;state&quot;: &quot;OPEN&quot;
+    }
+  ],
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/branislavjuhaas/dn-cascade.git",
-    "accountId": "55a856b0-101e-44db-962d-38be55e40fbf"
+}</component>
+  <component name="GitHubPullRequestState">{
+  &quot;prStates&quot;: [
+    {
+      &quot;id&quot;: {
+        &quot;id&quot;: &quot;PR_kwDOL5N2X8615aSa&quot;,
+        &quot;number&quot;: 99
+      },
+      &quot;lastSeen&quot;: 1764260104479
+    }
+  ]
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/branislavjuhaas/dn-cascade.git&quot;,
+    &quot;accountId&quot;: &quot;55a856b0-101e-44db-962d-38be55e40fbf&quot;
   }
-}]]></component>
+}</component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "customColor": "",
-  "associatedIndex": 1
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 1
+}</component>
   <component name="ProjectId" id="353FSyKOGGO0itZ46yfpR9sz9yU" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "sunlake",
-    "last_opened_file_path": "C:/Users/juhas/source/repos/dn-cascade",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "pnpm",
-    "npm.dev.executor": "Run",
-    "prettierjs.PrettierConfiguration.Package": "C:\\Users\\juhas\\source\\repos\\dn-cascade\\node_modules\\prettier",
-    "settings.editor.selected.configurable": "settings.javascript.prettier",
-    "ts.external.directory.path": "C:\\Users\\juhas\\source\\repos\\dn-cascade\\node_modules\\typescript\\lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;sunlake&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/juhas/source/repos/dn-cascade&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;pnpm&quot;,
+    &quot;npm.db:migrate.executor&quot;: &quot;Run&quot;,
+    &quot;npm.dev.executor&quot;: &quot;Run&quot;,
+    &quot;prettierjs.PrettierConfiguration.Package&quot;: &quot;C:\\Users\\juhas\\source\\repos\\dn-cascade\\node_modules\\prettier&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;settings.javascript.prettier&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\juhas\\source\\repos\\dn-cascade\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "mysql"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;postgresql&quot;,
+      &quot;mysql&quot;
     ],
-    "vue.recent.templates": [
-      "Vue Composition API Component"
+    &quot;vue.recent.templates&quot;: [
+      &quot;Vue Composition API Component&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\juhas\source\repos\dn-cascade" />
@@ -87,7 +119,17 @@
       <recent name="C:\Users\juhas\source\repos\dn-cascade\server\auth" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="npm.dev">
+    <configuration name="db:migrate" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="db:migrate" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
     <configuration name="dev" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
@@ -101,13 +143,14 @@
     <recent_temporary>
       <list>
         <item itemvalue="npm.dev" />
+        <item itemvalue="npm.db:migrate" />
       </list>
     </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-3aa1da707db6-JavaScript-WS-252.26830.93" />
+        <option value="bundled-js-predefined-d6986cc7102b-3aa1da707db6-JavaScript-WS-252.27397.92" />
       </set>
     </attachedChunks>
   </component>
@@ -119,6 +162,11 @@
       <option name="presentableId" value="Default" />
       <updated>1762330855208</updated>
       <workItem from="1762330856488" duration="28163000" />
+      <workItem from="1764260045763" duration="5131000" />
+      <workItem from="1764315240193" duration="1937000" />
+      <workItem from="1764336778959" duration="575000" />
+      <workItem from="1764337646317" duration="19000" />
+      <workItem from="1764496845092" duration="2218000" />
     </task>
     <task id="LOCAL-00001" summary="feat: remove all monorepo project files">
       <option name="closed" value="true" />
@@ -320,7 +368,15 @@
       <option name="project" value="LOCAL" />
       <updated>1762462125354</updated>
     </task>
-    <option name="localTasksCounter" value="26" />
+    <task id="LOCAL-00026" summary="chore: Remove storage option from nuxt.config.ts">
+      <option name="closed" value="true" />
+      <created>1764262061037</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1764262061038</updated>
+    </task>
+    <option name="localTasksCounter" value="27" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -362,6 +418,15 @@
     <MESSAGE value="feat: add sunlake graphics" />
     <MESSAGE value="feat: update workspace configuration for improved project structure and task summaries" />
     <MESSAGE value="feat: add login dialog with Google and GitHub authentication options" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: add login dialog with Google and GitHub authentication options" />
+    <MESSAGE value="chore: Remove storage option from nuxt.config.ts" />
+    <option name="LAST_COMMIT_MESSAGE" value="chore: Remove storage option from nuxt.config.ts" />
+  </component>
+  <component name="github-copilot-workspace">
+    <instructionFileLocations>
+      <option value=".github/instructions" />
+    </instructionFileLocations>
+    <promptFileLocations>
+      <option value=".github/prompts" />
+    </promptFileLocations>
   </component>
 </project>
