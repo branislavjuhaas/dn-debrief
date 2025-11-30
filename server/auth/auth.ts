@@ -1,11 +1,20 @@
 import { betterAuth } from "better-auth";
-import { createAuthMiddleware } from "better-auth/api";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { openAPI } from "better-auth/plugins";
+import { openAPI, admin as adminPlugin } from "better-auth/plugins";
 import { db } from "~~/server/db/db";
 import * as schema from "~~/server/db/schema/auth";
 import { sendEmail, generateEmailTemplate } from "~~/server/utils/send-email";
 import { supervisors } from "~~/server/db/schema/auth";
+import {
+  ac,
+  admin,
+  chief_adjudicator,
+  developer,
+  junior_organizer,
+  motion_committee_member,
+  organizer,
+  user,
+} from "~~/server/auth/permissions";
 
 /**
  * Generate a normalized search string from a user's name.
@@ -40,6 +49,18 @@ export const auth = betterAuth({
     openAPI({
       path: "/docs",
     }),
+    adminPlugin({
+      ac,
+      roles: {
+        user,
+        organizer,
+        junior_organizer,
+        chief_adjudicator,
+        motion_committee_member,
+        admin,
+        developer,
+      },
+    }),
   ],
   emailAndPassword: {
     enabled: true,
@@ -57,18 +78,6 @@ export const auth = betterAuth({
   },
   user: {
     additionalFields: {
-      search: {
-        type: "string",
-        required: true,
-        defaultValue: "",
-        input: false, // don't allow user to set search
-      },
-      role: {
-        type: "string",
-        required: true,
-        defaultValue: "user",
-        input: false, // don't allow user to set role
-      },
       credential: {
         type: "number",
         required: true,
@@ -90,14 +99,6 @@ export const auth = betterAuth({
   databaseHooks: {
     user: {
       create: {
-        before: async (user, _ctx) => {
-          return {
-            data: {
-              ...user,
-              search: generateSearchParam(user.name),
-            },
-          };
-        },
         after: async (user, ctx) => {
           const userId = user.id;
           const body = ctx?.body;
@@ -110,18 +111,10 @@ export const auth = betterAuth({
                 ...supervisor,
                 userId,
               });
-            } catch (error) {}
+            } catch (error) {
+              console.error(error);
+            }
           }
-        },
-      },
-      update: {
-        before: async (data, _ctx) => {
-          return {
-            data: {
-              ...data,
-              search: generateSearchParam(data.name),
-            },
-          };
         },
       },
     },
