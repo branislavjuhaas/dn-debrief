@@ -1,4 +1,4 @@
-import { BASE_ERROR_CODES } from "better-auth";
+import type { BASE_ERROR_CODES } from "better-auth";
 
 const MESSAGES: Record<keyof typeof BASE_ERROR_CODES, string> = {
   USER_NOT_FOUND: "Používateľ nebol nájdený.",
