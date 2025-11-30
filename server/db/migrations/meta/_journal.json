@@ -8,6 +8,13 @@
       "when": 1764318147058,
       "tag": "0000_install-extensions",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1764501589549,
+      "tag": "0001_ambitious_sleeper",
+      "breakpoints": true
     }
   ]
 }
