@@ -10,6 +10,7 @@ import {
   index,
   serial,
 } from "drizzle-orm/pg-core";
+import type { SQL } from "drizzle-orm";
 import { relations, sql } from "drizzle-orm";
 import { clubMemberships, clubManagers } from "./clubs";
 import { eventOrganizers, eventRegistrations } from "./events";
@@ -32,6 +33,12 @@ export const users = pgTable(
     id: serial("id").primaryKey(),
     name: text("name").notNull(),
     surname: text("surname").notNull(),
+    search: text("search")
+      .notNull()
+      .generatedAlwaysAs(
+        (): SQL =>
+          sql`(lower(regexp_replace(public.immutable_unaccent(${users.name} || ${users.surname}), '[^a-zA-Z0-9]', '', 'g')))`,
+      ),
     email: varchar("email", { length: 255 }).notNull().unique(),
     emailVerified: boolean("email_verified").default(false).notNull(),
     image: text("image"),
@@ -50,10 +57,7 @@ export const users = pgTable(
   },
   (table) => [
     index("users_role_idx").on(table.role),
-    index("users_name_search_idx").using(
-      "gin",
-      sql`(to_tsvector('simple', public.immutable_unaccent(regexp_replace(${table.name} || ' ' || ${table.surname}, '[^a-zA-Z0-9]', '', 'g'))))`,
-    ),
+    index("users_search_idx").using("gin", sql`${table.search} gin_trgm_ops`),
   ],
 );
 
