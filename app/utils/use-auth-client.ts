@@ -11,6 +11,21 @@ import {
   user,
 } from "~~/server/auth/permissions";
 
+/**
+ * Create and return an authentication client pre-configured for the app.
+ *
+ * This factory wires up:
+ * - `adminClient` plugin with the application's access control (`ac`) and role set.
+ * - Additional user profile fields that are stored with the auth user object.
+ *
+ * Additional fields:
+ * - `surname` — required string, user-provided.
+ * - `credential` — numeric, required, default 0, not editable by the user.
+ * - `birthdate` — optional date, user-provided.
+ * - `address` — optional string, user-provided.
+ *
+ * @returns Configured auth client instance.
+ */
 export default () =>
   createAuthClient({
     plugins: [

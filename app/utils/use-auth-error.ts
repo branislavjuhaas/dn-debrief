@@ -31,5 +31,13 @@ const MESSAGES: Record<keyof typeof BASE_ERROR_CODES, string> = {
     "Používateľ už má heslo. Zadajte ho pre vymazanie účtu.",
 };
 
+/**
+ * Map an authentication error code to a localized, human-readable message.
+ *
+ * @param code - The error code returned by the authentication library, or
+ *               `undefined` when no specific code is available.
+ * @returns A localized message corresponding to the error code, or a generic
+ *          fallback message when the code is unknown.
+ */
 export default (code: string | undefined): string =>
   MESSAGES[code as keyof typeof BASE_ERROR_CODES] ?? "Nastala neznáma chyba.";
