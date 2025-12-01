@@ -7,6 +7,12 @@ const logout = async () => {
   userStore.clear();
 };
 
+const open = defineModel("open", {
+  type: Boolean,
+  required: false,
+  default: false,
+});
+
 const navItems = ref([
   [
     {
@@ -51,7 +57,8 @@ const navItems = ref([
     :disabled="!userStore.isAuthenticated"
     class="lg:hidden"
     collapsed
-    icon="ph:magnifying-glass" />
+    icon="ph:magnifying-glass"
+    @click="open = true" />
   <UFieldGroup v-if="userStore.isAuthenticated">
     <UButton
       to="/profile"

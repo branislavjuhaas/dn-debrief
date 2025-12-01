@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import AppLogo from "~/components/header/AppLogo.vue";
 import AppNav from "~/components/header/AppNav.vue";
+import AppSearchClient from "~/components/header/AppSearch.client.vue";
 
 const userStore = useUserStore();
+const searchOpen = ref(false);
 </script>
 
 <template>
@@ -13,17 +15,20 @@ const userStore = useUserStore();
       </NuxtLink>
     </template>
     <UDashboardSearchButton
+      class="w-96"
       :disabled="!userStore.isAuthenticated"
       icon="ph:magnifying-glass"
-      class="w-96">
+      @click="searchOpen = true">
       {{
         userStore.isAuthenticated
           ? "Hľadať ľudí, podujatia a kluby..."
           : "Pre vyhľadávanie sa prihláste"
       }}
     </UDashboardSearchButton>
+
+    <AppSearchClient v-model:open="searchOpen" />
     <template #right>
-      <AppNav />
+      <AppNav v-model:open="searchOpen" />
     </template>
   </UHeader>
 </template>
