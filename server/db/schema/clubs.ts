@@ -10,7 +10,7 @@ import {
   index,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
+import { relations, type SQL, sql } from "drizzle-orm";
 import { users } from "./auth";
 
 // ENUMS
@@ -25,8 +25,13 @@ export const clubs = pgTable(
   {
     id: serial("id").primaryKey(),
     name: text("name").notNull(),
+    search: text("search")
+      .notNull()
+      .generatedAlwaysAs(
+        (): SQL =>
+          sql`(lower(regexp_replace(public.immutable_unaccent(${clubs.name}), '[^a-zA-Z0-9]', '', 'g')))`,
+      ),
     description: text("description"),
-    search: varchar("search", { length: 32 }).notNull(),
     isActive: boolean("is_active").default(true).notNull(),
     league: league("league").default("senior").notNull(),
     region: region("region").default("central"),
@@ -36,7 +41,10 @@ export const clubs = pgTable(
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
   },
-  (table) => [index("clubs_search_idx").on(table.search)],
+  (table) => [
+    index("clubs_isActive_idx").on(table.isActive),
+    index("clubs_search_idx").using("gin", sql`${table.search} gin_trgm_ops`),
+  ],
 );
 
 export const clubsRelations = relations(clubs, ({ many }) => ({

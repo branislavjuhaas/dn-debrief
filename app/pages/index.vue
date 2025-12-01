@@ -7,9 +7,9 @@ const userStore = useUserStore();
 </script>
 
 <template>
-  <UPageSection>
+  <UPageBody>
     <ProseH1>{{ useGreeting(userStore.user) }}</ProseH1>
-  </UPageSection>
+  </UPageBody>
 </template>
 
 <style scoped></style>

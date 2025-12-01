@@ -10,7 +10,8 @@ import {
   index,
   serial,
 } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
+import type { SQL } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import { clubMemberships, clubManagers } from "./clubs";
 import { eventOrganizers, eventRegistrations } from "./events";
 
@@ -31,14 +32,23 @@ export const users = pgTable(
   {
     id: serial("id").primaryKey(),
     name: text("name").notNull(),
+    surname: text("surname").notNull(),
+    search: text("search")
+      .notNull()
+      .generatedAlwaysAs(
+        (): SQL =>
+          sql`(lower(regexp_replace(public.immutable_unaccent(${users.name} || ${users.surname}), '[^a-zA-Z0-9]', '', 'g')))`,
+      ),
     email: varchar("email", { length: 255 }).notNull().unique(),
     emailVerified: boolean("email_verified").default(false).notNull(),
     image: text("image"),
-    search: varchar("search", { length: 32 }).notNull(),
     role: userRoleEnum("role").default("user").notNull(),
     credential: integer("credential").default(0).notNull(),
     birthdate: date("birthdate"),
     address: text("address"),
+    banned: boolean("banned").default(false).notNull(),
+    banReason: text("ban_reason"),
+    banExpires: timestamp("ban_expires"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
@@ -46,8 +56,8 @@ export const users = pgTable(
       .notNull(),
   },
   (table) => [
-    index("users_search_idx").on(table.search),
     index("users_role_idx").on(table.role),
+    index("users_search_idx").using("gin", sql`${table.search} gin_trgm_ops`),
   ],
 );
 
@@ -104,15 +114,16 @@ export const sessions = pgTable(
     id: serial("id").primaryKey(),
     expiresAt: timestamp("expires_at").notNull(),
     token: text("token").notNull().unique(),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-    updatedAt: timestamp("updated_at")
-      .$onUpdate(() => /* @__PURE__ */ new Date())
-      .notNull(),
     ipAddress: text("ip_address"),
     userAgent: text("user_agent"),
     userId: integer("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
+    impersonatedBy: text("impersonated_by"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
   },
   (table) => [index("sessions_userId_idx").on(table.userId)],
 );

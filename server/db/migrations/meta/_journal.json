@@ -5,8 +5,15 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1764142516356,
-      "tag": "0000_greedy_domino",
+      "when": 1764318147058,
+      "tag": "0000_install-extensions",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1764589252914,
+      "tag": "0001_reflective_vanisher",
       "breakpoints": true
     }
   ]

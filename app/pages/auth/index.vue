@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { createAuthClient } from "better-auth/vue";
 import AppDialog from "~/components/dialog/AppDialog.vue";
 import type { FormSubmitEvent, AuthFormField } from "@nuxt/ui";
 import * as z from "zod";
@@ -15,7 +14,7 @@ useSeoMeta({
   title: "Prihlásenie",
 });
 
-const authClient = createAuthClient();
+const authClient = useAuthClient();
 const userStore = useUserStore();
 
 /** Field configuration consumed by `UAuthForm`. */
@@ -119,7 +118,7 @@ const loginPassword = async (payload: FormSubmitEvent<Schema>) => {
 </script>
 
 <template>
-  <UPageSection>
+  <UPageBody>
     <ProseH1>Prihlásenie na platformu DN Cascade</ProseH1>
     <AppDialog>
       <DialogHeader title="Vitajte späť!">
@@ -130,21 +129,21 @@ const loginPassword = async (payload: FormSubmitEvent<Schema>) => {
       </DialogHeader>
       <div class="flex flex-row gap-3 w-full">
         <UButton
-          @click="loginGoogle"
           variant="subtle"
-          color="neutral"
-          icon="ph:google-logo"
+          class="cursor-pointer"
           block
-          class="cursor-pointer">
+          icon="ph:google-logo"
+          color="neutral"
+          @click="loginGoogle">
           Google
         </UButton>
         <UButton
-          @click="loginGithub"
           variant="subtle"
           color="neutral"
           icon="ph:github-logo"
           block
-          class="cursor-pointer">
+          class="cursor-pointer"
+          @click="loginGithub">
           GitHub
         </UButton>
       </div>
@@ -164,7 +163,7 @@ const loginPassword = async (payload: FormSubmitEvent<Schema>) => {
         </template>
       </UAuthForm>
     </AppDialog>
-  </UPageSection>
+  </UPageBody>
 </template>
 
 <style scoped></style>

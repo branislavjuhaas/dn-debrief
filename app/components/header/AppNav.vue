@@ -1,13 +1,17 @@
 <script setup lang="ts">
-import { createAuthClient } from "better-auth/vue";
-
-const authClient = createAuthClient();
+const authClient = useAuthClient();
 const userStore = useUserStore();
 
 const logout = async () => {
   authClient.signOut();
   userStore.clear();
 };
+
+const open = defineModel("open", {
+  type: Boolean,
+  required: false,
+  default: false,
+});
 
 const navItems = ref([
   [
@@ -53,7 +57,8 @@ const navItems = ref([
     :disabled="!userStore.isAuthenticated"
     class="lg:hidden"
     collapsed
-    icon="ph:magnifying-glass" />
+    icon="ph:magnifying-glass"
+    @click="open = true" />
   <UFieldGroup v-if="userStore.isAuthenticated">
     <UButton
       to="/profile"
@@ -61,9 +66,10 @@ const navItems = ref([
       variant="outline"
       :avatar="{
         src: `${userStore.user?.image}`,
-        alt: `${userStore.user?.name}`,
+        alt: `${userStore.fullName}`,
+        chip: userStore.impersonation ? { color: 'info', inset: true } : false,
       }">
-      {{ userStore.user?.name }}
+      {{ userStore.fullName }}
     </UButton>
     <UDropdownMenu
       :items="navItems"

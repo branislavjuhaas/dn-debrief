@@ -10,7 +10,7 @@ import {
   index,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
+import { relations, type SQL, sql } from "drizzle-orm";
 import { league, region } from "./clubs";
 import { users } from "./auth";
 
@@ -62,7 +62,13 @@ export type RegistrationDetails = {
   defaultDeadline: Deadline;
   deadlines: Deadline[];
   prices: Price[];
-  collectedDetails: ("name" | "email" | "birthdate" | "address" | "phone")[];
+  collectedDetails: {
+    name: boolean;
+    email: boolean;
+    birthdate: boolean;
+    address: boolean;
+    phone: boolean;
+  };
   questions: Question[];
 };
 
@@ -74,9 +80,14 @@ export const events = pgTable(
     id: serial("id").primaryKey(),
     season: varchar("season", { length: 9 }).notNull(),
     name: text("name").notNull(),
+    search: text("search")
+      .notNull()
+      .generatedAlwaysAs(
+        (): SQL =>
+          sql`(lower(regexp_replace(public.immutable_unaccent(${events.name} || ${events.season}), '[^a-zA-Z0-9]', '', 'g')))`,
+      ),
     league: league("league").default("senior").notNull(),
     region: region("region").default("central"),
-    search: varchar("search", { length: 32 }).notNull(),
     draft: boolean("draft").default(false).notNull(),
     beginning: timestamp("beginning").notNull(),
     end: timestamp("end").notNull(),
@@ -89,10 +100,11 @@ export const events = pgTable(
       .notNull(),
   },
   (table) => [
-    index("events_search_idx").on(table.search),
+    index("events_league_idx").on(table.league),
     index("events_region_idx").on(table.region),
     index("events_season_idx").on(table.season),
     index("events_end_draft_idx").on(table.end, table.draft),
+    index("events_search_idx").using("gin", sql`${table.search} gin_trgm_ops`),
   ],
 );
 

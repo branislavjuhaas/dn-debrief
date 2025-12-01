@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { any } from "better-auth";
-
 const props = defineProps<{
   icon?: string;
   title: string;

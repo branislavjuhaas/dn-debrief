@@ -15,7 +15,7 @@ export default (
     return Number.NaN;
   }
 
-  let age = now.getFullYear() - birth.getFullYear();
+  const age = now.getFullYear() - birth.getFullYear();
   const beforeBirthday =
     now.getMonth() < birth.getMonth() ||
     (now.getMonth() === birth.getMonth() && now.getDate() < birth.getDate());

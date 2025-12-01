@@ -3,7 +3,6 @@ import AppDialog from "~/components/dialog/AppDialog.vue";
 import { DateFormatter, getLocalTimeZone } from "@internationalized/date";
 import type { StepperItem } from "@nuxt/ui";
 import * as z from "zod";
-import { createAuthClient } from "better-auth/vue";
 
 /** Gate the route to unauthenticated visitors. */
 definePageMeta({
@@ -28,7 +27,7 @@ const df = new DateFormatter("sk-SK", {
 });
 
 const route = useRoute();
-const authClient = createAuthClient();
+const authClient = useAuthClient();
 const userStore = useUserStore();
 
 /** Three-step wizard definition rendered by the stepper */
@@ -118,8 +117,8 @@ const accountState = reactive<Partial<AccountSchema>>({
 
 /** Holds personal info values for the collection step */
 const userState = reactive<Partial<UserSchema>>({
-  name: userStore?.user?.name.split(" ")[0] || undefined,
-  surname: userStore?.user?.name.split(" ")[1] || undefined,
+  name: userStore?.user?.name,
+  surname: userStore?.user?.surname,
   birthdate: undefined,
   address: undefined,
 });
@@ -154,7 +153,8 @@ const submitRegistration = async () => {
   if (route.query.collection === "true") {
     try {
       await authClient.updateUser({
-        name: `${userState.name} ${userState.surname}`,
+        name: userState.name,
+        surname: userState.surname,
         birthdate: userState.birthdate.toString(),
         address: userState.address,
       } as any);
@@ -162,8 +162,8 @@ const submitRegistration = async () => {
       await createSupervisors(supervisorState);
 
       currentStep.value = "complete";
-    } catch (err: any) {
-      regError.value = useAuthError(err.code);
+    } catch (err) {
+      regError.value = useAuthError((err as any).code);
     }
     return;
   }
@@ -182,7 +182,8 @@ const submitRegistration = async () => {
   const { data, error } = await authClient.signUp.email({
     email: accountState.email,
     password: accountState.password,
-    name: `${userState.name} ${userState.surname}`,
+    name: userState.name,
+    surname: userState.surname,
     birthdate: userState.birthdate.toString(),
     address: userState.address,
     supervisor:
@@ -196,11 +197,11 @@ const submitRegistration = async () => {
 
   if (error || !data) {
     console.log(error, data);
-    regError.value = useAuthError((error as any).code || "UNKNOWN_ERROR");
+    regError.value = useAuthError(error.code || "UNKNOWN_ERROR");
     return;
   }
 
-  if ((data as any).emailVerified) {
+  if (data.emailVerified) {
     await userStore.set();
     currentStep.value = "complete";
 
@@ -254,7 +255,7 @@ const currentStepperStep = computed(() => {
 </script>
 
 <template>
-  <UPageSection>
+  <UPageBody>
     <ProseH1>Registrácia na platformu DN Cascade</ProseH1>
     <AppDialog>
       <!-- EMAIL VERIFICATION NOTICE -->
@@ -431,12 +432,12 @@ const currentStepperStep = computed(() => {
 
       <USeparator />
       <UStepper
+        v-model="currentStepperStep"
         :items="items"
         class="w-full"
-        disabled
-        v-model="currentStepperStep" />
+        disabled />
     </AppDialog>
-  </UPageSection>
+  </UPageBody>
 </template>
 
 <style scoped></style>

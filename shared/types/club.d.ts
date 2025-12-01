@@ -1,5 +1,5 @@
 import type { InferSelectModel } from "drizzle-orm";
-import { clubs, clubMemberships } from "~~/server/db/schema/clubs";
+import type { clubs, clubMemberships } from "~~/server/db/schema/clubs";
 
 export type Club = InferSelectModel<typeof clubs>;
 

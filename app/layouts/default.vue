@@ -2,9 +2,9 @@
 
 <template>
   <UPage>
-    <UMain>
+    <UContainer>
       <slot />
-    </UMain>
+    </UContainer>
   </UPage>
 </template>
 
