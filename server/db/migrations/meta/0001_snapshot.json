@@ -1,5 +1,5 @@
 {
-  "id": "fc9c4c3e-89b3-4671-8d84-0dc237ebe04c",
+  "id": "61d17daa-132d-48ce-b517-10cc880a790e",
   "prevId": "103dfd07-7f42-4efb-88d8-73ff92661510",
   "version": "7",
   "dialect": "postgresql",
@@ -343,6 +343,16 @@
           "primaryKey": false,
           "notNull": true
         },
+        "search": {
+          "name": "search",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "generated": {
+            "as": "(lower(regexp_replace(public.immutable_unaccent(\"users\".\"name\" || \"users\".\"surname\"), '[^a-zA-Z0-9]', '', 'g')))",
+            "type": "stored"
+          }
+        },
         "email": {
           "name": "email",
           "type": "varchar(255)",
@@ -439,11 +449,11 @@
           "method": "btree",
           "with": {}
         },
-        "users_name_search_idx": {
-          "name": "users_name_search_idx",
+        "users_search_idx": {
+          "name": "users_search_idx",
           "columns": [
             {
-              "expression": "(to_tsvector('simple', public.immutable_unaccent(regexp_replace(\"name\" || ' ' || \"surname\", '[^a-zA-Z0-9]', '', 'g'))))",
+              "expression": "\"search\" gin_trgm_ops",
               "asc": true,
               "isExpression": true,
               "nulls": "last"
@@ -847,6 +857,16 @@
           "primaryKey": false,
           "notNull": true
         },
+        "search": {
+          "name": "search",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "generated": {
+            "as": "(lower(regexp_replace(public.immutable_unaccent(\"clubs\".\"name\"), '[^a-zA-Z0-9]', '', 'g')))",
+            "type": "stored"
+          }
+        },
         "description": {
           "name": "description",
           "type": "text",
@@ -892,11 +912,26 @@
         }
       },
       "indexes": {
-        "clubs_name_search_idx": {
-          "name": "clubs_name_search_idx",
+        "clubs_isActive_idx": {
+          "name": "clubs_isActive_idx",
           "columns": [
             {
-              "expression": "(to_tsvector('simple', public.immutable_unaccent(regexp_replace(\"name\", '[^a-zA-Z0-9]', '', 'g'))))",
+              "expression": "is_active",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "clubs_search_idx": {
+          "name": "clubs_search_idx",
+          "columns": [
+            {
+              "expression": "\"search\" gin_trgm_ops",
               "asc": true,
               "isExpression": true,
               "nulls": "last"
@@ -1177,6 +1212,16 @@
           "primaryKey": false,
           "notNull": true
         },
+        "search": {
+          "name": "search",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "generated": {
+            "as": "(lower(regexp_replace(public.immutable_unaccent(\"events\".\"name\" || \"events\".\"season\"), '[^a-zA-Z0-9]', '', 'g')))",
+            "type": "stored"
+          }
+        },
         "league": {
           "name": "league",
           "type": "league",
@@ -1240,21 +1285,6 @@
         }
       },
       "indexes": {
-        "events_name_search_idx": {
-          "name": "events_name_search_idx",
-          "columns": [
-            {
-              "expression": "(to_tsvector('simple', public.immutable_unaccent(regexp_replace(\"name\", '[^a-zA-Z0-9]', '', 'g'))))",
-              "asc": true,
-              "isExpression": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "gin",
-          "with": {}
-        },
         "events_league_idx": {
           "name": "events_league_idx",
           "columns": [
@@ -1319,6 +1349,21 @@
           "isUnique": false,
           "concurrently": false,
           "method": "btree",
+          "with": {}
+        },
+        "events_search_idx": {
+          "name": "events_search_idx",
+          "columns": [
+            {
+              "expression": "\"search\" gin_trgm_ops",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "gin",
           "with": {}
         }
       },
