@@ -12,5 +12,5 @@ export default defineNuxtPlugin(async (_nuxtApp) => {
     return;
   }
 
-  await userStore.set(headers, session.session.impersonatedBy !== null);
+  await userStore.set(session.session.impersonatedBy !== null, headers);
 });

@@ -30,7 +30,7 @@ export const useUserStore = defineStore("user", {
       ),
   },
   actions: {
-    async set(headers?: HeadersInit, impersonation?: boolean) {
+    async set(impersonation?: boolean, headers?: HeadersInit) {
       const { data } = await $fetch<ApiResponse<User>>("/api/users/me", {
         headers,
         credentials: "include",
@@ -41,6 +41,7 @@ export const useUserStore = defineStore("user", {
     clear() {
       console.log("Clearing user");
       this.user = null;
+      this.impersonation = false;
     },
   },
 });
