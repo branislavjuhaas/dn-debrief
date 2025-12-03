@@ -5,7 +5,7 @@ import { eq } from "drizzle-orm";
 defineRouteMeta({
   openAPI: {
     description:
-      "Get the authenticated user's profile including supervisors and club memberships.",
+      "Get the authenticated user's profile including supervisors, club memberships and linked accounts.",
     tags: ["Users"],
     responses: {
       200: {
@@ -18,10 +18,9 @@ defineRouteMeta({
                 success: { type: "boolean" },
                 statusCode: { type: "number" },
                 data: {
-                  type: "object",
+                  type: ["object", "null"],
                   properties: {
                     id: { type: "number" },
-                    // include other user fields as needed
                     name: { type: "string" },
                     email: { type: "string", format: "email" },
                     supervisors: {
@@ -29,13 +28,10 @@ defineRouteMeta({
                       items: {
                         type: "object",
                         properties: {
-                          id: { type: "number" },
-                          clubId: { type: "number" },
-                          userId: { type: "number" },
-                          season: { type: "string" },
                           name: { type: "string" },
                           email: { type: "string", format: "email" },
                         },
+                        required: ["name", "email"],
                       },
                     },
                     clubMemberships: {
@@ -43,20 +39,33 @@ defineRouteMeta({
                       items: {
                         type: "object",
                         properties: {
-                          id: { type: "number" },
+                          season: { type: "string" },
+                          confirmed: { type: "boolean" },
                           club: {
                             type: "object",
                             properties: {
                               id: { type: "number" },
                               name: { type: "string" },
                             },
+                            required: ["id", "name"],
                           },
+                        },
+                        required: ["season", "confirmed", "club"],
+                      },
+                    },
+                    accounts: {
+                      type: "array",
+                      items: {
+                        type: "object",
+                        properties: {
+                          providerId: { type: "string" },
                         },
                       },
                     },
                   },
                 },
               },
+              required: ["success", "statusCode", "data"],
             },
             examples: {
               success: {
@@ -68,11 +77,16 @@ defineRouteMeta({
                     name: "Jane Doe",
                     email: "jane@example.com",
                     supervisors: [
-                      { id: 1, name: "John Doe", email: "john@example.com" },
+                      { name: "John Doe", email: "john@example.com" },
                     ],
                     clubMemberships: [
-                      { id: 1, club: { id: 2, name: "Sučany" } },
+                      {
+                        season: "2024",
+                        confirmed: true,
+                        club: { id: 2, name: "Sučany" },
+                      },
                     ],
+                    accounts: [{ providerId: "github|12345" }],
                   },
                 },
               },
@@ -88,10 +102,13 @@ defineRouteMeta({
 /**
  * Handler: GET /api/users/me
  *
- * Retrieves the authenticated user's profile including supervisors and club memberships.
+ * Retrieves the authenticated user's profile including:
+ *  - supervisors: Array<{ name: string, email: string }>
+ *  - clubMemberships: Array<{ season: string, confirmed: boolean, club: { id: number, name: string } }>
+ *  - accounts: Array<{ providerId: string }>
  *
  * Returns:
- *  - { success: boolean, statusCode: number, data: { id:number, name:string, email:string, supervisors: Array, clubMemberships: Array } }
+ *  { success: boolean, statusCode: number, data: { id: number, name: string, email: string, supervisors: Array, clubMemberships: Array, accounts: Array } | null }
  */
 export default defineEventHandler(async (event) => {
   const user = await useAuth(event);
@@ -99,9 +116,18 @@ export default defineEventHandler(async (event) => {
   const data = await db.query.users.findFirst({
     where: eq(users.id, user.id),
     with: {
-      supervisors: true,
+      supervisors: {
+        columns: { name: true, email: true },
+      },
       clubMemberships: {
-        with: { club: true },
+        with: { club: { columns: { id: true, name: true } } },
+        columns: {
+          season: true,
+          confirmed: true,
+        },
+      },
+      accounts: {
+        columns: { providerId: true },
       },
     },
   });
