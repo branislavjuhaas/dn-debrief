@@ -16,4 +16,5 @@ export type Supervisor = InferSelectModel<typeof supervisors>;
 export type User = InferSelectModel<typeof users> & {
   clubMemberships?: ClubMembership[];
   supervisors?: Supervisor[];
+  accounts: { providerId: string }[];
 };

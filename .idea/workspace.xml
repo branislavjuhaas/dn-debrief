@@ -4,21 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d4cc1df9-ad00-4ded-af2d-7ea9f25f0f27" name="Changes" comment="chore: Refactor user state handling and update user information in registration flow">
+    <list default="true" id="d4cc1df9-ad00-4ded-af2d-7ea9f25f0f27" name="Changes" comment="chore: Update the user profile API to include linked accounts and enhanced data structure">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/components/dialog/AppDialog.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/components/dialog/AppDialog.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/components/dialog/DialogHeader.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/components/dialog/DialogHeader.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/plugins/auth.server.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/plugins/auth.server.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/eslint.config.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/eslint.config.mjs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pnpm-lock.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pnpm-lock.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/api/clubs/list.get.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/api/clubs/list.get.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/auth/auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/auth/auth.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/routes/auth/verify.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/routes/auth/verify.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/utils/use-auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/utils/use-auth.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/types/club.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/shared/types/club.d.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shared/types/user.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/shared/types/user.d.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/utils/use-age.ts" beforeDir="false" afterPath="$PROJECT_DIR$/shared/utils/use-age.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -69,7 +57,7 @@
   }
 }</component>
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="ProjectErrors" />
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
@@ -80,39 +68,39 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "sunlake",
-    "last_opened_file_path": "C:/Users/juhas/source/repos/dn-cascade",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "pnpm",
-    "npm.db:generate.executor": "Run",
-    "npm.db:migrate.executor": "Run",
-    "npm.dev.executor": "Run",
-    "npm.generate.executor": "Run",
-    "npm.lint:fix.executor": "Run",
-    "prettierjs.PrettierConfiguration.Package": "C:\\Users\\juhas\\source\\repos\\dn-cascade\\node_modules\\prettier",
-    "settings.editor.selected.configurable": "settings.javascript.prettier",
-    "ts.external.directory.path": "C:\\Users\\juhas\\source\\repos\\dn-cascade\\node_modules\\typescript\\lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;sunlake&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/juhas/source/repos/dn-cascade&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;pnpm&quot;,
+    &quot;npm.db:generate.executor&quot;: &quot;Run&quot;,
+    &quot;npm.db:migrate.executor&quot;: &quot;Run&quot;,
+    &quot;npm.dev.executor&quot;: &quot;Run&quot;,
+    &quot;npm.generate.executor&quot;: &quot;Run&quot;,
+    &quot;npm.lint:fix.executor&quot;: &quot;Run&quot;,
+    &quot;prettierjs.PrettierConfiguration.Package&quot;: &quot;C:\\Users\\juhas\\source\\repos\\dn-cascade\\node_modules\\prettier&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;settings.javascript.prettier&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\juhas\\source\\repos\\dn-cascade\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "postgresql",
-      "mysql"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;postgresql&quot;,
+      &quot;mysql&quot;
     ],
-    "vue.recent.templates": [
-      "Vue Composition API Component"
+    &quot;vue.recent.templates&quot;: [
+      &quot;Vue Composition API Component&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\juhas\source\repos\dn-cascade" />
@@ -123,7 +111,7 @@
       <recent name="C:\Users\juhas\source\repos\dn-cascade\server\auth" />
     </key>
   </component>
-  <component name="RunManager" selected="npm.lint:fix">
+  <component name="RunManager" selected="npm.dev">
     <configuration name="db:generate" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
@@ -154,16 +142,6 @@
       <envs />
       <method v="2" />
     </configuration>
-    <configuration name="generate" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
-      <package-json value="$PROJECT_DIR$/package.json" />
-      <command value="run" />
-      <scripts>
-        <script value="generate" />
-      </scripts>
-      <node-interpreter value="project" />
-      <envs />
-      <method v="2" />
-    </configuration>
     <configuration name="lint:fix" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
@@ -176,11 +154,10 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="npm.lint:fix" />
         <item itemvalue="npm.dev" />
         <item itemvalue="npm.db:migrate" />
         <item itemvalue="npm.db:generate" />
-        <item itemvalue="npm.generate" />
+        <item itemvalue="npm.lint:fix" />
       </list>
     </recent_temporary>
   </component>
@@ -203,111 +180,11 @@
       <workItem from="1764315240193" duration="1937000" />
       <workItem from="1764336778959" duration="575000" />
       <workItem from="1764337646317" duration="19000" />
-      <workItem from="1764496845092" duration="8730000" />
-    </task>
-    <task id="LOCAL-00001" summary="feat: remove all monorepo project files">
-      <option name="closed" value="true" />
-      <created>1762330934056</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1762330934056</updated>
-    </task>
-    <task id="LOCAL-00002" summary="feat: add initial project structure with configuration files and database schema">
-      <option name="closed" value="true" />
-      <created>1762361446993</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1762361446993</updated>
-    </task>
-    <task id="LOCAL-00003" summary="feat: reorder createdAt and updatedAt fields in auth table definition">
-      <option name="closed" value="true" />
-      <created>1762361571945</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1762361571945</updated>
-    </task>
-    <task id="LOCAL-00004" summary="feat: update workspace configuration for initial project structure and settings">
-      <option name="closed" value="true" />
-      <created>1762361578696</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1762361578696</updated>
-    </task>
-    <task id="LOCAL-00005" summary="feat: add initial app structure with configuration and layout components">
-      <option name="closed" value="true" />
-      <created>1762363100940</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1762363100940</updated>
-    </task>
-    <task id="LOCAL-00006" summary="feat: add AppFooter component with footer links and project information">
-      <option name="closed" value="true" />
-      <created>1762406299860</created>
-      <option name="number" value="00006" />
-      <option name="presentableId" value="LOCAL-00006" />
-      <option name="project" value="LOCAL" />
-      <updated>1762406299861</updated>
-    </task>
-    <task id="LOCAL-00007" summary="feat: remove unused fill attribute from AppLogo component and clean up content.config.ts imports">
-      <option name="closed" value="true" />
-      <created>1762406363284</created>
-      <option name="number" value="00007" />
-      <option name="presentableId" value="LOCAL-00007" />
-      <option name="project" value="LOCAL" />
-      <updated>1762406363284</updated>
-    </task>
-    <task id="LOCAL-00008" summary="feat: update workspace configuration to reflect new app structure and layout components">
-      <option name="closed" value="true" />
-      <created>1762406379630</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1762406379630</updated>
-    </task>
-    <task id="LOCAL-00009" summary="feat: add AppFooter component to app.vue for improved layout">
-      <option name="closed" value="true" />
-      <created>1762406391671</created>
-      <option name="number" value="00009" />
-      <option name="presentableId" value="LOCAL-00009" />
-      <option name="project" value="LOCAL" />
-      <updated>1762406391671</updated>
-    </task>
-    <task id="LOCAL-00010" summary="feat: wrap slot in UMain component for improved layout structure">
-      <option name="closed" value="true" />
-      <created>1762406408613</created>
-      <option name="number" value="00010" />
-      <option name="presentableId" value="LOCAL-00010" />
-      <option name="project" value="LOCAL" />
-      <updated>1762406408613</updated>
-    </task>
-    <task id="LOCAL-00011" summary="feat: add additional built dependencies to pnpm-workspace.yaml">
-      <option name="closed" value="true" />
-      <created>1762429118519</created>
-      <option name="number" value="00011" />
-      <option name="presentableId" value="LOCAL-00011" />
-      <option name="project" value="LOCAL" />
-      <updated>1762429118520</updated>
-    </task>
-    <task id="LOCAL-00012" summary="feat: add Pinia for state management and create user store">
-      <option name="closed" value="true" />
-      <created>1762429150968</created>
-      <option name="number" value="00012" />
-      <option name="presentableId" value="LOCAL-00012" />
-      <option name="project" value="LOCAL" />
-      <updated>1762429150968</updated>
-    </task>
-    <task id="LOCAL-00013" summary="feat: generate pnpm-lock">
-      <option name="closed" value="true" />
-      <created>1762429173995</created>
-      <option name="number" value="00013" />
-      <option name="presentableId" value="LOCAL-00013" />
-      <option name="project" value="LOCAL" />
-      <updated>1762429173995</updated>
+      <workItem from="1764496845092" duration="14826000" />
+      <workItem from="1764585350303" duration="5228000" />
+      <workItem from="1764596493481" duration="7750000" />
+      <workItem from="1764691864546" duration="812000" />
+      <workItem from="1764768265433" duration="1504000" />
     </task>
     <task id="LOCAL-00014" summary="feat: generate pnpm-lock">
       <option name="closed" value="true" />
@@ -557,7 +434,151 @@
       <option name="project" value="LOCAL" />
       <updated>1764504805980</updated>
     </task>
-    <option name="localTasksCounter" value="45" />
+    <task id="LOCAL-00045" summary="chore: Update ESLint configuration and bump a better-auth version to 1.4.0">
+      <option name="closed" value="true" />
+      <created>1764505881822</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1764505881822</updated>
+    </task>
+    <task id="LOCAL-00046" summary="chore: Refactor imports to use type for better type safety and clean up unused code">
+      <option name="closed" value="true" />
+      <created>1764505914272</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1764505914272</updated>
+    </task>
+    <task id="LOCAL-00047" summary="chore: Enhance user store with impersonation handling and update user display name">
+      <option name="closed" value="true" />
+      <created>1764511903389</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1764511903389</updated>
+    </task>
+    <task id="LOCAL-00048" summary="chore: Remove unused Session type from user definitions">
+      <option name="closed" value="true" />
+      <created>1764511954537</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1764511954537</updated>
+    </task>
+    <task id="LOCAL-00049" summary="chore: Remove unused Session type from user definitions">
+      <option name="closed" value="true" />
+      <created>1764512155703</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1764512155703</updated>
+    </task>
+    <task id="LOCAL-00050" summary="chore: Remove unused pageSection configuration from app settings">
+      <option name="closed" value="true" />
+      <created>1764512314307</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1764512314311</updated>
+    </task>
+    <task id="LOCAL-00051" summary="chore: Fix surname extraction logic in mapProfileToUser function">
+      <option name="closed" value="true" />
+      <created>1764513354789</created>
+      <option name="number" value="00051" />
+      <option name="presentableId" value="LOCAL-00051" />
+      <option name="project" value="LOCAL" />
+      <updated>1764513354789</updated>
+    </task>
+    <task id="LOCAL-00052" summary="chore: Update journal and create initial database schema for accounts, sessions, and users">
+      <option name="closed" value="true" />
+      <created>1764513366915</created>
+      <option name="number" value="00052" />
+      <option name="presentableId" value="LOCAL-00052" />
+      <option name="project" value="LOCAL" />
+      <updated>1764513366915</updated>
+    </task>
+    <task id="LOCAL-00053" summary="chore: Add search fields to users, clubs, and events with appropriate indexes">
+      <option name="closed" value="true" />
+      <created>1764589281703</created>
+      <option name="number" value="00053" />
+      <option name="presentableId" value="LOCAL-00053" />
+      <option name="project" value="LOCAL" />
+      <updated>1764589281704</updated>
+    </task>
+    <task id="LOCAL-00054" summary="chore: Update journal version and add initial database schema for accounts, sessions, and events">
+      <option name="closed" value="true" />
+      <created>1764589298706</created>
+      <option name="number" value="00054" />
+      <option name="presentableId" value="LOCAL-00054" />
+      <option name="project" value="LOCAL" />
+      <updated>1764589298706</updated>
+    </task>
+    <task id="LOCAL-00055" summary="chore: Refactor userStore set method parameters for clarity">
+      <option name="closed" value="true" />
+      <created>1764597522580</created>
+      <option name="number" value="00055" />
+      <option name="presentableId" value="LOCAL-00055" />
+      <option name="project" value="LOCAL" />
+      <updated>1764597522580</updated>
+    </task>
+    <task id="LOCAL-00056" summary="chore: Add utility functions for string capitalization and translation">
+      <option name="closed" value="true" />
+      <created>1764617622368</created>
+      <option name="number" value="00056" />
+      <option name="presentableId" value="LOCAL-00056" />
+      <option name="project" value="LOCAL" />
+      <updated>1764617622368</updated>
+    </task>
+    <task id="LOCAL-00057" summary="chore: Add detailed documentation for authentication client, error mapping, and greeting functions">
+      <option name="closed" value="true" />
+      <created>1764617629905</created>
+      <option name="number" value="00057" />
+      <option name="presentableId" value="LOCAL-00057" />
+      <option name="project" value="LOCAL" />
+      <updated>1764617629905</updated>
+    </task>
+    <task id="LOCAL-00058" summary="chore: Add impersonation banner to user interface for enhanced user experience">
+      <option name="closed" value="true" />
+      <created>1764617637636</created>
+      <option name="number" value="00058" />
+      <option name="presentableId" value="LOCAL-00058" />
+      <option name="project" value="LOCAL" />
+      <updated>1764617637636</updated>
+    </task>
+    <task id="LOCAL-00059" summary="chore: Implement search functionality in AppSearch component with debounced input">
+      <option name="closed" value="true" />
+      <created>1764617928186</created>
+      <option name="number" value="00059" />
+      <option name="presentableId" value="LOCAL-00059" />
+      <option name="project" value="LOCAL" />
+      <updated>1764617928186</updated>
+    </task>
+    <task id="LOCAL-00060" summary="chore: Integrate AppSearchClient into AppHeader and AppNav for improved search functionality">
+      <option name="closed" value="true" />
+      <created>1764617934488</created>
+      <option name="number" value="00060" />
+      <option name="presentableId" value="LOCAL-00060" />
+      <option name="project" value="LOCAL" />
+      <updated>1764617934488</updated>
+    </task>
+    <task id="LOCAL-00061" summary="chore: Implement search API for users, clubs, and events with query parameters">
+      <option name="closed" value="true" />
+      <created>1764618200832</created>
+      <option name="number" value="00061" />
+      <option name="presentableId" value="LOCAL-00061" />
+      <option name="project" value="LOCAL" />
+      <updated>1764618200832</updated>
+    </task>
+    <task id="LOCAL-00062" summary="chore: Update the user profile API to include linked accounts and enhanced data structure">
+      <option name="closed" value="true" />
+      <created>1764769001088</created>
+      <option name="number" value="00062" />
+      <option name="presentableId" value="LOCAL-00062" />
+      <option name="project" value="LOCAL" />
+      <updated>1764769001090</updated>
+    </task>
+    <option name="localTasksCounter" value="63" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -575,24 +596,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: change breakpoint on navigation search" />
-    <MESSAGE value="feat: add AppDialog component for enhanced UI layout" />
-    <MESSAGE value="feat: add DialogHeader component for structured UI presentation" />
-    <MESSAGE value="feat: add navigation dropdown menu with user profile and logout functionality" />
-    <MESSAGE value="feat: add sunlake graphics" />
-    <MESSAGE value="feat: update workspace configuration for improved project structure and task summaries" />
-    <MESSAGE value="feat: add login dialog with Google and GitHub authentication options" />
-    <MESSAGE value="chore: Remove storage option from nuxt.config.ts" />
-    <MESSAGE value="chore: Add SQL extensions for unaccent and pg_trgm support" />
-    <MESSAGE value="chore: Add base margin to page body in app configuration" />
-    <MESSAGE value="chore: Refactor layout components in app.vue and default.vue" />
-    <MESSAGE value="chore: Replace UPageSection with UPageBody in index.vue and register.vue" />
-    <MESSAGE value="chore: Update workspace configuration and remove unnecessary options" />
-    <MESSAGE value="chore: Replace search fields with tsvector indexing for improved text search in auth, clubs, and events" />
-    <MESSAGE value="chore: Enhance authentication with role-based access control and permissions management" />
-    <MESSAGE value="chore: Add database schema for user accounts, sessions, and roles with necessary extensions and constraints" />
-    <MESSAGE value="chore: Update workspace configuration and add new npm scripts for database generation and migration" />
-    <MESSAGE value="chore: Enhance text search functionality with immutable unaccenting and add user ban fields" />
     <MESSAGE value="chore: Update an import statement to use type for BASE_ERROR_CODES in use-auth-error.ts" />
     <MESSAGE value="chore: Add authentication client setup with role-based permissions" />
     <MESSAGE value="chore: Replace createAuthClient with useAuthClient in navigation and registration components" />
@@ -600,7 +603,25 @@
     <MESSAGE value="chore: Add surname field and mapping functions for Google and GitHub profiles" />
     <MESSAGE value="chore: Add linting scripts for ESLint to package.json" />
     <MESSAGE value="chore: Refactor user state handling and update user information in registration flow" />
-    <option name="LAST_COMMIT_MESSAGE" value="chore: Refactor user state handling and update user information in registration flow" />
+    <MESSAGE value="chore: Update ESLint configuration and bump a better-auth version to 1.4.0" />
+    <MESSAGE value="chore: Refactor imports to use type for better type safety and clean up unused code" />
+    <MESSAGE value="chore: Enhance user handling with full name display and impersonation support" />
+    <MESSAGE value="chore: Enhance user store with impersonation handling and update user display name" />
+    <MESSAGE value="chore: Remove unused Session type from user definitions" />
+    <MESSAGE value="chore: Remove unused pageSection configuration from app settings" />
+    <MESSAGE value="chore: Fix surname extraction logic in mapProfileToUser function" />
+    <MESSAGE value="chore: Update journal and create initial database schema for accounts, sessions, and users" />
+    <MESSAGE value="chore: Add search fields to users, clubs, and events with appropriate indexes" />
+    <MESSAGE value="chore: Update journal version and add initial database schema for accounts, sessions, and events" />
+    <MESSAGE value="chore: Refactor userStore set method parameters for clarity" />
+    <MESSAGE value="chore: Add utility functions for string capitalization and translation" />
+    <MESSAGE value="chore: Add detailed documentation for authentication client, error mapping, and greeting functions" />
+    <MESSAGE value="chore: Add impersonation banner to user interface for enhanced user experience" />
+    <MESSAGE value="chore: Implement search functionality in AppSearch component with debounced input" />
+    <MESSAGE value="chore: Integrate AppSearchClient into AppHeader and AppNav for improved search functionality" />
+    <MESSAGE value="chore: Implement search API for users, clubs, and events with query parameters" />
+    <MESSAGE value="chore: Update the user profile API to include linked accounts and enhanced data structure" />
+    <option name="LAST_COMMIT_MESSAGE" value="chore: Update the user profile API to include linked accounts and enhanced data structure" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>
