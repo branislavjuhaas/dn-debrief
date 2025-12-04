@@ -4,8 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d4cc1df9-ad00-4ded-af2d-7ea9f25f0f27" name="Changes" comment="chore: Update the user profile API to include linked accounts and enhanced data structure">
+    <list default="true" id="d4cc1df9-ad00-4ded-af2d-7ea9f25f0f27" name="Changes" comment="chore: Add club managements structure to user profile API for enhanced data representation">
+      <change afterPath="$PROJECT_DIR$/app/layouts/management.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/pages/manage/clubs/index.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/pages/manage/index.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/utils/use-management.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/app.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/app.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/components/header/AppNav.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/components/header/AppNav.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nuxt.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/nuxt.config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared/types/club.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/shared/types/club.d.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shared/types/user.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/shared/types/user.d.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -184,39 +192,8 @@
       <workItem from="1764585350303" duration="5228000" />
       <workItem from="1764596493481" duration="7750000" />
       <workItem from="1764691864546" duration="812000" />
-      <workItem from="1764768265433" duration="1504000" />
-    </task>
-    <task id="LOCAL-00014" summary="feat: generate pnpm-lock">
-      <option name="closed" value="true" />
-      <created>1762429178536</created>
-      <option name="number" value="00014" />
-      <option name="presentableId" value="LOCAL-00014" />
-      <option name="project" value="LOCAL" />
-      <updated>1762429178536</updated>
-    </task>
-    <task id="LOCAL-00015" summary="feat: add AppNav component and integrate user authentication in AppHeader">
-      <option name="closed" value="true" />
-      <created>1762429260588</created>
-      <option name="number" value="00015" />
-      <option name="presentableId" value="LOCAL-00015" />
-      <option name="project" value="LOCAL" />
-      <updated>1762429260588</updated>
-    </task>
-    <task id="LOCAL-00016" summary="feat: set locale and color scheme for UApp component">
-      <option name="closed" value="true" />
-      <created>1762429663317</created>
-      <option name="number" value="00016" />
-      <option name="presentableId" value="LOCAL-00016" />
-      <option name="project" value="LOCAL" />
-      <updated>1762429663317</updated>
-    </task>
-    <task id="LOCAL-00017" summary="feat: update workspace configuration to reflect new app structure and layout components">
-      <option name="closed" value="true" />
-      <created>1762429680403</created>
-      <option name="number" value="00017" />
-      <option name="presentableId" value="LOCAL-00017" />
-      <option name="project" value="LOCAL" />
-      <updated>1762429680403</updated>
+      <workItem from="1764768265433" duration="1529000" />
+      <workItem from="1764845185425" duration="10690000" />
     </task>
     <task id="LOCAL-00018" summary="feat: update workspace configuration and task summaries for improved project structure">
       <option name="closed" value="true" />
@@ -578,7 +555,39 @@
       <option name="project" value="LOCAL" />
       <updated>1764769001090</updated>
     </task>
-    <option name="localTasksCounter" value="63" />
+    <task id="LOCAL-00063" summary="chore: Enhance user type definition to include accounts for better integration">
+      <option name="closed" value="true" />
+      <created>1764770408094</created>
+      <option name="number" value="00063" />
+      <option name="presentableId" value="LOCAL-00063" />
+      <option name="project" value="LOCAL" />
+      <updated>1764770408094</updated>
+    </task>
+    <task id="LOCAL-00064" summary="chore: Add custom error page for handling 404 errors with user-friendly messages">
+      <option name="closed" value="true" />
+      <created>1764847319703</created>
+      <option name="number" value="00064" />
+      <option name="presentableId" value="LOCAL-00064" />
+      <option name="project" value="LOCAL" />
+      <updated>1764847319705</updated>
+    </task>
+    <task id="LOCAL-00065" summary="chore: Enhance error handling by adding Slovak messages for 404 and 500 errors">
+      <option name="closed" value="true" />
+      <created>1764847578244</created>
+      <option name="number" value="00065" />
+      <option name="presentableId" value="LOCAL-00065" />
+      <option name="project" value="LOCAL" />
+      <updated>1764847578244</updated>
+    </task>
+    <task id="LOCAL-00066" summary="chore: Add club managements structure to user profile API for enhanced data representation">
+      <option name="closed" value="true" />
+      <created>1764869742593</created>
+      <option name="number" value="00066" />
+      <option name="presentableId" value="LOCAL-00066" />
+      <option name="project" value="LOCAL" />
+      <updated>1764869742594</updated>
+    </task>
+    <option name="localTasksCounter" value="67" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -596,10 +605,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="chore: Update an import statement to use type for BASE_ERROR_CODES in use-auth-error.ts" />
-    <MESSAGE value="chore: Add authentication client setup with role-based permissions" />
-    <MESSAGE value="chore: Replace createAuthClient with useAuthClient in navigation and registration components" />
-    <MESSAGE value="chore: Update ESLint configuration to override TypeScript rules for explicit any" />
     <MESSAGE value="chore: Add surname field and mapping functions for Google and GitHub profiles" />
     <MESSAGE value="chore: Add linting scripts for ESLint to package.json" />
     <MESSAGE value="chore: Refactor user state handling and update user information in registration flow" />
@@ -621,7 +626,11 @@
     <MESSAGE value="chore: Integrate AppSearchClient into AppHeader and AppNav for improved search functionality" />
     <MESSAGE value="chore: Implement search API for users, clubs, and events with query parameters" />
     <MESSAGE value="chore: Update the user profile API to include linked accounts and enhanced data structure" />
-    <option name="LAST_COMMIT_MESSAGE" value="chore: Update the user profile API to include linked accounts and enhanced data structure" />
+    <MESSAGE value="chore: Enhance user type definition to include accounts for better integration" />
+    <MESSAGE value="chore: Add custom error page for handling 404 errors with user-friendly messages" />
+    <MESSAGE value="chore: Enhance error handling by adding Slovak messages for 404 and 500 errors" />
+    <MESSAGE value="chore: Add club managements structure to user profile API for enhanced data representation" />
+    <option name="LAST_COMMIT_MESSAGE" value="chore: Add club managements structure to user profile API for enhanced data representation" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>
