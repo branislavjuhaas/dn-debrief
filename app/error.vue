@@ -3,12 +3,34 @@ import AppHeader from "~/components/header/AppHeader.vue";
 import AppFooter from "~/components/footer/AppFooter.vue";
 import type { NuxtError } from "#app";
 
-useSeoMeta({
-  title: "Stránka nenájdená",
-  description: "Stránka, ktorú hľadáte, nebola nájdená.",
-});
+const slovakErrorMessage = (statusCode: number) => {
+  switch (statusCode) {
+    case 404:
+      return "Stránka nenájdená";
+    case 500:
+      return "Interná chyba servera";
+    default:
+      return "Nastala chyba";
+  }
+};
+
+const slovakErrorDescription = (statusCode: number) => {
+  switch (statusCode) {
+    case 404:
+      return "Stránka, ktorú hľadáte, nebola nájdená.";
+    case 500:
+      return "Došlo k internej chybe servera. Skúste to prosím neskôr.";
+    default:
+      return "Nastala chyba pri spracovaní vašej požiadavky.";
+  }
+};
 
 const { error } = defineProps<{ error: NuxtError }>();
+
+useSeoMeta({
+  title: slovakErrorMessage(error.statusCode),
+  description: slovakErrorDescription(error.statusCode),
+});
 
 console.error("Nuxt Error:", error);
 </script>
@@ -23,12 +45,8 @@ console.error("Nuxt Error:", error);
       }"
       :error="{
         ...error,
-        statusMessage:
-          error.statusCode === 404 ? 'Stránka nenájdená' : error.statusMessage,
-        message:
-          error.statusCode === 404
-            ? 'Stránka, ktorú hľadáte, nebola nájdená.'
-            : error.message,
+        statusMessage: slovakErrorMessage(error.statusCode),
+        message: slovakErrorDescription(error.statusCode),
       }" />
 
     <AppFooter />
