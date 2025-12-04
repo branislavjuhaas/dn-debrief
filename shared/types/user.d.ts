@@ -1,6 +1,6 @@
 import type { InferSelectModel } from "drizzle-orm";
 import type { supervisors, users } from "~~/server/db/schema/auth";
-import type { ClubMembership } from "#shared/types/club";
+import type { ClubManagement, ClubMembership } from "#shared/types/club";
 
 export type Role =
   | "user"
@@ -15,6 +15,7 @@ export type Supervisor = InferSelectModel<typeof supervisors>;
 
 export type User = InferSelectModel<typeof users> & {
   clubMemberships?: ClubMembership[];
+  clubManagements?: ClubManagement[];
   supervisors?: Supervisor[];
-  accounts: { providerId: string }[];
+  accounts?: { providerId: string }[];
 };
