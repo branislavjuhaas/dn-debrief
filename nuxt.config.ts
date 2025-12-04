@@ -2,7 +2,6 @@
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
-
   modules: [
     "@nuxt/eslint",
     "@nuxt/test-utils",
@@ -58,5 +57,15 @@ export default defineNuxtConfig({
         provider: "google",
       },
     ],
+  },
+  hooks: {
+    "pages:extend"(pages) {
+      for (const page of pages) {
+        if (page.path.startsWith("/manage")) {
+          page.meta = page.meta || {};
+          page.meta.layout = "management";
+        }
+      }
+    },
   },
 });
