@@ -53,6 +53,24 @@ defineRouteMeta({
                         required: ["season", "confirmed", "club"],
                       },
                     },
+                    clubManagements: {
+                      type: "array",
+                      items: {
+                        type: "object",
+                        properties: {
+                          id: { type: "number" },
+                          club: {
+                            type: "object",
+                            properties: {
+                              id: { type: "number" },
+                              name: { type: "string" },
+                            },
+                            required: ["id", "name"],
+                          },
+                        },
+                        required: ["id", "club"],
+                      },
+                    },
                     accounts: {
                       type: "array",
                       items: {
@@ -83,6 +101,12 @@ defineRouteMeta({
                       {
                         season: "2024",
                         confirmed: true,
+                        club: { id: 2, name: "Sučany" },
+                      },
+                    ],
+                    clubManagements: [
+                      {
+                        id: 10,
                         club: { id: 2, name: "Sučany" },
                       },
                     ],
@@ -124,6 +148,12 @@ export default defineEventHandler(async (event) => {
         columns: {
           season: true,
           confirmed: true,
+        },
+      },
+      clubManagements: {
+        with: { club: { columns: { id: true, name: true } } },
+        columns: {
+          id: true,
         },
       },
       accounts: {
