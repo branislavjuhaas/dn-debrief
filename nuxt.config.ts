@@ -1,71 +1,42 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: "2025-07-15",
+  compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
+
   modules: [
-    "@nuxt/eslint",
-    "@nuxt/test-utils",
-    "@nuxt/ui",
-    "@nuxt/image",
-    "@nuxt/content",
-    "@pinia/nuxt",
+    '@nuxt/content',
+    '@nuxt/ui',
+    '@nuxt/image',
+    '@nuxt/hints',
+    '@nuxt/eslint',
+    'v-gsap-nuxt',
+    '@nuxthub/core'
   ],
-  nitro: {
-    experimental: { openAPI: true },
-    openAPI: {
-      production: "prerender",
-      meta: {
-        title: "DN Cascade API Docs",
-        description: "API documentation for DN Cascade",
-        version: "2.25.0.1",
-      },
-      route: "/api/docs/openapi.json",
-      ui: {
-        scalar: {
-          route: "/api/docs",
-        },
-        swagger: false,
-      },
+
+  hub: {
+    db: {
+      dialect: 'postgresql',
+      driver: 'neon-http'
     },
-  },
-  css: ["~/assets/css/main.css"],
-  ui: {
-    colorMode: false,
-  },
-  app: {
-    head: {
-      charset: "utf-8",
-      viewport: "width=device-width, initial-scale=1, maximum-scale=1",
-      titleTemplate: "%s | DebRIEF II",
-      title: "DN",
+    blob: {
+      driver: 'fs',
+      dir: '.data/blob'
     },
-  },
-  fonts: {
-    defaults: {
-      weights: [400, 700],
-      styles: ["normal", "italic"],
-      subsets: ["latin"],
+    kv: {
+      driver: 'cloudflare-kv-binding',
+      namespaceId: 'd6ea32a01fe140d7a45fc76d40265073'
     },
-    provider: "google",
-    families: [
-      {
-        name: "DM Sans",
-        weights: ["100 900"],
-        styles: ["normal", "italic"],
-        subsets: ["latin"],
-        preload: true,
-        provider: "google",
-      },
-    ],
+    cache: {
+      driver: 'cloudflare-kv-binding',
+      namespaceId: '7cf7f3f9f90443259577e5501e262f94'
+    }
   },
-  hooks: {
-    "pages:extend"(pages) {
-      for (const page of pages) {
-        if (page.path.startsWith("/manage")) {
-          page.meta = page.meta || {};
-          page.meta.layout = "management";
-        }
+  $production: {
+    hub: {
+      blob: {
+        driver: 'cloudflare-r2',
+        bucketName: '<bucket-name>'
       }
-    },
-  },
-});
+    }
+  }
+})
