@@ -1,4 +1,5 @@
 # DN Cascade Platform
+
 ![Version 2.25.2.1](https://img.shields.io/badge/Version-2.25.2.1-blue)
 ![MIT License](https://img.shields.io/badge/License-MIT-red)
 ![Nuxt](https://img.shields.io/badge/Nuxt-%231D293D?logo=nuxt&logoColor=%2300DC82&link=https%3A%2F%2Fnuxt.com)

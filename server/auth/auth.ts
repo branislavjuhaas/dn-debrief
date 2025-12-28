@@ -1,7 +1,7 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { openAPI, admin as adminPlugin } from "better-auth/plugins";
-import { db } from 'hub:db'
+import { db } from "hub:db";
 import * as schema from "~~/server/db/schema/auth";
 import { sendEmail, generateEmailTemplate } from "~~/server/utils/send-email";
 import { supervisors } from "~~/server/db/schema/auth";
@@ -93,7 +93,7 @@ export const auth = betterAuth({
         type: "string",
         required: false,
         input: true,
-      }
+      },
     },
   },
   databaseHooks: {
