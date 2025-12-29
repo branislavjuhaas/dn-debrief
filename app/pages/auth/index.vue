@@ -45,6 +45,7 @@ const schema = z.object({
   password: z.string("Heslo je povinné"),
   remember: z.boolean().optional(),
 });
+
 /** Output type inferred from `schema`. */
 type Schema = z.output<typeof schema>;
 
@@ -62,7 +63,7 @@ const loginGithub = async () => {
     {
       onSuccess: (ctx) => {
         userStore.set();
-        if (!ctx.data.user?.birthdate) {
+        if (ctx.data.user && !ctx.data.user?.birthdate) {
           navigateTo("/auth/register?collection=true");
         }
       },
@@ -84,7 +85,7 @@ const loginGoogle = async () => {
     {
       onSuccess: (ctx) => {
         userStore.set();
-        if (!ctx.data.user?.birthdate) {
+        if (ctx.data.user && !ctx.data.user?.birthdate) {
           navigateTo("/auth/register?collection=true");
         }
       },

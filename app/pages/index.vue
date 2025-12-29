@@ -1,8 +1,10 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const userStore = useUserStore();
+</script>
 
 <template>
   <UPageBody>
-    <ProseH1>Nazdar, Branislav!</ProseH1>
+    <ProseH1>{{ useGreeting(userStore.user) }}</ProseH1>
   </UPageBody>
 </template>
 
