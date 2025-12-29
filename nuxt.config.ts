@@ -57,6 +57,7 @@ export default defineNuxtConfig({
         bucketName: "dn-cascade-r2",
       },
     },
+    sourcemap: false,
   },
 
   ui: {
