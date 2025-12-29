@@ -30,11 +30,11 @@ export const useUserStore = defineStore("user", {
   },
   actions: {
     async set(impersonation?: boolean, headers?: HeadersInit) {
-      const { data } = await $fetch("/api/users/me", {
+      const { user } = await $fetch("/api/users/me", {
         headers,
         credentials: "include",
       });
-      this.user = data ?? null;
+      this.user = (user as unknown as User) ?? null;
       this.impersonation = impersonation ?? false;
     },
     clear() {

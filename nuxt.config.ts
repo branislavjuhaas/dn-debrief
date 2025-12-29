@@ -11,7 +11,10 @@ export default defineNuxtConfig({
     "@nuxt/eslint",
     "v-gsap-nuxt",
     "@nuxthub/core",
+    "@pinia/nuxt",
   ],
+
+  css: ["~/assets/css/main.css"],
 
   hub: {
     db: {

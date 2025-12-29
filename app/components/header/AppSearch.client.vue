@@ -29,7 +29,7 @@ const { data } = await useFetch("/api/search", {
       users: (payload.users || []).map((user) => ({
         id: user.id,
         label: `${user.name} ${user.surname}`,
-        suffix: useCapitalize(useTranslate("role", user.role)),
+        suffix: useTranslate("role", user.role),
         avatar: {
           src: user.image,
           alt: `${user.name} ${user.surname}`,
@@ -81,6 +81,7 @@ const groups = computed(() => [
   <UDashboardSearch
     v-model:search-term="searchTerm"
     v-model:open="open"
+    :color-mode="false"
     :groups="groups"
     placeholder="Hľadajte ľudí, podujatia a kluby..." />
 </template>
