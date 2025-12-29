@@ -39,6 +39,7 @@ const navItems = ref([
   [
     {
       label: "Panel správy",
+      to: "/manage",
       icon: "ph:nut",
     },
   ],

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import AppDialog from "~/components/dialog/AppDialog.vue";
 import type { FormSubmitEvent, AuthFormField } from "@nuxt/ui";
 import * as z from "zod";
 import useAuthError from "~/utils/use-auth-error";
@@ -46,6 +45,7 @@ const schema = z.object({
   password: z.string("Heslo je povinné"),
   remember: z.boolean().optional(),
 });
+
 /** Output type inferred from `schema`. */
 type Schema = z.output<typeof schema>;
 
@@ -63,7 +63,7 @@ const loginGithub = async () => {
     {
       onSuccess: (ctx) => {
         userStore.set();
-        if (!ctx.data.user?.birthdate) {
+        if (ctx.data.user && !ctx.data.user?.birthdate) {
           navigateTo("/auth/register?collection=true");
         }
       },
@@ -85,7 +85,7 @@ const loginGoogle = async () => {
     {
       onSuccess: (ctx) => {
         userStore.set();
-        if (!ctx.data.user?.birthdate) {
+        if (ctx.data.user && !ctx.data.user?.birthdate) {
           navigateTo("/auth/register?collection=true");
         }
       },

@@ -4,35 +4,18 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
 
   modules: [
-    "@nuxt/eslint",
-    "@nuxt/test-utils",
+    "@nuxt/content",
     "@nuxt/ui",
     "@nuxt/image",
-    "@nuxt/content",
+    "@nuxt/hints",
+    "@nuxt/eslint",
+    "v-gsap-nuxt",
+    "@nuxthub/core",
     "@pinia/nuxt",
   ],
-  nitro: {
-    experimental: { openAPI: true },
-    openAPI: {
-      production: "prerender",
-      meta: {
-        title: "DN Cascade API Docs",
-        description: "API documentation for DN Cascade",
-        version: "2.25.0.1",
-      },
-      route: "/api/docs/openapi.json",
-      ui: {
-        scalar: {
-          route: "/api/docs",
-        },
-        swagger: false,
-      },
-    },
-  },
+
   css: ["~/assets/css/main.css"],
-  ui: {
-    colorMode: false,
-  },
+
   app: {
     head: {
       charset: "utf-8",
@@ -41,22 +24,42 @@ export default defineNuxtConfig({
       title: "DN",
     },
   },
-  fonts: {
-    defaults: {
-      weights: [400, 700],
-      styles: ["normal", "italic"],
-      subsets: ["latin"],
+
+  components: [
+    {
+      path: "~/components",
+      pathPrefix: false,
     },
-    provider: "google",
-    families: [
-      {
-        name: "DM Sans",
-        weights: ["100 900"],
-        styles: ["normal", "italic"],
-        subsets: ["latin"],
-        preload: true,
-        provider: "google",
+  ],
+
+  hub: {
+    db: {
+      dialect: "postgresql",
+      driver: "neon-http",
+    },
+    blob: {
+      driver: "fs",
+      dir: ".data/blob",
+    },
+    kv: {
+      driver: "cloudflare-kv-binding",
+      namespaceId: "d6ea32a01fe140d7a45fc76d40265073",
+    },
+    cache: {
+      driver: "cloudflare-kv-binding",
+      namespaceId: "7cf7f3f9f90443259577e5501e262f94",
+    },
+  },
+  $production: {
+    hub: {
+      blob: {
+        driver: "cloudflare-r2",
+        bucketName: "dn-cascade-r2",
       },
-    ],
+    },
+  },
+
+  ui: {
+    fonts: false,
   },
 });

@@ -1,8 +1,4 @@
 <script setup lang="ts">
-useSeoMeta({
-  title: "Domov",
-});
-
 const userStore = useUserStore();
 </script>
 

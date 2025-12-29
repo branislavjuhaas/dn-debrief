@@ -6,7 +6,7 @@ const props = defineProps<{
 }>();
 
 const slots = defineSlots<{
-  default?: () => any;
+  default?: () => never;
 }>();
 </script>
 

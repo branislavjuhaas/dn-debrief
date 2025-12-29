@@ -1,6 +1,5 @@
 import { defineStore } from "pinia";
 import type { User } from "#shared/types/user";
-import type { ApiResponse } from "#shared/types/response";
 
 export const useUserStore = defineStore("user", {
   state: (): { user: User | null; impersonation: boolean } => ({
@@ -31,11 +30,11 @@ export const useUserStore = defineStore("user", {
   },
   actions: {
     async set(impersonation?: boolean, headers?: HeadersInit) {
-      const { data } = await $fetch<ApiResponse<User>>("/api/users/me", {
+      const { user } = await $fetch("/api/users/me", {
         headers,
         credentials: "include",
       });
-      this.user = data ?? null;
+      this.user = (user as unknown as User) ?? null;
       this.impersonation = impersonation ?? false;
     },
     clear() {

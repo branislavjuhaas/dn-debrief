@@ -46,6 +46,7 @@ export const users = pgTable(
     credential: integer("credential").default(0).notNull(),
     birthdate: date("birthdate"),
     address: text("address"),
+    phone: text("phone"),
     banned: boolean("banned").default(false).notNull(),
     banReason: text("ban_reason"),
     banExpires: timestamp("ban_expires"),

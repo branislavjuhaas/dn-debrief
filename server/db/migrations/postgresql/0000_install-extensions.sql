@@ -9,7 +9,4 @@ RETURNS text
 LANGUAGE sql
 IMMUTABLE
 PARALLEL SAFE
-AS $$
-SELECT public.unaccent('public.unaccent', $1);
-$$;
-
+AS 'SELECT public.unaccent($1)';
