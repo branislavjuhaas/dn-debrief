@@ -54,7 +54,7 @@ export default defineNuxtConfig({
     hub: {
       blob: {
         driver: "cloudflare-r2",
-        bucketName: "<bucket-name>",
+        bucketName: "dn-cascade-r2",
       },
     },
   },
