@@ -16,6 +16,22 @@ export default defineNuxtConfig({
 
   css: ["~/assets/css/main.css"],
 
+  app: {
+    head: {
+      charset: "utf-8",
+      viewport: "width=device-width, initial-scale=1, maximum-scale=1",
+      titleTemplate: "%s | DebRIEF II",
+      title: "DN",
+    },
+  },
+
+  components: [
+    {
+      path: "~/components",
+      pathPrefix: false,
+    },
+  ],
+
   hub: {
     db: {
       dialect: "postgresql",
@@ -41,5 +57,24 @@ export default defineNuxtConfig({
         bucketName: "<bucket-name>",
       },
     },
+  },
+
+  fonts: {
+    defaults: {
+      weights: [400, 700],
+      styles: ["normal", "italic"],
+      subsets: ["latin"],
+    },
+    provider: "google",
+    families: [
+      {
+        name: "DM Sans",
+        weights: ["100 900"],
+        styles: ["normal", "italic"],
+        subsets: ["latin"],
+        preload: true,
+        provider: "google",
+      },
+    ],
   },
 });

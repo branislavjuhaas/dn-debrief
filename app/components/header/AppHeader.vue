@@ -1,8 +1,4 @@
 <script setup lang="ts">
-import AppLogo from "~/components/header/AppLogo.vue";
-import AppNav from "~/components/header/AppNav.vue";
-import AppSearchClient from "~/components/header/AppSearch.client.vue";
-
 const userStore = useUserStore();
 const searchOpen = ref(false);
 </script>
@@ -26,7 +22,7 @@ const searchOpen = ref(false);
       }}
     </UDashboardSearchButton>
 
-    <AppSearchClient v-model:open="searchOpen" />
+    <AppSearch v-model:open="searchOpen" />
     <template #right>
       <AppNav v-model:open="searchOpen" />
     </template>
