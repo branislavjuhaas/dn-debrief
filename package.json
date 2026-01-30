@@ -20,6 +20,7 @@
     "@nuxt/hints": "1.0.0-alpha.6",
     "@nuxt/image": "2.0.0",
     "@nuxt/ui": "4.4.0",
+    "@nuxthub/core": "0.10.6",
     "eslint": "^9.0.0",
     "nuxt": "^4.3.0",
     "tailwindcss": "^4.0.0",

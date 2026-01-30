@@ -1,5 +1,12 @@
 export default defineNuxtConfig({
-  modules: ['@nuxt/eslint'],
+  modules: [
+    '@nuxt/a11y',
+    '@nuxt/eslint',
+    '@nuxt/hints',
+    '@nuxt/image',
+    '@nuxt/ui',
+    '@nuxthub/core',
+  ],
 
   eslint: {
     config: {
