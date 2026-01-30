@@ -7,32 +7,21 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "lint": "eslint . --fix",
+    "typecheck": "nuxt typecheck"
   },
   "dependencies": {
-    "@aws-sdk/client-ses": "^3.958.0",
-    "@neondatabase/serverless": "^1.0.2",
-    "@nuxt/content": "3.10.0",
-    "@nuxt/eslint": "1.12.1",
-    "@nuxt/hints": "1.0.0-alpha.5",
+    "@nuxt/a11y": "1.0.0-alpha.1",
+    "@nuxt/eslint": "1.13.0",
+    "@nuxt/hints": "1.0.0-alpha.6",
     "@nuxt/image": "2.0.0",
-    "@nuxt/ui": "4.3.0",
-    "@nuxthub/core": "0.10.4",
-    "@pinia/nuxt": "0.11.3",
-    "better-auth": "^1.4.9",
-    "better-sqlite3": "^12.5.0",
-    "drizzle-kit": "^0.31.8",
-    "drizzle-orm": "^0.45.1",
-    "eslint": "^9.39.2",
-    "nuxt": "^4.2.2",
-    "pinia": "^3.0.4",
-    "typescript": "^5.9.3",
-    "v-gsap-nuxt": "1.4.4",
-    "vue": "^3.5.26",
-    "vue-router": "^4.6.4",
-    "zod": "^4.2.1"
-  },
-  "devDependencies": {
-    "prettier": "3.7.4"
+    "@nuxt/ui": "4.4.0",
+    "eslint": "^9.0.0",
+    "nuxt": "^4.3.0",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.6.3",
+    "vue": "^3.5.27",
+    "vue-router": "^4.6.4"
   }
 }

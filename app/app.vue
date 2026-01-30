@@ -1,15 +1,6 @@
 <template>
-  <UApp :locale="sk">
+  <div>
     <NuxtRouteAnnouncer />
-    <NuxtLoadingIndicator color="var(--ui-primary)" />
-    <UMain>
-      <NuxtLayout>
-        <NuxtPage />
-      </NuxtLayout>
-    </UMain>
-  </UApp>
+    <NuxtWelcome />
+  </div>
 </template>
-
-<script setup lang="ts">
-import { sk } from "@nuxt/ui/locale";
-</script>
