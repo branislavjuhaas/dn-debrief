@@ -6,5 +6,6 @@ export default withNuxt({
     '@stylistic/indent': ['error', 2],
     '@stylistic/no-tabs': 'error',
     '@stylistic/semi': ['error', 'always'],
+    'vue/multi-word-component-names': 'off',
   },
 });

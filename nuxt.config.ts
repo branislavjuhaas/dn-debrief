@@ -8,6 +8,8 @@ export default defineNuxtConfig({
     '@nuxthub/core',
   ],
 
+  css: ['~/assets/css/main.css'],
+
   eslint: {
     config: {
       stylistic: {
