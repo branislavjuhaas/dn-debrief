@@ -13,4 +13,13 @@ export default defineNuxtConfig({
   ],
 
   css: ['~/assets/css/main.css'],
+
+  eslint: {
+    config: {
+      stylistic: {
+        semi: true,
+        indent: 2,
+      },
+    },
+  },
 })
