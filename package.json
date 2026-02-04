@@ -1,8 +1,5 @@
 {
   "name": "dn-cascade",
-  "version": "2.26.0.1",
-  "author": "Branislav Juhás",
-  "license": "MIT",
   "type": "module",
   "private": true,
   "scripts": {
@@ -10,24 +7,22 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare",
-    "lint": "eslint . --fix",
-    "typecheck": "nuxt typecheck"
+    "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@iconify-json/lucide": "^1.2.87",
-    "@iconify-json/ph": "^1.2.2",
     "@nuxt/a11y": "1.0.0-alpha.1",
     "@nuxt/eslint": "1.13.0",
     "@nuxt/hints": "1.0.0-alpha.6",
     "@nuxt/image": "2.0.0",
     "@nuxt/ui": "4.4.0",
     "@nuxthub/core": "0.10.6",
+    "better-auth": "^1.4.18",
     "eslint": "^9.0.0",
     "nuxt": "^4.3.0",
     "tailwindcss": "^4.0.0",
     "typescript": "^5.6.3",
     "vue": "^3.5.27",
-    "vue-router": "^4.6.4"
+    "vue-router": "^4.6.4",
+    "zod": "^4.3.6"
   }
 }

@@ -1,10 +1,6 @@
 <template>
-  <UApp>
+  <div>
     <NuxtRouteAnnouncer />
-    <NuxtLoadingIndicator color="var(--ui-primary)" />
-    <Header />
-    <NuxtLayout>
-      <NuxtPage />
-    </NuxtLayout>
-  </UApp>
+    <NuxtWelcome />
+  </div>
 </template>
