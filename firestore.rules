@@ -32,5 +32,9 @@ service cloud.firestore {
       allow read: if true;
       allow write: if request.auth.token.role in ['admin', 'developer'] || (request.auth.token.role in ['organizer', 'junior'] && (!exists(/databases/$(database)/documents/events/$(eventId)) || resource.data.organizers.hasAny([request.auth.uid])));
     }
+    match /hashes/{hashId} {
+      allow read: if false;
+      allow create: if true;
+    }
   }
 }
