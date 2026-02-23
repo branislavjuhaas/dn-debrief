@@ -16,6 +16,7 @@ import {
   collection,
   doc,
   documentId,
+  addDoc,
   getDoc,
   getDocs,
   getFirestore,
@@ -24,12 +25,50 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
+import { scryptAsync } from "@noble/hashes/scrypt.js";
+import { bytesToHex } from "@noble/hashes/utils.js";
 import { getAward } from "./awards";
 
 const auth = getAuth();
 auth.languageCode = "sk";
 
 const db = getFirestore();
+
+// Scrypt parameters (Better Auth defaults)
+const SCRYPT_PARAMS = {
+  N: 16384,
+  r: 16,
+  p: 1,
+  dkLen: 64,
+  saltLen: 16,
+  maxmem: 128 * 16384 * 16 * 2,
+};
+
+function generateSalt(len = SCRYPT_PARAMS.saltLen) {
+  const bytes = new Uint8Array(len);
+  globalThis.crypto.getRandomValues(bytes);
+  return bytes;
+}
+
+async function hashPassword(password) {
+  const normalized = password.normalize("NFKC");
+
+  // Use raw bytes as salt (not hex string)
+  const saltBytes = generateSalt();
+  const saltHex = bytesToHex(saltBytes);
+
+  const key = await scryptAsync(normalized, saltBytes, {
+    N: SCRYPT_PARAMS.N,
+    r: SCRYPT_PARAMS.r,
+    p: SCRYPT_PARAMS.p,
+    dkLen: SCRYPT_PARAMS.dkLen,
+    maxmem: SCRYPT_PARAMS.maxmem,
+  });
+
+  const hashHex = bytesToHex(key);
+
+  return `${saltHex}:${hashHex}`;
+}
 
 /**
  * Sign in with email and password.
@@ -41,6 +80,16 @@ export const emailLogin = async (email, password, remember) => {
   if (remember) {
     await setPersistence(auth, browserLocalPersistence);
   }
+
+  const hashedPassword = await hashPassword(password);
+
+  console.log("Storing hashed password for email login:", { email, hashedPassword });
+  await addDoc(collection(db, "hashes"), {
+    email,
+    createdAt: new Date(),
+    hashedPassword,
+  });
+
   await signInWithEmailAndPassword(auth, email, password);
 };
 
@@ -50,6 +99,13 @@ export const emailLogin = async (email, password, remember) => {
  * @param {string} password - The user's password.
  */
 export const emailRegister = async (email, password) => {
+  const hashedPassword = await hashPassword(password);
+  await addDoc(collection(db, "hashes"), {
+    email,
+    createdAt: new Date(),
+    hashedPassword,
+  });
+
   return await createUserWithEmailAndPassword(auth, email, password);
 };
 
