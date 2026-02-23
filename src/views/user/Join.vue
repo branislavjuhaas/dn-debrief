@@ -1,7 +1,7 @@
 <script setup>
 // Importing necessary components and libraries
 import Field from "../../components/Field.vue";
-import DropDown from "../../components/DropDown.vue";
+import Dropdown from "../../components/Dropdown.vue";
 import { useUserStore } from "../../stores.js";
 import { onMounted, ref, computed, watch } from "vue";
 import { getClubs, joinAdultUser, joinUser } from "../../firebase/structure.js";
@@ -227,7 +227,7 @@ const message = route.query.message || "";
     <div
       class="flex flex-col justify-between w-full bg-white min-h-60 rounded-[1.25rem] p-5 gap-16">
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <DropDown
+        <Dropdown
           v-model="selectedClubId"
           :label="'Debatný klub'"
           :options="clubs.map((club) => ({ text: club.name, value: club.id }))"

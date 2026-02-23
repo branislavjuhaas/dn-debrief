@@ -1,6 +1,6 @@
 <script setup>
 import Field from "../../components/Field.vue";
-import DropDown from "../../components/DropDown.vue";
+import Dropdown from "../../components/Dropdown.vue";
 import Toggle from "../../components/Toggle.vue";
 import { ref, computed, onMounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
@@ -184,7 +184,7 @@ const handleSubmit = async () => {
               :type="field.type"
               :required="!field.optional"
               :class="{ 'sm:col-span-2': hasOddFields && index === 0 }" />
-            <DropDown
+            <Dropdown
               v-else-if="field.type === 'dropdown'"
               v-model.trim="fieldValues[field.name]"
               :name="field.name"

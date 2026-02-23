@@ -11,7 +11,7 @@ import {
   updateUserProperty,
 } from "../../firebase/structure.js";
 import router from "../../router.js";
-import DropDown from "../../components/DropDown.vue";
+import Dropdown from "../../components/Dropdown.vue";
 import Toggle from "../../components/Toggle.vue";
 import { useUserStore } from "../../stores.js";
 import { translateKey, translateRole } from "../../helpers/translate.js";
@@ -539,7 +539,7 @@ const updateUserDevStatus = async (newValue) => {
             class="col-span-1 sm:col-start-2"
             label="Správca/-kyňa klubu"
             @update:model-value="updateClubManagerStatus" />
-          <DropDown
+          <Dropdown
             v-if="userRole && ['admin', 'developer'].includes(userStore.role)"
             v-model="userRole"
             class="col-start-1 col-span-1 sm:col-start-3 sm:col-span-2"
