@@ -1,4 +1,5 @@
-import { defineRelations } from 'drizzle-orm';
+import type { SQL } from 'drizzle-orm';
+import { defineRelations, sql } from 'drizzle-orm';
 import {
   pgTable,
   text,
@@ -8,7 +9,18 @@ import {
   index,
   serial,
   jsonb,
+  pgEnum,
 } from 'drizzle-orm/pg-core';
+
+export const userRoleEnum = pgEnum('role', [
+  'user',
+  'organizer',
+  'junior_organizer',
+  'chief_adjudicator',
+  'motion_committee_member',
+  'admin',
+  'developer',
+]);
 
 export const users = pgTable('users', {
   id: serial('id').primaryKey(),
@@ -21,16 +33,16 @@ export const users = pgTable('users', {
       (): SQL =>
         sql`(lower(regexp_replace(public.immutable_unaccent(${users.name} || ${users.surname}), '[^a-zA-Z0-9]', '', 'g')))`,
     ),
-  credential: integer('credential').default(0).notNull(),
+  emailVerified: boolean('email_verified').default(false).notNull(),
+  image: text('image'),
+  role: userRoleEnum('role').default('user').notNull(),
   birthdate: timestamp('birthdate'),
   street: text('street'),
   postalCode: text('postal_code'),
   city: text('city'),
   phone: text('phone'),
+  credential: integer('credential').default(0).notNull(),
   claims: jsonb('claims'),
-  emailVerified: boolean('email_verified').default(false).notNull(),
-  image: text('image'),
-  role: text('role'),
   banned: boolean('banned').default(false),
   banReason: text('ban_reason'),
   banExpires: timestamp('ban_expires'),
@@ -46,21 +58,21 @@ table => [
 ]);
 
 export const supervisors = pgTable(
-  "supervisors",
+  'supervisors',
   {
-    id: serial("id").primaryKey(),
-    name: text("name").notNull(),
+    id: serial('id').primaryKey(),
+    name: text('name').notNull(),
     email: text('email').notNull(),
-    userId: integer("user_id")
-      .references(() => users.id, { onDelete: "cascade" })
+    userId: integer('user_id')
+      .references(() => users.id, { onDelete: 'cascade' })
       .notNull(),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-    updatedAt: timestamp("updated_at")
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at')
       .defaultNow()
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
   },
-  (table) => [index("supervisors_userId_idx").on(table.userId)],
+  table => [index('supervisors_userId_idx').on(table.userId)],
 );
 
 export const sessions = pgTable(
@@ -124,24 +136,24 @@ export const verifications = pgTable(
 );
 
 export const authRelations = defineRelations(
-  { users, sessions, accounts },
+  { users, supervisors, sessions, accounts },
   r => ({
     users: {
       sessions: r.many.sessions(),
       accounts: r.many.accounts(),
       supervisors: r.many.supervisors({
-        from: r.supervisors.userId,
-        to: r.users.id,
+        from: r.users.id,
+        to: r.supervisors.userId,
       }),
     },
     sessions: {
-      user: r.one.users({
+      users: r.one.users({
         from: r.sessions.userId,
         to: r.users.id,
       }),
     },
     accounts: {
-      user: r.one.users({
+      users: r.one.users({
         from: r.accounts.userId,
         to: r.users.id,
       }),
@@ -151,6 +163,6 @@ export const authRelations = defineRelations(
         from: r.supervisors.userId,
         to: r.users.id,
       }),
-    }
+    },
   }),
 );

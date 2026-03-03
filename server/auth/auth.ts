@@ -1,7 +1,7 @@
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { openAPI, admin as adminPlugin } from 'better-auth/plugins';
-// import * as schema from '~~/server/db/schema/auth';
+import * as schema from '#server/db/schema/auth';
 import { db } from '#server/db/db';
 import {
   ac,
@@ -15,11 +15,11 @@ import {
 } from '~~/server/auth/permissions';
 
 export const auth = betterAuth({
-  experimental: { joins: true },
+  // TODO: use drizzle adapter joins once it support relations v2
   database: drizzleAdapter(db, {
     provider: 'pg',
     usePlural: true,
-    // schema: schema,
+    schema: schema,
   }),
   session: {
     cookieCache: {
