@@ -9,7 +9,6 @@ export default defineNuxtConfig({
     '@nuxt/hints',
     '@nuxt/image',
     '@nuxt/ui',
-    '@nuxthub/core'
   ],
 
   css: ['~/assets/css/main.css'],
