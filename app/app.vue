@@ -1,6 +1,7 @@
+<script setup lang="ts">
+import { sk } from '#ui/locale';
+</script>
+
 <template>
-  <div>
-    <NuxtRouteAnnouncer />
-    <NuxtWelcome />
-  </div>
+  <UApp :locale="sk" />
 </template>

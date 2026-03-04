@@ -1,7 +1,7 @@
 export default defineAppConfig({
   ui: {
     colors: {
-      neutral: 'zinc'
+      neutral: 'zinc',
     },
     icons: {
       arrowDown: 'i-ph-arrow-down',
@@ -45,7 +45,7 @@ export default defineAppConfig({
       system: 'i-ph-monitor',
       tip: 'i-ph-lightbulb',
       upload: 'i-ph-upload',
-      warning: 'i-ph-warning'
-    }
-  }
-})
+      warning: 'i-ph-warning',
+    },
+  },
+});
