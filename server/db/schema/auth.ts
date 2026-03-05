@@ -1,5 +1,5 @@
 import type { SQL } from 'drizzle-orm';
-import { defineRelations, sql } from 'drizzle-orm';
+import { sql } from 'drizzle-orm';
 import {
   pgTable,
   text,
@@ -135,34 +135,3 @@ export const verifications = pgTable(
   table => [index('verifications_identifier_idx').on(table.identifier)],
 );
 
-export const authRelations = defineRelations(
-  { users, supervisors, sessions, accounts },
-  r => ({
-    users: {
-      sessions: r.many.sessions(),
-      accounts: r.many.accounts(),
-      supervisors: r.many.supervisors({
-        from: r.users.id,
-        to: r.supervisors.userId,
-      }),
-    },
-    sessions: {
-      users: r.one.users({
-        from: r.sessions.userId,
-        to: r.users.id,
-      }),
-    },
-    accounts: {
-      users: r.one.users({
-        from: r.accounts.userId,
-        to: r.users.id,
-      }),
-    },
-    supervisors: {
-      user: r.one.users({
-        from: r.supervisors.userId,
-        to: r.users.id,
-      }),
-    },
-  }),
-);
