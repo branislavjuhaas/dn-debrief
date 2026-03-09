@@ -14,8 +14,8 @@ import { type SQL, sql } from 'drizzle-orm';
 import { users } from './auth';
 import { payments } from './payments';
 
-export const clubLeagueEnum = pgEnum('league', ['junior', 'senior', 'university']);
-export const clubRegionEnum = pgEnum('region', ['west', 'central', 'east']);
+export const leagueEnum = pgEnum('league', ['junior', 'senior', 'university']);
+export const regionEnum = pgEnum('region', ['west', 'central', 'east']);
 export const clubMembershipTypeEnum = pgEnum('club_registration_type', ['junior_student', 'senior_student', 'graduate', 'teacher']);
 
 export const clubs = pgTable('clubs', {
@@ -27,9 +27,9 @@ export const clubs = pgTable('clubs', {
       (): SQL =>
         sql`(lower(regexp_replace(public.immutable_unaccent(${clubs.name}), '[^a-zA-Z0-9]', '', 'g')))`,
     ),
-  league: clubLeagueEnum('league').notNull(),
+  league: leagueEnum('league').notNull(),
   isActive: boolean('is_active').default(true).notNull(),
-  region: clubRegionEnum('region').notNull(),
+  region: regionEnum('region').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at')
     .defaultNow()
