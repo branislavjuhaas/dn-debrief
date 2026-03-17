@@ -8,7 +8,7 @@ import {
   text,
   timestamp,
   index,
-  uniqueIndex,
+  primaryKey,
 } from 'drizzle-orm/pg-core';
 import { type SQL, sql } from 'drizzle-orm';
 import { users } from './auth';
@@ -62,10 +62,7 @@ export const clubMemberships = pgTable(
       .notNull(),
   },
   table => [
-    uniqueIndex('club_memberships_userId_season_unique').on(
-      table.userId,
-      table.season,
-    ),
+    primaryKey({ columns: [table.clubId, table.userId, table.season] }),
     index('club_memberships_userId_idx').on(table.userId),
     index('club_memberships_userId_season_idx').on(table.userId, table.season),
     index('club_memberships_paymentId_idx').on(table.paymentId),
@@ -79,7 +76,6 @@ export const clubMemberships = pgTable(
 export const clubManagers = pgTable(
   'club_managers',
   {
-    id: serial('id').primaryKey(),
     clubId: integer('club_id')
       .references(() => clubs.id)
       .notNull(),
@@ -93,10 +89,7 @@ export const clubManagers = pgTable(
       .notNull(),
   },
   table => [
-    uniqueIndex('club_managers_userId_clubId_unique').on(
-      table.userId,
-      table.clubId,
-    ),
+    primaryKey({ columns: [table.clubId, table.userId] }),
     index('club_managers_userId_idx').on(table.userId),
     index('club_managers_clubId_idx').on(table.clubId),
   ]);
