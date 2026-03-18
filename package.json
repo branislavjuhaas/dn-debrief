@@ -10,7 +10,8 @@
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "typecheck": "nuxt typecheck"
+    "typecheck": "nuxt typecheck",
+    "test": "vitest"
   },
   "dependencies": {
     "@nuxt/a11y": "1.0.0-alpha.1",
@@ -30,6 +31,11 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "drizzle-kit": "^1.0.0-beta.15-859cf75"
+    "@nuxt/test-utils": "^4.0.0",
+    "@vue/test-utils": "^2.4.6",
+    "drizzle-kit": "^1.0.0-beta.15-859cf75",
+    "happy-dom": "^20.8.4",
+    "playwright-core": "^1.58.2",
+    "vitest": "^4.1.0"
   }
 }

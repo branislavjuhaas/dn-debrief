@@ -93,4 +93,3 @@ export const clubManagers = pgTable(
     index('club_managers_userId_idx').on(table.userId),
     index('club_managers_clubId_idx').on(table.clubId),
   ]);
-
