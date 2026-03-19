@@ -3,15 +3,14 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "nuxt build",
-    "dev": "nuxt dev",
-    "generate": "nuxt generate",
-    "preview": "nuxt preview",
-    "postinstall": "nuxt prepare",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "typecheck": "nuxt typecheck",
-    "test": "vitest"
+    "build": "bun --bun nuxt build",
+    "dev": "bun --bun nuxt dev",
+    "preview": "bun --bun nuxt preview",
+    "postinstall": "bun --bun nuxt prepare",
+    "lint": "bun --bun eslint .",
+    "lint:fix": "bun --bun eslint . --fix",
+    "typecheck": "bun --bun nuxt typecheck",
+    "test": "bun --bun vitest"
   },
   "dependencies": {
     "@nuxt/a11y": "1.0.0-alpha.1",

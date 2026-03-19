@@ -1,0 +1,49 @@
+name: Lint and Test
+
+on:
+  push:
+    paths-ignore:
+      - "**.md"
+      - "LICENSE"
+      - ".gitignore"
+  pull_request:
+    paths-ignore:
+      - "**.md"
+      - "LICENSE"
+      - ".gitignore"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Cache Bun dependencies
+        uses: actions/cache@v5
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Lint code
+        run: bun lint
+
+      - name: Type check code
+        run: bun typecheck
+
+      - name: Run tests
+        run: bunx --bun vitest run
