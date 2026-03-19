@@ -3,14 +3,14 @@ name: Lint and Test
 on:
   push:
     paths-ignore:
-      - "**.md"
-      - "LICENSE"
-      - ".gitignore"
+      - "../../README.md"
+      - "../../LICENSE"
+      - "../../.gitignore"
   pull_request:
     paths-ignore:
-      - "**.md"
-      - "LICENSE"
-      - ".gitignore"
+      - "../../README.md"
+      - "../../LICENSE"
+      - "../../.gitignore"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
