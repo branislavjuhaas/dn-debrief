@@ -11,8 +11,7 @@ const userStore = useUserStore();
       class="w-96"
       :disabled="!userStore.isAuthenticated"
       icon="ph:magnifying-glass"
-      @click="searchOpen = true"
-    >
+      @click="searchOpen = true">
       {{
         userStore.isAuthenticated
           ? "Hľadať ľudí, podujatia a kluby..."
@@ -24,8 +23,7 @@ const userStore = useUserStore();
         :disabled="!userStore.isAuthenticated"
         class="lg:hidden"
         collapsed
-        icon="ph:magnifying-glass"
-      />
+        icon="ph:magnifying-glass" />
       <HeaderNav />
     </template>
   </UHeader>

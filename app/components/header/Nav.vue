@@ -68,8 +68,7 @@ const navItems = ref<DropdownMenuItem[][]>([
           chip: userStore.impersonation
             ? { color: 'info', inset: true }
             : false,
-        }"
-      >
+        }">
         {{ userStore.fullName }}
       </UButton>
       <UDropdownMenu
@@ -78,8 +77,7 @@ const navItems = ref<DropdownMenuItem[][]>([
           align: 'end',
           side: 'bottom',
           sideOffset: 8,
-        }"
-      >
+        }">
         <UButton icon="ph:sort-ascending" color="neutral" variant="outline" />
       </UDropdownMenu>
     </UFieldGroup>
