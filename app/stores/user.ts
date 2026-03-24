@@ -9,12 +9,14 @@ export const useUserStore = defineStore("user", {
   getters: {
     isAuthenticated: (state) => !!state.user,
     isCompleteUser: (state) =>
-      !!(state.user &&
+      !!(
+        state.user &&
         state.user.birthdate &&
         state.user.street &&
         state.user.postalCode &&
         state.user.city &&
-        state.user.phone),
+        state.user.phone
+      ),
     fullName: (state) =>
       state.user ? `${state.user.name} ${state.user.surname}` : "",
     isMember: (state) =>
