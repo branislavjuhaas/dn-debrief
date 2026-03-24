@@ -5,7 +5,7 @@ import type { User, UserRole } from "#shared/types/user";
 export const requireUser = async (
   event: H3Event,
   roles: UserRole[] | null = null,
-) => {
+): Promise<User> => {
   const session = await auth.api.getSession({
     headers: event.headers,
   });
@@ -20,5 +20,17 @@ export const requireUser = async (
     throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
   }
 
-  return { ...session.user, id: Number(session.user.id) } as unknown as User;
+  return session as unknown as User;
+};
+
+export const getUser = async (event: H3Event): Promise<User | null> => {
+  const session = await auth.api.getSession({
+    headers: event.headers,
+  });
+
+  if (!session || !session.user) {
+    return null;
+  }
+
+  return session as unknown as User;
 };
