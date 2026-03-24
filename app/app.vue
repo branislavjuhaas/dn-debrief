@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { sk } from "#ui/locale";
 import Header from "~/components/Header.vue";
+import Footer from "~/components/Footer.vue";
 </script>
 
 <template>
@@ -8,5 +9,7 @@ import Header from "~/components/Header.vue";
     <NuxtRouteAnnouncer />
     <NuxtAnnouncer />
     <Header />
+    <UMain />
+    <Footer />
   </UApp>
 </template>
