@@ -4,7 +4,7 @@ import { db } from "#server/db/db";
 export default defineEventHandler(async (event) => {
   const user = await requireUser(event);
 
-  const userData = db.query.users.findFirst({
+  const userData = await db.query.users.findFirst({
     where: { id: user.id },
     with: {
       legalGuardians: true,
