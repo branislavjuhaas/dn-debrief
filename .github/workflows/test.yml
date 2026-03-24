@@ -1,6 +1,7 @@
 name: Lint and Test
 
 on:
+  workflow_call:
   push:
     paths-ignore:
       - "../../README.md"
@@ -23,27 +24,25 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          bun-version: latest
+          node-version: lts/*
+          cache: pnpm
 
-      - name: Cache Bun dependencies
-        uses: actions/cache@v5
-        with:
-          path: ~/.bun/install/cache
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-bun-
+      - name: Setup pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@10 --activate
 
       - name: Install dependencies
-        run: bun install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Lint code
-        run: bun lint
+        run: pnpm lint
 
       - name: Type check code
-        run: bun typecheck
+        run: pnpm typecheck
 
       - name: Run tests
-        run: bunx --bun vitest run
+        run: pnpm vitest run
