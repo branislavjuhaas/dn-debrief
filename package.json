@@ -3,14 +3,14 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "bun --bun nuxt build",
-    "dev": "bun --bun nuxt dev",
-    "preview": "bun --bun nuxt preview",
-    "postinstall": "bun --bun nuxt prepare",
-    "lint": "bun --bun eslint .",
-    "lint:fix": "bun --bun eslint . --fix",
-    "typecheck": "bun --bun nuxt typecheck",
-    "test": "bun --bun vitest"
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "nuxt typecheck",
+    "test": "vitest"
   },
   "dependencies": {
     "@nuxt/a11y": "1.0.0-alpha.1",
@@ -24,6 +24,7 @@
     "drizzle-orm": "^1.0.0-beta.18-8755db3",
     "eslint": "^10.1.0",
     "nuxt": "^4.4.2",
+    "postgres": "^3.4.8",
     "tailwindcss": "^4.2.2",
     "typescript": "^5.9.3",
     "vue": "^3.5.30",
@@ -42,5 +43,6 @@
     "playwright-core": "^1.58.2",
     "prettier": "^3.8.1",
     "vitest": "^4.1.1"
-  }
+  },
+  "packageManager": "pnpm@10.32.1+sha512.a706938f0e89ac1456b6563eab4edf1d1faf3368d1191fc5c59790e96dc918e4456ab2e67d613de1043d2e8c81f87303e6b40d4ffeca9df15ef1ad567348f2be"
 }
