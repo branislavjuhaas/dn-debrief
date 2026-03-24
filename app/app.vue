@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { sk } from '#ui/locale';
-import Header from '~/components/Header.vue';
+import { sk } from "#ui/locale";
+import Header from "~/components/Header.vue";
 </script>
 
 <template>

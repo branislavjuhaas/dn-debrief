@@ -1,8 +1,8 @@
-import { betterAuth } from 'better-auth';
-import { drizzleAdapter } from 'better-auth/adapters/drizzle';
-import { openAPI, admin as adminPlugin } from 'better-auth/plugins';
-import * as schema from '#server/db/schema/auth';
-import { db } from '#server/db/db';
+import { betterAuth } from "better-auth";
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { openAPI, admin as adminPlugin } from "better-auth/plugins";
+import * as schema from "#server/db/schema/auth";
+import { db } from "#server/db/db";
 import {
   ac,
   admin,
@@ -12,12 +12,12 @@ import {
   motion_committee_member,
   organizer,
   user,
-} from '~~/server/auth/permissions';
+} from "~~/server/auth/permissions";
 
 export const auth = betterAuth({
   // TODO: use drizzle adapter joins once it support relations v2
   database: drizzleAdapter(db, {
-    provider: 'pg',
+    provider: "pg",
     usePlural: true,
     schema: schema,
   }),
@@ -29,7 +29,7 @@ export const auth = betterAuth({
   },
   plugins: [
     openAPI({
-      path: '/docs',
+      path: "/docs",
     }),
     adminPlugin({
       ac,
@@ -64,8 +64,8 @@ export const auth = betterAuth({
       clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
       mapProfileToUser: (profile) => {
         return {
-          name: profile.name.split(' ').slice(0, -1).join(' '),
-          surname: profile.name.split(' ').slice(-1)[0],
+          name: profile.name.split(" ").slice(0, -1).join(" "),
+          surname: profile.name.split(" ").slice(-1)[0],
         };
       },
     },
@@ -73,43 +73,43 @@ export const auth = betterAuth({
   user: {
     additionalFields: {
       surname: {
-        type: 'string',
+        type: "string",
         required: true,
         input: true,
       },
       credential: {
-        type: 'number',
+        type: "number",
         required: true,
         defaultValue: 0,
         input: false, // don't allow user to set credential
       },
       birthdate: {
-        type: 'date',
+        type: "date",
         required: false,
         input: true,
       },
       street: {
-        type: 'string',
+        type: "string",
         required: false,
         input: true,
       },
       postalCode: {
-        type: 'string',
+        type: "string",
         required: false,
         input: true,
       },
       city: {
-        type: 'string',
+        type: "string",
         required: false,
         input: true,
       },
       phone: {
-        type: 'string',
+        type: "string",
         required: false,
         input: true,
       },
       claims: {
-        type: 'json',
+        type: "json",
         required: false,
         input: false, // don't allow user to set claims
       },
@@ -124,7 +124,9 @@ export const auth = betterAuth({
   emailVerification: {
     sendOnSignUp: true,
     sendVerificationEmail: async ({ user, token }, _request) => {
-      console.log(`Send verification email to ${user.email} with token ${token}`);
+      console.log(
+        `Send verification email to ${user.email} with token ${token}`,
+      );
     },
   },
 });

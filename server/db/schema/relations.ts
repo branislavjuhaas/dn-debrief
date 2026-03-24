@@ -1,15 +1,15 @@
-import { defineRelations } from 'drizzle-orm';
-import { users, supervisors } from './auth';
-import { clubs, clubMemberships, clubManagers } from './clubs';
-import { payments } from './payments';
+import { defineRelations } from "drizzle-orm";
+import { users, legalGuardians } from "./auth";
+import { clubs, clubMemberships, clubManagers } from "./clubs";
+import { payments } from "./payments";
 
 export const relations = defineRelations(
-  { users, supervisors, clubs, clubMemberships, clubManagers, payments },
-  r => ({
+  { users, legalGuardians, clubs, clubMemberships, clubManagers, payments },
+  (r) => ({
     users: {
-      supervisors: r.many.supervisors({
+      legalGuardians: r.many.legalGuardians({
         from: r.users.id,
-        to: r.supervisors.userId,
+        to: r.legalGuardians.userId,
       }),
       payments: r.many.payments({
         from: r.users.id,
@@ -22,17 +22,17 @@ export const relations = defineRelations(
       clubs: r.many.clubs({
         from: r.users.id.through(r.clubMemberships.userId),
         to: r.clubs.id.through(r.clubMemberships.clubId),
-        alias: 'member',
+        alias: "member",
       }),
       managedClubs: r.many.clubs({
         from: r.users.id.through(r.clubManagers.userId),
         to: r.clubs.id.through(r.clubManagers.clubId),
-        alias: 'manager',
+        alias: "manager",
       }),
     },
-    supervisors: {
+    legalGuardians: {
       user: r.one.users({
-        from: r.supervisors.userId,
+        from: r.legalGuardians.userId,
         to: r.users.id,
       }),
     },
@@ -44,12 +44,12 @@ export const relations = defineRelations(
       members: r.many.users({
         from: r.clubs.id.through(r.clubMemberships.clubId),
         to: r.users.id.through(r.clubMemberships.userId),
-        alias: 'member',
+        alias: "member",
       }),
       managers: r.many.users({
         from: r.clubs.id.through(r.clubManagers.clubId),
         to: r.users.id.through(r.clubManagers.userId),
-        alias: 'manager',
+        alias: "manager",
       }),
     },
     clubMemberships: {

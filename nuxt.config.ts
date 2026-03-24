@@ -1,29 +1,19 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-
   modules: [
-    '@nuxt/a11y',
-    '@nuxt/eslint',
-    '@nuxt/hints',
-    '@nuxt/image',
-    '@nuxt/ui',
-    '@nuxt/test-utils/module',
+    "@nuxt/a11y",
+    "@nuxt/eslint",
+    "@nuxt/hints",
+    "@nuxt/image",
+    "@nuxt/ui",
+    "@nuxt/test-utils/module",
   ],
   devtools: { enabled: true },
 
-  css: ['~/assets/css/main.css'],
-  compatibilityDate: '2025-07-15',
+  css: ["~/assets/css/main.css"],
+  compatibilityDate: "2025-07-15",
 
   nitro: {
-    preset: 'bun',
-  },
-
-  eslint: {
-    config: {
-      stylistic: {
-        semi: true,
-        indent: 2,
-      },
-    },
+    preset: "bun",
   },
 });

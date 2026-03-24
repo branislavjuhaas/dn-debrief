@@ -1,9 +1,9 @@
-import { createAccessControl } from 'better-auth/plugins/access';
+import { createAccessControl } from "better-auth/plugins/access";
 import {
   defaultStatements,
   adminAc,
   userAc,
-} from 'better-auth/plugins/admin/access';
+} from "better-auth/plugins/admin/access";
 
 const statement = {
   ...defaultStatements,
@@ -13,8 +13,8 @@ export const ac = createAccessControl(statement);
 
 // Admin role (all admin permissions except impersonation)
 export const admin = ac.newRole({
-  user: ['create', 'list', 'set-role', 'ban', 'delete', 'set-password'],
-  session: ['list', 'revoke', 'delete'],
+  user: ["create", "list", "set-role", "ban", "delete", "set-password"],
+  session: ["list", "revoke", "delete"],
 });
 
 // Developer role (all admin permissions including impersonation)
