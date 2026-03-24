@@ -13,17 +13,25 @@ export default createConfigForNuxt({
   },
 })
   .append(
-    prettierConfig, // disables conflicting stylistic rules
+    // Disable stylistic ESLint rules that conflict with Prettier's output.
+    prettierConfig,
     {
       plugins: { prettier: prettierPlugin },
       rules: {
-        "prettier/prettier": "error", // runs Prettier during eslint --fix
+        "prettier/prettier": [
+          "error",
+          {
+            bracketSameLine: true,
+          },
+        ],
       },
     },
   )
   .overrideRules({
+    // Let Prettier fully control template closing bracket placement.
+    "vue/html-closing-bracket-newline": "off",
+    "@stylistic/vue/html-closing-bracket-newline": "off",
     "vue/multi-word-component-names": "off",
-    "vue/max-attributes-per-line": ["error", { singleline: 5 }],
     "@typescript-eslint/no-restricted-types": "off",
     "@typescript-eslint/no-empty-object-type": "off",
     "@typescript-eslint/no-explicit-any": "off",
