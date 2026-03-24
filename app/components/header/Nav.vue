@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { DropdownMenuItem } from "@nuxt/ui";
+
 const userStore = useUserStore();
 const authClient = useAuthClient();
 
@@ -7,7 +9,7 @@ const logout = async () => {
   userStore.clear();
 };
 
-const navItems = ref([
+const navItems = ref<DropdownMenuItem[][]>([
   [
     {
       label: "Môj profil",
@@ -46,6 +48,7 @@ const navItems = ref([
     {
       label: "Odhlásiť sa",
       icon: "ph:plugs",
+      color: "error",
       onSelect: () => logout(),
     },
   ],
