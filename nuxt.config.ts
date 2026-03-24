@@ -7,6 +7,7 @@ export default defineNuxtConfig({
     "@nuxt/image",
     "@nuxt/ui",
     "@nuxt/test-utils/module",
+    "@pinia/nuxt",
   ],
   devtools: { enabled: true },
 
