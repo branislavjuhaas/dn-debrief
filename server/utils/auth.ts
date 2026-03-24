@@ -1,17 +1,22 @@
-import type { UserRole } from "#shared/types/user";
 import type { H3Event } from "h3";
 import { auth } from "#server/auth/auth";
+import type { User, UserRole } from "#shared/types/user";
 
-export const requireUser = (event: H3Event, roles?: UserRole[] = null) => {
+export const requireUser = async (
+  event: H3Event,
+  roles: UserRole[] | null = null,
+) => {
   const session = await auth.api.getSession({
     headers: event.headers,
   });
 
-  if (
-    !session ||
-    !session.user ||
-    (roles && roles.includes(session.user.role))
-  ) {
+  if (!session || !session.user) {
+    throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
+  }
+
+  const role = session?.user?.role;
+
+  if (roles && !roles.includes(role as UserRole)) {
     throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
   }
 
