@@ -1,5 +1,6 @@
 {
   "name": "dn-cascade",
+  "version": "2.26.0.1",
   "type": "module",
   "private": true,
   "scripts": {
