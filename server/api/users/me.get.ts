@@ -7,7 +7,12 @@ export default defineEventHandler(async (event) => {
   const userData = await db.query.users.findFirst({
     where: { id: user.id },
     with: {
-      legalGuardians: true,
+      legalGuardians: {
+        columns: {
+          name: true,
+          email: true,
+        },
+      },
       payments: true,
       memberships: {
         with: {
@@ -18,9 +23,15 @@ export default defineEventHandler(async (event) => {
           },
         },
       },
-      managedClubs: true,
+      managedClubs: {
+        columns: {
+          name: true,
+        },
+      },
     },
   });
+
+  console.log(userData);
 
   return { user: userData };
 });
