@@ -2,9 +2,24 @@ import { defineRelations } from "drizzle-orm";
 import { users, legalGuardians } from "./auth";
 import { clubs, clubMemberships, clubManagers } from "./clubs";
 import { payments } from "./payments";
+import {
+  eventOrganizers,
+  eventRegistrations,
+  events,
+} from "#server/db/schema/events";
 
 export const relations = defineRelations(
-  { users, legalGuardians, clubs, clubMemberships, clubManagers, payments },
+  {
+    users,
+    legalGuardians,
+    clubs,
+    clubMemberships,
+    clubManagers,
+    payments,
+    events,
+    eventRegistrations,
+    eventOrganizers,
+  },
   (r) => ({
     users: {
       legalGuardians: r.many.legalGuardians({
@@ -28,6 +43,14 @@ export const relations = defineRelations(
         from: r.users.id.through(r.clubManagers.userId),
         to: r.clubs.id.through(r.clubManagers.clubId),
         alias: "manager",
+      }),
+      eventRegistrations: r.many.eventRegistrations({
+        from: r.users.id,
+        to: r.eventRegistrations.userId,
+      }),
+      eventsOrganized: r.many.events({
+        from: r.users.id.through(r.eventOrganizers.userId),
+        to: r.events.id.through(r.eventOrganizers.eventId),
       }),
     },
     legalGuardians: {
@@ -80,6 +103,49 @@ export const relations = defineRelations(
     payments: {
       user: r.one.users({
         from: r.payments.userId,
+        to: r.users.id,
+      }),
+      clubMemberships: r.many.clubMemberships({
+        from: r.payments.id,
+        to: r.clubMemberships.paymentId,
+      }),
+      eventRegistrations: r.many.eventRegistrations({
+        from: r.payments.id,
+        to: r.eventRegistrations.paymentId,
+      }),
+    },
+    events: {
+      organizers: r.many.users({
+        from: r.events.id.through(r.eventOrganizers.eventId),
+        to: r.users.id.through(r.eventOrganizers.userId),
+      }),
+      registrations: r.many.eventRegistrations({
+        from: r.events.id,
+        to: r.eventRegistrations.eventId,
+      }),
+    },
+    eventRegistrations: {
+      event: r.one.events({
+        from: r.eventRegistrations.eventId,
+        to: r.events.id,
+      }),
+      user: r.one.users({
+        from: r.eventRegistrations.userId,
+        to: r.users.id,
+      }),
+      payment: r.one.payments({
+        from: r.eventRegistrations.paymentId,
+        to: r.payments.id,
+        optional: true,
+      }),
+    },
+    eventOrganizers: {
+      event: r.one.events({
+        from: r.eventOrganizers.eventId,
+        to: r.events.id,
+      }),
+      user: r.one.users({
+        from: r.eventOrganizers.userId,
         to: r.users.id,
       }),
     },
