@@ -31,7 +31,5 @@ export default defineEventHandler(async (event) => {
     },
   });
 
-  console.log(userData);
-
   return { user: userData };
 });
