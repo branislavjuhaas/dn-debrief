@@ -26,13 +26,13 @@ const footerLinks: FooterColumn[] = [
     label: "Užitočné odkazy",
     children: [
       {
-        label: "Fastballot",
-        to: "https://fastballot.sk/",
+        label: "Slovenská debatná asociácia",
+        to: "https://sda.sk/",
         target: "_blank",
       },
       {
-        label: "Slovenská debatná asociácia",
-        to: "https://sda.sk/",
+        label: "Fastballot",
+        to: "https://fastballot.sk/",
         target: "_blank",
       },
     ],
