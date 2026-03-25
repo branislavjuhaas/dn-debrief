@@ -3,6 +3,7 @@ import { sql } from "drizzle-orm";
 import {
   pgTable,
   text,
+  date,
   timestamp,
   boolean,
   integer,
@@ -38,7 +39,7 @@ export const users = pgTable(
     emailVerified: boolean("email_verified").default(false).notNull(),
     image: text("image"),
     role: userRoleEnum("role").default("user").notNull(),
-    birthdate: timestamp("birthdate"),
+    birthdate: date("birthdate"),
     street: text("street"),
     postalCode: text("postal_code"),
     city: text("city"),
