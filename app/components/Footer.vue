@@ -2,7 +2,7 @@
 import { version } from "~~/package.json";
 import type { FooterColumn } from "@nuxt/ui";
 
-const source = "https://github.com/branislavjuhaas/dn-cascade";
+const source = "https://github.com/branislavjuhaas/dn-debrief";
 
 const footerLinks: FooterColumn[] = [
   {
