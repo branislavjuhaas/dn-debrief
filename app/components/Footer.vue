@@ -41,7 +41,7 @@ const footerLinks: FooterColumn[] = [
     label: "O projekte",
     children: [
       {
-        label: "O projekte DND",
+        label: "O systéme DebRIEF",
         to: "/about",
       },
       {
