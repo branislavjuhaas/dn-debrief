@@ -10,8 +10,7 @@ const userStore = useUserStore();
     <UDashboardSearchButton
       class="w-96"
       :disabled="!userStore.isAuthenticated"
-      icon="ph:magnifying-glass"
-      @click="searchOpen = true">
+      icon="ph:magnifying-glass">
       {{
         userStore.isAuthenticated
           ? "Hľadať ľudí, podujatia a kluby..."
