@@ -5,7 +5,9 @@ const userStore = useUserStore();
 <template>
   <UHeader>
     <template #left>
-      <DebriefLogo />
+      <NuxtLink to="/" class="flex items-center gap-2">
+        <DebriefLogo />
+      </NuxtLink>
     </template>
     <UDashboardSearchButton
       class="w-96"
