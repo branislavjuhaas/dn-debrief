@@ -9,7 +9,9 @@ import Footer from "~/components/Footer.vue";
     <NuxtRouteAnnouncer />
     <NuxtAnnouncer />
     <Header />
-    <UMain />
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
     <Footer />
   </UApp>
 </template>
