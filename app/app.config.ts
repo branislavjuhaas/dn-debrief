@@ -3,6 +3,14 @@ export default defineAppConfig({
     colors: {
       neutral: "zinc",
     },
+    pageHeader: {
+      slots: {
+        root: "border-b-0 pb-2",
+      },
+    },
+    pageBody: {
+      base: "space-y-8",
+    },
     icons: {
       arrowDown: "i-ph-arrow-down",
       arrowLeft: "i-ph-arrow-left",
