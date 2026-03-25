@@ -1,5 +1,6 @@
-import { defineStore } from "pinia";
 import type { User } from "#shared/types/user";
+
+// TODO: Implement https://pinia.vuejs.org/core-concepts/state.html#TypeScript
 
 export const useUserStore = defineStore("user", {
   state: (): { user: User | null; impersonation: boolean } => ({
