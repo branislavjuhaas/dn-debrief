@@ -6,7 +6,7 @@ import {
   eventOrganizers,
   eventRegistrations,
   events,
-} from "#server/db/schema/events";
+} from "./events";
 
 export const relations = defineRelations(
   {

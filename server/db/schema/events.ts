@@ -13,9 +13,9 @@ import {
   boolean,
 } from "drizzle-orm/pg-core";
 
-import { leagueEnum, regionEnum } from "#server/db/schema/clubs";
-import { users } from "#server/db/schema/auth";
-import { payments } from "#server/db/schema/payments";
+import { leagueEnum, regionEnum } from "./clubs";
+import { users } from "./auth";
+import { payments } from "./payments";
 
 export const eventTypeEnum = pgEnum("event_type", [
   "tournament",
