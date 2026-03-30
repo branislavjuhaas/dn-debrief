@@ -96,6 +96,7 @@ export const events = pgTable(
       ),
     type: eventTypeEnum("type").notNull(),
     description: jsonb("description").notNull(),
+    thumbnailUrl: text("thumbnail_url"),
     beginning: timestamp("beginning").notNull(),
     end: timestamp("end").notNull(),
     targetLeague: leagueEnum("target_league"),
