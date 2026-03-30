@@ -15,7 +15,7 @@ import { users } from "./auth";
 import { payments } from "./payments";
 
 export const leagueEnum = pgEnum("league", ["junior", "senior", "university"]);
-export const regionEnum = pgEnum("region", ["west", "central", "east"]);
+export const regionEnum = pgEnum("region", ["western", "central", "eastern"]);
 export const clubMembershipTypeEnum = pgEnum("club_registration_type", [
   "junior_student",
   "senior_student",
@@ -34,8 +34,8 @@ export const clubs = pgTable(
         (): SQL =>
           sql`(lower(regexp_replace(public.immutable_unaccent(${clubs.name}), '[^a-zA-Z0-9]', '', 'g')))`,
       ),
-    league: leagueEnum("league").notNull(),
     isActive: boolean("is_active").default(true).notNull(),
+    league: leagueEnum("league").notNull(),
     region: regionEnum("region").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
