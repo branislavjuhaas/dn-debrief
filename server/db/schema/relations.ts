@@ -2,11 +2,7 @@ import { defineRelations } from "drizzle-orm";
 import { users, legalGuardians } from "./auth";
 import { clubs, clubMemberships, clubManagers } from "./clubs";
 import { payments } from "./payments";
-import {
-  eventOrganizers,
-  eventRegistrations,
-  events,
-} from "./events";
+import { eventOrganizers, eventRegistrations, events } from "./events";
 
 export const relations = defineRelations(
   {
