@@ -29,7 +29,6 @@ jobs:
           node-version: lts/*
           cache: pnpm
 
-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -41,4 +40,3 @@ jobs:
 
       - name: Deploy to Vercel
         run: pnpm dlx vercel@latest deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
-
