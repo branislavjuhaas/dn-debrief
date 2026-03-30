@@ -20,7 +20,7 @@ export const requireUser = async (
     throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
   }
 
-  return session as unknown as User;
+  return session.user as unknown as User;
 };
 
 export const getUser = async (event: H3Event): Promise<User | null> => {
@@ -32,5 +32,5 @@ export const getUser = async (event: H3Event): Promise<User | null> => {
     return null;
   }
 
-  return session as unknown as User;
+  return session.user as unknown as User;
 };
