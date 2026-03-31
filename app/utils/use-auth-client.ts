@@ -22,7 +22,9 @@ import {
  * - `surname` — required string, user-provided.
  * - `credential` — numeric, required, default 0, not editable by the user.
  * - `birthdate` — optional date, user-provided.
- * - `address` — optional string, user-provided.
+ * - `street`, `postalCode`, `city`, `phone` — optional strings, user-provided.
+ * - `phone` — optional string, user-provided.
+ * - `claims` — optional JSON, not editable by the user, can be used to store arbitrary claims.
  *
  * @returns Configured auth client instance.
  */
@@ -59,10 +61,30 @@ export default () =>
         required: false,
         input: true,
       },
-      address: {
+      street: {
         type: "string",
         required: false,
         input: true,
+      },
+      postalCode: {
+        type: "string",
+        required: false,
+        input: true,
+      },
+      city: {
+        type: "string",
+        required: false,
+        input: true,
+      },
+      phone: {
+        type: "string",
+        required: false,
+        input: true,
+      },
+      claims: {
+        type: "json",
+        required: false,
+        input: false, // don't allow user to set claims
       },
     },
   });

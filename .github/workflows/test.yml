@@ -1,0 +1,46 @@
+name: Lint and Test
+
+on:
+  workflow_call:
+  push:
+    paths-ignore:
+      - "../../README.md"
+      - "../../LICENSE"
+      - "../../.gitignore"
+  pull_request:
+    paths-ignore:
+      - "../../README.md"
+      - "../../LICENSE"
+      - "../../.gitignore"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: lts/*
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint code
+        run: pnpm lint
+
+      - name: Type check code
+        run: pnpm typecheck
+
+      - name: Run tests
+        run: pnpm vitest run

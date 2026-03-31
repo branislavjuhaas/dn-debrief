@@ -1,98 +1,118 @@
+import type { SQL } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import {
   pgTable,
-  boolean,
-  integer,
-  serial,
   text,
   timestamp,
-  varchar,
-  jsonb,
+  integer,
   index,
-  uniqueIndex,
+  serial,
+  jsonb,
+  pgEnum,
+  primaryKey,
+  boolean,
 } from "drizzle-orm/pg-core";
-import { relations, type SQL, sql } from "drizzle-orm";
-import { league, region } from "./clubs";
-import { users } from "./auth";
 
-// EVENTS TABLE JSON TYPES
-export type Happening = {
+import { leagueEnum, regionEnum } from "./clubs";
+import { users } from "./auth";
+import { payments } from "./payments";
+
+export const eventTypeEnum = pgEnum("event_type", [
+  "tournament",
+  "workshop",
+  "other",
+]);
+
+export type FeaturedProperty = {
+  icon: string;
+  text: string;
+  badge?: {
+    text: string;
+    href: string;
+  };
+};
+
+export type SchedulePart = {
+  // Beginning time in minutes from the start of the day (e.g. 540 for 9:00 AM)
   beginning: number;
+  // Duration in minutes (e.g. 120 for 2 hours)
   duration: number;
-  name: string;
+  text: string;
 };
 
 export type Day = {
-  name: string;
-  date: string;
-  happenings: Happening[];
+  date: Date;
+  schedule: SchedulePart[];
 };
 
-export type Module = {
-  name: string;
-  value: string;
-  link?: {
-    name: string;
-    value: string;
-  };
+export type Schedule = {
+  days: Day[];
 };
 
-export type EventDetails = {
-  modules: Module[];
-  description: string;
-  schedule: Day[];
-  type: "tournament" | "seminar" | "other";
+export type RegistrationField = {
+  title: string;
+  description?: string;
+  required?: boolean;
+  type?: "text" | "date" | "select" | "multiselect";
+  options?: string[];
 };
 
-export type Deadline = {
-  role?: string;
-  date: string | null;
-};
-
-export type Price = {
-  role: string;
-  value: number;
-};
-
-export type Question = {
-  text: string;
-  answer: "text" | "number" | "date" | "checkbox" | string[];
-};
-
-export type RegistrationDetails = {
-  defaultDeadline: Deadline;
-  deadlines: Deadline[];
-  prices: Price[];
-  collectedDetails: {
-    name: boolean;
-    email: boolean;
-    birthdate: boolean;
-    address: boolean;
-    phone: boolean;
-  };
-  questions: Question[];
-};
-
-// EVENTS
+export type RegistrationsConfig =
+  | {
+      deadline: Date;
+      href: string;
+    }
+  | {
+      allowedRoles?: {
+        role: string;
+        deadline: Date;
+      };
+      requireAccount: boolean;
+      requireMembership: boolean;
+      collectedDetails: (
+        | "name"
+        | "surname"
+        | "email"
+        | "phone"
+        | "birthdate"
+        | "street"
+        | "postalCode"
+        | "city"
+      )[];
+      registrationFields: RegistrationField[];
+    };
 
 export const events = pgTable(
   "events",
   {
     id: serial("id").primaryKey(),
-    season: varchar("season", { length: 9 }).notNull(),
+    slug: text("Slug").notNull().unique(),
     name: text("name").notNull(),
     search: text("search")
       .notNull()
       .generatedAlwaysAs(
         (): SQL =>
-          sql`(lower(regexp_replace(public.immutable_unaccent(${events.name} || ${events.season}), '[^a-zA-Z0-9]', '', 'g')))`,
+          sql`(lower(regexp_replace(public.immutable_unaccent(${events.name}), '[^a-zA-Z0-9]', '', 'g')))`,
       ),
-    league: league("league").default("senior").notNull(),
-    region: region("region").default("central"),
-    draft: boolean("draft").default(false).notNull(),
+    type: eventTypeEnum("type").notNull(),
+    description: jsonb("description").notNull(),
+    thumbnailUrl: text("thumbnail_url"),
     beginning: timestamp("beginning").notNull(),
     end: timestamp("end").notNull(),
-    details: jsonb("details").$type<EventDetails>().notNull(),
-    registration: jsonb("registration").$type<RegistrationDetails>().notNull(),
+    targetLeague: leagueEnum("target_league"),
+    targetRegion: regionEnum("target_region"),
+    place: text("place"),
+    featuredProperties: jsonb("featured_properties")
+      .$type<FeaturedProperty[]>()
+      .notNull()
+      .default([]),
+    schedule: jsonb("schedule")
+      .$type<Schedule>()
+      .notNull()
+      .default({ days: [] }),
+    registrationConfig: jsonb("registration_config")
+      .$type<RegistrationsConfig>()
+      .notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
@@ -100,29 +120,19 @@ export const events = pgTable(
       .notNull(),
   },
   (table) => [
-    index("events_league_idx").on(table.league),
-    index("events_region_idx").on(table.region),
-    index("events_season_idx").on(table.season),
-    index("events_end_draft_idx").on(table.end, table.draft),
+    index("events_type_idx").on(table.type),
+    index("events_beginning_end_idx").on(table.beginning, table.end),
+    index("events_targetLeague_idx").on(table.targetLeague),
+    index("events_targetRegion_idx").on(table.targetRegion),
     index("events_search_idx").using("gin", sql`${table.search} gin_trgm_ops`),
   ],
 );
 
-export const eventsRelations = relations(events, ({ many }) => ({
-  organizers: many(eventOrganizers, { relationName: "eventOrganizers" }),
-  registrations: many(eventRegistrations, {
-    relationName: "eventRegistrations",
-  }),
-}));
-
-// EVENT ORGANIZERS
-
 export const eventOrganizers = pgTable(
   "event_organizers",
   {
-    id: serial("id").primaryKey(),
     eventId: integer("event_id")
-      .references(() => events.id)
+      .references(() => events.id, { onDelete: "cascade" })
       .notNull(),
     userId: integer("user_id")
       .references(() => users.id, { onDelete: "cascade" })
@@ -134,72 +144,34 @@ export const eventOrganizers = pgTable(
       .notNull(),
   },
   (table) => [
-    uniqueIndex("event_organizers_eventId_userId_unique").on(
-      table.eventId,
-      table.userId,
-    ),
-    index("event_organizers_eventId_idx").on(table.eventId),
+    primaryKey({ columns: [table.eventId, table.userId] }),
     index("event_organizers_userId_idx").on(table.userId),
   ],
 );
 
-export const eventOrganizersRelations = relations(
-  eventOrganizers,
-  ({ one }) => ({
-    event: one(events, {
-      fields: [eventOrganizers.eventId],
-      references: [events.id],
-      relationName: "eventOrganizers",
-    }),
-    user: one(users, {
-      fields: [eventOrganizers.userId],
-      references: [users.id],
-      relationName: "user_event_organizers",
-    }),
-  }),
-);
-
-// EVENT REGISTRATIONS JSON TYPES
-export type RegistrationData = {
-  [key: string]: string | string[] | number | boolean;
-};
-
-// EVENT REGISTRATIONS
-
 export const eventRegistrations = pgTable(
   "event_registrations",
   {
-    id: serial("id").primaryKey(),
     eventId: integer("event_id")
-      .references(() => events.id)
+      .references(() => events.id, { onDelete: "cascade" })
       .notNull(),
-    userId: integer("user_id").references(() => users.id, {
-      onDelete: "cascade",
-    }),
-    data: jsonb("data").$type<RegistrationData>().notNull(),
+    userId: integer("user_id")
+      .references(() => users.id, { onDelete: "cascade" })
+      .notNull(),
+    registrationData: jsonb("registration_data").notNull(),
+    confirmed: boolean("confirmed").default(false).notNull(),
+    paymentId: integer("payment_id")
+      .unique()
+      .references(() => payments.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
   },
   (table) => [
-    uniqueIndex("event_registrations_eventId_userId_unique").on(
-      table.eventId,
-      table.userId,
-    ),
-    index("event_registrations_eventId_idx").on(table.eventId),
+    primaryKey({ columns: [table.eventId, table.userId] }),
     index("event_registrations_userId_idx").on(table.userId),
+    index("event_registrations_eventId_idx").on(table.eventId),
   ],
-);
-
-export const eventRegistrationsRelations = relations(
-  eventRegistrations,
-  ({ one }) => ({
-    event: one(events, {
-      fields: [eventRegistrations.eventId],
-      references: [events.id],
-      relationName: "eventRegistrations",
-    }),
-    user: one(users, {
-      fields: [eventRegistrations.userId],
-      references: [users.id],
-      relationName: "user_event_registrations",
-    }),
-  }),
 );

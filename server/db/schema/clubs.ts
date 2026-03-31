@@ -4,21 +4,24 @@ import {
   boolean,
   integer,
   serial,
+  smallint,
   text,
   timestamp,
-  varchar,
   index,
-  uniqueIndex,
+  primaryKey,
 } from "drizzle-orm/pg-core";
-import { relations, type SQL, sql } from "drizzle-orm";
+import { type SQL, sql } from "drizzle-orm";
 import { users } from "./auth";
+import { payments } from "./payments";
 
-// ENUMS
-
-export const league = pgEnum("league", ["junior", "senior", "university"]);
-export const region = pgEnum("region", ["west", "central", "east"]);
-
-// CLUBS
+export const leagueEnum = pgEnum("league", ["junior", "senior", "university"]);
+export const regionEnum = pgEnum("region", ["western", "central", "eastern"]);
+export const clubMembershipTypeEnum = pgEnum("club_registration_type", [
+  "junior_student",
+  "senior_student",
+  "graduate",
+  "teacher",
+]);
 
 export const clubs = pgTable(
   "clubs",
@@ -31,10 +34,9 @@ export const clubs = pgTable(
         (): SQL =>
           sql`(lower(regexp_replace(public.immutable_unaccent(${clubs.name}), '[^a-zA-Z0-9]', '', 'g')))`,
       ),
-    description: text("description"),
     isActive: boolean("is_active").default(true).notNull(),
-    league: league("league").default("senior").notNull(),
-    region: region("region").default("central"),
+    league: leagueEnum("league").notNull(),
+    region: regionEnum("region").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
@@ -47,25 +49,21 @@ export const clubs = pgTable(
   ],
 );
 
-export const clubsRelations = relations(clubs, ({ many }) => ({
-  memberships: many(clubMemberships, { relationName: "clubMemberships" }),
-  managers: many(clubManagers, { relationName: "clubManagers" }),
-}));
-
-// CLUB MEMBERSHIPS
-
 export const clubMemberships = pgTable(
   "club_memberships",
   {
-    id: serial("id").primaryKey(),
     clubId: integer("club_id")
       .references(() => clubs.id)
       .notNull(),
     userId: integer("user_id")
       .references(() => users.id, { onDelete: "cascade" })
       .notNull(),
-    season: varchar("season", { length: 4 }).notNull(),
+    season: smallint("season").notNull(),
+    registrationType: clubMembershipTypeEnum("registration_type").notNull(),
     confirmed: boolean("confirmed").default(false).notNull(),
+    paymentId: integer("payment_id")
+      .unique()
+      .references(() => payments.id, { onDelete: "set null" }),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
@@ -73,12 +71,10 @@ export const clubMemberships = pgTable(
       .notNull(),
   },
   (table) => [
-    uniqueIndex("club_memberships_userId_season_unique").on(
-      table.userId,
-      table.season,
-    ),
+    primaryKey({ columns: [table.clubId, table.userId, table.season] }),
     index("club_memberships_userId_idx").on(table.userId),
     index("club_memberships_userId_season_idx").on(table.userId, table.season),
+    index("club_memberships_paymentId_idx").on(table.paymentId),
     index("club_memberships_clubId_season_confirmed_idx").on(
       table.clubId,
       table.season,
@@ -87,28 +83,9 @@ export const clubMemberships = pgTable(
   ],
 );
 
-export const clubMembershipsRelations = relations(
-  clubMemberships,
-  ({ one }) => ({
-    club: one(clubs, {
-      fields: [clubMemberships.clubId],
-      references: [clubs.id],
-      relationName: "clubMemberships",
-    }),
-    user: one(users, {
-      fields: [clubMemberships.userId],
-      references: [users.id],
-      relationName: "user_club_memberships",
-    }),
-  }),
-);
-
-// CLUB MANAGERS
-
 export const clubManagers = pgTable(
   "club_managers",
   {
-    id: serial("id").primaryKey(),
     clubId: integer("club_id")
       .references(() => clubs.id)
       .notNull(),
@@ -122,24 +99,8 @@ export const clubManagers = pgTable(
       .notNull(),
   },
   (table) => [
-    uniqueIndex("club_managers_userId_clubId_unique").on(
-      table.userId,
-      table.clubId,
-    ),
+    primaryKey({ columns: [table.clubId, table.userId] }),
     index("club_managers_userId_idx").on(table.userId),
     index("club_managers_clubId_idx").on(table.clubId),
   ],
 );
-
-export const clubManagersRelations = relations(clubManagers, ({ one }) => ({
-  club: one(clubs, {
-    fields: [clubManagers.clubId],
-    references: [clubs.id],
-    relationName: "clubManagers",
-  }),
-  user: one(users, {
-    fields: [clubManagers.userId],
-    references: [users.id],
-    relationName: "user_club_managements",
-  }),
-}));

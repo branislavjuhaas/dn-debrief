@@ -1,38 +1,49 @@
 {
   "name": "dn-cascade",
+  "version": "2.26.0.1",
   "type": "module",
   "private": true,
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
-    "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "nuxt typecheck",
+    "test": "vitest"
   },
   "dependencies": {
-    "@aws-sdk/client-ses": "^3.958.0",
-    "@neondatabase/serverless": "^1.0.2",
-    "@nuxt/content": "3.10.0",
-    "@nuxt/eslint": "1.12.1",
-    "@nuxt/hints": "1.0.0-alpha.5",
+    "@nuxt/a11y": "1.0.0-alpha.1",
+    "@nuxt/eslint": "1.15.2",
+    "@nuxt/eslint-config": "^1.15.2",
+    "@nuxt/hints": "1.0.0",
     "@nuxt/image": "2.0.0",
-    "@nuxt/ui": "4.3.0",
-    "@nuxthub/core": "0.10.4",
+    "@nuxt/ui": "4.6.0",
     "@pinia/nuxt": "0.11.3",
-    "better-auth": "^1.4.9",
-    "better-sqlite3": "^12.5.0",
-    "drizzle-kit": "^0.31.8",
-    "drizzle-orm": "^0.45.1",
-    "eslint": "^9.39.2",
-    "nuxt": "^4.2.2",
-    "pinia": "^3.0.4",
+    "better-auth": "1.5.5",
+    "drizzle-orm": "1.0.0-beta.19",
+    "eslint": "^10.1.0",
+    "nuxt": "^4.4.2",
+    "postgres": "^3.4.8",
+    "tailwindcss": "^4.2.2",
     "typescript": "^5.9.3",
-    "v-gsap-nuxt": "1.4.4",
-    "vue": "^3.5.26",
-    "vue-router": "^4.6.4",
-    "zod": "^4.2.1"
+    "vue": "^3.5.30",
+    "vue-router": "^5.0.4",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
-    "prettier": "3.7.4"
-  }
+    "@iconify-json/ph": "^1.2.2",
+    "@nuxt/test-utils": "^4.0.0",
+    "@types/bun": "^1.3.11",
+    "@vue/test-utils": "^2.4.6",
+    "drizzle-kit": "1.0.0-beta.19",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.5",
+    "happy-dom": "^20.8.7",
+    "playwright-core": "^1.58.2",
+    "prettier": "^3.8.1",
+    "vitest": "^4.1.1"
+  },
+  "packageManager": "pnpm@10.32.1+sha512.a706938f0e89ac1456b6563eab4edf1d1faf3368d1191fc5c59790e96dc918e4456ab2e67d613de1043d2e8c81f87303e6b40d4ffeca9df15ef1ad567348f2be"
 }

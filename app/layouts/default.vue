@@ -1,17 +1,11 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div>
-    <AppHeader />
-    <UMain>
-      <UPage>
-        <UContainer>
-          <slot />
-        </UContainer>
-      </UPage>
-    </UMain>
-    <AppFooter />
-  </div>
+  <UMain>
+    <UContainer class="pt-20">
+      <slot />
+    </UContainer>
+  </UMain>
 </template>
 
 <style scoped></style>

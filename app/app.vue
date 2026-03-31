@@ -1,15 +1,17 @@
+<script setup lang="ts">
+import { sk } from "#ui/locale";
+import Header from "~/components/Header.vue";
+import Footer from "~/components/Footer.vue";
+</script>
+
 <template>
   <UApp :locale="sk">
     <NuxtRouteAnnouncer />
-    <NuxtLoadingIndicator color="var(--ui-primary)" />
-    <UMain>
-      <NuxtLayout>
-        <NuxtPage />
-      </NuxtLayout>
-    </UMain>
+    <NuxtAnnouncer />
+    <Header />
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
+    <Footer />
   </UApp>
 </template>
-
-<script setup lang="ts">
-import { sk } from "@nuxt/ui/locale";
-</script>

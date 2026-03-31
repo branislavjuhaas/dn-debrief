@@ -1,21 +1,17 @@
+import type { SQL } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import {
   pgTable,
-  pgEnum,
-  varchar,
   text,
+  date,
   timestamp,
   boolean,
-  date,
   integer,
   index,
   serial,
+  jsonb,
+  pgEnum,
 } from "drizzle-orm/pg-core";
-import type { SQL } from "drizzle-orm";
-import { relations, sql } from "drizzle-orm";
-import { clubMemberships, clubManagers } from "./clubs";
-import { eventOrganizers, eventRegistrations } from "./events";
-
-// USERS
 
 export const userRoleEnum = pgEnum("role", [
   "user",
@@ -31,6 +27,7 @@ export const users = pgTable(
   "users",
   {
     id: serial("id").primaryKey(),
+    email: text("email").notNull().unique(),
     name: text("name").notNull(),
     surname: text("surname").notNull(),
     search: text("search")
@@ -39,15 +36,17 @@ export const users = pgTable(
         (): SQL =>
           sql`(lower(regexp_replace(public.immutable_unaccent(${users.name} || ${users.surname}), '[^a-zA-Z0-9]', '', 'g')))`,
       ),
-    email: varchar("email", { length: 255 }).notNull().unique(),
     emailVerified: boolean("email_verified").default(false).notNull(),
     image: text("image"),
     role: userRoleEnum("role").default("user").notNull(),
-    credential: integer("credential").default(0).notNull(),
     birthdate: date("birthdate"),
-    address: text("address"),
+    street: text("street"),
+    postalCode: text("postal_code"),
+    city: text("city"),
     phone: text("phone"),
-    banned: boolean("banned").default(false).notNull(),
+    credential: integer("credential").default(0).notNull(),
+    claims: jsonb("claims"),
+    banned: boolean("banned").default(false),
     banReason: text("ban_reason"),
     banExpires: timestamp("ban_expires"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -62,32 +61,12 @@ export const users = pgTable(
   ],
 );
 
-export const usersRelations = relations(users, ({ many }) => ({
-  clubMemberships: many(clubMemberships, {
-    relationName: "user_club_memberships",
-  }),
-  clubManagements: many(clubManagers, {
-    relationName: "user_club_managements",
-  }),
-  eventOrganizations: many(eventOrganizers, {
-    relationName: "user_event_organizers",
-  }),
-  eventRegistrations: many(eventRegistrations, {
-    relationName: "user_event_registrations",
-  }),
-  supervisors: many(supervisors),
-  sessions: many(sessions),
-  accounts: many(accounts),
-}));
-
-// SUPERVISORS
-
-export const supervisors = pgTable(
-  "supervisors",
+export const legalGuardians = pgTable(
+  "legal_guardians",
   {
     id: serial("id").primaryKey(),
     name: text("name").notNull(),
-    email: varchar("email", { length: 255 }).notNull().unique(),
+    email: text("email").notNull(),
     userId: integer("user_id")
       .references(() => users.id, { onDelete: "cascade" })
       .notNull(),
@@ -99,15 +78,6 @@ export const supervisors = pgTable(
   },
   (table) => [index("supervisors_userId_idx").on(table.userId)],
 );
-
-export const supervisorsRelations = relations(supervisors, ({ one }) => ({
-  user: one(users, {
-    fields: [supervisors.userId],
-    references: [users.id],
-  }),
-}));
-
-// SESSIONS
 
 export const sessions = pgTable(
   "sessions",
@@ -128,15 +98,6 @@ export const sessions = pgTable(
   },
   (table) => [index("sessions_userId_idx").on(table.userId)],
 );
-
-export const sessionRelations = relations(sessions, ({ one }) => ({
-  users: one(users, {
-    fields: [sessions.userId],
-    references: [users.id],
-  }),
-}));
-
-// ACCOUNTS
 
 export const accounts = pgTable(
   "accounts",
@@ -161,15 +122,6 @@ export const accounts = pgTable(
   },
   (table) => [index("accounts_userId_idx").on(table.userId)],
 );
-
-export const accountRelations = relations(accounts, ({ one }) => ({
-  users: one(users, {
-    fields: [accounts.userId],
-    references: [users.id],
-  }),
-}));
-
-// VERIFICATIONS
 
 export const verifications = pgTable(
   "verifications",

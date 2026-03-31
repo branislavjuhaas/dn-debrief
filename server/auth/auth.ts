@@ -1,10 +1,8 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { openAPI, admin as adminPlugin } from "better-auth/plugins";
-import { db } from "hub:db";
-import * as schema from "~~/server/db/schema/auth";
-import { sendEmail, generateEmailTemplate } from "~~/server/utils/send-email";
-import { supervisors } from "~~/server/db/schema/auth";
+import * as schema from "#server/db/schema/auth";
+import { db } from "#server/db/db";
 import {
   ac,
   admin,
@@ -17,12 +15,18 @@ import {
 } from "~~/server/auth/permissions";
 
 export const auth = betterAuth({
-  experimental: { joins: true },
+  // TODO: use drizzle adapter joins once it support relations v2
   database: drizzleAdapter(db, {
     provider: "pg",
     usePlural: true,
     schema: schema,
   }),
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60, // 5 minutes
+    },
+  },
   plugins: [
     openAPI({
       path: "/docs",
@@ -84,7 +88,17 @@ export const auth = betterAuth({
         required: false,
         input: true,
       },
-      address: {
+      street: {
+        type: "string",
+        required: false,
+        input: true,
+      },
+      postalCode: {
+        type: "string",
+        required: false,
+        input: true,
+      },
+      city: {
         type: "string",
         required: false,
         input: true,
@@ -94,28 +108,10 @@ export const auth = betterAuth({
         required: false,
         input: true,
       },
-    },
-  },
-  databaseHooks: {
-    user: {
-      create: {
-        after: async (user, ctx) => {
-          const userId = user.id;
-          const body = ctx?.body;
-
-          const supervisor = body?.supervisor;
-
-          if (supervisor) {
-            try {
-              await db.insert(supervisors).values({
-                ...supervisor,
-                userId,
-              });
-            } catch (error) {
-              console.error(error);
-            }
-          }
-        },
+      claims: {
+        type: "json",
+        required: false,
+        input: false, // don't allow user to set claims
       },
     },
   },
@@ -128,17 +124,9 @@ export const auth = betterAuth({
   emailVerification: {
     sendOnSignUp: true,
     sendVerificationEmail: async ({ user, token }, _request) => {
-      await sendEmail({
-        to: [user.email],
-        subject: "Potvrďte svoju emailovú adresu",
-        html: generateEmailTemplate({
-          title: "Potvrďte, že ste to vy!",
-          text: "Pre potvrdenie autenticity vášho účtu kliknite, prosím, na nasledujúci odkaz:",
-          icon: "https://www.sda.sk/wp-content/uploads/2025/11/question_mark.png",
-          linkText: "Potvrdiť emailovú adresu",
-          link: `${process.env.BETTER_AUTH_URL}/auth/verify?token=${token}`,
-        }),
-      });
+      console.log(
+        `Send verification email to ${user.email} with token ${token}`,
+      );
     },
   },
 });

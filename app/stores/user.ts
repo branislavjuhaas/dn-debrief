@@ -1,5 +1,6 @@
-import { defineStore } from "pinia";
 import type { User } from "#shared/types/user";
+
+// TODO: Implement https://pinia.vuejs.org/core-concepts/state.html#TypeScript
 
 export const useUserStore = defineStore("user", {
   state: (): { user: User | null; impersonation: boolean } => ({
@@ -7,11 +8,15 @@ export const useUserStore = defineStore("user", {
     impersonation: false,
   }),
   getters: {
-    isAuthenticated: (state) => state.user !== null,
+    isAuthenticated: (state) => !!state.user,
     isCompleteUser: (state) =>
-      state.user !== null &&
-      [state.user.birthdate, state.user.address, state.user.name].every(
-        (field) => field !== undefined && field !== null,
+      !!(
+        state.user &&
+        state.user.birthdate &&
+        state.user.street &&
+        state.user.postalCode &&
+        state.user.city &&
+        state.user.phone
       ),
     fullName: (state) =>
       state.user ? `${state.user.name} ${state.user.surname}` : "",
@@ -38,7 +43,6 @@ export const useUserStore = defineStore("user", {
       this.impersonation = impersonation ?? false;
     },
     clear() {
-      console.log("Clearing user");
       this.user = null;
       this.impersonation = false;
     },
