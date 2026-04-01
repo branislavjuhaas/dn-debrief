@@ -8,6 +8,9 @@ on:
     branches:
       - main
 
+env:
+  NITRO_PRESET: "vercel"
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
