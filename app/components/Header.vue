@@ -3,7 +3,7 @@ const userStore = useUserStore();
 </script>
 
 <template>
-  <UHeader>
+  <UHeader :toggle="false">
     <template #left>
       <NuxtLink to="/" class="flex items-center gap-2">
         <DebriefLogo />

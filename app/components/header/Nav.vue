@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import type { DropdownMenuItem } from "@nuxt/ui";
+import { breakpointsTailwind } from "@vueuse/core";
 
 const userStore = useUserStore();
 const authClient = useAuthClient();
+
+const breakpoints = useBreakpoints(breakpointsTailwind);
+const mobile = breakpoints.smaller("lg");
 
 const logout = async () => {
   authClient.signOut();
@@ -70,7 +74,33 @@ const navItems = ref<DropdownMenuItem[][]>([
         }">
         {{ userStore.fullName }}
       </UButton>
+      <UDrawer v-if="mobile" :handle="false" :ui="{ content: 'rounded-none' }">
+        <UButton icon="ph:sort-ascending" color="neutral" variant="outline" />
+
+        <template #body>
+          <div class="flex flex-col gap-1 pb-4">
+            <template v-for="(group, i) in navItems" :key="i">
+              <USeparator v-if="i > 0" class="my-1" />
+              <UButton
+                v-for="item in group"
+                :key="item.label"
+                :label="item.label"
+                :icon="item.icon"
+                :color="item.color ?? 'neutral'"
+                variant="ghost"
+                class="w-full justify-start"
+                @click="
+                  () => {
+                    item.onSelect?.();
+                    open = false;
+                  }
+                " />
+            </template>
+          </div>
+        </template>
+      </UDrawer>
       <UDropdownMenu
+        v-else
         :items="navItems"
         :content="{
           align: 'end',
