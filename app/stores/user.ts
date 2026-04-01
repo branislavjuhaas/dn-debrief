@@ -3,10 +3,12 @@ import type { User } from "#shared/types/user";
 // TODO: Implement https://pinia.vuejs.org/core-concepts/state.html#TypeScript
 
 export const useUserStore = defineStore("user", {
-  state: (): { user: User | null; impersonation: boolean } => ({
-    user: null,
-    impersonation: false,
-  }),
+  state: () => {
+    return {
+      user: null,
+      impersonation: false,
+    };
+  },
   getters: {
     isAuthenticated: (state) => !!state.user,
     isCompleteUser: (state) =>
