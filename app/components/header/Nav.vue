@@ -86,13 +86,13 @@ const navItems = ref<DropdownMenuItem[][]>([
                 :key="item.label"
                 :label="item.label"
                 :icon="item.icon"
+                :disabled="item.disabled"
                 :color="item.color ?? 'neutral'"
                 variant="ghost"
-                class="w-full justify-start"
+                class="w-full justify-start rounded!"
                 @click="
-                  () => {
-                    item.onSelect?.();
-                    open = false;
+                  (event) => {
+                    item.onSelect?.(event);
                   }
                 " />
             </template>

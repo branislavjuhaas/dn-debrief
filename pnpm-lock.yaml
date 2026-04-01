@@ -29,6 +29,9 @@ importers:
       '@pinia/nuxt':
         specifier: 0.11.3
         version: 0.11.3(magicast@0.5.2)(pinia@3.0.4(typescript@5.9.3)(vue@3.5.30(typescript@5.9.3)))
+      '@vueuse/core':
+        specifier: ^14.2.1
+        version: 14.2.1(vue@3.5.30(typescript@5.9.3))
       '@vueuse/nuxt':
         specifier: 14.2.1
         version: 14.2.1(a84885f7755651b337c394f7b1eea8e2)
