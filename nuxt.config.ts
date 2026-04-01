@@ -20,4 +20,15 @@ export default defineNuxtConfig({
       tasks: true,
     },
   },
+
+  vite: {
+    optimizeDeps: {
+      include: [
+        "better-auth/client",
+        "better-auth/client/plugins",
+        "better-auth/plugins/access",
+        "better-auth/plugins/admin/access",
+      ],
+    },
+  },
 });
