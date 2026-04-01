@@ -3,50 +3,18 @@ import type { User } from "#shared/types/user";
 // TODO: Implement https://pinia.vuejs.org/core-concepts/state.html#TypeScript
 
 export const useUserStore = defineStore("user", {
-  state: () => {
+  state: (): { user: User | null; impersonated: boolean } => {
     return {
       user: null,
-      impersonation: false,
+      impersonated: false,
     };
   },
   getters: {
-    isAuthenticated: (state) => !!state.user,
-    isCompleteUser: (state) =>
-      !!(
-        state.user &&
-        state.user.birthdate &&
-        state.user.street &&
-        state.user.postalCode &&
-        state.user.city &&
-        state.user.phone
-      ),
-    fullName: (state) =>
-      state.user ? `${state.user.name} ${state.user.surname}` : "",
-    isMember: (state) =>
-      state.user?.clubMemberships?.some(
-        (membership) =>
-          membership.season === new Date().getFullYear().toString() &&
-          membership.confirmed,
-      ),
-    isMemberCandidate: (state) =>
-      state.user?.clubMemberships?.some(
-        (membership) =>
-          membership.season === new Date().getFullYear().toString() &&
-          !membership.confirmed,
-      ),
-  },
-  actions: {
-    async set(impersonation?: boolean, headers?: HeadersInit) {
-      const { user } = await $fetch("/api/users/me", {
-        headers,
-        credentials: "include",
-      });
-      this.user = (user as unknown as User) ?? null;
-      this.impersonation = impersonation ?? false;
+    fullName(state) {
+      return `${state.user?.name} ${state.user?.surname}`;
     },
-    clear() {
-      this.user = null;
-      this.impersonation = false;
+    isAuthenticated(state) {
+      return state.user != null;
     },
   },
 });

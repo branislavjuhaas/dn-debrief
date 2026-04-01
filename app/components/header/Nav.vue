@@ -6,7 +6,7 @@ const authClient = useAuthClient();
 
 const logout = async () => {
   authClient.signOut();
-  userStore.clear();
+  userStore.$reset();
 };
 
 const navItems = ref<DropdownMenuItem[][]>([
@@ -33,7 +33,8 @@ const navItems = ref<DropdownMenuItem[][]>([
     },
   ],
   ...(userStore.isAuthenticated &&
-  (userStore.user.role !== "user" || userStore.user.managedClubs.length > 0)
+  (userStore.user?.role !== "user" ||
+    (userStore.user?.managedClubs?.length ?? 0) > 0)
     ? [
         [
           {
@@ -65,9 +66,7 @@ const navItems = ref<DropdownMenuItem[][]>([
         :avatar="{
           src: `${userStore.user?.image}`,
           alt: `${userStore.fullName}`,
-          chip: userStore.impersonation
-            ? { color: 'info', inset: true }
-            : false,
+          chip: userStore.impersonated ? { color: 'info', inset: true } : false,
         }">
         {{ userStore.fullName }}
       </UButton>
