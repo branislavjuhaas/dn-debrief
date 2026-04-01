@@ -4,13 +4,20 @@ export default defineNuxtPlugin(async (_nuxtApp) => {
   const userStore = useUserStore();
   const headers = useRequestHeaders();
 
-  const session = await auth.api.getSession({
+  const result = await auth.api.getSession({
     headers: headers,
   });
 
-  if (!session) {
-    return;
-  }
+  if (!result || !result.session) return;
 
-  await userStore.set(session.session.impersonatedBy !== null, headers);
+  const { user } = await $fetch("/api/users/me", {
+    headers: headers,
+  });
+
+  if (!user) return;
+
+  await userStore.$patch({
+    user,
+    impersonated: !!result.session.impersonatedBy,
+  });
 });
