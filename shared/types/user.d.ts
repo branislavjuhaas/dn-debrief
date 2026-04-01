@@ -4,10 +4,10 @@ import type {
   legalGuardians,
 } from "#server/db/schema/auth";
 
-type UserRole = (typeof userRoleEnum.enumValues)[number];
+export type UserRole = (typeof userRoleEnum.enumValues)[number];
 
-type LegalGuardian = typeof legalGuardians.$inferSelect;
+export type LegalGuardian = typeof legalGuardians.$inferSelect;
 
-type User = typeof users.$inferSelect & {
+export type User = typeof users.$inferSelect & {
   legalGuardians?: LegalGuardian[];
 };
