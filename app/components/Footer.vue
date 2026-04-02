@@ -65,7 +65,9 @@ const footerLinks: FooterColumn[] = [
               Projekt <b>DN DebRIEF (Sunlake)</b> je postavený výhradne na
               open-source technológiách. Produkčne prevádzkované na serveroch v
               Európskej únii.
-              <ULink href="/about" class="text-primary font-bold"
+              <ULink
+                href="/about"
+                class="text-default hover:text-highlighted font-bold"
                 >Zistite viac!</ULink
               >
             </p>
@@ -79,7 +81,9 @@ const footerLinks: FooterColumn[] = [
       </p>
     </template>
     <template #right>
-      <UBadge variant="subtle" class="mr-1">v{{ version }}</UBadge>
+      <UBadge variant="subtle" color="neutral" class="mr-1"
+        >v{{ version }}</UBadge
+      >
       <UColorModeButton />
       <UButton
         icon="ph:github-logo"
