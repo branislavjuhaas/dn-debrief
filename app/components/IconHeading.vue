@@ -7,9 +7,9 @@ defineProps<{
 <template>
   <div class="flex flex-row gap-1 items-center">
     <UIcon :name="icon" class="size-5" />
-    <h3 class="text-base font-bold">
+    <h2 class="text-base font-bold">
       <slot />
-    </h3>
+    </h2>
   </div>
 </template>
 
