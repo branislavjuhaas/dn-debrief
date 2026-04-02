@@ -5,7 +5,7 @@ const userStore = useUserStore();
 <template>
   <UHeader :toggle="false">
     <template #left>
-      <NuxtLink to="/" class="flex items-center gap-2">
+      <NuxtLink to="/" class="flex items-center gap-2" aria-label="Domov">
         <DebriefLogo />
       </NuxtLink>
     </template>

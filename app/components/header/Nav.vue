@@ -71,11 +71,16 @@ const navItems = ref<DropdownMenuItem[][]>([
           src: `${userStore.user?.image}`,
           alt: `${userStore.fullName}`,
           chip: userStore.impersonated ? { color: 'info', inset: true } : false,
-        }">
+        }"
+        aria-label="Používateľský profil">
         {{ userStore.fullName }}
       </UButton>
       <UDrawer v-if="mobile" :handle="false" :ui="{ content: 'rounded-none' }">
-        <UButton icon="ph:sort-ascending" color="neutral" variant="outline" />
+        <UButton
+          icon="ph:sort-ascending"
+          color="neutral"
+          variant="outline"
+          aria-label="Otvoriť menu" />
 
         <template #body>
           <div class="flex flex-col gap-1 pb-4">
@@ -107,7 +112,11 @@ const navItems = ref<DropdownMenuItem[][]>([
           side: 'bottom',
           sideOffset: 8,
         }">
-        <UButton icon="ph:sort-ascending" color="neutral" variant="outline" />
+        <UButton
+          icon="ph:sort-ascending"
+          color="neutral"
+          variant="outline"
+          aria-label="Otvoriť menu" />
       </UDropdownMenu>
     </UFieldGroup>
   </template>
