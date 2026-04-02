@@ -72,7 +72,6 @@ const navItems = ref<DropdownMenuItem[][]>([
         {{ userStore.fullName }}
       </UButton>
       <UDropdownMenu
-        v-model:open="dropdownOpen"
         :items="navItems"
         :content="{
           align: 'end',
