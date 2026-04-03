@@ -14,11 +14,14 @@ const EmailParams = require("mailersend").EmailParams;
 const MailerSend = require("mailersend").MailerSend;
 const { onSchedule } = require("firebase-functions/v2/scheduler");
 const { onDocumentCreated } = require("firebase-functions/v2/firestore");
+const { defineSecret } = require('firebase-functions/params');
 
 // All available logging functions
 const { logger } = require("firebase-functions/v2");
 
 admin.initializeApp();
+
+const mailerSendApiKey = defineSecret('MAILERSEND_API_KEY');
 
 /**
  * This function sends an email to a user.
@@ -42,8 +45,7 @@ admin.initializeApp();
 exports.sendEmail = onCall({ enforceAppCheck: true }, async (data, context) => {
   try {
     const mailerSend = new MailerSend({
-      apiKey:
-        "mlsn.6ec3427e51bcb074615c91ce41eb8678c3a8c6ce11e5b0999eb9520f133445f4",
+      apiKey: mailerSendApiKey.value(),
     });
 
     const recipients = [new Recipient(data.data.email, data.data.fullName)];
