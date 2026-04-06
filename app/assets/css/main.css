@@ -4,6 +4,18 @@
 @theme static {
   --font-sans: "DM Sans", sans-serif;
   --font-mono: "SF Mono", monospace;
+
+  --color-sda-50: oklch(0.959 0.066 152.23);
+  --color-sda-100: oklch(0.914 0.143 151.89);
+  --color-sda-200: oklch(0.831 0.214 151.25);
+  --color-sda-300: oklch(0.764 0.197 151.37);
+  --color-sda-400: oklch(0.671 0.173 151.29);
+  --color-sda-500: oklch(0.586 0.15 151.39);
+  --color-sda-600: oklch(0.494 0.127 151.43);
+  --color-sda-700: oklch(0.401 0.103 151.68);
+  --color-sda-800: oklch(0.309 0.08 151.42);
+  --color-sda-900: oklch(0.225 0.058 151.66);
+  --color-sda-950: oklch(0.172 0.043 151.07);
 }
 
 /* Hide scrollbar for Chrome, Safari, and Opera */
