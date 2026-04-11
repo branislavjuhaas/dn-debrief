@@ -24,7 +24,7 @@ const shifts = useState("about-graphics-shifts", () =>
         }" />
     </div>
     <div
-      class="flex items-center justify-center rounded-lg ring shadow-primary/10 shadow-[0_-20px_200px_200px] min-w-34 min-h-34 -z-10 ring-primary col-span-2 row-span-2 row-start-1 col-start-5">
+      class="flex items-center justify-center rounded-lg ring shadow-primary/10 shadow-[0_0_300px_300px] min-w-34 min-h-34 -z-10 ring-primary col-span-2 row-span-2 row-start-1 col-start-5">
       <UIcon name="i-ph-brain" size="4rem" class="text-primary" />
     </div>
   </div>
