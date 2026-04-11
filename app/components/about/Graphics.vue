@@ -9,7 +9,8 @@ const shifts = useState("about-graphics-shifts", () =>
 </script>
 
 <template>
-  <div class="gap-0 md:gap-2 lg:gap-4 grid grid-cols-10 w-fit mx-auto mt-10">
+  <div
+    class="flex md:grid gap-2 lg:gap-4 items-center justify-center grid-cols-10 w-fit mx-auto mt-10">
     <div
       v-for="(icon, i) in icons"
       :key="i"
@@ -24,7 +25,7 @@ const shifts = useState("about-graphics-shifts", () =>
         }" />
     </div>
     <div
-      class="flex items-center justify-center rounded-lg ring shadow-primary/10 shadow-[0_0_300px_300px] min-w-34 min-h-34 -z-10 ring-primary col-span-2 row-span-2 row-start-1 col-start-5">
+      class="flex items-center justify-center rounded-lg ring shadow-primary/10 shadow-[0_0_300px_300px] min-w-34 min-h-34 w-full h-full -z-10 ring-primary col-span-2 row-span-2 row-start-1 col-start-5">
       <UIcon name="i-ph-brain" size="4rem" class="text-primary" />
     </div>
   </div>
