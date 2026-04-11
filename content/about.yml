@@ -1,0 +1,35 @@
+hero:
+  headline: DebRIEF - pohon rozvoja SDA
+  headlineIcon: ph:charging-station
+  icons:
+    - i-ph-users-three
+    - i-ph-ticket
+    - i-ph-medal-military
+    - i-ph-bank
+    - i-ph-shield-check
+    - i-ph-chart-bar
+    - i-ph-flag-banner-fold
+    - i-ph-globe-hemisphere-west
+    - i-ph-currency-eur
+    - i-ph-buildings
+    - i-ph-books
+    - i-ph-megaphone
+    - i-ph-swatches
+    - i-ph-circuitry
+    - i-ph-lightning-a
+    - i-ph-heartbeat
+platform:
+  title: Systém pre 21. storočie
+  description: DebRIEF je moderná debatná platforma ponúkajúca množstvo pokročilých funkcií kritických pre chod organizácie.
+  features:
+    - title: Správa registrácií a klubov
+      description: Sledovanie trendov v reálnom čase umožňujúce sledovanie plnenia strategických cieľov. Už žiadne neaktuálne údaje!
+      icon: i-ph-users-three-bold
+    - title: Centrum podujatí
+      description: Pozvánky na podujatia, registrácie, platby a výsledky dostupné okamžite po zverejnení. Nenechajte si ich ujsť!
+      icon: ph:ticket-bold
+    - title: Sociálne funkcie
+      icon: i-ph-eyes-bold
+      description: Úprava profilu, ocenenia za úspechy v debanom programe či angažovanie sa v organizácii. Staňte sa jaderom komunity!
+  image: /assets/about/future.jpg
+  alt: Moderná budova

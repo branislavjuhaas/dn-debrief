@@ -6,13 +6,24 @@ export default defineNuxtConfig({
     "@nuxt/hints",
     "@nuxt/image",
     "@nuxt/ui",
+    "@nuxt/content",
     "@nuxt/test-utils/module",
     "@pinia/nuxt",
     "@vueuse/nuxt",
+    "nuxt-studio",
   ],
   devtools: { enabled: true },
 
   css: ["~/assets/css/main.css"],
+
+  content: {
+    experimental: { sqliteConnector: "native" },
+  },
+
+  experimental: {
+    inlineRouteRules: true,
+  },
+
   compatibilityDate: "2025-07-15",
 
   nitro: {
