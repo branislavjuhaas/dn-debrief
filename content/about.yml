@@ -1,6 +1,6 @@
 hero:
   headline: DebRIEF - pohon rozvoja SDA
-  headlineIcon: ph:charging-station
+  headlineIcon: i-ph-charging-station-bold
   icons:
     - i-ph-users-three
     - i-ph-ticket
