@@ -9,7 +9,7 @@ const shifts = useState("about-graphics-shifts", () =>
 </script>
 
 <template>
-  <div class="gap-2 lg:gap-4 grid grid-cols-10 w-fit mx-auto mt-10">
+  <div class="gap-0 md:gap-2 lg:gap-4 grid grid-cols-10 w-fit mx-auto mt-10">
     <div
       v-for="(icon, i) in icons"
       :key="i"
