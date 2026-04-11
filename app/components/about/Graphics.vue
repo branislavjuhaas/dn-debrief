@@ -19,7 +19,8 @@ const shifts = useState("about-graphics-shifts", () =>
         size="2rem"
         class="text-neutral"
         :style="{
-          opacity: 0.5 - Math.abs(3.5 - (i % 8)) / 12 + shifts[i] * 0.4,
+          opacity:
+            0.5 - Math.abs(3.5 - (i % 8)) / 12 + (shifts[i] ?? 0.5) * 0.4,
         }" />
     </div>
     <div

@@ -24,7 +24,7 @@ const { data } = await useAsyncData("about", () =>
         Inteligentná <br />
         <span class="text-primary">debatná</span> platforma
       </template>
-      <AboutGraphics :icons="data!.hero.icons" />
+      <AboutGraphics :icons="data!.hero.icons as string[]" />
     </UPageHero>
     <UPageSection v-bind="data!.platform" orientation="horizontal">
       <NuxtImg
