@@ -16,8 +16,11 @@ const shifts = useState("about-graphics-shifts", () =>
     <motion.div
       v-for="(icon, i) in icons"
       :key="i"
-      :initial="{ opacity: 0, x: (3.5 - (i % 8)) * -50 }"
-      :transition="{ duration: 0.7, delay: 1.4 }"
+      :initial="{
+        opacity: 0,
+        x: (3.5 - (i % 8)) * Math.abs(3.5 - (i % 8)) * -25,
+      }"
+      :transition="{ duration: 0.6, delay: 1.4, ease: [0.16, 1, 0.3, 1] }"
       :animate="{ opacity: 1, x: 0 }"
       class="p-4 rounded-lg bg-default ring ring-default w-16 h-16 hidden md:block">
       <UIcon
