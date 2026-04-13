@@ -14,7 +14,9 @@ const { data } = await useAsyncData("about", () =>
 
 <template>
   <UPage class="pb-16">
-    <UPageHero>
+    <UPageHero
+      :ui="{ container: 'sm:pb-40 lg:pb-64' }"
+      class="flex items-center min-h-[calc(100vh-var(--ui-header-height))]">
       <template #headline>
         <UBadge variant="subtle" :icon="data!.hero.headlineIcon" size="lg">
           {{ data!.hero.headline }}</UBadge
@@ -26,6 +28,7 @@ const { data } = await useAsyncData("about", () =>
       </template>
       <AboutGraphics :icons="data!.hero.icons as string[]" />
     </UPageHero>
+    <ProseHr />
     <UPageSection v-bind="data!.platform" orientation="horizontal">
       <NuxtImg
         :src="data!.platform.image"
