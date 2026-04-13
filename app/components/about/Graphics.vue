@@ -51,7 +51,7 @@ const shifts = useState("about-graphics-shifts", () =>
         ],
       }"
       :transition="{ duration: 1.4, times: [0, 0.4, 1] }"
-      class="flex items-center justify-center rounded-lg ring ring-current min-w-34 min-h-34 w-full h-full -z-10 col-span-2 row-span-2 row-start-1 col-start-5">
+      class="flex items-center justify-center rounded-lg outline outline-current min-w-34 min-h-34 w-full h-full -z-10 col-span-2 row-span-2 row-start-1 col-start-5">
       <UIcon name="i-ph-brain" size="4rem" />
     </motion.div>
   </div>
