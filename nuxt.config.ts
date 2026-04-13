@@ -11,6 +11,7 @@ export default defineNuxtConfig({
     "@pinia/nuxt",
     "@vueuse/nuxt",
     "nuxt-studio",
+    "motion-v/nuxt",
   ],
   devtools: { enabled: true },
 
@@ -40,6 +41,15 @@ export default defineNuxtConfig({
         "better-auth/plugins/access",
         "better-auth/plugins/admin/access",
       ],
+    },
+  },
+
+  studio: {
+    repository: {
+      provider: "github",
+      owner: "branislavjuhaas",
+      repo: "dn-debrief",
+      branch: "main",
     },
   },
 });

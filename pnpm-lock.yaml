@@ -47,6 +47,9 @@ importers:
       eslint:
         specifier: ^10.1.0
         version: 10.1.0(jiti@2.6.1)
+      motion-v:
+        specifier: ^2.2.1
+        version: 2.2.1(@vueuse/core@14.2.1(vue@3.5.31(typescript@5.9.3)))(vue@3.5.31(typescript@5.9.3))
       nuxt:
         specifier: ^4.4.2
         version: 4.4.2(0c85f2af25137ca3bc2db3a9894aa0c8)
@@ -5315,8 +5318,8 @@ packages:
   motion-utils@12.36.0:
     resolution: {integrity: sha512-eHWisygbiwVvf6PZ1vhaHCLamvkSbPIeAYxWUuL3a2PD/TROgE7FvfHWTIH4vMl798QLfMw15nRqIaRDXTlYRg==}
 
-  motion-v@2.2.0:
-    resolution: {integrity: sha512-8rrUBt9UMwy45MfLMwHer9J7xBY/rL31S+0U3ZUAouqjH3AOVHvS0NGuXwF4mfWfvb22rfZEv59ZsBc2f1epxQ==}
+  motion-v@2.2.1:
+    resolution: {integrity: sha512-BYbABe1Ep/u33dHOrK+8SoVU2MuiQqT94JOYsgrge8QbrwkKf2lS6rHW2QyzP6t89wcyBvzZeLQQwfrx76dj9A==}
     peerDependencies:
       '@vueuse/core': '>=10.0.0'
       vue: '>=3.0.0'
@@ -8795,7 +8798,7 @@ snapshots:
       knitwork: 1.3.0
       magic-string: 0.30.21
       mlly: 1.8.2
-      motion-v: 2.2.0(@vueuse/core@14.2.1(vue@3.5.31(typescript@5.9.3)))(vue@3.5.31(typescript@5.9.3))
+      motion-v: 2.2.1(@vueuse/core@14.2.1(vue@3.5.31(typescript@5.9.3)))(vue@3.5.31(typescript@5.9.3))
       ohash: 2.0.11
       pathe: 2.0.3
       reka-ui: 2.9.2(vue@3.5.31(typescript@5.9.3))
@@ -12915,7 +12918,7 @@ snapshots:
 
   motion-utils@12.36.0: {}
 
-  motion-v@2.2.0(@vueuse/core@14.2.1(vue@3.5.31(typescript@5.9.3)))(vue@3.5.31(typescript@5.9.3)):
+  motion-v@2.2.1(@vueuse/core@14.2.1(vue@3.5.31(typescript@5.9.3)))(vue@3.5.31(typescript@5.9.3)):
     dependencies:
       '@vueuse/core': 14.2.1(vue@3.5.31(typescript@5.9.3))
       framer-motion: 12.38.0

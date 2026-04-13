@@ -27,6 +27,7 @@
     "better-auth": "1.5.5",
     "drizzle-orm": "1.0.0-beta.19",
     "eslint": "^10.1.0",
+    "motion-v": "^2.2.1",
     "nuxt": "^4.4.2",
     "nuxt-studio": "1.6.0",
     "pinia": "^3.0.4",
