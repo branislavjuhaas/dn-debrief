@@ -1,7 +1,7 @@
 <script setup lang="ts"></script>
 
 <template>
-  <UMain>
+  <UMain class="overflow-x-hidden">
     <slot />
   </UMain>
 </template>
