@@ -83,7 +83,7 @@ export const auth = betterAuth({
         defaultValue: 0,
         input: false, // don't allow user to set credential
       },
-      birthdate: {
+      birthDate: {
         type: "date",
         required: false,
         input: true,
@@ -98,7 +98,7 @@ export const auth = betterAuth({
         required: false,
         input: true,
       },
-      city: {
+      town: {
         type: "string",
         required: false,
         input: true,

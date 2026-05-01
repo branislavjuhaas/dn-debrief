@@ -74,10 +74,10 @@ export type RegistrationsConfig =
         | "surname"
         | "email"
         | "phone"
-        | "birthdate"
+        | "birthDate"
         | "street"
         | "postalCode"
-        | "city"
+        | "town"
       )[];
       registrationFields: RegistrationField[];
     };

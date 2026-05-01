@@ -21,8 +21,8 @@ import {
  * Additional fields:
  * - `surname` — required string, user-provided.
  * - `credential` — numeric, required, default 0, not editable by the user.
- * - `birthdate` — optional date, user-provided.
- * - `street`, `postalCode`, `city`, `phone` — optional strings, user-provided.
+ * - `birthDate` — optional date, user-provided.
+ * - `street`, `postalCode`, `town`, `phone` — optional strings, user-provided.
  * - `phone` — optional string, user-provided.
  * - `claims` — optional JSON, not editable by the user, can be used to store arbitrary claims.
  *
@@ -56,7 +56,7 @@ export default () =>
         defaultValue: 0,
         input: false, // don't allow user to set credential
       },
-      birthdate: {
+      birthDate: {
         type: "date",
         required: false,
         input: true,
@@ -71,7 +71,7 @@ export default () =>
         required: false,
         input: true,
       },
-      city: {
+      town: {
         type: "string",
         required: false,
         input: true,
