@@ -12,6 +12,11 @@ export default defineAppConfig({
     pageBody: {
       base: "space-y-8",
     },
+    input: {
+      slots: {
+        root: "w-full",
+      },
+    },
     icons: {
       arrowDown: "i-ph-arrow-down",
       arrowLeft: "i-ph-arrow-left",
