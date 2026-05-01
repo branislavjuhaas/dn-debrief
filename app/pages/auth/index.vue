@@ -141,7 +141,7 @@ const providers = computed(() => [
             >
           </template>
           <template #validation>
-            <UAlert
+            <LazyUAlert
               v-if="error"
               color="error"
               icon="i-ph-warning-octagon"
