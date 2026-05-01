@@ -1,35 +1,10 @@
 import { requireUser } from "#server/utils/auth";
-import { db } from "#server/db/db";
+import { getCompleteUser } from "#server/utils/user";
 
 export default defineEventHandler(async (event) => {
   const user = await requireUser(event);
 
-  const userData = await db.query.users.findFirst({
-    where: { id: user.id },
-    with: {
-      legalGuardians: {
-        columns: {
-          name: true,
-          email: true,
-        },
-      },
-      payments: true,
-      memberships: {
-        with: {
-          club: {
-            columns: {
-              name: true,
-            },
-          },
-        },
-      },
-      managedClubs: {
-        columns: {
-          name: true,
-        },
-      },
-    },
-  });
+  const userData = await getCompleteUser(user.id);
 
   return { user: userData };
 });
