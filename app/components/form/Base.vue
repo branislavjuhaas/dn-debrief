@@ -14,13 +14,17 @@ const slots = defineSlots<{
 </script>
 
 <template>
-  <UPageCard :ui="{ root: 'overflow-hidden', container: 'grid md:grid-cols-2 p-0 sm:p-0 gap-x-0' }">
+  <UPageCard
+    :ui="{
+      root: 'overflow-hidden',
+      container: 'grid md:grid-cols-2 p-0 sm:p-0 gap-x-0',
+    }">
     <div class="hidden md:block relative">
       <NuxtImg
         src="/assets/form.png"
         alt="Background image"
         width="800"
-        class="object-cover absolute w-full h-full"/>
+        class="object-cover absolute w-full h-full" />
     </div>
     <div class="flex flex-col gap-y-4 p-4 sm:p-6">
       <div class="flex flex-col text-center">
@@ -42,7 +46,7 @@ const slots = defineSlots<{
       </div>
 
       <slot />
-      
+
       <div
         v-if="!!slots.footer"
         class="text-sm text-pretty text-muted text-center font-medium">
