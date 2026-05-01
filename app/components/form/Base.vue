@@ -29,7 +29,7 @@ const slots = defineSlots<{
     <div class="flex flex-col gap-y-4 p-4 sm:p-6">
       <div class="flex flex-col text-center">
         <div v-if="icon" class="mb-2">
-          <UIcon :name="icon" class="size-8 shrink-0 inline-block" />
+          <UIcon :name="icon" class="size-16 shrink-0 inline-block" />
         </div>
 
         <div
