@@ -4,7 +4,8 @@ import type { FormSubmitEvent, AuthFormField } from "@nuxt/ui";
 
 useSeoMeta({
   title: "Prihlásenie",
-  description: "Prihláste se na platformu DebRIEF a začněte využívať všetky jej funkcie.",
+  description:
+    "Prihláste se na platformu DebRIEF a začněte využívať všetky jej funkcie.",
 });
 
 const authClient = useAuthClient();

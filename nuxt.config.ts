@@ -15,6 +15,20 @@ export default defineNuxtConfig({
   ],
   devtools: { enabled: true },
 
+  app: {
+    head: {
+      charset: "utf-8",
+      title: "Inteligentná debatná platforma",
+      description:
+        "DebRIEF II je inteligentná debatná platforma využívajúca moderné technológie na zlepšenie správy Slovenskej debatnej asociácie.",
+      titleTemplate: "%s | DebRIEF II",
+      htmlAttrs: {
+        lang: "sk",
+      },
+      link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" }],
+    },
+  },
+
   css: ["~/assets/css/main.css"],
 
   content: {
@@ -32,22 +46,6 @@ export default defineNuxtConfig({
       tasks: true,
     },
   },
-
-  app: {
-    head: {
-      charset: 'utf-8',
-      title: 'Inteligentná debatná platforma',
-      description: 'DebRIEF II je inteligentná debatná platforma využívajúca moderné technológie na zlepšenie správy Slovenskej debatnej asociácie.',
-      titleTemplate: '%s | DebRIEF II',
-      htmlAttrs: {
-        lang: 'sk',
-      },
-      link: [
-        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
-      ],
-    },
-  },
-
 
   vite: {
     optimizeDeps: {
