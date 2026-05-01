@@ -50,7 +50,7 @@ const loadCurrentUser = async () => {
   await userStore.$patch({
     user,
   });
-}
+};
 
 const emailLogin = (payload: FormSubmitEvent<LoginFormData>) => {
   submitting.value = true;
@@ -60,7 +60,7 @@ const emailLogin = (payload: FormSubmitEvent<LoginFormData>) => {
     {
       email: payload.data.email,
       password: payload.data.password,
-      remember: payload.data.remember,
+      rememberMe: payload.data.remember,
     },
     {
       onSuccess: async () => {
@@ -68,13 +68,13 @@ const emailLogin = (payload: FormSubmitEvent<LoginFormData>) => {
         submitting.value = false;
         navigateTo("/");
       },
-      onError: (ctx: { error: { code: string } }) => {
+      onError: (ctx) => {
         error.value = translateAuthError(ctx.error.code);
         submitting.value = false;
       },
     },
   );
-}
+};
 
 const githubLogin = async () => {
   submitting.value = true;
@@ -84,11 +84,11 @@ const githubLogin = async () => {
     provider: "github",
     callbackURL: "/",
   });
-}
+};
 
 const googleLogin = async () => {
   // TODO: Implement Google login
-}
+};
 
 const providers = computed(() => [
   {
