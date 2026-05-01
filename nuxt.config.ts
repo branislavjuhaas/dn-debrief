@@ -19,8 +19,6 @@ export default defineNuxtConfig({
     head: {
       charset: "utf-8",
       title: "Inteligentná debatná platforma",
-      description:
-        "DebRIEF II je inteligentná debatná platforma využívajúca moderné technológie na zlepšenie správy Slovenskej debatnej asociácie.",
       titleTemplate: "%s | DebRIEF II",
       htmlAttrs: {
         lang: "sk",
