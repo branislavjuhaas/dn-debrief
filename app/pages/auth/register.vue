@@ -25,10 +25,13 @@ const items = ref<StepperItem[]>([
 const { index, current, isCurrent, goTo, goToNext } = useStepper({
   "account-info": {
     title: "Vitajte na platforme",
+    description: undefined,
+    icon: undefined,
   },
   "profile-completion": {
     title: "Ďakujeme za základné údaje",
     description: "Pre dokončenie účtu, vyplňte, prosím, osobné informácie",
+    icon: undefined,
   },
   "email-verification": {
     title: "Čakáme na overenie",
@@ -93,11 +96,19 @@ const profileSchema = z.object({
   phone: z.e164("Neplatné telefónne číslo"),
 });
 
-const profileState = reactive({
+const profileState = reactive<{
+  firstName: string;
+  lastName: string;
+  birthDate: CalendarDate | null;
+  phone: string;
+  street: string;
+  postalCode: string;
+  town: string;
+}>({
   firstName: userStore.user?.name || "",
   lastName: userStore.user?.surname || "",
   birthDate: userStore.user?.birthDate
-    ? parseDate(userStore.user.birthDate) as unknown
+    ? parseDate(userStore.user.birthDate)
     : null,
   phone: userStore.user?.phone || "",
   street: userStore.user?.street || "",
@@ -132,12 +143,12 @@ const processAccount = () => {
       {
         name: profileState.firstName,
         surname: profileState.lastName,
-        birthDate: profileState.birthDate?.toString(),
+        birthDate: profileState.birthDate?.toString() || undefined,
         phone: profileState.phone,
         street: profileState.street,
         postalCode: profileState.postalCode,
         town: profileState.town,
-      },
+      } as any,
       {
         onSuccess: async () => {
           const { user } = await $fetch("/api/users/me");
@@ -154,8 +165,8 @@ const processAccount = () => {
           processingAccount.value = false;
           goTo("next-steps");
         },
-        onError: (err) => {
-          error.value = translateAuthError(err);
+        onError: (err: any) => {
+          error.value = translateAuthError(err.code || "UNKNOWN_ERROR");
           processingAccount.value = false;
         },
       },
@@ -169,19 +180,19 @@ const processAccount = () => {
       password: accountState.password,
       name: profileState.firstName,
       surname: profileState.lastName,
-      birthDate: profileState.birthDate?.toString(),
+      birthDate: profileState.birthDate?.toString() || undefined,
       phone: profileState.phone,
       street: profileState.street,
       postalCode: profileState.postalCode,
       town: profileState.town,
-    },
+    } as any,
     {
       onSuccess: () => {
         processingAccount.value = false;
         goTo("email-verification");
       },
-      onError: (err) => {
-        error.value = translateAuthError(err);
+      onError: (err: any) => {
+        error.value = translateAuthError(err.code || "UNKNOWN_ERROR");
         processingAccount.value = false;
       },
     },
@@ -254,7 +265,9 @@ const processAccount = () => {
           </UFormField>
 
           <UFormField label="Dátum narodenia" name="birthDate" required>
-            <UInputDate v-model="profileState.birthDate" class="w-full" />
+            <UInputDate
+              v-model="profileState.birthDate as CalendarDate | null"
+              class="w-full" />
           </UFormField>
 
           <UFormField
