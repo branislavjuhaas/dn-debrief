@@ -2,6 +2,11 @@
 import * as z from "zod";
 import type { FormSubmitEvent, AuthFormField } from "@nuxt/ui";
 
+useSeoMeta({
+  title: "Prihlásenie",
+  description: "Prihláste se na platformu DebRIEF a začněte využívať všetky jej funkcie.",
+});
+
 const authClient = useAuthClient();
 const userStore = useUserStore();
 
