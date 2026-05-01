@@ -27,18 +27,22 @@ const slots = defineSlots<{
         <div v-if="icon" class="mb-2">
           <UIcon :name="icon" class="size-8 shrink-0 inline-block" />
         </div>
+
         <div
           v-if="title || !!slots.title"
           class="text-xl text-pretty font-semibold text-highlighted">
           <slot name="title">{{ title }}</slot>
         </div>
+
         <div
           v-if="description || !!slots.description"
           class="mt-1 text-base text-pretty text-muted">
           <slot name="description">{{ description }}</slot>
         </div>
       </div>
+
       <slot />
+      
       <div
         v-if="!!slots.footer"
         class="text-sm text-pretty text-muted text-center font-medium">
