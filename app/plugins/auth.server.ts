@@ -1,5 +1,15 @@
 import { auth } from "~~/server/auth/auth";
 
+const isUserComplete = (user: any) => {
+  return !!(
+    user.birthDate &&
+    user.street &&
+    user.postalCode &&
+    user.town &&
+    user.phone
+  );
+};
+
 export default defineNuxtPlugin(async (_nuxtApp) => {
   const userStore = useUserStore();
   const headers = useRequestHeaders();
@@ -15,6 +25,14 @@ export default defineNuxtPlugin(async (_nuxtApp) => {
   });
 
   if (!user) return;
+
+  if (!isUserComplete(user)) {
+    const url = useNuxtApp().ssrContext?.url;
+    if (url !== "/auth/register?verified=true") {
+      await navigateTo("/auth/register?verified=true");
+      return;
+    }
+  }
 
   await userStore.$patch({
     user,
