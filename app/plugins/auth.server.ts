@@ -28,8 +28,8 @@ export default defineNuxtPlugin(async (_nuxtApp) => {
 
   if (!isUserComplete(user)) {
     const url = useNuxtApp().ssrContext?.url;
-    if (url !== "/auth/register?verified=true") {
-      await navigateTo("/auth/register?verified=true");
+    if (url !== "/auth/register?completion=true") {
+      await navigateTo("/auth/register?completion=true");
       return;
     }
   }

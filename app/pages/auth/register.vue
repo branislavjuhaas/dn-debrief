@@ -22,33 +22,55 @@ const items = ref<StepperItem[]>([
   },
 ]);
 
-const { index, current, isCurrent, goTo, goToNext } = useStepper({
+const { current, isCurrent, goTo, goToNext } = useStepper({
   "account-info": {
     title: "Vitajte na platforme",
     description: undefined,
     icon: undefined,
+    step: 0,
   },
   "profile-completion": {
     title: "Ďakujeme za základné údaje",
     description: "Pre dokončenie účtu, vyplňte, prosím, osobné informácie",
     icon: undefined,
+    step: 1,
   },
   "email-verification": {
     title: "Čakáme na overenie",
     description:
       "Na vami zadaný email sme poslali link na overenie účtu. Pre pokračovanie v registrácii, kliknite, prosím, na odkaz v maily.",
     icon: "i-ph-mailbox",
+    step: 1,
+  },
+  "email-verified": {
+    title: "Váš email bol overený",
+    description:
+      "Dakujeme za overenie vášho emailu. Prosím, pokračujte v registrácii.",
+    icon: "i-ph-check-circle",
+    step: 1,
   },
   "next-steps": {
     title: "Už sme skoro hotoví",
     description:
       "Váš účet bol úspešne vytvorený. Pre získanie prístupu ku všetkým podujatiam a funkciám sa, prosím, registrujte do SDA.",
     icon: "i-ph-confetti",
+    step: 2,
+  },
+  "return-home": {
+    title: "Hotovo!",
+    description:
+      "Váš účet bol úspešne aktualizovaný. Pokračujte, prosím, na domovskú stránku.",
+    icon: "i-ph-confetti",
+    step: 2,
   },
 });
 
-if (useRoute().query.verified) {
+if (useRoute().query.completion) {
   goTo("profile-completion");
+}
+
+if (useRoute().query.verified) {
+  goTo("email-verified");
 }
 
 const userStore = useUserStore();
@@ -163,7 +185,7 @@ const processAccount = () => {
           });
 
           processingAccount.value = false;
-          goTo("next-steps");
+          goTo("return-home");
         },
         onError: (err: any) => {
           error.value = translateAuthError(err.code || "UNKNOWN_ERROR");
@@ -207,40 +229,46 @@ const processAccount = () => {
       <FormBase
         :title="current.title"
         :description="current.description"
-        :icon="current.icon">
+        :icon="current.icon"
+      >
         <template v-if="isCurrent('account-info')" #description>
           Máte už účet?
           <ULink to="/auth" class="text-secondary">Prihláste sa.</ULink>
         </template>
 
         <USeparator
-          v-if="isCurrent('account-info') || isCurrent('profile-completion')" />
+          v-if="isCurrent('account-info') || isCurrent('profile-completion')"
+        />
 
         <UForm
           v-if="isCurrent('account-info')"
           :schema="accountSchema"
           :state="accountState"
           class="space-y-5"
-          @submit="goToNext()">
+          @submit="goToNext()"
+        >
           <UFormField label="Email" name="email" required>
             <UInput
               v-model="accountState.email"
               type="email"
-              placeholder="Zadejte email" />
+              placeholder="Zadejte email"
+            />
           </UFormField>
 
           <UFormField label="Heslo" name="password" required>
             <UInput
               v-model="accountState.password"
               type="password"
-              placeholder="Zadejte heslo" />
+              placeholder="Zadejte heslo"
+            />
           </UFormField>
 
           <UFormField label="Potvrďte heslo" name="confirmPassword" required>
             <UInput
               v-model="accountState.confirmPassword"
               type="password"
-              placeholder="Zadejte heslo znova" />
+              placeholder="Zadejte heslo znova"
+            />
           </UFormField>
 
           <UButton type="submit" block> Pokračovat </UButton>
@@ -251,33 +279,39 @@ const processAccount = () => {
           :schema="profileSchema"
           :state="profileState"
           class="space-y-5"
-          @submit="processAccount()">
+          @submit="processAccount()"
+        >
           <UFormField label="Meno" name="firstName" required>
             <UInput
               v-model="profileState.firstName"
-              placeholder="Zadejte svoje meno" />
+              placeholder="Zadejte svoje meno"
+            />
           </UFormField>
 
           <UFormField label="Priezvisko" name="lastName" required>
             <UInput
               v-model="profileState.lastName"
-              placeholder="Zadejte svoje priezvisko" />
+              placeholder="Zadejte svoje priezvisko"
+            />
           </UFormField>
 
           <UFormField label="Dátum narodenia" name="birthDate" required>
             <UInputDate
               v-model="profileState.birthDate as CalendarDate | null"
-              class="w-full" />
+              class="w-full"
+            />
           </UFormField>
 
           <UFormField
             label="Telefónne číslo"
             name="phone"
             description="v medzinárodnom formáte s predvoľbou (+421...) a bez medzier"
-            required>
+            required
+          >
             <UInput
               v-model="profileState.phone"
-              placeholder="Zadejte telefonné číslo" />
+              placeholder="Zadejte telefonné číslo"
+            />
           </UFormField>
 
           <USeparator label="Adresa trvalého pobytu" />
@@ -285,20 +319,23 @@ const processAccount = () => {
           <UFormField label="Ulica a číslo" name="street" required>
             <UInput
               v-model="profileState.street"
-              placeholder="Zadejte ulicu trvalého pobytu" />
+              placeholder="Zadejte ulicu trvalého pobytu"
+            />
           </UFormField>
 
           <div class="flex space-x-4">
             <UFormField label="PSČ" name="postalCode" required class="flex-1">
               <UInput
                 v-model="profileState.postalCode"
-                placeholder="Zadejte PSČ trvalého pobytu" />
+                placeholder="Zadejte PSČ trvalého pobytu"
+              />
             </UFormField>
 
             <UFormField label="Obec" name="town" required class="flex-1">
               <UInput
                 v-model="profileState.town"
-                placeholder="Zadejte obec trvalého pobytu" />
+                placeholder="Zadejte obec trvalého pobytu"
+              />
             </UFormField>
           </div>
 
@@ -306,21 +343,33 @@ const processAccount = () => {
             v-if="error"
             color="error"
             icon="i-ph-warning-octagon"
-            :title="error" />
+            :title="error"
+          />
 
           <UButton type="submit" block :loading="processingAccount">
             Pokračovat
           </UButton>
         </UForm>
 
-        <UButton v-if="isCurrent('next-steps')" to="/profile/join" block
+        <UButton
+          v-if="isCurrent('email-verified')"
+          block
+          @click="goTo('next-steps')"
+          >Pokračovať</UButton
+        >
+
+        <UButton v-else-if="isCurrent('next-steps')" to="/profile/join" block
           >Registrovať sa do SDA</UButton
+        >
+
+        <UButton v-else-if="isCurrent('return-home')" to="/" block
+          >Návrat na domovskú stránku</UButton
         >
 
         <USeparator />
 
         <template #footer>
-          <UStepper v-model="index" :items="items" :disabled="true" />
+          <UStepper v-model="current.step" :items="items" :disabled="true" />
         </template>
       </FormBase>
     </UPageBody>
