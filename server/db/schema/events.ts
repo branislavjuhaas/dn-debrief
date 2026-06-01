@@ -49,12 +49,25 @@ export type Schedule = {
   days: Day[];
 };
 
-export type RegistrationField = {
+export type RegistrationQuestion = {
+  uuid: string;
   title: string;
   description?: string;
   required?: boolean;
   type?: "text" | "date" | "select" | "multiselect";
   options?: string[];
+};
+
+export type RegistrationSection = {
+  uuid: string;
+  title: string;
+  questions: RegistrationQuestion[];
+  next?: {
+    type: "static" | "conditional";
+    then?: string;
+    rules?: { question: string; value: any; then: string }[];
+    fallback?: string;
+  } | null;
 };
 
 export type RegistrationsConfig =
@@ -63,12 +76,11 @@ export type RegistrationsConfig =
       href: string;
     }
   | {
-      allowedRoles?: {
-        role: string;
-        deadline: Date;
-      };
+      allowedRoles?: string[];
       requireAccount: boolean;
       requireMembership: boolean;
+      softDeadline?: Date;
+      hardDeadline?: Date;
       collectedDetails: (
         | "name"
         | "surname"
@@ -79,8 +91,26 @@ export type RegistrationsConfig =
         | "postalCode"
         | "town"
       )[];
-      registrationFields: RegistrationField[];
+      sections: RegistrationSection[];
+      conditionalStartSections?: { role: string; section: string }[];
+      fallbackStartSection: string;
     };
+
+export type RegistrationData = {
+  question: string;
+  answer: any;
+}[];
+
+export type CollectedDetails = {
+  name?: string;
+  surname?: string;
+  email?: string;
+  phone?: string;
+  birthDate?: Date;
+  street?: string;
+  postalCode?: string;
+  town?: string;
+};
 
 export const events = pgTable(
   "events",
@@ -146,6 +176,7 @@ export const eventOrganizers = pgTable(
   (table) => [
     primaryKey({ columns: [table.eventId, table.userId] }),
     index("event_organizers_userId_idx").on(table.userId),
+    index("event_organizers_eventId_idx").on(table.eventId),
   ],
 );
 
@@ -155,10 +186,15 @@ export const eventRegistrations = pgTable(
     eventId: integer("event_id")
       .references(() => events.id, { onDelete: "cascade" })
       .notNull(),
-    userId: integer("user_id")
-      .references(() => users.id, { onDelete: "cascade" })
+    userId: integer("user_id").references(() => users.id, {
+      onDelete: "cascade",
+    }),
+    registrationData: jsonb("registration_data")
+      .$type<RegistrationData>()
       .notNull(),
-    registrationData: jsonb("registration_data").notNull(),
+    collectedDetails: jsonb("collected_details")
+      .$type<CollectedDetails>()
+      .notNull(),
     confirmed: boolean("confirmed").default(false).notNull(),
     paymentId: integer("payment_id")
       .unique()
