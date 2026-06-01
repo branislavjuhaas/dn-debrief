@@ -229,46 +229,40 @@ const processAccount = () => {
       <FormBase
         :title="current.title"
         :description="current.description"
-        :icon="current.icon"
-      >
+        :icon="current.icon">
         <template v-if="isCurrent('account-info')" #description>
           Máte už účet?
           <ULink to="/auth" class="text-secondary">Prihláste sa.</ULink>
         </template>
 
         <USeparator
-          v-if="isCurrent('account-info') || isCurrent('profile-completion')"
-        />
+          v-if="isCurrent('account-info') || isCurrent('profile-completion')" />
 
         <UForm
           v-if="isCurrent('account-info')"
           :schema="accountSchema"
           :state="accountState"
           class="space-y-5"
-          @submit="goToNext()"
-        >
+          @submit="goToNext()">
           <UFormField label="Email" name="email" required>
             <UInput
               v-model="accountState.email"
               type="email"
-              placeholder="Zadejte email"
-            />
+              placeholder="Zadejte email" />
           </UFormField>
 
           <UFormField label="Heslo" name="password" required>
             <UInput
               v-model="accountState.password"
               type="password"
-              placeholder="Zadejte heslo"
-            />
+              placeholder="Zadejte heslo" />
           </UFormField>
 
           <UFormField label="Potvrďte heslo" name="confirmPassword" required>
             <UInput
               v-model="accountState.confirmPassword"
               type="password"
-              placeholder="Zadejte heslo znova"
-            />
+              placeholder="Zadejte heslo znova" />
           </UFormField>
 
           <UButton type="submit" block> Pokračovat </UButton>
@@ -279,39 +273,33 @@ const processAccount = () => {
           :schema="profileSchema"
           :state="profileState"
           class="space-y-5"
-          @submit="processAccount()"
-        >
+          @submit="processAccount()">
           <UFormField label="Meno" name="firstName" required>
             <UInput
               v-model="profileState.firstName"
-              placeholder="Zadejte svoje meno"
-            />
+              placeholder="Zadejte svoje meno" />
           </UFormField>
 
           <UFormField label="Priezvisko" name="lastName" required>
             <UInput
               v-model="profileState.lastName"
-              placeholder="Zadejte svoje priezvisko"
-            />
+              placeholder="Zadejte svoje priezvisko" />
           </UFormField>
 
           <UFormField label="Dátum narodenia" name="birthDate" required>
             <UInputDate
               v-model="profileState.birthDate as CalendarDate | null"
-              class="w-full"
-            />
+              class="w-full" />
           </UFormField>
 
           <UFormField
             label="Telefónne číslo"
             name="phone"
             description="v medzinárodnom formáte s predvoľbou (+421...) a bez medzier"
-            required
-          >
+            required>
             <UInput
               v-model="profileState.phone"
-              placeholder="Zadejte telefonné číslo"
-            />
+              placeholder="Zadejte telefonné číslo" />
           </UFormField>
 
           <USeparator label="Adresa trvalého pobytu" />
@@ -319,23 +307,20 @@ const processAccount = () => {
           <UFormField label="Ulica a číslo" name="street" required>
             <UInput
               v-model="profileState.street"
-              placeholder="Zadejte ulicu trvalého pobytu"
-            />
+              placeholder="Zadejte ulicu trvalého pobytu" />
           </UFormField>
 
           <div class="flex space-x-4">
             <UFormField label="PSČ" name="postalCode" required class="flex-1">
               <UInput
                 v-model="profileState.postalCode"
-                placeholder="Zadejte PSČ trvalého pobytu"
-              />
+                placeholder="Zadejte PSČ trvalého pobytu" />
             </UFormField>
 
             <UFormField label="Obec" name="town" required class="flex-1">
               <UInput
                 v-model="profileState.town"
-                placeholder="Zadejte obec trvalého pobytu"
-              />
+                placeholder="Zadejte obec trvalého pobytu" />
             </UFormField>
           </div>
 
@@ -343,8 +328,7 @@ const processAccount = () => {
             v-if="error"
             color="error"
             icon="i-ph-warning-octagon"
-            :title="error"
-          />
+            :title="error" />
 
           <UButton type="submit" block :loading="processingAccount">
             Pokračovat
