@@ -1,5 +1,5 @@
 import { defineRelations } from "drizzle-orm";
-import { users, legalGuardians } from "./auth";
+import { users, legalGuardians, awards } from "./auth";
 import { clubs, clubMemberships, clubManagers } from "./clubs";
 import { payments } from "./payments";
 import { eventOrganizers, eventRegistrations, events } from "./events";
@@ -7,6 +7,7 @@ import { eventOrganizers, eventRegistrations, events } from "./events";
 export const relations = defineRelations(
   {
     users,
+    awards,
     legalGuardians,
     clubs,
     clubMemberships,
@@ -18,6 +19,10 @@ export const relations = defineRelations(
   },
   (r) => ({
     users: {
+      awards: r.many.awards({
+        from: r.users.id,
+        to: r.awards.userId,
+      }),
       legalGuardians: r.many.legalGuardians({
         from: r.users.id,
         to: r.legalGuardians.userId,

@@ -11,6 +11,8 @@ import {
   serial,
   jsonb,
   pgEnum,
+  smallint,
+  primaryKey,
 } from "drizzle-orm/pg-core";
 
 export const userRoleEnum = pgEnum("role", [
@@ -58,6 +60,29 @@ export const users = pgTable(
   (table) => [
     index("users_role_idx").on(table.role),
     index("users_search_idx").using("gin", sql`${table.search} gin_trgm_ops`),
+  ],
+);
+
+export const awards = pgTable(
+  "awards",
+  {
+    award: text("name").notNull(),
+    userId: integer("user_id")
+      .references(() => users.id, { onDelete: "cascade" })
+      .notNull(),
+    level: smallint("level").notNull(),
+    awardedBy: integer("awarded_by").references(() => users.id, {
+      onDelete: "cascade",
+    }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.userId, table.award, table.level] }),
+    index("awards_userId_idx").on(table.userId),
   ],
 );
 
