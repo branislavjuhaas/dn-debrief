@@ -40,7 +40,7 @@ const slots = defineSlots<{
 
         <div
           v-if="description || !!slots.description"
-          class="mt-1 text-base text-pretty text-muted">
+          class="mt-1 text-base text-pretty text-muted mx-8">
           <slot name="description">{{ description }}</slot>
         </div>
       </div>
