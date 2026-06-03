@@ -10,5 +10,6 @@ export type LegalGuardian = typeof legalGuardians.$inferSelect;
 
 export type User = typeof users.$inferSelect & {
   legalGuardians?: LegalGuardian[];
+  clubMemberships?: ClubMembership[];
   managedClubs?: Club[];
 };
