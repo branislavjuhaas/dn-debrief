@@ -43,10 +43,10 @@ const { current, isCurrent, goTo, goToNext } = useStepper({
     step: 1,
   },
   "email-verified": {
-    title: "Váš email bol overený",
+    title: "Váš email bol overený!",
     description:
-      "Dakujeme za overenie vášho emailu. Prosím, pokračujte v registrácii.",
-    icon: "i-ph-check-circle",
+      "Dakujeme za overenie vášho emailu. Pre získanie maximálnych možností platfotmy DebRIEF, prosím, pokračujte v registrácii.",
+    icon: "i-ph-checks",
     step: 1,
   },
   "next-steps": {
