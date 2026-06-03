@@ -17,6 +17,11 @@ export default defineAppConfig({
         root: "w-full",
       },
     },
+    selectMenu: {
+      slots: {
+        base: "w-full",
+      },
+    },
     icons: {
       arrowDown: "i-ph-arrow-down",
       arrowLeft: "i-ph-arrow-left",
