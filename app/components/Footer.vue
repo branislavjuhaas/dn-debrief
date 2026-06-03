@@ -41,7 +41,7 @@ const footerLinks: FooterColumn[] = [
     label: "O projekte",
     children: [
       {
-        label: "O systéme DebRIEF",
+        label: "O platforme DebRIEF",
         to: "/about",
       },
       {
@@ -62,8 +62,8 @@ const footerLinks: FooterColumn[] = [
         <UFooterColumns :columns="footerLinks">
           <template #right>
             <p class="text-muted text-sm">
-              Projekt <b>DN DebRIEF (Sunlake)</b> je postavený výhradne na
-              open-source technológiách. Produkčne prevádzkované na serveroch v
+              Projekt <b>DN DebRIEF (Sunlake)</b> je konštruovaný výhradne na
+              open-source technológiách a produkčne prevádzkovaný na serveroch v
               Európskej únii.
               <ULink
                 href="/about"
