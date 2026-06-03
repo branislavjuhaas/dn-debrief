@@ -26,6 +26,7 @@
     "@vueuse/core": "^14.3.0",
     "@vueuse/nuxt": "14.3.0",
     "better-auth": "1.6.13",
+    "date-fns": "^4.4.0",
     "drizzle-orm": "1.0.0-rc.3",
     "eslint": "^10.4.1",
     "motion-v": "^2.2.1",
