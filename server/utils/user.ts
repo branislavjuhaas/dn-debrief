@@ -6,7 +6,7 @@ export const getCompleteUser = async (userId: number) => {
     with: {
       legalGuardians: true,
       payments: true,
-      memberships: {
+      clubMemberships: {
         with: {
           club: true,
         },

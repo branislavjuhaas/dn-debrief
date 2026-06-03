@@ -31,7 +31,7 @@ export const relations = defineRelations(
         from: r.users.id,
         to: r.payments.userId,
       }),
-      memberships: r.many.clubMemberships({
+      clubMemberships: r.many.clubMemberships({
         from: r.users.id,
         to: r.clubMemberships.userId,
       }),
