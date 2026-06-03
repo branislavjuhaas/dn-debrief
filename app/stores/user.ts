@@ -16,5 +16,15 @@ export const useUserStore = defineStore("user", {
     isAuthenticated(state) {
       return state.user != null;
     },
+    isMember(state) {
+      const currentYear = new Date().getFullYear();
+      return state.user?.clubMemberships?.some((m) => m.season === currentYear);
+    },
+    isConfirmedMember(state) {
+      const currentYear = new Date().getFullYear();
+      return state.user?.clubMemberships?.some(
+        (m) => m.season === currentYear && m.confirmed,
+      );
+    },
   },
 });
