@@ -185,7 +185,13 @@ const processAccount = () => {
           });
 
           processingAccount.value = false;
-          goTo("return-home");
+
+          if (userStore.isMember) {
+            goTo("return-home");
+            return;
+          }
+
+          goTo("next-steps");
         },
         onError: (err: any) => {
           error.value = translateAuthError(err.code || "UNKNOWN_ERROR");
