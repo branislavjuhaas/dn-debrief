@@ -3,6 +3,7 @@ import { users, legalGuardians, awards } from "./auth";
 import { clubs, clubMemberships, clubManagers } from "./clubs";
 import { payments } from "./payments";
 import { eventOrganizers, eventRegistrations, events } from "./events";
+import { settings } from "./settings";
 
 export const relations = defineRelations(
   {
@@ -13,6 +14,7 @@ export const relations = defineRelations(
     clubMemberships,
     clubManagers,
     payments,
+    settings,
     events,
     eventRegistrations,
     eventOrganizers,
@@ -54,6 +56,7 @@ export const relations = defineRelations(
         to: r.events.id.through(r.eventOrganizers.eventId),
       }),
     },
+    settings: {},
     legalGuardians: {
       user: r.one.users({
         from: r.legalGuardians.userId,
