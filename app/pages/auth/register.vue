@@ -5,6 +5,7 @@ import { useStepper } from "@vueuse/core";
 import { CalendarDate, parseDate } from "@internationalized/date";
 import { differenceInYears } from "date-fns";
 
+// STEPPER CONFIGURATION
 const items = ref<StepperItem[]>([
   {
     title: "Tvorba účtu",
@@ -66,16 +67,23 @@ const { current, isCurrent, goTo, goToNext } = useStepper({
   },
 });
 
+// CLIENT SERVICES & STORES
 const userStore = useUserStore();
+const authClient = useAuthClient();
+const route = useRoute();
 
-if (useRoute().query.completion) {
+const processingAccount = ref<boolean>(false);
+const error = ref<string | null>(null);
+
+// INITIAL ROUTING / MIDDLEWARE LOGIC
+if (route.query.completion) {
   if (!userStore.isAuthenticated) {
     navigateTo("/auth");
   }
   goTo("profile-completion");
-} else if (useRoute().query.verified) {
+} else if (route.query.verified) {
   goTo("email-verified");
-} else if (useRoute().query.next) {
+} else if (route.query.next) {
   if (!userStore.isAuthenticated) {
     navigateTo("/auth?next=/auth/register?next=true");
   }
@@ -86,6 +94,9 @@ if (useRoute().query.completion) {
   }
 }
 
+// VALIDATION SCHEMAS & STATE
+
+// --- Account Setup ---
 const accountSchema = z
   .object({
     email: z.email("Neplatný email"),
@@ -96,7 +107,7 @@ const accountSchema = z
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Heslá sa nezhodujú",
-    path: ["confirmPassword"], // error will appear on this field
+    path: ["confirmPassword"],
   });
 
 const accountState = reactive({
@@ -105,6 +116,7 @@ const accountState = reactive({
   confirmPassword: "",
 });
 
+// --- Profile Details ---
 const profileSchema = z.object({
   firstName: z.string("Meno je povinný údaj").nonempty("Meno je povinný údaj"),
   lastName: z
@@ -170,25 +182,32 @@ const profileState = reactive<{
   },
 });
 
-const authClient = useAuthClient();
+// COMPUTED PROPERTIES
+const age = computed(() => {
+  return Math.abs(
+    differenceInYears(
+      profileState.birthDate?.toString() || new Date(),
+      new Date(),
+    ),
+  );
+});
 
-const processingAccount = ref<boolean>(false);
-const error = ref<string | null>(null);
-
+// METHODS / BUSINESS LOGIC
 const processAccount = () => {
   processingAccount.value = true;
-
   const loggedIn = !!userStore.user;
 
   const accountResult = accountSchema.safeParse(accountState);
   if (accountResult.error && !loggedIn) {
     error.value = "Neplatné údaje pre vytvorenie účtu";
+    processingAccount.value = false;
     return;
   }
 
   const profileResult = profileSchema.safeParse(profileState);
   if (profileResult.error) {
     error.value = "Neplatné údaje pre dokončenie profilu";
+    processingAccount.value = false;
     return;
   }
 
@@ -212,20 +231,17 @@ const processAccount = () => {
 
           if (!user) {
             error.value = translateAuthError("UNKNOWN_ERROR");
+            processingAccount.value = false;
             return;
           }
 
-          await userStore.$patch({
-            user,
-          });
-
+          await userStore.$patch({ user });
           processingAccount.value = false;
 
           if (userStore.isMember) {
             goTo("return-home");
             return;
           }
-
           goTo("next-steps");
         },
         onError: (err: any) => {
@@ -262,20 +278,12 @@ const processAccount = () => {
     },
   );
 };
-
-const age = computed(() => {
-  return Math.abs(
-    differenceInYears(
-      profileState.birthDate?.toString() || new Date(),
-      new Date(),
-    ),
-  );
-});
 </script>
 
 <template>
   <UPage>
     <UPageHeader title="Registrácia na platformu DebRIEF" />
+
     <UPageBody>
       <FormBase
         :title="current.title"
@@ -346,7 +354,7 @@ const age = computed(() => {
           <UFormField
             label="Telefónne číslo"
             name="phone"
-            description="v medzinárodnom formáte s predvoľbou (+421...) a bez medzier"
+            description="v medzinárodnom formáte s predvoľbou (+421...) and bez medzier"
             required>
             <UInput
               v-model="profileState.phone"
@@ -378,13 +386,16 @@ const age = computed(() => {
           <template v-if="age < 18">
             <USeparator label="Údaje zákonného/-ej zástupcu/-kyne" />
 
-            <UFormField label="Meno a priezvisko" name="name" required>
+            <UFormField
+              label="Meno a priezvisko"
+              name="legalGuardian.name"
+              required>
               <UInput
                 v-model="profileState.legalGuardian.name"
                 placeholder="Zadejte meno a priezvisko zákonného/-ej zástupcu/-kyne" />
             </UFormField>
 
-            <UFormField label="E-mail " name="email" required>
+            <UFormField label="E-mail" name="legalGuardian.email" required>
               <UInput
                 v-model="profileState.legalGuardian.email"
                 type="email"
@@ -410,17 +421,17 @@ const age = computed(() => {
             userStore.isAuthenticated
               ? goTo('next-steps')
               : navigateTo('/auth?next=/auth/register?next=true')
-          "
-          >Pokračovať</UButton
-        >
+          ">
+          Pokračovať
+        </UButton>
 
-        <UButton v-else-if="isCurrent('next-steps')" to="/profile/join" block
-          >Registrovať sa do SDA</UButton
-        >
+        <UButton v-else-if="isCurrent('next-steps')" to="/profile/join" block>
+          Registrovať sa do SDA
+        </UButton>
 
-        <UButton v-else-if="isCurrent('return-home')" to="/" block
-          >Návrat na domovskú stránku</UButton
-        >
+        <UButton v-else-if="isCurrent('return-home')" to="/" block>
+          Návrat na domovskú stránku
+        </UButton>
 
         <USeparator />
 
