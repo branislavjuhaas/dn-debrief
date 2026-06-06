@@ -27,7 +27,15 @@ const slots = defineSlots<{
         class="object-cover absolute w-full h-full" />
     </div>
     <div class="flex flex-col gap-y-4 p-4 sm:p-6">
-      <div class="flex flex-col text-center">
+      <div
+        v-if="
+          title ||
+          !!slots.title ||
+          description ||
+          !!slots.description ||
+          !!slots.footer
+        "
+        class="flex flex-col text-center">
         <div v-if="icon" class="mb-2">
           <UIcon :name="icon" class="size-16 shrink-0 inline-block" />
         </div>

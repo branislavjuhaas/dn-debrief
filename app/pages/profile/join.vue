@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import * as z from "zod";
-import type { RadioGroupItem, SelectMenuItem } from "@nuxt/ui";
+import type { FormSubmitEvent, RadioGroupItem, SelectMenuItem } from "@nuxt/ui";
 
 const { data: seasons } = await useFetch("/api/settings/seasons");
 
@@ -21,7 +21,11 @@ if (filteredSeasons?.length === 0) {
   throw createError({ statusCode: 404, message: "No seasons available" });
 }
 
-const { data: availableClubs, status } = useLazyFetch("/api/clubs/active", {
+const {
+  data: availableClubs,
+  status,
+  error,
+} = useLazyFetch("/api/clubs/active", {
   transform: (data) =>
     data?.clubs?.map(
       (club) => ({ label: club.name, id: club.id }) as SelectMenuItem,
@@ -56,7 +60,12 @@ const membershipTypes = ref<RadioGroupItem[]>([
 
 const membershipSchema = z.object({
   clubId: z.number(),
-  registrationType: z.string(),
+  registrationType: z.enum([
+    "junior_student",
+    "senior_student",
+    "teacher",
+    "graduate",
+  ]),
 });
 
 type MembershipSchema = z.output<typeof membershipSchema>;
@@ -65,6 +74,39 @@ const membershipState = reactive<Partial<MembershipSchema>>({
   clubId: undefined,
   registrationType: lastUserSeason?.registrationType,
 });
+
+const requestError = ref<string | null>(null);
+const loading = ref(false);
+
+const onSubmit = async (event: FormSubmitEvent<MembershipSchema>) => {
+  loading.value = true;
+  const data = await $fetch(`/api/clubs/${event.data.clubId}/join`, {
+    method: "POST",
+    body: {
+      registrationType: event.data.registrationType,
+    },
+    onRequestError: (_error) => {
+      loading.value = false;
+      requestError.value =
+        "Nastala chyba pri registrácii. Skúste to znova neskôr.";
+    },
+    onResponseError: (error) => {
+      loading.value = false;
+      if (error.response.status === 404) {
+        requestError.value =
+          "Nepodarilo sa nájsť debatný klub. Skúste to znova.";
+        return;
+      }
+
+      requestError.value =
+        "Nastala chyba pri registrácii. Skúste to znova neskôr.";
+    },
+  });
+
+  userStore.addClubMemberships(data.clubMemberships);
+
+  loading.value = false;
+};
 </script>
 
 <template>
@@ -76,7 +118,19 @@ const membershipState = reactive<Partial<MembershipSchema>>({
         <UForm
           :schema="membershipSchema"
           :state="membershipState"
-          class="space-y-4">
+          class="space-y-4"
+          @submit="onSubmit">
+          <LazyUAlert
+            v-if="error"
+            color="error"
+            icon="i-ph-warning-octagon"
+            title="Nepodarilo sa načítať aktívne debatné kluby, skúste to znova neskôr." />
+          <LazyUAlert
+            v-if="requestError"
+            color="error"
+            icon="i-ph-warning-octagon"
+            :title="requestError" />
+
           <UFormField
             label="Debatný klub"
             description="Najčastejšie škola, kde navštevujete debatný klub">
@@ -84,7 +138,9 @@ const membershipState = reactive<Partial<MembershipSchema>>({
               v-model="membershipState.clubId"
               value-key="id"
               :items="availableClubs"
-              :loading="status === 'pending'" />
+              placeholder="Vyberte debatný klub"
+              :loading="status === 'pending'"
+              :disabled="!!error" />
           </UFormField>
           <UFormField
             label="Typ registráce"
@@ -98,7 +154,9 @@ const membershipState = reactive<Partial<MembershipSchema>>({
               :items="membershipTypes" />
           </UFormField>
 
-          <UButton block>Záväzne sa registrovať do SDA</UButton>
+          <UButton :disabled="!!error" :loading="loading" type="submit" block
+            >Záväzne sa registrovať do SDA</UButton
+          >
         </UForm>
       </FormBase>
     </UPageBody>

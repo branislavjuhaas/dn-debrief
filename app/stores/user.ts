@@ -1,5 +1,3 @@
-import type { User } from "#shared/types/user";
-
 // TODO: Implement https://pinia.vuejs.org/core-concepts/state.html#TypeScript
 
 export const useUserStore = defineStore("user", {
@@ -25,6 +23,15 @@ export const useUserStore = defineStore("user", {
       return state.user?.clubMemberships?.some(
         (m) => m.season === currentYear && m.confirmed,
       );
+    },
+  },
+  actions: {
+    async addClubMemberships(memberships: ClubMembership[]) {
+      if (!this.user) return;
+      this.user.clubMemberships = [
+        ...(this.user.clubMemberships ?? []),
+        ...memberships,
+      ];
     },
   },
 });
