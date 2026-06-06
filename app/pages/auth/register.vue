@@ -66,19 +66,25 @@ const { current, isCurrent, goTo, goToNext } = useStepper({
   },
 });
 
-if (useRoute().query.completion) {
-  goTo("profile-completion");
-}
-
-if (useRoute().query.verified) {
-  goTo("email-verified");
-}
-
-if (useRoute().query.next) {
-  goTo("next-steps");
-}
-
 const userStore = useUserStore();
+
+if (useRoute().query.completion) {
+  if (!userStore.isAuthenticated) {
+    navigateTo("/auth");
+  }
+  goTo("profile-completion");
+} else if (useRoute().query.verified) {
+  goTo("email-verified");
+} else if (useRoute().query.next) {
+  if (!userStore.isAuthenticated) {
+    navigateTo("/auth?next=/auth/register?next=true");
+  }
+  goTo("next-steps");
+} else {
+  if (userStore.isAuthenticated) {
+    navigateTo("/profile");
+  }
+}
 
 const accountSchema = z
   .object({
@@ -274,40 +280,46 @@ const age = computed(() => {
       <FormBase
         :title="current.title"
         :description="current.description"
-        :icon="current.icon">
+        :icon="current.icon"
+      >
         <template v-if="isCurrent('account-info')" #description>
           Máte už účet?
           <ULink to="/auth" class="text-secondary">Prihláste sa.</ULink>
         </template>
 
         <USeparator
-          v-if="isCurrent('account-info') || isCurrent('profile-completion')" />
+          v-if="isCurrent('account-info') || isCurrent('profile-completion')"
+        />
 
         <UForm
           v-if="isCurrent('account-info')"
           :schema="accountSchema"
           :state="accountState"
           class="space-y-5"
-          @submit="goToNext()">
+          @submit="goToNext()"
+        >
           <UFormField label="Email" name="email" required>
             <UInput
               v-model="accountState.email"
               type="email"
-              placeholder="Zadejte email" />
+              placeholder="Zadejte email"
+            />
           </UFormField>
 
           <UFormField label="Heslo" name="password" required>
             <UInput
               v-model="accountState.password"
               type="password"
-              placeholder="Zadejte heslo" />
+              placeholder="Zadejte heslo"
+            />
           </UFormField>
 
           <UFormField label="Potvrďte heslo" name="confirmPassword" required>
             <UInput
               v-model="accountState.confirmPassword"
               type="password"
-              placeholder="Zadejte heslo znova" />
+              placeholder="Zadejte heslo znova"
+            />
           </UFormField>
 
           <UButton type="submit" block> Pokračovat </UButton>
@@ -318,33 +330,39 @@ const age = computed(() => {
           :schema="profileSchema"
           :state="profileState"
           class="space-y-5"
-          @submit="processAccount()">
+          @submit="processAccount()"
+        >
           <UFormField label="Meno" name="firstName" required>
             <UInput
               v-model="profileState.firstName"
-              placeholder="Zadejte svoje meno" />
+              placeholder="Zadejte svoje meno"
+            />
           </UFormField>
 
           <UFormField label="Priezvisko" name="lastName" required>
             <UInput
               v-model="profileState.lastName"
-              placeholder="Zadejte svoje priezvisko" />
+              placeholder="Zadejte svoje priezvisko"
+            />
           </UFormField>
 
           <UFormField label="Dátum narodenia" name="birthDate" required>
             <UInputDate
               v-model="profileState.birthDate as CalendarDate | null"
-              class="w-full" />
+              class="w-full"
+            />
           </UFormField>
 
           <UFormField
             label="Telefónne číslo"
             name="phone"
             description="v medzinárodnom formáte s predvoľbou (+421...) a bez medzier"
-            required>
+            required
+          >
             <UInput
               v-model="profileState.phone"
-              placeholder="Zadejte telefonné číslo" />
+              placeholder="Zadejte telefonné číslo"
+            />
           </UFormField>
 
           <USeparator label="Adresa trvalého pobytu" />
@@ -352,20 +370,23 @@ const age = computed(() => {
           <UFormField label="Ulica a číslo" name="street" required>
             <UInput
               v-model="profileState.street"
-              placeholder="Zadejte ulicu trvalého pobytu" />
+              placeholder="Zadejte ulicu trvalého pobytu"
+            />
           </UFormField>
 
           <div class="flex space-x-4">
             <UFormField label="PSČ" name="postalCode" required class="flex-1">
               <UInput
                 v-model="profileState.postalCode"
-                placeholder="Zadejte PSČ trvalého pobytu" />
+                placeholder="Zadejte PSČ trvalého pobytu"
+              />
             </UFormField>
 
             <UFormField label="Obec" name="town" required class="flex-1">
               <UInput
                 v-model="profileState.town"
-                placeholder="Zadejte obec trvalého pobytu" />
+                placeholder="Zadejte obec trvalého pobytu"
+              />
             </UFormField>
           </div>
 
@@ -375,14 +396,16 @@ const age = computed(() => {
             <UFormField label="Meno a priezvisko" name="name" required>
               <UInput
                 v-model="profileState.legalGuardian.name"
-                placeholder="Zadejte meno a priezvisko zákonného/-ej zástupcu/-kyne" />
+                placeholder="Zadejte meno a priezvisko zákonného/-ej zástupcu/-kyne"
+              />
             </UFormField>
 
             <UFormField label="E-mail " name="email" required>
               <UInput
                 v-model="profileState.legalGuardian.email"
                 type="email"
-                placeholder="Zadejte e-mail zákonného/-ej zástupcu/-kyne" />
+                placeholder="Zadejte e-mail zákonného/-ej zástupcu/-kyne"
+              />
             </UFormField>
           </template>
 
@@ -390,7 +413,8 @@ const age = computed(() => {
             v-if="error"
             color="error"
             icon="i-ph-warning-octagon"
-            :title="error" />
+            :title="error"
+          />
 
           <UButton type="submit" block :loading="processingAccount">
             Pokračovat
