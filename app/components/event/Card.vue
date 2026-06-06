@@ -39,7 +39,13 @@ const props = defineProps<{
           </div>
         </div>
         <span class="text-sm text-muted">
-          {{ formatRange(props.event.beginning, props.event.end) }} -
+          {{
+            formatRange(
+              new Date(props.event.beginning),
+              new Date(props.event.end),
+            )
+          }}
+          -
           {{ props.event.place }}
         </span>
       </template>

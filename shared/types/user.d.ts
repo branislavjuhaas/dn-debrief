@@ -6,9 +6,11 @@ import type {
 
 export type UserRole = (typeof userRoleEnum.enumValues)[number];
 
-export type LegalGuardian = typeof legalGuardians.$inferSelect;
+export type LegalGuardian = SerializeInferredDates<
+  typeof legalGuardians.$inferSelect
+>;
 
-export type User = typeof users.$inferSelect & {
+export type User = SerializeInferredDates<typeof users.$inferSelect> & {
   legalGuardian?: LegalGuardian | null;
   clubMemberships?: ClubMembership[];
   managedClubs?: Club[];
