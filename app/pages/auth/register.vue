@@ -3,6 +3,7 @@ import * as z from "zod";
 import type { StepperItem } from "@nuxt/ui";
 import { useStepper } from "@vueuse/core";
 import { CalendarDate, parseDate } from "@internationalized/date";
+import { differenceInYears } from "date-fns";
 
 const items = ref<StepperItem[]>([
   {
@@ -116,6 +117,19 @@ const profileSchema = z.object({
     .string("Obec trvalého pobytu je povinný údaj")
     .nonempty("Obec trvalého pobytu je povinný údaj"),
   phone: z.e164("Neplatné telefónne číslo"),
+  legalGuardian: z.object({
+    name: z
+      .string("Meno zákonného/-ej zástupce/-kne je povinný údaj")
+      .nonempty("Meno zákonného/-ej zástupce/-kne je povinný údaj"),
+    email: z
+      .string("Email zákonného/-ej zástupce/-kne je povinný údaj")
+      .nonempty("Email zákonného/-ej zástupce/-kne je povinný údaj")
+      .refine(
+        (value) =>
+          value !== userStore.user?.email && value !== accountState.email,
+        "Email zákonného/-ej zástupce/-kne musí byť rôzny od emailu používateľa",
+      ),
+  }),
 });
 
 const profileState = reactive<{
@@ -126,6 +140,10 @@ const profileState = reactive<{
   street: string;
   postalCode: string;
   town: string;
+  legalGuardian: {
+    name: string;
+    email: string;
+  };
 }>({
   firstName: userStore.user?.name || "",
   lastName: userStore.user?.surname || "",
@@ -136,6 +154,10 @@ const profileState = reactive<{
   street: userStore.user?.street || "",
   postalCode: userStore.user?.postalCode || "",
   town: userStore.user?.town || "",
+  legalGuardian: {
+    name: userStore.user?.legalGuardian?.name || "",
+    email: userStore.user?.legalGuardian?.email || "",
+  },
 });
 
 const authClient = useAuthClient();
@@ -170,6 +192,9 @@ const processAccount = () => {
         street: profileState.street,
         postalCode: profileState.postalCode,
         town: profileState.town,
+        ...(age.value < 18
+          ? { legalGuardian: profileState.legalGuardian }
+          : {}),
       } as any,
       {
         onSuccess: async () => {
@@ -213,6 +238,7 @@ const processAccount = () => {
       street: profileState.street,
       postalCode: profileState.postalCode,
       town: profileState.town,
+      ...(age.value < 18 ? { legalGuardian: profileState.legalGuardian } : {}),
     } as any,
     {
       onSuccess: () => {
@@ -226,6 +252,15 @@ const processAccount = () => {
     },
   );
 };
+
+const age = computed(() => {
+  return Math.abs(
+    differenceInYears(
+      profileState.birthDate?.toString() || new Date(),
+      new Date(),
+    ),
+  );
+});
 </script>
 
 <template>
@@ -329,6 +364,23 @@ const processAccount = () => {
                 placeholder="Zadejte obec trvalého pobytu" />
             </UFormField>
           </div>
+
+          <template v-if="age < 18">
+            <USeparator label="Údaje zákonného/-ej zástupcu/-kyne" />
+
+            <UFormField label="Meno a priezvisko" name="name" required>
+              <UInput
+                v-model="profileState.legalGuardian.name"
+                placeholder="Zadejte meno a priezvisko zákonného/-ej zástupcu/-kyne" />
+            </UFormField>
+
+            <UFormField label="E-mail " name="email" required>
+              <UInput
+                v-model="profileState.legalGuardian.email"
+                type="email"
+                placeholder="Zadejte e-mail zákonného/-ej zástupcu/-kyne" />
+            </UFormField>
+          </template>
 
           <LazyUAlert
             v-if="error"

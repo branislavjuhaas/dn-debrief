@@ -13,6 +13,8 @@ import {
   organizer,
   user,
 } from "~~/server/auth/permissions";
+import { createAuthMiddleware } from "better-auth/api";
+import { legalGuardians } from "#server/db/schema/auth";
 
 export const auth = betterAuth({
   // TODO: use drizzle adapter joins once it support relations v2
@@ -128,5 +130,35 @@ export const auth = betterAuth({
         `Send verification email to ${user.email} with token ${token}`,
       );
     },
+  },
+  hooks: {
+    after: createAuthMiddleware(async (ctx) => {
+      if (ctx.path === "/sign-up/email") {
+        const body = ctx.body as any;
+        if (body && "legalGuardian" in body) {
+          await db.insert(legalGuardians).values({
+            userId: (ctx.context.returned as any).user.id,
+            ...body.legalGuardian,
+          });
+        }
+      }
+      if (ctx.path === "/update-user") {
+        const body = ctx.body as any;
+        if (body && "legalGuardian" in body) {
+          const userId = (ctx.context.session as any).user.id;
+
+          await db
+            .insert(legalGuardians)
+            .values({
+              userId: userId,
+              ...body.legalGuardian,
+            })
+            .onConflictDoUpdate({
+              target: [legalGuardians.userId],
+              set: { ...body.legalGuardian },
+            });
+        }
+      }
+    }),
   },
 });
