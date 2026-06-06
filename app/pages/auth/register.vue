@@ -74,6 +74,10 @@ if (useRoute().query.verified) {
   goTo("email-verified");
 }
 
+if (useRoute().query.next) {
+  goTo("next-steps");
+}
+
 const userStore = useUserStore();
 
 const accountSchema = z
@@ -396,7 +400,11 @@ const age = computed(() => {
         <UButton
           v-if="isCurrent('email-verified')"
           block
-          @click="goTo('next-steps')"
+          @click="
+            userStore.isAuthenticated
+              ? goTo('next-steps')
+              : navigateTo('/auth?next=/auth/register?next=true')
+          "
           >Pokračovať</UButton
         >
 
