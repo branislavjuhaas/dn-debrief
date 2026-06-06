@@ -7,7 +7,7 @@ export const getSetting = async (key: "current-seasons") => {
     const seasons = settings?.currentSeasons;
 
     const filteredSeasons = seasons?.filter((season) => {
-      return season <= new Date().getFullYear();
+      return season >= new Date().getFullYear();
     });
     return filteredSeasons;
   }
