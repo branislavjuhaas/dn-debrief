@@ -1,7 +1,8 @@
-import { createClubMembership, isClubActive } from "#server/utils/clubs";
+import { db } from "#server/db/db";
 import * as z from "zod";
+import { clubMemberships } from "#server/db/schema/clubs";
 
-const schema = z.object({
+const bodySchema = z.object({
   registrationType: z.enum([
     "junior_student",
     "senior_student",
@@ -11,36 +12,50 @@ const schema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
+  // Authentication & parameter resolution
   const user = await requireUser(event);
-  const clubId = Number.parseInt(getRouterParam(event, "id")!);
+  const clubId = Number.parseInt(getRouterParam(event, "id") ?? "", 10);
 
-  if (!(await isClubActive(clubId))) {
+  // Validate club existence
+  const club = await db.query.clubs.findFirst({
+    where: {
+      id: clubId,
+    },
+  });
+
+  if (!club) {
     throw createError({
       statusCode: 404,
-      statusMessage: "Not found",
+      statusMessage: "Not Found",
       message: "Club not found",
     });
   }
 
-  const { registrationType } = await readValidatedBody(event, schema.parse);
-  const currentSeasons = await getSetting("currentSeasons");
+  // Request payload & configuration parsing
+  const { registrationType } = await readValidatedBody(event, bodySchema.parse);
+  const currentSeasons = (await getSetting("current-seasons")) ?? [];
 
-  const clubMemberships = [];
+  // Generate rows for every ongoing season
+  const membershipRows = currentSeasons.map((season) => ({
+    userId: user.id,
+    clubId,
+    registrationType,
+    season,
+  }));
 
-  for (const season of currentSeasons ?? []) {
-    const membership = await createClubMembership({
-      clubId,
-      userId: user.id,
-      season,
-      registrationType,
-    });
+  // Bulk database insertion
+  const insertedMemberships = await db
+    .insert(clubMemberships)
+    .values(membershipRows)
+    .returning();
 
-    if (membership[0]) {
-      clubMemberships.push(membership[0]);
-    }
-  }
+  // Hydrate results with parent club data for frontend store requirements
+  const clubMembershipsWithClub = insertedMemberships.map((membership) => ({
+    ...membership,
+    club,
+  }));
 
   return {
-    clubMemberships,
+    clubMemberships: clubMembershipsWithClub,
   };
 });
