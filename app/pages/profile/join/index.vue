@@ -2,6 +2,10 @@
 import * as z from "zod";
 import type { FormSubmitEvent, RadioGroupItem, SelectMenuItem } from "@nuxt/ui";
 
+definePageMeta({
+  middleware: ["auth"],
+});
+
 const { data: seasons } = await useFetch("/api/settings/seasons");
 
 if (!seasons?.value?.seasons || seasons?.value?.seasons.length === 0) {
