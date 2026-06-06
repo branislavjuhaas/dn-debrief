@@ -105,7 +105,7 @@ const onSubmit = async (event: FormSubmitEvent<MembershipSchema>) => {
 
   userStore.addClubMemberships(data.clubMemberships);
 
-  loading.value = false;
+  navigateTo("/profile/join/finished");
 };
 </script>
 
