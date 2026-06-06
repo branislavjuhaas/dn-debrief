@@ -4,7 +4,7 @@ export const getCompleteUser = async (userId: number) => {
   return await db.query.users.findFirst({
     where: { id: userId },
     with: {
-      legalGuardians: true,
+      legalGuardian: true,
       payments: true,
       clubMemberships: {
         with: {

@@ -25,7 +25,7 @@ export const relations = defineRelations(
         from: r.users.id,
         to: r.awards.userId,
       }),
-      legalGuardians: r.many.legalGuardians({
+      legalGuardian: r.one.legalGuardians({
         from: r.users.id,
         to: r.legalGuardians.userId,
       }),

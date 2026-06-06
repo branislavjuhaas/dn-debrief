@@ -9,7 +9,7 @@ export type UserRole = (typeof userRoleEnum.enumValues)[number];
 export type LegalGuardian = typeof legalGuardians.$inferSelect;
 
 export type User = typeof users.$inferSelect & {
-  legalGuardians?: LegalGuardian[];
+  legalGuardian?: LegalGuardian | null;
   clubMemberships?: ClubMembership[];
   managedClubs?: Club[];
 };

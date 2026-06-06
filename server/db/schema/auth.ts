@@ -94,6 +94,7 @@ export const legalGuardians = pgTable(
     email: text("email").notNull(),
     userId: integer("user_id")
       .references(() => users.id, { onDelete: "cascade" })
+      .unique()
       .notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
