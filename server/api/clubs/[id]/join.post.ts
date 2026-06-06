@@ -47,6 +47,7 @@ export default defineEventHandler(async (event) => {
   const insertedMemberships = await db
     .insert(clubMemberships)
     .values(membershipRows)
+    .onConflictDoNothing()
     .returning();
 
   // Hydrate results with parent club data for frontend store requirements
