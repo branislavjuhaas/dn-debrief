@@ -1,0 +1,1 @@
+ALTER TABLE "legal_guardians" ADD CONSTRAINT "legal_guardians_user_id_key" UNIQUE("user_id");
