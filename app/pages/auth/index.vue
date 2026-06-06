@@ -72,7 +72,8 @@ const emailLogin = (payload: FormSubmitEvent<LoginFormData>) => {
       onSuccess: async () => {
         await loadCurrentUser();
         submitting.value = false;
-        navigateTo("/");
+        const next = useRoute().query.next;
+        navigateTo(next ? `${next as string}` : "/");
       },
       onError: (ctx) => {
         error.value = translateAuthError(ctx.error.code);
@@ -86,9 +87,12 @@ const githubLogin = async () => {
   submitting.value = true;
   error.value = null;
 
+  const next = useRoute().query.next;
+  console.log(next);
+
   await authClient.signIn.social({
     provider: "github",
-    callbackURL: "/",
+    callbackURL: next ? `${next as string}` : "/",
   });
 };
 
