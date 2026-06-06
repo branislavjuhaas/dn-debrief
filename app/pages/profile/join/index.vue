@@ -2,18 +2,21 @@
 import * as z from "zod";
 import type { FormSubmitEvent, RadioGroupItem, SelectMenuItem } from "@nuxt/ui";
 
+// PAGE METADATA & STORES
 definePageMeta({
   middleware: ["auth"],
 });
 
+const userStore = useUserStore();
+
+// SEASON DATA FETCHING & FILTERING
 const { data: seasons } = await useFetch("/api/settings/seasons");
 
 if (!seasons?.value?.seasons || seasons?.value?.seasons.length === 0) {
   throw createError({ statusCode: 404, message: "No seasons available" });
 }
 
-const userStore = useUserStore();
-
+// Filter out seasons where the user already holds a membership
 const filteredSeasons = seasons?.value?.seasons?.filter(
   (season) =>
     !userStore.user?.clubMemberships?.some(
@@ -25,6 +28,13 @@ if (filteredSeasons?.length === 0) {
   throw createError({ statusCode: 404, message: "No seasons available" });
 }
 
+// CLUB DATA FETCHING & HISTORICAL STATE
+
+// Retrieve user's most recent membership data to pre-populate form values
+const lastUserSeason =
+  userStore.user?.clubMemberships?.sort((a, b) => b.season - a.season)[0] ??
+  undefined;
+
 const {
   data: availableClubs,
   status,
@@ -35,14 +45,12 @@ const {
       (club) => ({ label: club.name, id: club.id }) as SelectMenuItem,
     ),
   onResponse: () => {
+    // Automatically set the fallback historical club ID upon api response
     membershipState.clubId = lastUserSeason?.clubId;
   },
 });
 
-const lastUserSeason =
-  userStore.user?.clubMemberships?.sort((a, b) => b.season - a.season)[0] ??
-  undefined;
-
+// VALIDATION SCHEMAS & FORM STATE
 const membershipTypes = ref<RadioGroupItem[]>([
   {
     label: "Základoškolský/-á debatér/-ka",
@@ -82,8 +90,10 @@ const membershipState = reactive<Partial<MembershipSchema>>({
 const requestError = ref<string | null>(null);
 const loading = ref(false);
 
+// FORM SUBMISSION HANDLER
 const onSubmit = async (event: FormSubmitEvent<MembershipSchema>) => {
   loading.value = true;
+
   const data = await $fetch(`/api/clubs/${event.data.clubId}/join`, {
     method: "POST",
     body: {
@@ -101,12 +111,12 @@ const onSubmit = async (event: FormSubmitEvent<MembershipSchema>) => {
           "Nepodarilo sa nájsť debatný klub. Skúste to znova.";
         return;
       }
-
       requestError.value =
         "Nastala chyba pri registrácii. Skúste to znova neskôr.";
     },
   });
 
+  // Dynamically update user state context with returned memberships
   userStore.addClubMemberships(data.clubMemberships);
 
   navigateTo("/profile/join/finished");
@@ -117,6 +127,7 @@ const onSubmit = async (event: FormSubmitEvent<MembershipSchema>) => {
   <UPage>
     <UPageHeader
       :title="`Registrácia do SDA na ${(filteredSeasons?.length || 0) > 1 ? 'kalendárne roky' : 'kalendárny rok'} ${filteredSeasons?.join(', ')}`" />
+
     <UPageBody>
       <FormBase>
         <UForm
@@ -129,6 +140,7 @@ const onSubmit = async (event: FormSubmitEvent<MembershipSchema>) => {
             color="error"
             icon="i-ph-warning-octagon"
             title="Nepodarilo sa načítať aktívne debatné kluby, skúste to znova neskôr." />
+
           <LazyUAlert
             v-if="requestError"
             color="error"
@@ -146,6 +158,7 @@ const onSubmit = async (event: FormSubmitEvent<MembershipSchema>) => {
               :loading="status === 'pending'"
               :disabled="!!error" />
           </UFormField>
+
           <UFormField
             label="Typ registráce"
             description="Vyberte, prosím, čo vás najviac vystihuje">
@@ -158,11 +171,13 @@ const onSubmit = async (event: FormSubmitEvent<MembershipSchema>) => {
               :items="membershipTypes" />
           </UFormField>
 
-          <UButton :disabled="!!error" :loading="loading" type="submit" block
-            >Záväzne sa registrovať do SDA</UButton
-          >
+          <UButton :disabled="!!error" :loading="loading" type="submit" block>
+            Záväzne sa registrovať do SDA
+          </UButton>
         </UForm>
       </FormBase>
     </UPageBody>
   </UPage>
 </template>
+
+<style scoped></style>
