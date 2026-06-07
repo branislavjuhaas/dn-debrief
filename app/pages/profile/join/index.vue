@@ -71,20 +71,18 @@ const membershipTypes = ref<RadioGroupItem[]>([
 ]);
 
 const membershipSchema = z.object({
-  clubId: z.number(),
-  registrationType: z.enum([
-    "junior_student",
-    "senior_student",
-    "teacher",
-    "graduate",
-  ]),
+  clubId: z.number("Vyberte debatný klub"),
+  registrationType: z.enum(
+    ["junior_student", "senior_student", "teacher", "graduate"],
+    "Neplatný typ členstva",
+  ),
 });
 
 type MembershipSchema = z.output<typeof membershipSchema>;
 
 const membershipState = reactive<Partial<MembershipSchema>>({
   clubId: undefined,
-  registrationType: lastUserSeason?.registrationType,
+  registrationType: lastUserSeason?.registrationType ?? "senior_student",
 });
 
 const requestError = ref<string | null>(null);
@@ -129,7 +127,27 @@ const onSubmit = async (event: FormSubmitEvent<MembershipSchema>) => {
       :title="`Registrácia do SDA na ${(filteredSeasons?.length || 0) > 1 ? 'kalendárne roky' : 'kalendárny rok'} ${filteredSeasons?.join(', ')}`" />
 
     <UPageBody>
-      <FormBase>
+      <FormBase
+        title="Členstvo na dosah ruky"
+        description="Pre získanie všetkých jeho výhod dokončite, prosím, registráciu">
+        <USeparator />
+
+        <UFormField
+          label="Osobné údaje"
+          description="Registráciou zodpovedáte za správnosť osobných údajov"
+          required>
+          <ProfileCard :user="userStore.user!">
+            <template #footer>
+              Nesprávne údaje?
+              <ULink to="/profile/edit" class="underline text-primary"
+                >Upraviť profil</ULink
+              ></template
+            >
+          </ProfileCard>
+        </UFormField>
+
+        <USeparator />
+
         <UForm
           :schema="membershipSchema"
           :state="membershipState"
@@ -149,7 +167,9 @@ const onSubmit = async (event: FormSubmitEvent<MembershipSchema>) => {
 
           <UFormField
             label="Debatný klub"
-            description="Najčastejšie škola, kde navštevujete debatný klub">
+            name="clubId"
+            description="Najčastejšie škola, kde navštevujete debatný klub"
+            required>
             <USelectMenu
               v-model="membershipState.clubId"
               value-key="id"
@@ -160,8 +180,9 @@ const onSubmit = async (event: FormSubmitEvent<MembershipSchema>) => {
           </UFormField>
 
           <UFormField
-            label="Typ registráce"
-            description="Vyberte, prosím, čo vás najviac vystihuje">
+            label="Najlepšie ma vystihuje"
+            name="registrationType"
+            required>
             <URadioGroup
               v-model="membershipState.registrationType"
               :ui="{ fieldset: 'grid grid-cols-2' }"
