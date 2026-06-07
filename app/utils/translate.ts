@@ -1,3 +1,5 @@
+import type { UserRole } from "#shared/types/user";
+
 export const translateAuthError = (errorCode: string) => {
   console.log(errorCode);
 
@@ -64,6 +66,27 @@ export const translateAuthError = (errorCode: string) => {
     case "ACCOUNT_NOT_FOUND":
       return "Účet nenájdený";
 
+    default:
+      return "Nastala neznáma chyba. Skúste to, prosím, znova.";
+  }
+};
+
+export const translateRole = (role: UserRole) => {
+  switch (role) {
+    case "user":
+      return "Používateľ/-ka";
+    case "organizer":
+      return "Organizátor/-ka";
+    case "junior_organizer":
+      return "Junior organizátor/-ka";
+    case "chief_adjudicator":
+      return "Hlavný/-á rozhodca/-kyňa";
+    case "motion_committee_member":
+      return "Člen/-ka tézového výboru";
+    case "admin":
+      return "Administrátor/-ka";
+    case "developer":
+      return "Vývojár/-ka";
     default:
       return "Nastala neznáma chyba. Skúste to, prosím, znova.";
   }

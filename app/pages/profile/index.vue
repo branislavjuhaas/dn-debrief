@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { TabsItem } from "@nuxt/ui";
+
 definePageMeta({
   middleware: ["auth"],
 });
@@ -11,6 +13,25 @@ const logout = async () => {
   userStore.$reset();
   navigateTo("/");
 };
+
+const tabItems = ref<TabsItem[]>([
+  {
+    label: "Osobné údaje",
+    slot: "details",
+  },
+  {
+    label: "Členstvá v SDA",
+    slot: "memberships",
+  },
+  {
+    label: "Registrácie a podujatia",
+    disabled: true,
+  },
+  {
+    label: "Platby",
+    disabled: true,
+  },
+]);
 </script>
 
 <template>
@@ -32,6 +53,18 @@ const logout = async () => {
         </UButton>
       </template>
     </ProfileHeader>
-    <UPageBody> </UPageBody>
+    <UPageBody>
+      <UTabs :items="tabItems" variant="link" :ui="{ content: 'mt-4' }">
+        <template #details>
+          <div class="flex flex-row justify-between ml-6">
+            <ProfileDetails :user="userStore.user!" />
+            <ProfileAwards :user-awards="userStore.user!.awards" />
+          </div>
+        </template>
+        <template #memberships>
+          <div>Členstvá v SDA</div>
+        </template>
+      </UTabs>
+    </UPageBody>
   </UPage>
 </template>

@@ -2,13 +2,13 @@
 import { parseDate } from "@internationalized/date";
 import { differenceInYears } from "date-fns";
 
-const formatter = new Intl.DateTimeFormat("sk-SK", {
-  dateStyle: "medium", // 'medium' outputs numeric day, month, and year
-});
-
 defineProps<{
   user: User;
 }>();
+
+const formatter = new Intl.DateTimeFormat("sk-SK", {
+  dateStyle: "medium", // 'medium' outputs numeric day, month, and year
+});
 </script>
 
 <template>
