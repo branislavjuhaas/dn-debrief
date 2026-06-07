@@ -30,8 +30,10 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="flex flex-row justify-between items-end w-full">
-    <div class="flex flex-row items-center space-x-3">
+  <div
+    class="flex flex-col lg:flex-row items-start lg:items-end justify-center sm:justify-between w-full space-y-4">
+    <div
+      class="flex flex-col sm:flex-row items-center max-sm:self-center space-x-3">
       <span
         class="relative inline-flex items-center justify-center shrink-0 select-none rounded-full align-middle bg-elevated size-25 text-4xl"
         aria-hidden="true">
@@ -59,16 +61,18 @@ onMounted(() => {
       </span>
 
       <div class="flex flex-col">
-        <h1 class="text-3xl sm:text-4xl text-pretty font-bold text-highlighted">
+        <h1
+          class="text-3xl sm:text-4xl text-pretty font-bold text-highlighted max-sm:text-center">
           {{ user.name }} {{ user.surname }}
         </h1>
-        <address class="text-base text-muted not-italic">
+        <address class="text-base text-muted not-italic max-sm:text-center">
           {{ user.email }}
         </address>
       </div>
     </div>
 
-    <div class="flex flex-wrap items-center gap-1.5">
+    <div
+      class="flex flex-wrap items-center max-sm:justify-center max-sm:w-full gap-1.5">
       <slot name="links" />
     </div>
   </div>
