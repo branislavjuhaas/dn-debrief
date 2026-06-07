@@ -56,7 +56,7 @@ const tabItems = ref<TabsItem[]>([
     <UPageBody>
       <UTabs :items="tabItems" variant="link" :ui="{ content: 'mt-4' }">
         <template #details>
-          <div class="flex flex-row justify-between ml-6">
+          <div class="flex flex-col lg:flex-row lg:justify-between ml-6 gap-4">
             <ProfileDetails :user="userStore.user!" />
             <ProfileAwards :user-awards="userStore.user!.awards" />
           </div>
