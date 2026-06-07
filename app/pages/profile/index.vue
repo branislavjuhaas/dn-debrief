@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { AlertProps, TabsItem } from "@nuxt/ui";
-import { user } from "~~/server/auth/permissions";
 
 definePageMeta({
   middleware: ["auth"],

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { differenceInYears } from "date-fns";
+
 defineProps<{
   user: User;
 }>();
