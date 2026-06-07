@@ -1,14 +1,8 @@
 <script setup lang="ts">
-import { parseDate } from "@internationalized/date";
 import { differenceInYears } from "date-fns";
-
 defineProps<{
   user: User;
 }>();
-
-const formatter = new Intl.DateTimeFormat("sk-SK", {
-  dateStyle: "medium",
-});
 </script>
 
 <template>
@@ -20,15 +14,13 @@ const formatter = new Intl.DateTimeFormat("sk-SK", {
     <ProfileDetail
       icon="i-ph-cake-fill"
       label="Dátum narodenia"
-      :value="
-        formatter.format(parseDate(user.birthDate ?? '').toDate('utc'))
-      " />
+      type="date"
+      :value="user.birthDate" />
     <ProfileDetail
       icon="i-ph-phone-disconnect-fill"
       label="Telefónne číslo"
-      :value="
-        user.phone?.replace(/^(\+421)(\d{3})(\d{3})(\d{3})$/, '$1 $2 $3 $4')
-      " />
+      type="phone"
+      :value="user.phone" />
     <ProfileDetail
       icon="i-ph-buildings-fill"
       label="Adresa trvalého pobytu"

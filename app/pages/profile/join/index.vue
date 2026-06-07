@@ -10,7 +10,9 @@ definePageMeta({
 const userStore = useUserStore();
 
 // SEASON DATA FETCHING & FILTERING
-const { data: seasons } = await useFetch("/api/settings/seasons");
+const { data: seasons } = await useFetch("/api/settings/seasons", {
+  key: "seasons",
+});
 
 if (!seasons?.value?.seasons || seasons?.value?.seasons.length === 0) {
   throw createError({ statusCode: 404, message: "No seasons available" });
