@@ -10,7 +10,7 @@ export default defineAppConfig({
       },
     },
     pageBody: {
-      base: "space-y-8",
+      base: "mt-6 space-y-8",
     },
     input: {
       slots: {
