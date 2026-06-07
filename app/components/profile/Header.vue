@@ -48,7 +48,7 @@ onMounted(() => {
         </span>
 
         <span
-          class="absolute text-sm bottom-1 right-1 rounded-full px-2 py-0.5 text-white font-medium ring-2 ring-bg"
+          class="absolute text-sm bottom-1 right-1 rounded-full px-2 py-0.5 text-white font-medium ring-2 ring-bg overflow-hidden"
           :class="user.role === 'developer' ? 'id-developer' : 'id-regular'"
           :aria-label="`ID používateľa: ${user.id}`">
           <NumberFlow
