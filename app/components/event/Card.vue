@@ -14,11 +14,11 @@ const props = defineProps<{
     <UCard
       class="event-card w-full shadow hover:bg-muted"
       :ui="{ body: 'sm:p-0' }">
-      <div class="aspect-[7/3] w-full overflow-hidden">
+      <div class="aspect-7/3 w-full overflow-hidden">
         <NuxtImg
           :src="props.event.thumbnailUrl || '/images/event-placeholder.png'"
           alt="Event thumbnail"
-          class="object-cover aspect-[7/3] w-full transition-transform duration-300" />
+          class="object-cover aspect-7/3 w-full transition-transform duration-300" />
       </div>
 
       <template #footer>
