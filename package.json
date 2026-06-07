@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@internationalized/date": "^3.12.2",
+    "@number-flow/vue": "^0.5.0",
     "@nuxt/a11y": "1.0.0-alpha.1",
     "@nuxt/content": "^3.14.0",
     "@nuxt/eslint": "1.15.2",
