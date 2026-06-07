@@ -12,9 +12,11 @@ import {
   motion_committee_member,
   organizer,
   user,
-} from "~~/server/auth/permissions";
-import { createAuthMiddleware } from "better-auth/api";
+} from "#server/auth/permissions";
+import { APIError, createAuthMiddleware } from "better-auth/api";
 import { legalGuardians } from "#server/db/schema/auth";
+import { adminRoleRank } from "#shared/utils/user";
+import type { UserRole } from "#shared/types/user";
 
 export const auth = betterAuth({
   // TODO: use drizzle adapter joins once it support relations v2
@@ -132,6 +134,31 @@ export const auth = betterAuth({
     },
   },
   hooks: {
+    before: createAuthMiddleware(async (ctx) => {
+      if (ctx.path === "/admin/set-role") {
+        const { userId, role } = ctx.body as { userId: number; role: UserRole };
+        const userRole = ctx.context.session?.user.role as UserRole;
+
+        if (adminRoleRank(userRole) < adminRoleRank(role)) {
+          throw new APIError("UNAUTHORIZED", {
+            statusCode: 401,
+
+            message: "Role above current role cannot be set",
+          });
+        }
+
+        const { role: affectedRole } = (await db.query.users.findFirst({
+          where: { id: userId },
+          columns: { role: true },
+        })) ?? { role: "user" };
+
+        if (adminRoleRank(role) < adminRoleRank(affectedRole)) {
+          throw new APIError("UNAUTHORIZED", {
+            message: "Role of superior user cannot be set",
+          });
+        }
+      }
+    }),
     after: createAuthMiddleware(async (ctx) => {
       if (ctx.path === "/sign-up/email") {
         const body = ctx.body as any;

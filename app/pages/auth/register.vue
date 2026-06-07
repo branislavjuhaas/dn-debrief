@@ -235,7 +235,7 @@ const processAccount = () => {
             return;
           }
 
-          await userStore.$patch({ user });
+          userStore.$patch({ user });
           processingAccount.value = false;
 
           if (userStore.isMember) {
