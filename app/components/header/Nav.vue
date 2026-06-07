@@ -65,7 +65,7 @@ const navItems = ref<DropdownMenuItem[][]>([
         variant="outline"
         :avatar="{
           src: `${userStore.user?.image}`,
-          alt: `${userStore.fullName}`,
+          alt: 'Profile picture',
           chip: userStore.impersonated ? { color: 'info', inset: true } : false,
         }"
         aria-label="Používateľský profil">
