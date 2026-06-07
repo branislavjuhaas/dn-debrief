@@ -7,6 +7,7 @@ const authClient = useAuthClient();
 const logout = async () => {
   authClient.signOut();
   userStore.$reset();
+  navigateTo("/");
 };
 
 const navItems = ref<DropdownMenuItem[][]>([
