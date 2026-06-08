@@ -1,8 +1,6 @@
 import type { UserRole } from "#shared/types/user";
 
 export const translateAuthError = (errorCode: string) => {
-  console.log(errorCode);
-
   switch (errorCode) {
     // User related errors
     case "USER_NOT_FOUND":

@@ -6,11 +6,9 @@ export default defineNuxtConfig({
     "@nuxt/hints",
     "@nuxt/image",
     "@nuxt/ui",
-    "@nuxt/content",
     "@nuxt/test-utils/module",
     "@pinia/nuxt",
     "@vueuse/nuxt",
-    "nuxt-studio",
     "motion-v/nuxt",
   ],
   devtools: { enabled: true },
@@ -28,10 +26,6 @@ export default defineNuxtConfig({
   },
 
   css: ["~/assets/css/main.css"],
-
-  content: {
-    experimental: { sqliteConnector: "native" },
-  },
 
   experimental: {
     inlineRouteRules: true,
@@ -53,15 +47,6 @@ export default defineNuxtConfig({
         "better-auth/plugins/access",
         "better-auth/plugins/admin/access",
       ],
-    },
-  },
-
-  studio: {
-    repository: {
-      provider: "github",
-      owner: "branislavjuhaas",
-      repo: "dn-debrief",
-      branch: "main",
     },
   },
 });

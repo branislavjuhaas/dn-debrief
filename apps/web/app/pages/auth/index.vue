@@ -92,7 +92,6 @@ const githubLogin = async () => {
   error.value = null;
 
   const next = useRoute().query.next;
-  console.log(next);
 
   await authClient.signIn.social({
     provider: "github",

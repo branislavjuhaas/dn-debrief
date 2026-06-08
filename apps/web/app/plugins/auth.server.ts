@@ -34,7 +34,7 @@ export default defineNuxtPlugin(async (_nuxtApp) => {
     }
   }
 
-  await userStore.$patch({
+  userStore.$patch({
     user,
     impersonated: !!result.session.impersonatedBy,
   });

@@ -127,11 +127,10 @@ export const auth = betterAuth({
   },
   emailVerification: {
     sendOnSignUp: true,
-    sendVerificationEmail: async ({ user, token }, _request) => {
-      console.log(
-        `Send verification email to ${user.email} with token ${token}`,
-      );
-    },
+    sendVerificationEmail: async (
+      { user: _user, token: _token },
+      _request,
+    ) => {},
   },
   hooks: {
     before: createAuthMiddleware(async (ctx) => {
