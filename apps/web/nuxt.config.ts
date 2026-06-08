@@ -2,7 +2,6 @@
 export default defineNuxtConfig({
   modules: [
     "@nuxt/a11y",
-    "@nuxt/eslint",
     "@nuxt/hints",
     "@nuxt/image",
     "@nuxt/ui",
