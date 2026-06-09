@@ -16,12 +16,5 @@
   "devDependencies": {
     "vite-plus": "catalog:"
   },
-  "devEngines": {
-    "packageManager": {
-      "name": "pnpm",
-      "version": "^11.0.0",
-      "onFail": "download"
-    }
-  },
   "packageManager": "pnpm@11.5.2"
 }
