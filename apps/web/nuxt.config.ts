@@ -49,6 +49,7 @@ export default defineNuxtConfig({
         "better-auth/plugins/access",
         "better-auth/plugins/admin/access",
         "date-fns",
+        "zod",
       ],
     },
   },
