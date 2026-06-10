@@ -27,10 +27,12 @@ const formattedValue = computed(() => {
 </script>
 
 <template>
-  <span class="space-x-2 text-sm items-center flex">
+  <span class="space-x-2 text-sm items-center flex text-pretty">
     <UIcon :name="icon" class="size-5" />
-    {{ label }}:&nbsp;
-    <b v-if="formattedValue">{{ formattedValue }}</b>
-    <span v-else class="text-dimmed">chýba</span>
+    <span class="max-sm:flex flex-col">
+      {{ label }}:&nbsp;
+      <b v-if="formattedValue">{{ formattedValue }}</b>
+      <span v-else class="text-dimmed">chýba</span>
+    </span>
   </span>
 </template>

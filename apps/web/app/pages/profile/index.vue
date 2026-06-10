@@ -98,8 +98,9 @@ if (!userStore.isComplete) {
             :to="alert.to">
             <UAlert variant="subtle" v-bind="alert" class="mb-4" />
           </component>
-          <div class="flex flex-col lg:flex-row lg:justify-between ml-6 gap-4">
-            <ProfileDetails :user="userStore.user!" />
+          <div
+            class="flex flex-col lg:flex-row lg:justify-between gap-4 items-center sm:items-start">
+            <ProfileDetails :user="userStore.user!" class="pl-6 w-full" />
             <ProfileAwards :user-awards="userStore.user!.awards" />
           </div>
         </template>
