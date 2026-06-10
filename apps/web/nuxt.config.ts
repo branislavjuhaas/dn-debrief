@@ -41,10 +41,13 @@ export default defineNuxtConfig({
   vite: {
     optimizeDeps: {
       include: [
+        "@internationalized/date",
+        "@number-flow/vue",
         "better-auth/client",
         "better-auth/client/plugins",
         "better-auth/plugins/access",
         "better-auth/plugins/admin/access",
+        "date-fns",
       ],
     },
   },
