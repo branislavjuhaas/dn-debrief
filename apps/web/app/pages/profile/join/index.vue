@@ -9,47 +9,25 @@ definePageMeta({
 
 const userStore = useUserStore();
 
-// SEASON DATA FETCHING & FILTERING
+// SEASON DATA FETCHING
 const { data: seasons } = await useFetch("/api/settings/seasons", {
-  key: "seasons",
+  key: "filtered-seasons",
 });
 
 if (!seasons?.value?.seasons || seasons?.value?.seasons.length === 0) {
   throw createError({ statusCode: 404, message: "No seasons available" });
 }
 
-// Filter out seasons where the user already holds a membership
-const filteredSeasons = seasons?.value?.seasons?.filter(
-  (season) =>
-    !userStore.user?.clubMemberships?.some(
-      (membership) => membership.season === season,
-    ),
-);
-
-if (filteredSeasons?.length === 0) {
-  throw createError({ statusCode: 404, message: "No seasons available" });
-}
-
 // CLUB DATA FETCHING & HISTORICAL STATE
-
 // Retrieve user's most recent membership data to pre-populate form values
 const lastUserSeason =
   userStore.user?.clubMemberships?.sort((a, b) => b.season - a.season)[0] ??
   undefined;
 
-const {
-  data: availableClubs,
-  status,
-  error,
-} = useLazyFetch("/api/clubs/active", {
-  transform: (data) =>
-    data?.clubs?.map(
-      (club) => ({ label: club.name, id: club.id }) as SelectMenuItem,
-    ),
-  onResponse: () => {
-    // Automatically set the fallback historical club ID upon api response
-    membershipState.clubId = lastUserSeason?.clubId;
-  },
+const { data: availableClubs, error } = await useFetch("/api/clubs/active", {
+  key: "active-clubs",
+  getCachedData: (key, nuxtApp) =>
+    nuxtApp.payload.data[key] ?? nuxtApp.static.data[key],
 });
 
 // VALIDATION SCHEMAS & FORM STATE
@@ -83,7 +61,7 @@ const membershipSchema = z.object({
 type MembershipSchema = z.output<typeof membershipSchema>;
 
 const membershipState = reactive<Partial<MembershipSchema>>({
-  clubId: undefined,
+  clubId: lastUserSeason?.clubId,
   registrationType: lastUserSeason?.registrationType ?? "senior_student",
 });
 
@@ -126,7 +104,7 @@ const onSubmit = async (event: FormSubmitEvent<MembershipSchema>) => {
 <template>
   <UPage>
     <UPageHeader
-      :title="`Registrácia do SDA na ${(filteredSeasons?.length || 0) > 1 ? 'kalendárne roky' : 'kalendárny rok'} ${filteredSeasons?.join(', ')}`" />
+      :title="`Registrácia do SDA na ${(seasons?.seasons?.length || 0) > 1 ? 'kalendárne roky' : 'kalendárny rok'} ${seasons?.seasons?.join(', ')}`" />
 
     <UPageBody>
       <FormBase
@@ -175,9 +153,9 @@ const onSubmit = async (event: FormSubmitEvent<MembershipSchema>) => {
             <USelectMenu
               v-model="membershipState.clubId"
               value-key="id"
-              :items="availableClubs"
+              label-key="name"
+              :items="availableClubs?.clubs"
               placeholder="Vyberte debatný klub"
-              :loading="status === 'pending'"
               :disabled="!!error" />
           </UFormField>
 

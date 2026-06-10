@@ -24,6 +24,7 @@
     "@vueuse/nuxt": "14.3.0",
     "better-auth": "1.6.15",
     "date-fns": "^4.4.0",
+    "drizzle-orm": "1.0.0-rc.3",
     "motion-v": "^2.3.0",
     "nuxt": "^4.4.8",
     "pinia": "^3.0.4",

@@ -47,19 +47,13 @@ if (!userStore.isComplete) {
     to: "/profile/edit",
   };
 } else {
-  const { data } = await useFetch("/api/settings/seasons", { key: "seasons" });
+  const { data } = await useFetch("/api/settings/seasons", {
+    key: "filtered-seasons",
+  });
 
-  const userSeasons = userStore.user?.clubMemberships?.map(
-    (membership) => membership.season,
-  );
-
-  const filteredSeasons = data.value?.seasons?.filter(
-    (season) => !userSeasons?.includes(season),
-  );
-
-  if (filteredSeasons && filteredSeasons.length > 0) {
+  if (data.value?.seasons && data.value.seasons?.length > 0) {
     alert.value = {
-      title: `Registrácia na ${(filteredSeasons?.length || 0) > 1 ? "roky" : "rok"} ${filteredSeasons?.join(", ")} otvorená`,
+      title: `Registrácia na ${(data.value.seasons?.length || 0) > 1 ? "roky" : "rok"} ${data.value.seasons?.join(", ")} otvorená`,
       description:
         "Nenechajte si ani v nich ujsť žiadnu z výhod plného členstvo v SDA a zaregistrujte sa ešte dnes!",
       icon: "i-ph-megaphone",

@@ -10,5 +10,6 @@ export default defineEventHandler(async (_event) => {
       isActive: true,
     },
   });
+
   return { clubs };
 });
