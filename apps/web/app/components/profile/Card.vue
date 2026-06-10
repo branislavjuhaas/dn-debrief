@@ -13,7 +13,8 @@ const formatter = new Intl.DateTimeFormat("sk-SK", {
 
 <template>
   <UCard>
-    <div class="grid grid-cols-2 space-y-2 text-sm text-muted">
+    <div
+      class="grid grid-cols-1 xl:grid-cols-2 gap-2 text-sm text-muted wrap-break-word">
       <div>
         Email: <span class="text-default">{{ user.email }}</span>
       </div>
