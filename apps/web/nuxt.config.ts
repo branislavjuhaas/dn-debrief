@@ -13,6 +13,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
 
   app: {
+    pageTransition: { name: "page", mode: "out-in" },
     head: {
       charset: "utf-8",
       title: "Inteligentná debatná platforma",
