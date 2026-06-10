@@ -6,7 +6,7 @@ allowBuilds:
   better-sqlite3: true
   esbuild: true
   sharp: true
-  unrs-resolver: set this to true or false
+  unrs-resolver: true
   vue-demi: true
 catalog:
   vite: npm:@voidzero-dev/vite-plus-core@latest
