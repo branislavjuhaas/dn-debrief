@@ -52,7 +52,10 @@ const levelStyles: Record<number, string> = {
         v-for="award in filteredAwards"
         :key="award.award"
         :delay-duration="0"
-        :text="getAward(award.award).levels[award.level - 1]?.title">
+        :text="
+          getAward(award.award).levels[award.level - 1]?.title ??
+          'Neznáme ocenenie'
+        ">
         <ULink
           :to="`/awards?detail=${award.award}`"
           class="flex items-center w-min p-2 border rounded-2xl transition-colors duration-200"
