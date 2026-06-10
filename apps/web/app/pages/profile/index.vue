@@ -84,7 +84,11 @@ if (!userStore.isComplete) {
       </template>
     </ProfileHeader>
     <UPageBody>
-      <UTabs :items="tabItems" variant="link" :ui="{ content: 'mt-4' }">
+      <UTabs
+        :items="tabItems"
+        variant="link"
+        color="neutral"
+        :ui="{ content: 'mt-4' }">
         <template #details>
           <component
             :is="alert.to ? ULink : 'span'"
