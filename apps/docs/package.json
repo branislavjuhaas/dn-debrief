@@ -2,7 +2,8 @@
   "name": "@dn-debrief/docs",
   "scripts": {
     "dev": "nuxt dev",
-    "build": "nuxt build"
+    "build": "nuxt build",
+    "postinstall": "nuxt prepare"
   },
   "dependencies": {
     "docus": "latest",
