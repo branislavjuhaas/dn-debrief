@@ -71,7 +71,7 @@ export const clubMemberships = pgTable(
       .notNull(),
   },
   (table) => [
-    primaryKey({ columns: [table.clubId, table.userId, table.season] }),
+    primaryKey({ columns: [table.userId, table.season] }),
     index("club_memberships_userId_idx").on(table.userId),
     index("club_memberships_userId_season_idx").on(table.userId, table.season),
     index("club_memberships_paymentId_idx").on(table.paymentId),
