@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { AlertProps, TabsItem } from "@nuxt/ui";
+import type { AlertProps, TabsItem, TimelineItem } from "@nuxt/ui";
 
 definePageMeta({
   middleware: ["auth"],
@@ -55,13 +55,37 @@ if (!userStore.isComplete) {
     alert.value = {
       title: `Registrácia na ${(data.value.seasons?.length || 0) > 1 ? "roky" : "rok"} ${data.value.seasons?.join(", ")} otvorená`,
       description:
-        "Nenechajte si ani v nich ujsť žiadnu z výhod plného členstvo v SDA a zaregistrujte sa ešte dnes!",
+        "Nenechajte si ujsť žiadnu z výhod plného členstvo v SDA a zaregistrujte sa ešte dnes!",
       icon: "i-ph-megaphone",
       color: "primary",
       to: "/profile/join",
     };
   }
 }
+
+const memberships = computed<TimelineItem[]>(() => {
+  return (
+    userStore.user?.clubMemberships?.map((m) => ({
+      date: m.season.toString(),
+      title: m.club?.name,
+      icon: m.confirmed ? "i-ph-seal-check-bold" : "i-ph-seal-question-bold",
+    })) ?? []
+  );
+});
+
+const currentMembership = computed(() => {
+  return userStore.user?.clubMemberships?.filter(
+    (m) => m.season === new Date().getFullYear(),
+  )[0];
+});
+
+const membershipValue = computed(() => {
+  return currentMembership.value
+    ? currentMembership.value.confirmed
+      ? memberships.value.length - 1
+      : memberships.value.length - 2
+    : memberships.value.length - 1;
+});
 </script>
 
 <template>
@@ -103,7 +127,21 @@ if (!userStore.isComplete) {
           </div>
         </template>
         <template #memberships>
-          <div>Členstvá v SDA</div>
+          <UTimeline
+            v-model="membershipValue"
+            :items="memberships"
+            orientation="horizontal"
+            :color="
+              currentMembership
+                ? currentMembership.confirmed
+                  ? 'primary'
+                  : 'warning'
+                : 'error'
+            "
+            :ui="{
+              root: 'w-fit',
+              item: 'flex-1',
+            }" />
         </template>
       </UTabs>
     </UPageBody>
