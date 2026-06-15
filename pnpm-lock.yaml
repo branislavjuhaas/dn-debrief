@@ -358,6 +358,9 @@ importers:
       drizzle-kit:
         specifier: 1.0.0-rc.3
         version: 1.0.0-rc.3
+      tsdown:
+        specifier: ^0.22.2
+        version: 0.22.2(@typescript/native-preview@7.0.0-dev.20260609.1)(typescript@6.0.3)
       typescript:
         specifier: ^6.0.3
         version: 6.0.3

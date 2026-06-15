@@ -1,10 +1,10 @@
 {
-  "extends": "../../tsconfig.json", // 👈 Keep this! Inherit your global configurations
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "noEmit": true,
+    "noEmit": false,
+    "outDir": "./dist",
     "rootDir": "./src",
     "types": ["node"]
   },
