@@ -222,6 +222,19 @@ importers:
         version: 0.1.24(@opentelemetry/api@1.9.1)(@types/node@25.9.2)(esbuild@0.28.0)(happy-dom@20.10.2)(jiti@2.7.0)(terser@5.48.0)(typescript@6.0.3)(vite@7.3.5(@types/node@25.9.2)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(yaml@2.9.0))(yaml@2.9.0)
 
   apps/cli:
+    dependencies:
+      '@dn-debrief/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+      citty:
+        specifier: ^0.2.2
+        version: 0.2.2
+      consola:
+        specifier: ^3.4.2
+        version: 3.4.2
+      rc9:
+        specifier: ^3.0.1
+        version: 3.0.1
     devDependencies:
       '@types/node':
         specifier: ^25.9.2

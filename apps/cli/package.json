@@ -2,7 +2,7 @@
   "name": "@dn-debrief/cli",
   "type": "module",
   "version": "2.26.0.1",
-  "description": "Intelligent CLI for the DN DebRIEF platform.",
+  "description": "Intelligent CLI for the DN DebRIEF platform",
   "author": "Branislav Juhás <branislav@juhaas.com>",
   "license": "AGPL-3.0",
   "homepage": "https://docs.debrief.sda.sk",
@@ -31,5 +31,15 @@
     "bumpp": "^11.1.0",
     "tsdown": "^0.22.2",
     "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "@dn-debrief/db": "workspace:*",
+    "citty": "^0.2.2",
+    "consola": "^3.4.2",
+    "rc9": "^3.0.1"
+  },
+  "exports": {
+    ".": "./dist/index.mjs",
+    "./package.json": "./package.json"
   }
 }
