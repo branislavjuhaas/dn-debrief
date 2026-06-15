@@ -1,5 +1,6 @@
 import { defineCommand } from "citty";
 import consola from "consola";
+import { colorize } from "consola/utils";
 import { readUserConfig, writeUserConfig } from "rc9";
 
 const read = defineCommand({
@@ -11,7 +12,12 @@ const read = defineCommand({
     const config = readUserConfig(".debriefrc");
 
     consola.info(
-      `Working configuration for the user: ${JSON.stringify(config, null, " ")}`,
+      `Working configuration for the user:\n${Object.entries(config)
+        .map(
+          ([key, value]) =>
+            `  ${colorize("dim", key)}: ${colorize("green", typeof value === "object" ? JSON.stringify(value) : value)}`,
+        )
+        .join("\n")}`,
     );
   },
 });
