@@ -18,13 +18,29 @@ export default defineConfig({
       "typescript/unbound-method": "off",
       "no-console": "warn",
     },
+    overrides: [
+      {
+        files: [
+          "apps/web/server/**/*",
+          "apps/cli/**/*",
+          "app/components/OgImage/*",
+        ],
+        rules: {
+          "no-console": "off",
+        },
+      },
+    ],
     ignorePatterns: [
       ".output/**",
       ".data/**",
       ".nuxt/**",
       ".nitro/**",
+      ".cache/**",
       "dist/**",
       "node_modules/**",
+      "coverage/**",
+      "playwright-report/**",
+      "test-results/**",
     ],
   },
 
