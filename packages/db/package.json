@@ -1,6 +1,5 @@
 {
   "name": "@dn-debrief/db",
-  "version": "1.0.0",
   "type": "module",
   "main": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
