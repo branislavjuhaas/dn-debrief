@@ -8,10 +8,12 @@ services:
     restart: always
     environment:
       POSTGRES_USER: debrief_user
-      POSTGRES_PASSWORD: debrief_password
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
       POSTGRES_DB: debrief_production
     volumes:
       - pgdata:/var/lib/postgresql
+    networks:
+      - dokploy-network
     ports:
       - "5432:5432"
     healthcheck:
@@ -22,10 +24,7 @@ services:
 
   # --- Short-lived Database Schema Migrator ---
   db-migrate:
-    image: debrief-web:latest
-    build:
-      context: .
-      dockerfile: apps/web/Dockerfile
+    image: ghcr.io/branislavjuhaas/dn-debrief-web:latest
     container_name: debrief-migrator
     working_dir: /app/packages/db
     command: >
@@ -33,8 +32,9 @@ services:
       pnpm install --frozen-lockfile --ignore-scripts &&
       pnpm --filter @dn-debrief/db exec drizzle-kit migrate --config=drizzle.config.ts"
     environment:
-      - CI=true
-      - DATABASE_URL=postgresql://debrief_user:debrief_password@debrief-postgres:5432/debrief_production
+      DATABASE_URL: postgresql://debrief_user:${DATABASE_PASSWORD}@debrief-postgres:5432/debrief_production
+    networks:
+      - dokploy-network
     depends_on:
       postgres:
         condition: service_healthy
@@ -46,10 +46,12 @@ services:
     restart: always
     environment:
       MINIO_ROOT_USER: debrief_user
-      MINIO_ROOT_PASSWORD: debrief_password
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     volumes:
       - miniodata:/data
     command: server /data --console-address ":9001"
+    networks:
+      - dokploy-network
     ports:
       - "9000:9000" # S3 API Port
       - "9001:9001" # Storage Console Dashboard UI
@@ -65,21 +67,21 @@ services:
 
   # --- Nuxt Server ---
   web:
-    image: debrief-web:latest
+    image: ghcr.io/branislavjuhaas/dn-debrief-web:latest
     container_name: debrief-web
     restart: always
-    ports:
-      - "3000:3000"
     environment:
-      BETTER_AUTH_SECRET: 58a32fdca7e7285d516247c668589b1ab3c5e58168ef6efdae7a1dfc39401dff
-      BETTER_AUTH_URL: http://localhost:3000
-      DATABASE_URL: postgresql://debrief_user:debrief_password@debrief-postgres:5432/debrief_production
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
+      BETTER_AUTH_URL: ${BETTER_AUTH_URL}
+      DATABASE_URL: postgresql://debrief_user:${DATABASE_PASSWORD}@debrief-postgres:5432/debrief_production
       NODE_ENV: production
       GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
       GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
       S3_ENDPOINT: http://debrief-minio:9000
       S3_ACCESS_KEY: debrief_user
-      S3_SECRET_KEY: debrief_password
+      S3_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+    networks:
+      - dokploy-network
     depends_on:
       postgres:
         condition: service_healthy
@@ -87,6 +89,10 @@ services:
         condition: service_healthy
       db-migrate:
         condition: service_completed_successfully
+
+networks:
+  dokploy-network:
+    external: true
 
 volumes:
   pgdata:
