@@ -8,6 +8,8 @@ COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 COPY packages/db/package.json ./packages/db/
 COPY apps/web/package.json ./apps/web/
 
+RUN apk add --no-cache git
+
 RUN pnpm install --frozen-lockfile
 
 COPY packages/db ./packages/db
