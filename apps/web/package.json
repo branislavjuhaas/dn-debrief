@@ -1,0 +1,47 @@
+{
+  "name": "@dn-debrief/web",
+  "version": "2.26.0.1",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "lint": "vp check --fix",
+    "test": "vp test"
+  },
+  "dependencies": {
+    "@dn-debrief/db": "workspace:*",
+    "@internationalized/date": "^3.12.2",
+    "@number-flow/vue": "^0.5.0",
+    "@nuxt/a11y": "1.0.0-alpha.1",
+    "@nuxt/hints": "1.1.2",
+    "@nuxt/image": "2.0.0",
+    "@nuxt/ui": "4.8.2",
+    "@pinia/nuxt": "0.11.3",
+    "@vueuse/core": "^14.3.0",
+    "@vueuse/nuxt": "14.3.0",
+    "better-auth": "1.6.15",
+    "date-fns": "^4.4.0",
+    "drizzle-orm": "1.0.0-rc.3",
+    "motion-v": "^2.3.0",
+    "nuxt": "^4.4.8",
+    "pinia": "^3.0.4",
+    "tailwindcss": "^4.3.0",
+    "typescript": "^6.0.3",
+    "vue": "^3.5.35",
+    "vue-router": "^5.1.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@iconify-json/ph": "^1.2.2",
+    "@nuxt/test-utils": "^4.0.3",
+    "@types/node": "^25.9.2",
+    "@vue/test-utils": "^2.4.11",
+    "happy-dom": "^20.10.2",
+    "playwright-core": "^1.60.0",
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
+  }
+}
