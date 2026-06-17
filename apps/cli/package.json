@@ -36,6 +36,7 @@
     "@dn-debrief/db": "workspace:*",
     "citty": "^0.2.2",
     "consola": "^3.4.2",
+    "drizzle-orm": "1.0.0-rc.3",
     "rc9": "^3.0.1"
   },
   "exports": {
