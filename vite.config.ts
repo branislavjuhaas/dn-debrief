@@ -23,6 +23,7 @@ export default defineConfig({
         files: [
           "apps/web/server/**/*",
           "apps/cli/**/*",
+          "packages/db/src/migrate.*",
           "app/components/OgImage/*",
         ],
         rules: {
@@ -47,7 +48,7 @@ export default defineConfig({
   fmt: {
     bracketSameLine: true,
     printWidth: 80,
-    semi: true, // Keeps your preferred trailing semicolons
+    semi: true,
     singleQuote: false,
     sortPackageJson: false,
     ignorePatterns: [],

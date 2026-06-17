@@ -27,11 +27,7 @@ services:
       context: .
       dockerfile: apps/web/Dockerfile
     container_name: debrief-migrator
-    working_dir: /app/packages/db
-    command: >
-      sh -c "corepack enable &&
-      pnpm install --frozen-lockfile --ignore-scripts &&
-      pnpm --filter @dn-debrief/db exec drizzle-kit migrate --config=drizzle.config.ts"
+    command: ["node", "migrate.mjs"]
     environment:
       - CI=true
       - DATABASE_URL=postgresql://debrief_user:debrief_password@debrief-postgres:5432/debrief_production
@@ -66,6 +62,9 @@ services:
   # --- Nuxt Server ---
   web:
     image: debrief-web:latest
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
     container_name: debrief-web
     restart: always
     ports:

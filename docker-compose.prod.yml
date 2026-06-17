@@ -22,15 +22,11 @@ services:
       timeout: 3s
       retries: 5
 
-  # --- Short-lived Database Schema Migrator ---
+  # --- Flat, Instant Database Migrator ---
   db-migrate:
     image: ghcr.io/branislavjuhaas/dn-debrief-web:latest
     container_name: debrief-migrator
-    working_dir: /app/packages/db
-    command: >
-      sh -c "corepack enable &&
-      pnpm install --frozen-lockfile --ignore-scripts &&
-      pnpm --filter @dn-debrief/db exec drizzle-kit migrate --config=drizzle.config.ts"
+    command: ["node", "migrate.mjs"]
     environment:
       DATABASE_URL: postgresql://debrief_user:${DATABASE_PASSWORD}@debrief-postgres:5432/debrief_production
     networks:
@@ -53,8 +49,8 @@ services:
     networks:
       - dokploy-network
     ports:
-      - "9000:9000" # S3 API Port
-      - "9001:9001" # Storage Console Dashboard UI
+      - "9000:9000" # S3 API
+      - "9001:9001" # Console Dashboard
     healthcheck:
       test:
         [
