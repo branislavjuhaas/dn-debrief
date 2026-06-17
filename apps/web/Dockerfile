@@ -4,11 +4,9 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 
 WORKDIR /app
 
-COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json tsconfig.json ./
 COPY packages/db/package.json ./packages/db/
 COPY apps/web/package.json ./apps/web/
-
-RUN apk add --no-cache git
 
 RUN pnpm install --frozen-lockfile --ignore-scripts
 
@@ -25,19 +23,19 @@ WORKDIR /app
 ENV NODE_ENV=production
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
-# 1. Monorepo structural files (Required so pnpm can resolve production modules)
+# 1. Monorepo structural files
 COPY --from=builder /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml ./
 
 # 2. Copy ONLY the db metadata and SQL migrations (No raw TypeScript source files!)
 COPY --from=builder /app/packages/db/package.json ./packages/db/
-COPY --from=builder /app/packages/db/drizzle ./packages/db/drizzle
-COPY --from=builder /app/packages/db/drizzle.config.ts ./packages/db/   # Required by drizzle-kit CLI
+COPY --from=builder /app/packages/db/migrations ./packages/db/migrations
+COPY --from=builder /app/packages/db/drizzle.config.ts ./packages/db/
 
 # 3. Copy the compiled standalone Nuxt 4 server bundle
 COPY --from=builder /app/apps/web/package.json ./apps/web/
 COPY --from=builder /app/apps/web/.output ./apps/web/.output
 
-# 4. Install only production-grade engines/binaries (Skips all heavy devDependencies)
+# 4. Install only production-grade engines/binaries
 RUN pnpm install --prod --frozen-lockfile --ignore-scripts
 
 EXPOSE 3000
