@@ -139,19 +139,18 @@ const profileSchema = z.object({
     .string("Obec trvalého pobytu je povinný údaj")
     .nonempty("Obec trvalého pobytu je povinný údaj"),
   phone: z.e164("Neplatné telefónne číslo"),
-  legalGuardian: z.object({
-    name: z
-      .string("Meno zákonného/-ej zástupce/-kne je povinný údaj")
-      .nonempty("Meno zákonného/-ej zástupce/-kne je povinný údaj"),
-    email: z
-      .string("Email zákonného/-ej zástupce/-kne je povinný údaj")
-      .nonempty("Email zákonného/-ej zástupce/-kne je povinný údaj")
-      .refine(
-        (value) =>
-          value !== userStore.user?.email && value !== accountState.email,
-        "Email zákonného/-ej zástupce/-kne musí byť rôzny od emailu používateľa",
-      ),
-  }),
+  legalGuardian: z
+    .object({
+      name: z.string("Meno zákonného/-ej zástupce/-kne je povinný údaj"),
+      email: z
+        .string("Email zákonného/-ej zástupce/-kne je povinný údaj")
+        .refine(
+          (value) =>
+            value !== userStore.user?.email && value !== accountState.email,
+          "Email zákonného/-ej zástupce/-kne musí byť rôzny od emailu používateľa",
+        ),
+    })
+    .optional(),
 });
 
 const profileState = reactive<{
