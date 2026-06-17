@@ -92,7 +92,7 @@ CREATE TABLE "club_managers" (
 );
 --> statement-breakpoint
 CREATE TABLE "club_memberships" (
-	"club_id" integer,
+	"club_id" integer NOT NULL,
 	"user_id" integer,
 	"season" smallint,
 	"registration_type" "club_registration_type" NOT NULL,
@@ -100,7 +100,7 @@ CREATE TABLE "club_memberships" (
 	"payment_id" integer UNIQUE,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
-	CONSTRAINT "club_memberships_pkey" PRIMARY KEY("club_id","user_id","season")
+	CONSTRAINT "club_memberships_pkey" PRIMARY KEY("user_id","season")
 );
 --> statement-breakpoint
 CREATE TABLE "clubs" (

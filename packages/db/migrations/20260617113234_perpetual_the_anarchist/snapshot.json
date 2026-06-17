@@ -1,8 +1,8 @@
 {
   "version": "8",
   "dialect": "postgres",
-  "id": "3674d4e6-f0aa-43a2-9d47-db327f3d87cb",
-  "prevIds": ["00000000-0000-0000-0000-000000000000"],
+  "id": "34ff9880-b460-4909-802b-ef55ead30eae",
+  "prevIds": ["3a9f592d-51cd-4121-a709-d504c8a95503"],
   "ddl": [
     {
       "values": [
@@ -2466,7 +2466,7 @@
       "table": "club_managers"
     },
     {
-      "columns": ["club_id", "user_id", "season"],
+      "columns": ["user_id", "season"],
       "nameExplicit": false,
       "name": "club_memberships_pkey",
       "entityType": "pks",
