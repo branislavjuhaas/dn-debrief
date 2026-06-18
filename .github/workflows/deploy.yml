@@ -16,6 +16,7 @@ jobs:
   build-and-push:
     needs: quality-assurance
     runs-on: ubuntu-latest
+    environment: production
     permissions:
       contents: read
       packages: write
@@ -45,3 +46,6 @@ jobs:
             ${{ env.IMAGE_NAME }}:${{ github.event.release.tag_name }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+      - name: Trigger Dokploy Deployment
+        run: |
+          curl -X POST ${{ secrets.DOKPLOY_WEBHOOK_URL }}
