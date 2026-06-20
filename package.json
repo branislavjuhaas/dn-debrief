@@ -1,6 +1,6 @@
 {
   "name": "@dn-debrief/monorepo",
-  "version": "2.26.1",
+  "version": "2.26.0-alpha.2",
   "private": true,
   "type": "module",
   "scripts": {
@@ -18,5 +18,5 @@
   "devDependencies": {
     "vite-plus": "catalog:"
   },
-  "packageManager": "pnpm@11.5.2"
+  "packageManager": "pnpm@11.8.0"
 }
