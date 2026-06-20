@@ -8,7 +8,10 @@
     <Container class="max-w-xl p-0 py-10 sm:p-6">
       <Section class="px-6 py-5 bg-zinc-50 rounded-t-lg border border-zinc-300">
         <Link href="https://debrief.sda.sk">
-          <Img src="/logo.png" alt="Maizzle" class="h-5 w-18" />
+          <Img
+            src="https://v2.debrief.sda.sk/mailing/logo.png"
+            alt="Maizzle"
+            class="h-5 w-18" />
         </Link>
       </Section>
 
