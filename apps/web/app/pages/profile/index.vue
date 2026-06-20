@@ -65,7 +65,7 @@ if (!userStore.isComplete) {
 
 const memberships = computed<TimelineItem[]>(() => {
   return (userStore.user?.clubMemberships ?? [])
-    .sort((a, b) => (a.season ?? 0) - (b.season ?? 0))
+    .sort((a, b) => (b.season ?? 0) - (a.season ?? 0))
     ?.map((m) => ({
       date: m.season.toString(),
       title: m.club?.name,
@@ -109,7 +109,9 @@ const memberships = computed<TimelineItem[]>(() => {
         :items="tabItems"
         variant="link"
         color="neutral"
-        :ui="{ content: 'mt-4' }">
+        :ui="{
+          content: 'mt-4 overflow-x-auto scrollbar-none',
+        }">
         <template #details>
           <component
             :is="alert.to ? ULink : 'span'"
