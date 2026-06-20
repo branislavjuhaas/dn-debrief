@@ -64,27 +64,24 @@ if (!userStore.isComplete) {
 }
 
 const memberships = computed<TimelineItem[]>(() => {
-  return (
-    userStore.user?.clubMemberships?.map((m) => ({
+  return (userStore.user?.clubMemberships ?? [])
+    .sort((a, b) => (a.season ?? 0) - (b.season ?? 0))
+    ?.map((m) => ({
       date: m.season.toString(),
       title: m.club?.name,
-      icon: m.confirmed ? "i-ph-seal-check-bold" : "i-ph-seal-question-bold",
-    })) ?? []
-  );
-});
-
-const currentMembership = computed(() => {
-  return userStore.user?.clubMemberships?.filter(
-    (m) => m.season === new Date().getFullYear(),
-  )[0];
-});
-
-const membershipValue = computed(() => {
-  return currentMembership.value
-    ? currentMembership.value.confirmed
-      ? memberships.value.length - 1
-      : memberships.value.length - 2
-    : memberships.value.length - 1;
+      icon: m.confirmed
+        ? "i-ph-seal-check-bold"
+        : new Date().getFullYear() > m.season
+          ? "i-ph-seal-bold"
+          : "i-ph-seal-question-bold",
+      avatar: {
+        class: m.confirmed
+          ? "text-inverted! bg-success!"
+          : new Date().getFullYear() > m.season
+            ? "text-muted!"
+            : "text-inverted! bg-warning!",
+      },
+    }));
 });
 </script>
 
@@ -128,18 +125,10 @@ const membershipValue = computed(() => {
         </template>
         <template #memberships>
           <UTimeline
-            v-model="membershipValue"
             :items="memberships"
             orientation="horizontal"
-            :color="
-              currentMembership
-                ? currentMembership.confirmed
-                  ? 'primary'
-                  : 'warning'
-                : 'error'
-            "
             :ui="{
-              root: 'w-fit',
+              root: 'max-w-80 w-full',
               item: 'flex-1',
             }" />
         </template>
