@@ -128,8 +128,7 @@ const memberships = computed<TimelineItem[]>(() => {
             :items="memberships"
             orientation="horizontal"
             :ui="{
-              root: 'max-w-80 w-full',
-              item: 'flex-1',
+              item: 'flex-1 max-w-46 w-full',
             }" />
         </template>
       </UTabs>
