@@ -5,9 +5,15 @@ definePageMeta({
   middleware: ["auth"],
 });
 
+const userStore = useUserStore();
+
+useSeoMeta({
+  title: userStore.fullName,
+  description: "Profil aktuálne prihláseného/-ej používateľa/-ky",
+});
+
 const ULink = resolveComponent("ULink");
 
-const userStore = useUserStore();
 const authClient = useAuthClient();
 
 const logout = async () => {
@@ -35,34 +41,6 @@ const tabItems = ref<TabsItem[]>([
   },
 ]);
 
-const alert = ref<(AlertProps & { to?: string }) | null>(null);
-
-if (!userStore.isComplete) {
-  alert.value = {
-    title: "Chýbajúce údaje",
-    description:
-      "Váš profil momentálne nie je kompletný. Prosím, doplňte chýbajúce údaje.",
-    icon: "i-ph-detective",
-    color: "warning",
-    to: "/profile/edit",
-  };
-} else {
-  const { data } = await useFetch("/api/settings/seasons", {
-    key: "filtered-seasons",
-  });
-
-  if (data.value?.seasons && data.value.seasons?.length > 0) {
-    alert.value = {
-      title: `Registrácia na ${(data.value.seasons?.length || 0) > 1 ? "roky" : "rok"} ${data.value.seasons?.join(", ")} otvorená`,
-      description:
-        "Nenechajte si ujsť žiadnu z výhod plného členstvo v SDA a zaregistrujte sa ešte dnes!",
-      icon: "i-ph-megaphone",
-      color: "primary",
-      to: "/profile/join",
-    };
-  }
-}
-
 const memberships = computed<TimelineItem[]>(() => {
   return (userStore.user?.clubMemberships ?? [])
     .sort((a, b) => (b.season ?? 0) - (a.season ?? 0))
@@ -82,6 +60,61 @@ const memberships = computed<TimelineItem[]>(() => {
             : "text-inverted! bg-warning!",
       },
     }));
+});
+
+const { data: seasonsData } = await useFetch("/api/settings/seasons", {
+  key: "filtered-seasons",
+});
+
+const alert = computed<(AlertProps & { to?: string }) | null>(() => {
+  if (!userStore.isComplete) {
+    return {
+      title: "Chýbajúce údaje",
+      description:
+        "Váš profil momentálne nie je kompletný. Prosím, doplňte chýbajúce údaje.",
+      icon: "i-ph-detective",
+      color: "warning",
+      to: "/profile/edit",
+    };
+  }
+  if (seasonsData.value?.seasons && seasonsData.value.seasons?.length > 0) {
+    return {
+      title: `Registrácia na ${(seasonsData.value.seasons?.length || 0) > 1 ? "roky" : "rok"} ${seasonsData.value.seasons?.join(", ")} otvorená`,
+      description:
+        "Nenechajte si ujsť žiadnu z výhod plného členstvo v SDA a zaregistrujte sa ešte dnes!",
+      icon: "i-ph-megaphone",
+      color: "primary",
+      to: "/profile/join",
+    };
+  }
+  return null;
+});
+
+const membershipsAlert = computed<AlertProps & { to?: string }>(() => {
+  // check if there is a value with season equal to current year
+  const currentMembership = userStore.user?.clubMemberships?.find(
+    (m) => m.season === new Date().getFullYear(),
+  );
+  if (!currentMembership) {
+    return {
+      title: `Chýba registrácia na rok ${new Date().getFullYear()}`,
+      icon: "i-ph-seal-warning",
+      color: "error",
+      to: "/profile/join",
+    };
+  }
+  if (!currentMembership.confirmed) {
+    return {
+      title: `Registrácia na rok ${new Date().getFullYear()} nie je potvrdená`,
+      icon: "i-ph-seal-warning",
+      color: "warning",
+    };
+  }
+  return {
+    title: "Vaša registrácia do SDA je kompletná!",
+    icon: "i-ph-seal-check",
+    color: "success",
+  };
 });
 </script>
 
@@ -126,6 +159,14 @@ const memberships = computed<TimelineItem[]>(() => {
           </div>
         </template>
         <template #memberships>
+          <component
+            :is="membershipsAlert.to ? ULink : 'span'"
+            :to="membershipsAlert.to">
+            <UAlert
+              v-bind="membershipsAlert"
+              :ui="{ wrapper: 'flex-initial w-fit' }"
+              class="mb-4 flex flex-row justify-center items-center font-medium" />
+          </component>
           <UTimeline
             :items="memberships"
             orientation="horizontal"
