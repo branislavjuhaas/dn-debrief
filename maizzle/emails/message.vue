@@ -8,23 +8,24 @@
     <Container class="max-w-xl p-0 py-10 sm:p-6">
       <Section class="px-6 py-5 bg-zinc-50 rounded-t-lg border border-zinc-300">
         <Link href="https://debrief.sda.sk">
-          <Img src="/logo.png" alt="Maizzle" class="h-5 w-auto" />
+          <Img src="/logo.png" alt="Maizzle" class="h-5 w-18" />
         </Link>
       </Section>
 
       <Section class="px-6 py-6 bg-zinc-50 border-x border-zinc-300 mx-autos">
         <Row>
-          <Column>
+          <Column class="text-center">
             <Img
               src="https://api.iconify.design/ph:seal-question.svg"
               alt="Icon"
-              class="h-16" />
+              width="64"
+              height="64" />
           </Column>
         </Row>
         <Row class="text-center text-zinc-800 font-dm-sans mt-6">
           <Column>
-            <Heading class="text-xl">{ title }</Heading>
-            <Text class="text-zinc-500 mx-10 mt-1">{ text }</Text>
+            <Heading class="text-xl">${title}</Heading>
+            <Text class="text-zinc-500 mx-10 mt-1">${text}</Text>
           </Column>
         </Row>
       </Section>
