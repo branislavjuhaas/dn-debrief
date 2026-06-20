@@ -2,6 +2,7 @@ export default defineAppConfig({
   ui: {
     colors: {
       primary: "sda",
+      success: "sda",
       neutral: "zinc",
     },
     pageHeader: {
