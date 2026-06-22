@@ -69,7 +69,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       sentry: {
-        dsn: process.env.SENTRY_DSN!,
+        dsn: process.env.SENTRY_DSN,
       },
     },
   },
