@@ -1,3 +1,45 @@
+import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
+
+export const sendEmail = async (
+  to: string | string[],
+  subject: string,
+  text: string,
+  html?: string,
+) => {
+  const sesClient = new SESClient({
+    region: process.env.AWS_REGION,
+    credentials: {
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+    },
+  });
+
+  const params = {
+    Source: `${process.env.AWS_FROM_NAME} <${process.env.AWS_FROM_EMAIL}>`,
+    Destination: {
+      ToAddresses: Array.isArray(to) ? to : [to],
+    },
+    Message: {
+      Subject: {
+        Charset: "UTF-8",
+        Data: subject,
+      },
+      Body: {
+        Html: {
+          Charset: "UTF-8",
+          Data: html || text,
+        },
+        Text: {
+          Charset: "UTF-8",
+          Data: text,
+        },
+      },
+    },
+  };
+  const command = new SendEmailCommand(params);
+  await sesClient.send(command);
+};
+
 export const generateActionMail = (
   title: string,
   text: string,
@@ -60,7 +102,7 @@ export const generateActionMail = (
       <div class="sm-p-6" style="margin: 0 auto; max-width: 576px; padding: 40px 0;">
         <!--[if mso]><table role="none" cellpadding="0" cellspacing="0" style="width: 100%"><tr><td style="background-color: #fafafa"><![endif]-->
         <div style="border-top-left-radius: 8px; border-top-right-radius: 8px; border: 1px solid #d4d4d8; background-color: #fafafa; padding: 20px 24px;">
-          <a href="https://debrief.sda.sk" style="text-decoration: none;"><img src="https://v2.debrief.sda.sk/mailing/logo.png" alt="Maizzle" style="height: 20px; width: 72px; max-width: 100%; vertical-align: middle;" width="526" height="20"></a>
+          <a href="https://debrief.sda.sk" style="text-decoration: none;"><img src="https://v2.debrief.sda.sk/mailing/logo.png" alt="DebRIEF" style="height: 20px; width: 72px; max-width: 100%; vertical-align: middle;" width="526" height="20"></a>
         </div>
         <!--[if mso]></td></tr></table><![endif]-->
         <!--[if mso]><table role="none" cellpadding="0" cellspacing="0" style="width: 100%"><tr><td style="background-color: #fafafa"><![endif]-->
@@ -186,7 +228,7 @@ export const generateMessageMail = (
       <div class="sm-p-6" style="margin: 0 auto; max-width: 576px; padding: 40px 0;">
         <!--[if mso]><table role="none" cellpadding="0" cellspacing="0" style="width: 100%"><tr><td style="background-color: #fafafa"><![endif]-->
         <div style="border-top-left-radius: 8px; border-top-right-radius: 8px; border: 1px solid #d4d4d8; background-color: #fafafa; padding: 20px 24px;">
-          <a href="https://debrief.sda.sk" style="text-decoration: none;"><img src="https://v2.debrief.sda.sk/mailing/logo.png" alt="Maizzle" style="height: 20px; width: 72px; max-width: 100%; vertical-align: middle;" width="526" height="20"></a>
+          <a href="https://debrief.sda.sk" style="text-decoration: none;"><img src="https://v2.debrief.sda.sk/mailing/logo.png" alt="DebRIEF" style="height: 20px; width: 72px; max-width: 100%; vertical-align: middle;" width="526" height="20"></a>
         </div>
         <!--[if mso]></td></tr></table><![endif]-->
         <!--[if mso]><table role="none" cellpadding="0" cellspacing="0" style="width: 100%"><tr><td style="background-color: #fafafa"><![endif]-->
