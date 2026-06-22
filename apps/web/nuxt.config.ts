@@ -29,8 +29,8 @@ export default defineNuxtConfig({
 
   css: ["~/assets/css/main.css"],
 
-  experimental: {
-    inlineRouteRules: true,
+  routeRules: {
+    "/manage/**": { appLayout: "manage" },
   },
 
   compatibilityDate: "2025-07-15",
