@@ -1,7 +1,7 @@
 import * as Sentry from "@sentry/nuxt";
 
 Sentry.init({
-  dsn: useRuntimeConfig().public.sentry.dsn,
+  dsn: process.env.SENTRY_DSN,
 
   tracesSampleRate: 1.0,
 });
