@@ -49,6 +49,8 @@ jobs:
           build-args: |
             SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
             SENTRY_DSN=${{ env.SENTRY_DSN }}
+            SENTRY_ORG=${{ secrets.SENTRY_ORG }}
+            SENTRY_PROJECT=${{ secrets.SENTRY_PROJECT }}
       - name: Trigger Dokploy Deployment
         run: |
           curl -X POST ${{ secrets.DOKPLOY_WEBHOOK_URL }}

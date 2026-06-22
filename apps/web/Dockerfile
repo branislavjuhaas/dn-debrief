@@ -19,9 +19,13 @@ COPY apps/web ./apps/web
 # Set environment variables for Sentry DSN
 ARG SENTRY_DSN
 ARG SENTRY_AUTH_TOKEN
+ARG SENTRY_ORG
+ARG SENTRY_PROJECT
 
 ENV SENTRY_DSN=$SENTRY_DSN
 ENV SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN
+ENV SENTRY_ORG=$SENTRY_ORG
+ENV SENTRY_PROJECT=$SENTRY_PROJECT
 
 # Build both database tools and the web application
 RUN pnpm --filter @dn-debrief/db build

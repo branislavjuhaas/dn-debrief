@@ -57,8 +57,8 @@ export default defineNuxtConfig({
   },
 
   sentry: {
-    org: "realsda",
-    project: "dn-debrief",
+    org: process.env.SENTRY_ORG,
+    project: process.env.SENTRY_PROJECT,
   },
 
   sourcemap: {
