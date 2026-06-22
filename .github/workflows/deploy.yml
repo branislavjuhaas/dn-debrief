@@ -46,6 +46,9 @@ jobs:
             ${{ env.IMAGE_NAME }}:${{ github.event.release.tag_name }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: |
+            SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
+            SENTRY_DSN=${{ env.SENTRY_DSN }}
       - name: Trigger Dokploy Deployment
         run: |
           curl -X POST ${{ secrets.DOKPLOY_WEBHOOK_URL }}

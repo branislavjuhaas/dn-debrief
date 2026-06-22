@@ -9,7 +9,9 @@ export default defineNuxtConfig({
     "@pinia/nuxt",
     "@vueuse/nuxt",
     "motion-v/nuxt",
+    "@sentry/nuxt/module",
   ],
+
   devtools: { enabled: true },
 
   app: {
@@ -51,6 +53,24 @@ export default defineNuxtConfig({
         "date-fns",
         "zod",
       ],
+    },
+  },
+
+  sentry: {
+    org: "realsda",
+    project: "dn-debrief",
+  },
+
+  sourcemap: {
+    client: "hidden",
+    server: true,
+  },
+
+  runtimeConfig: {
+    public: {
+      sentry: {
+        dsn: process.env.SENTRY_DSN!,
+      },
     },
   },
 });

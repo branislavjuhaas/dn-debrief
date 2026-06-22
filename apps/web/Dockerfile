@@ -16,10 +16,16 @@ RUN pnpm install --frozen-lockfile --ignore-scripts
 COPY packages/db ./packages/db
 COPY apps/web ./apps/web
 
+# Set environment variables for Sentry DSN
+ARG SENTRY_DSN
+ARG SENTRY_AUTH_TOKEN
+
+ENV SENTRY_DSN=$SENTRY_DSN
+ENV SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN
+
 # Build both database tools and the web application
 RUN pnpm --filter @dn-debrief/db build
 RUN pnpm --filter @dn-debrief/web build
-
 
 # --- STAGE II: Sane, Flat Production Runtime Runner ---
 FROM node:24-alpine AS runner
