@@ -25,5 +25,22 @@ export default () =>
       });
     }
 
+    if (userStore.user?.role && userStore.user.role !== "user") {
+      feed.push({
+        title: "Prejsť na panel správy",
+        content:
+          "Pre úpravu nastavení a obsahu platformy, prejdite na panel správy.",
+      });
+    } else if (
+      userStore.user?.managedClubs &&
+      userStore.user.managedClubs.length > 0
+    ) {
+      feed.push({
+        title: "Prejsť na panel správy",
+        content:
+          "Pre prehľad o vašom klube a jeho údajoch, prejdite na panel správy.",
+      });
+    }
+
     return feed;
   });
