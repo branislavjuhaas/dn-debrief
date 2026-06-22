@@ -12,8 +12,6 @@ useSeoMeta({
   description: "Profil aktuálne prihláseného/-ej používateľa/-ky",
 });
 
-const ULink = resolveComponent("ULink");
-
 const authClient = useAuthClient();
 
 const logout = async () => {
@@ -32,7 +30,7 @@ const tabItems = ref<TabsItem[]>([
     slot: "memberships",
   },
   {
-    label: "Registrácie a podujatia",
+    label: "Registrácie na podujatia",
     disabled: true,
   },
   {
@@ -66,7 +64,7 @@ const { data: seasonsData } = await useFetch("/api/settings/seasons", {
   key: "filtered-seasons",
 });
 
-const alert = computed<(AlertProps & { to?: string }) | null>(() => {
+const alert = computed<AlertProps | null>(() => {
   if (!userStore.isComplete) {
     return {
       title: "Chýbajúce údaje",
@@ -74,7 +72,15 @@ const alert = computed<(AlertProps & { to?: string }) | null>(() => {
         "Váš profil momentálne nie je kompletný. Prosím, doplňte chýbajúce údaje.",
       icon: "i-ph-detective",
       color: "warning",
-      to: "/profile/edit",
+      actions: [
+        {
+          label: "Doplniť profil",
+          to: "/profile/edit",
+          size: "md",
+          icon: "i-ph-list-checks",
+          color: "warning",
+        },
+      ],
     };
   }
   if (seasonsData.value?.seasons && seasonsData.value.seasons?.length > 0) {
@@ -84,13 +90,21 @@ const alert = computed<(AlertProps & { to?: string }) | null>(() => {
         "Nenechajte si ujsť žiadnu z výhod plného členstvo v SDA a zaregistrujte sa ešte dnes!",
       icon: "i-ph-megaphone",
       color: "primary",
-      to: "/profile/join",
+      actions: [
+        {
+          label: "Zaregistrovať sa",
+          to: "/profile/join",
+          size: "md",
+          icon: "i-ph-shield-check",
+          color: "primary",
+        },
+      ],
     };
   }
   return null;
 });
 
-const membershipsAlert = computed<AlertProps & { to?: string }>(() => {
+const membershipsAlert = computed<AlertProps>(() => {
   // check if there is a value with season equal to current year
   const currentMembership = userStore.user?.clubMemberships?.find(
     (m) => m.season === new Date().getFullYear(),
@@ -100,7 +114,15 @@ const membershipsAlert = computed<AlertProps & { to?: string }>(() => {
       title: `Chýba registrácia na rok ${new Date().getFullYear()}`,
       icon: "i-ph-seal-warning",
       color: "error",
-      to: "/profile/join",
+      actions: [
+        {
+          label: "Zaregistrovať sa",
+          to: "/profile/join",
+          size: "md",
+          icon: "i-ph-shield-check",
+          color: "neutral",
+        },
+      ],
     };
   }
   if (!currentMembership.confirmed) {
@@ -146,12 +168,12 @@ const membershipsAlert = computed<AlertProps & { to?: string }>(() => {
           content: 'mt-4 overflow-x-auto scrollbar-none',
         }">
         <template #details>
-          <component
-            :is="alert.to ? ULink : 'span'"
+          <UAlert
             v-if="alert"
-            :to="alert.to">
-            <UAlert variant="subtle" v-bind="alert" class="mb-4" />
-          </component>
+            variant="subtle"
+            orientation="horizontal"
+            v-bind="alert"
+            class="mb-4" />
           <div
             class="flex flex-col lg:flex-row lg:justify-between gap-4 items-center sm:items-start">
             <ProfileDetails :user="userStore.user!" class="pl-6 w-full" />
@@ -159,14 +181,10 @@ const membershipsAlert = computed<AlertProps & { to?: string }>(() => {
           </div>
         </template>
         <template #memberships>
-          <component
-            :is="membershipsAlert.to ? ULink : 'span'"
-            :to="membershipsAlert.to">
-            <UAlert
-              v-bind="membershipsAlert"
-              :ui="{ wrapper: 'flex-initial w-fit' }"
-              class="mb-4 flex flex-row justify-center items-center font-medium" />
-          </component>
+          <UAlert
+            v-bind="membershipsAlert"
+            orientation="horizontal"
+            class="mb-4" />
           <UTimeline
             :items="memberships"
             orientation="horizontal"
