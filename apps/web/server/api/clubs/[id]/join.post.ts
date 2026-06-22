@@ -36,17 +36,8 @@ export default defineEventHandler(async (event) => {
   const { registrationType } = await readValidatedBody(event, bodySchema.parse);
   const currentSeasons = (await getSetting("current-seasons")) ?? [];
 
-  const fullUser = await db.query.users.findFirst({
-    where: {
-      id: user.id,
-    },
-    columns: {
-      birthDate: true,
-    },
-  });
-
   const age = Math.abs(
-    differenceInYears(fullUser?.birthDate || new Date(), new Date()),
+    differenceInYears(user.birthDate || new Date(), new Date()),
   );
 
   // Generate rows for every ongoing season
