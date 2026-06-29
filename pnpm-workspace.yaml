@@ -1,6 +1,7 @@
 packages:
   - "apps/*"
   - "packages/*"
+  - "maizzle"
 allowBuilds:
   "@parcel/watcher": true
   "@sentry/cli": true
