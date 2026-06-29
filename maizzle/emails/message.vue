@@ -39,7 +39,7 @@
               href="https://github.com/branislavjuhaas/dn-debrief"
               target="_blank">
               <Img
-                src="https://api.iconify.design/ph:github-logo.svg"
+                src="https://v2.debrief.sda.sk/mailing/github-logo.png"
                 alt="Icon"
                 width="20"
                 class="h-5"

@@ -159,7 +159,7 @@ export const generateActionMail = (
             <!--[if mso]></td><![endif]-->
             <!--[if mso]><td style="width: 20px"><![endif]-->
             <div style="width: 20px; max-width: 100%; display: inline-block; font-size: medium">
-              <a href="https://github.com/branislavjuhaas/dn-debrief" target="_blank" style="text-decoration: none;"><img src="https://api.iconify.design/ph:github-logo.svg" alt="Icon" width="20" style="height: 20px; max-width: 100%; vertical-align: middle;" height="20"></a>
+              <a href="https://github.com/branislavjuhaas/dn-debrief" target="_blank" style="text-decoration: none;"><img src="https://v2.debrief.sda.sk/mailing/github-logo.png" alt="Icon" width="20" style="height: 20px; max-width: 100%; vertical-align: middle;" height="20"></a>
             </div>
             <!--[if mso]></td><![endif]-->
           </div>
@@ -271,7 +271,7 @@ export const generateMessageMail = (
             <!--[if mso]></td><![endif]-->
             <!--[if mso]><td style="width: 20px"><![endif]-->
             <div style="width: 20px; max-width: 100%; display: inline-block; font-size: medium">
-              <a href="https://github.com/branislavjuhaas/dn-debrief" target="_blank" style="text-decoration: none;"><img src="https://api.iconify.design/ph:github-logo.svg" alt="Icon" width="20" style="height: 20px; max-width: 100%; vertical-align: middle;" height="20"></a>
+              <a href="https://github.com/branislavjuhaas/dn-debrief" target="_blank" style="text-decoration: none;"><img src="https://v2.debrief.sda.sk/mailing/github-logo.png" alt="Icon" width="20" style="height: 20px; max-width: 100%; vertical-align: middle;" height="20"></a>
             </div>
             <!--[if mso]></td><![endif]-->
           </div>
