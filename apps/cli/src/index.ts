@@ -8,7 +8,7 @@ import { init } from "./init";
 const main = defineCommand({
   meta: {
     name: "debrief",
-    version: "2.26.0.1",
+    version: "2.26.0-alpha.3",
     description: "Command line interface of DebRIEF",
   },
   subCommands: {

@@ -1,6 +1,6 @@
 {
   "name": "@dn-debrief/web",
-  "version": "2.26.0-alpha.1",
+  "version": "2.26.0-alpha.3",
   "type": "module",
   "private": true,
   "scripts": {
