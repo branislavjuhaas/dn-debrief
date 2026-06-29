@@ -40,5 +40,5 @@ COPY --from=builder /app/apps/web/.output ./.output
 
 EXPOSE 3000
 
-# Default execution targeted at the web core with Sentry preloaded
+# Default execution targeted at the web core
 CMD ["node", ".output/server/index.mjs"]
