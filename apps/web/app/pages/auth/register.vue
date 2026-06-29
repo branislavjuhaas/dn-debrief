@@ -143,14 +143,22 @@ const profileSchema = z.object({
   phone: z.e164("Neplatné telefónne číslo"),
   legalGuardian: z
     .object({
-      name: z.string("Meno zákonného/-ej zástupce/-kne je povinný údaj"),
+      name: z
+        .string("Meno zákonného/-ej zástupce/-kne je povinný údaj")
+        .refine((value) => {
+          if (age.value >= 18) return true;
+          return value.length > 0;
+        }, "Meno zákonného/-ej zástupcu/-kne nemôže byť prázdne"),
       email: z
         .string("Email zákonného/-ej zástupce/-kne je povinný údaj")
-        .refine(
-          (value) =>
-            value !== userStore.user?.email && value !== accountState.email,
-          "Email zákonného/-ej zástupce/-kne musí byť rôzny od emailu používateľa",
-        ),
+        .refine((value) => {
+          if (age.value >= 18) return true;
+          return (
+            z.email().safeParse(value).success &&
+            value !== userStore.user?.email &&
+            value !== accountState.email
+          );
+        }, "Email zákonného/-ej zástupcu/-kne musí byť platný a rôzny od emailu používateľa"),
     })
     .optional(),
 });

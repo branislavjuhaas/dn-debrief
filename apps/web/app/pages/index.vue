@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { motion } from "motion-v";
 import type { User } from "#shared/types/user";
 
 const userStore = useUserStore();
@@ -22,6 +23,8 @@ const greet = (user: User | null) => {
 
   return `${salute}, ${user.name}!`;
 };
+
+const feed = useFeed();
 </script>
 
 <template>
@@ -32,12 +35,46 @@ const greet = (user: User | null) => {
         <IconHeading icon="ph:newspaper-clipping-fill"
           >Najrelevantnejšie udalosti</IconHeading
         >
-        <div
-          class="flex flex-row gap-4 w-full py-1 px-0.5 overflow-x-scroll no-scrollbar"></div>
+        <UEmpty
+          title="Žiadne dostupné podujatia"
+          description="Momentálne nie sú k dispozícii žiadne podujatia na zobrazenie."
+          :actions="
+            ['developer', 'admin', 'organizer', 'junior-organizer'].includes(
+              userStore.user?.role ?? '',
+            )
+              ? [
+                  {
+                    icon: 'i-ph-plus',
+                    label: 'Vytvoriť podujatie',
+                    color: 'primary',
+                    variant: 'subtle',
+                    to: '/manage/events/new',
+                  },
+                ]
+              : undefined
+          "
+          :ui="{ header: 'max-w-lg' }" />
+        <!-- <div
+          class="flex flex-row gap-4 w-full py-1 px-0.5 overflow-x-scroll no-scrollbar"></div> -->
       </div>
       <div class="space-y-2">
         <IconHeading icon="ph:megaphone-fill">Pre vás</IconHeading>
-        <div class="flex flex-col gap-4 w-full py-1 px-0.5"></div>
+        <div class="flex flex-col gap-3 w-full py-1 px-0.5">
+          <motion.div
+            v-for="(item, index) in feed"
+            :key="item.title"
+            :transition="{
+              duration: 0.4,
+              ease: 'easeOut',
+              delay: index * 0.05,
+            }"
+            :initial="{ translateY: 10, opacity: 0 }"
+            :animate="{ translateY: 0, opacity: 1 }"
+            class="px-6 py-3 rounded-lg overflow-hidden drop-shadow bg-default ring ring-default">
+            <h3 class="text-sm font-bold">{{ item.title }}</h3>
+            <div class="text-sm text-muted">{{ item.content }}</div>
+          </motion.div>
+        </div>
       </div>
     </UPageBody>
   </UPage>

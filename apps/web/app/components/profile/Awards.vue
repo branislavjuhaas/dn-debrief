@@ -33,7 +33,7 @@ const levelStyles: Record<number, string> = {
 </script>
 
 <template>
-  <UCard class="w-full max-w-96">
+  <UCard class="w-full max-w-96 m-px">
     <template #header>
       <div class="flex flex-row justify-between items-center">
         <span class="text-sm font-bold">Ocenenia</span>

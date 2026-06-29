@@ -9,7 +9,9 @@ export default defineNuxtConfig({
     "@pinia/nuxt",
     "@vueuse/nuxt",
     "motion-v/nuxt",
+    "@sentry/nuxt/module",
   ],
+
   devtools: { enabled: true },
 
   app: {
@@ -27,8 +29,8 @@ export default defineNuxtConfig({
 
   css: ["~/assets/css/main.css"],
 
-  experimental: {
-    inlineRouteRules: true,
+  routeRules: {
+    "/manage/**": { appLayout: "manage" },
   },
 
   compatibilityDate: "2025-07-15",
@@ -51,6 +53,24 @@ export default defineNuxtConfig({
         "date-fns",
         "zod",
       ],
+    },
+  },
+
+  sentry: {
+    org: process.env.SENTRY_ORG,
+    project: process.env.SENTRY_PROJECT,
+  },
+
+  sourcemap: {
+    client: "hidden",
+    server: true,
+  },
+
+  runtimeConfig: {
+    public: {
+      sentry: {
+        dsn: process.env.SENTRY_DSN,
+      },
     },
   },
 });

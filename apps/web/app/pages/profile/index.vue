@@ -5,9 +5,13 @@ definePageMeta({
   middleware: ["auth"],
 });
 
-const ULink = resolveComponent("ULink");
-
 const userStore = useUserStore();
+
+useSeoMeta({
+  title: userStore.fullName,
+  description: "Profil aktuálne prihláseného/-ej používateľa/-ky",
+});
+
 const authClient = useAuthClient();
 
 const logout = async () => {
@@ -26,7 +30,7 @@ const tabItems = ref<TabsItem[]>([
     slot: "memberships",
   },
   {
-    label: "Registrácie a podujatia",
+    label: "Registrácie na podujatia",
     disabled: true,
   },
   {
@@ -35,56 +39,104 @@ const tabItems = ref<TabsItem[]>([
   },
 ]);
 
-const alert = ref<(AlertProps & { to?: string }) | null>(null);
+const memberships = computed<TimelineItem[]>(() => {
+  return (userStore.user?.clubMemberships ?? [])
+    .sort((a, b) => (b.season ?? 0) - (a.season ?? 0))
+    ?.map((m) => ({
+      date: m.season.toString(),
+      title: m.club?.name,
+      icon: m.confirmed
+        ? "i-ph-seal-check-bold"
+        : new Date().getFullYear() > m.season
+          ? "i-ph-seal-bold"
+          : "i-ph-seal-question-bold",
+      avatar: {
+        class: m.confirmed
+          ? "text-inverted! bg-success!"
+          : new Date().getFullYear() > m.season
+            ? "text-muted!"
+            : "text-inverted! bg-warning!",
+      },
+    }));
+});
 
-if (!userStore.isComplete) {
-  alert.value = {
-    title: "Chýbajúce údaje",
-    description:
-      "Váš profil momentálne nie je kompletný. Prosím, doplňte chýbajúce údaje.",
-    icon: "i-ph-detective",
-    color: "warning",
-    to: "/profile/edit",
-  };
-} else {
-  const { data } = await useFetch("/api/settings/seasons", {
-    key: "filtered-seasons",
-  });
+const { data: seasonsData } = await useFetch("/api/settings/seasons", {
+  key: "filtered-seasons",
+});
 
-  if (data.value?.seasons && data.value.seasons?.length > 0) {
-    alert.value = {
-      title: `Registrácia na ${(data.value.seasons?.length || 0) > 1 ? "roky" : "rok"} ${data.value.seasons?.join(", ")} otvorená`,
+const alert = computed<AlertProps | null>(() => {
+  if (!userStore.isComplete) {
+    return {
+      title: "Chýbajúce údaje",
+      description:
+        "Váš profil momentálne nie je kompletný. Prosím, doplňte chýbajúce údaje.",
+      icon: "i-ph-detective",
+      color: "warning",
+      actions: [
+        {
+          label: "Doplniť profil",
+          to: "/profile/edit",
+          size: "md",
+          icon: "i-ph-list-checks",
+          color: "warning",
+        },
+      ],
+    };
+  }
+  if (seasonsData.value?.seasons && seasonsData.value.seasons?.length > 0) {
+    return {
+      title: `Registrácia na ${(seasonsData.value.seasons?.length || 0) > 1 ? "roky" : "rok"} ${seasonsData.value.seasons?.join(", ")} otvorená`,
       description:
         "Nenechajte si ujsť žiadnu z výhod plného členstvo v SDA a zaregistrujte sa ešte dnes!",
       icon: "i-ph-megaphone",
       color: "primary",
-      to: "/profile/join",
+      actions: [
+        {
+          label: "Zaregistrovať sa",
+          to: "/profile/join",
+          size: "md",
+          icon: "i-ph-shield-check",
+          color: "primary",
+        },
+      ],
     };
   }
-}
-
-const memberships = computed<TimelineItem[]>(() => {
-  return (
-    userStore.user?.clubMemberships?.map((m) => ({
-      date: m.season.toString(),
-      title: m.club?.name,
-      icon: m.confirmed ? "i-ph-seal-check-bold" : "i-ph-seal-question-bold",
-    })) ?? []
-  );
+  return null;
 });
 
-const currentMembership = computed(() => {
-  return userStore.user?.clubMemberships?.filter(
+const membershipsAlert = computed<AlertProps>(() => {
+  // check if there is a value with season equal to current year
+  const currentMembership = userStore.user?.clubMemberships?.find(
     (m) => m.season === new Date().getFullYear(),
-  )[0];
-});
-
-const membershipValue = computed(() => {
-  return currentMembership.value
-    ? currentMembership.value.confirmed
-      ? memberships.value.length - 1
-      : memberships.value.length - 2
-    : memberships.value.length - 1;
+  );
+  if (!currentMembership) {
+    return {
+      title: `Chýba registrácia na rok ${new Date().getFullYear()}`,
+      icon: "i-ph-seal-warning",
+      color: "error",
+      actions: [
+        {
+          label: "Zaregistrovať sa",
+          to: "/profile/join",
+          size: "md",
+          icon: "i-ph-shield-check",
+          color: "neutral",
+        },
+      ],
+    };
+  }
+  if (!currentMembership.confirmed) {
+    return {
+      title: `Registrácia na rok ${new Date().getFullYear()} nie je potvrdená`,
+      icon: "i-ph-seal-warning",
+      color: "warning",
+    };
+  }
+  return {
+    title: "Vaša registrácia do SDA je kompletná!",
+    icon: "i-ph-seal-check",
+    color: "success",
+  };
 });
 </script>
 
@@ -112,14 +164,16 @@ const membershipValue = computed(() => {
         :items="tabItems"
         variant="link"
         color="neutral"
-        :ui="{ content: 'mt-4' }">
+        :ui="{
+          content: 'mt-4 overflow-x-auto scrollbar-none',
+        }">
         <template #details>
-          <component
-            :is="alert.to ? ULink : 'span'"
+          <UAlert
             v-if="alert"
-            :to="alert.to">
-            <UAlert variant="subtle" v-bind="alert" class="mb-4" />
-          </component>
+            variant="subtle"
+            orientation="horizontal"
+            v-bind="alert"
+            class="mb-4" />
           <div
             class="flex flex-col lg:flex-row lg:justify-between gap-4 items-center sm:items-start">
             <ProfileDetails :user="userStore.user!" class="pl-6 w-full" />
@@ -127,20 +181,15 @@ const membershipValue = computed(() => {
           </div>
         </template>
         <template #memberships>
+          <UAlert
+            v-bind="membershipsAlert"
+            orientation="horizontal"
+            class="mb-4" />
           <UTimeline
-            v-model="membershipValue"
             :items="memberships"
             orientation="horizontal"
-            :color="
-              currentMembership
-                ? currentMembership.confirmed
-                  ? 'primary'
-                  : 'warning'
-                : 'error'
-            "
             :ui="{
-              root: 'w-fit',
-              item: 'flex-1',
+              item: 'flex-1 max-w-46 w-full',
             }" />
         </template>
       </UTabs>
