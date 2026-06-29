@@ -16,7 +16,7 @@ jobs:
   build-and-push:
     needs: quality-assurance
     runs-on: ubuntu-latest
-    environment: production
+    environment: Production
     permissions:
       contents: read
       packages: write

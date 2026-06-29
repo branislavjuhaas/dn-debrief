@@ -9,7 +9,7 @@ export default defineNuxtConfig({
     "@pinia/nuxt",
     "@vueuse/nuxt",
     "motion-v/nuxt",
-    "@sentry/nuxt/module",
+    "@sentry/nuxt/module", // Modern Sentry SDK Module
   ],
 
   devtools: { enabled: true },
@@ -57,19 +57,23 @@ export default defineNuxtConfig({
   },
 
   sentry: {
-    org: process.env.SENTRY_ORG,
-    project: process.env.SENTRY_PROJECT,
+    sourceMapsUploadOptions: {
+      enabled: !!process.env.SENTRY_AUTH_TOKEN,
+      authToken: process.env.SENTRY_AUTH_TOKEN || "",
+      org: process.env.SENTRY_ORG || "",
+      project: process.env.SENTRY_PROJECT || "",
+    },
   },
 
   sourcemap: {
-    client: "hidden",
-    server: true,
+    client: process.env.SENTRY_AUTH_TOKEN ? "hidden" : false,
+    server: !!process.env.SENTRY_AUTH_TOKEN,
   },
 
   runtimeConfig: {
     public: {
       sentry: {
-        dsn: process.env.SENTRY_DSN,
+        dsn: process.env.SENTRY_DSN || "",
       },
     },
   },
