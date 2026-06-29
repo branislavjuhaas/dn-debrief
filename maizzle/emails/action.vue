@@ -1,9 +1,7 @@
 <template>
   <Layout class="bg-zinc-200">
     <Font family="DM Sans" />
-    <Preheader
-      >Pre aktiváciu vášho účtu, potvrďte, prosím, svoj email</Preheader
-    >
+    <Preheader>${preheader}</Preheader>
 
     <Container class="max-w-xl p-0 py-10 sm:p-6">
       <Section class="px-6 py-5 bg-zinc-50 rounded-t-lg border border-zinc-300">
@@ -18,14 +16,10 @@
       <Section class="px-6 py-6 bg-zinc-50 border-x border-zinc-300 mx-autos">
         <Row>
           <Column class="text-center">
-            <Img
-              src="https://api.iconify.design/ph:seal-question.svg"
-              alt="Icon"
-              width="64"
-              height="64" />
+            <Spacer class="h-8" />
           </Column>
         </Row>
-        <Row class="text-center text-zinc-800 font-dm-sans mt-6">
+        <Row class="text-center text-zinc-800 font-dm-sans mt-6 mb-2">
           <Column>
             <Heading class="text-xl">${title}</Heading>
             <Text class="text-zinc-500 mx-10 mt-1">${text}</Text>
