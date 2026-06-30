@@ -12,6 +12,7 @@
     "test": "vp test"
   },
   "dependencies": {
+    "@aws-sdk/client-ses": "^3.1075.0",
     "@dn-debrief/db": "workspace:*",
     "@internationalized/date": "^3.12.2",
     "@number-flow/vue": "^0.5.1",
