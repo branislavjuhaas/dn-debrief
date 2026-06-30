@@ -29,7 +29,7 @@
     "motion-v": "^2.3.0",
     "nuxt": "^4.4.8",
     "pinia": "^3.0.4",
-    "tailwindcss": "^4.3.1",
+    "tailwindcss": "^4.3.2",
     "typescript": "^6.0.3",
     "vue": "^3.5.39",
     "vue-router": "^5.1.0",
@@ -42,7 +42,6 @@
     "@vue/test-utils": "^2.4.11",
     "happy-dom": "^20.10.6",
     "playwright-core": "^1.61.1",
-    "vite-plus": "catalog:",
-    "vitest": "catalog:"
+    "vite-plus": "catalog:"
   }
 }

@@ -7,7 +7,6 @@
     "dev:web": "pnpm --filter @dn-debrief/web dev",
     "dev:cli": "pnpm --filter @dn-debrief/cli dev",
     "dev:docs": "pnpm --filter @dn-debrief/docs dev",
-    "dev:maizzle": "pnpm --filter @dn-debrief/maizzle dev",
     "lint:web": "pnpm --filter @dn-debrief/web lint",
     "lint": "vp check --fix",
     "test:web": "pnpm --filter @dn-debrief/web test",

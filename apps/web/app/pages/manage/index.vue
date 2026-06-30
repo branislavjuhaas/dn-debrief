@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { PageCardProps } from "@nuxt/ui";
-
 const userStore = useUserStore();
 const managementViews: (PageCardProps & { roles: UserRole[] })[] = [
   {
@@ -19,7 +18,6 @@ const managementViews: (PageCardProps & { roles: UserRole[] })[] = [
       "Zoznam klubov registrovaných v Slovenskej debatnej asociácii s počtom členov a ostatnými informáciami.",
     roles: ["developer", "admin"],
   },
-
   {
     title: "Správa podujatí",
     icon: "i-ph-ticket-bold",
@@ -52,7 +50,6 @@ const managementViews: (PageCardProps & { roles: UserRole[] })[] = [
     roles: ["developer", "admin"],
   },
 ];
-
 const filteredManagementViews = computed(() => {
   return managementViews.filter((item) =>
     item.roles.includes(userStore.user?.role ?? "user"),

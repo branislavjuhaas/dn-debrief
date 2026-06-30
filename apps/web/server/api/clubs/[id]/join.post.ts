@@ -2,7 +2,6 @@ import { db } from "@dn-debrief/db";
 import * as z from "zod";
 import { clubMemberships } from "@dn-debrief/db/schema";
 import { differenceInYears } from "date-fns";
-import { obfuscateId } from "#shared/utils/obfuscate";
 
 const bodySchema = z.object({
   registrationType: z.enum([

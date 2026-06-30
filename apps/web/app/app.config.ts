@@ -58,6 +58,8 @@ export default defineAppConfig({
       loading: "i-ph-circle-notch",
       menu: "i-ph-list",
       minus: "i-ph-minus",
+      panelClose: "i-ph-caret-left",
+      panelOpen: "i-ph-caret-right",
       plus: "i-ph-plus",
       reload: "i-ph-arrow-counter-clockwise",
       search: "i-ph-magnifying-glass",

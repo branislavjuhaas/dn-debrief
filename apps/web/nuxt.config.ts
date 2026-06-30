@@ -10,7 +10,6 @@ export default defineNuxtConfig({
     "@vueuse/nuxt",
     "motion-v/nuxt",
   ],
-
   devtools: { enabled: true },
 
   app: {
@@ -52,6 +51,7 @@ export default defineNuxtConfig({
         "date-fns",
         "zod",
       ],
+      exclude: ["@aws-sdk/client-ses"],
     },
   },
 });

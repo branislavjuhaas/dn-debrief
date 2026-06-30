@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from "@nuxt/ui";
 import { useUserStore } from "~/stores/user";
-
 const userStore = useUserStore();
-
 const predefinedNavigation: (NavigationMenuItem & { roles: UserRole[] })[][] = [
   [
     {
@@ -56,7 +54,6 @@ const predefinedNavigation: (NavigationMenuItem & { roles: UserRole[] })[][] = [
     },
   ],
 ];
-
 const navigation = computed(() => {
   return predefinedNavigation
     .map((group) =>
