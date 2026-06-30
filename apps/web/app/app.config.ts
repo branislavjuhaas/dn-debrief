@@ -23,9 +23,6 @@ export default defineAppConfig({
         base: "w-full",
       },
     },
-    dashboardSidebarCollapse: {
-      base: "text-highlighted",
-    },
     icons: {
       arrowDown: "i-ph-arrow-down",
       arrowLeft: "i-ph-arrow-left",
@@ -58,6 +55,8 @@ export default defineAppConfig({
       loading: "i-ph-circle-notch",
       menu: "i-ph-list",
       minus: "i-ph-minus",
+      panelClose: "i-ph-caret-left",
+      panelOpen: "i-ph-caret-right",
       plus: "i-ph-plus",
       reload: "i-ph-arrow-counter-clockwise",
       search: "i-ph-magnifying-glass",

@@ -2,7 +2,6 @@ import { db } from "@dn-debrief/db";
 import * as z from "zod";
 import { clubMemberships } from "@dn-debrief/db/schema";
 import { differenceInYears } from "date-fns";
-import { obfuscateId } from "#shared/utils/obfuscate";
 
 const bodySchema = z.object({
   registrationType: z.enum([
@@ -56,39 +55,6 @@ export default defineEventHandler(async (event) => {
     .values(membershipRows)
     .onConflictDoNothing()
     .returning();
-
-  if (age < 18) {
-    const legalGuardian = await db.query.legalGuardians.findFirst({
-      columns: {
-        email: true,
-        name: true,
-      },
-      where: {
-        userId: user.id,
-      },
-    });
-
-    if (!legalGuardian || !legalGuardian.email) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: "Bad Request",
-        message: "Legal guardian email is required",
-      });
-    }
-
-    await sendEmail(
-      legalGuardian?.email,
-      "Potvrdenie registrácie do SDA",
-      `Dobrý deň, ${legalGuardian?.name.split(" ")[0]}. Registrácia vášho dieťaťa bola zaznamenaná v systéme. Pre jej potvrdenie, prosím, kliknite na nasledujúci odkaz: ${process.env.BETTER_AUTH_URL}/profile/join/verify?token=${obfuscateId(user.id)}`,
-      generateActionMail(
-        "Overte registráciu vášho dieťaťa",
-        "Potvrdenie registrácie",
-        `Dobrý deň, ${legalGuardian?.name.split(" ")[0]}.`,
-        "Potvrdiť registráciu",
-        `${process.env.BETTER_AUTH_URL}/profile/join/verify?token=${obfuscateId(user.id)}`,
-      ),
-    );
-  }
 
   // Hydrate results with parent club data for frontend store requirements
   const clubMembershipsWithClub = insertedMemberships.map((membership) => ({

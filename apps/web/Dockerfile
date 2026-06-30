@@ -20,6 +20,7 @@ COPY apps/web ./apps/web
 RUN pnpm --filter @dn-debrief/db build
 RUN pnpm --filter @dn-debrief/web build
 
+
 # --- STAGE II: Sane, Flat Production Runtime Runner ---
 FROM node:24-alpine AS runner
 WORKDIR /app

@@ -1,13 +1,12 @@
 {
   "name": "@dn-debrief/monorepo",
-  "version": "2.26.0-alpha.3",
+  "version": "2.26.0",
   "private": true,
   "type": "module",
   "scripts": {
     "dev:web": "pnpm --filter @dn-debrief/web dev",
     "dev:cli": "pnpm --filter @dn-debrief/cli dev",
     "dev:docs": "pnpm --filter @dn-debrief/docs dev",
-    "dev:maizzle": "pnpm --filter @dn-debrief/maizzle dev",
     "lint:web": "pnpm --filter @dn-debrief/web lint",
     "lint": "vp check --fix",
     "test:web": "pnpm --filter @dn-debrief/web test",
@@ -19,5 +18,5 @@
   "devDependencies": {
     "vite-plus": "catalog:"
   },
-  "packageManager": "pnpm@11.8.0"
+  "packageManager": "pnpm@11.5.2"
 }

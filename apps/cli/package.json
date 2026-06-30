@@ -1,7 +1,7 @@
 {
   "name": "@dn-debrief/cli",
   "type": "module",
-  "version": "2.26.0-alpha.3",
+  "version": "2.26.0-alpha.1",
   "description": "Intelligent CLI for the DN DebRIEF platform",
   "author": "Branislav Juhás <branislav@juhaas.com>",
   "license": "AGPL-3.0",
@@ -26,10 +26,10 @@
     "release": "bumpp"
   },
   "devDependencies": {
-    "@types/node": "^26.0.1",
-    "@typescript/native-preview": "7.0.0-dev.20260628.1",
+    "@types/node": "^25.9.2",
+    "@typescript/native-preview": "7.0.0-dev.20260609.1",
     "bumpp": "^11.1.0",
-    "tsdown": "^0.22.3",
+    "tsdown": "^0.22.2",
     "typescript": "^6.0.3"
   },
   "dependencies": {

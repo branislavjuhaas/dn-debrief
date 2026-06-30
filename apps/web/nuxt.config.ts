@@ -10,7 +10,6 @@ export default defineNuxtConfig({
     "@vueuse/nuxt",
     "motion-v/nuxt",
   ],
-
   devtools: { enabled: true },
 
   app: {
@@ -28,8 +27,8 @@ export default defineNuxtConfig({
 
   css: ["~/assets/css/main.css"],
 
-  routeRules: {
-    "/manage/**": { appLayout: "manage" },
+  experimental: {
+    inlineRouteRules: true,
   },
 
   compatibilityDate: "2025-07-15",

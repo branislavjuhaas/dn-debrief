@@ -24,8 +24,6 @@ const items = ref<StepperItem[]>([
   },
 ]);
 
-const route = useRoute();
-
 const { current, isCurrent, goTo, goToNext } = useStepper({
   "account-info": {
     title: "Vitajte na platforme",
@@ -47,11 +45,10 @@ const { current, isCurrent, goTo, goToNext } = useStepper({
     step: 1,
   },
   "email-verified": {
-    title: route.query.error ? "Email nebol overený" : "Váš email bol overený!",
-    description: route.query.error
-      ? "Váš email sa nepodarilo overiť. Ak bude problém pretrvávať, prosím, kontaktujte podporu."
-      : "Dakujeme za overenie vášho emailu. Pre získanie maximálnych možností platfotmy DebRIEF, prosím, pokračujte v registrácii.",
-    icon: route.query.error ? "i-ph-warning" : "i-ph-checks",
+    title: "Váš email bol overený!",
+    description:
+      "Dakujeme za overenie vášho emailu. Pre získanie maximálnych možností platfotmy DebRIEF, prosím, pokračujte v registrácii.",
+    icon: "i-ph-checks",
     step: 1,
   },
   "next-steps": {
@@ -73,6 +70,7 @@ const { current, isCurrent, goTo, goToNext } = useStepper({
 // CLIENT SERVICES & STORES
 const userStore = useUserStore();
 const authClient = useAuthClient();
+const route = useRoute();
 
 const processingAccount = ref<boolean>(false);
 const error = ref<string | null>(null);
@@ -425,7 +423,6 @@ const processAccount = () => {
 
         <UButton
           v-if="isCurrent('email-verified')"
-          :disabled="!!route.query.error"
           block
           @click="
             userStore.isAuthenticated
