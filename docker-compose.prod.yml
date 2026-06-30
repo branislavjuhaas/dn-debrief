@@ -23,6 +23,7 @@ services:
   # --- Flat, Instant Database Migrator ---
   db-migrate:
     image: ghcr.io/branislavjuhaas/dn-debrief-web:latest
+    pull_policy: always
     container_name: debrief-migrator
     command: ["node", "migrate.mjs"]
     environment:
@@ -62,6 +63,7 @@ services:
   # --- Nuxt Server ---
   web:
     image: ghcr.io/branislavjuhaas/dn-debrief-web:latest
+    pull_policy: always
     container_name: debrief-web
     restart: always
     environment:
