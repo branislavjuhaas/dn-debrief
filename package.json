@@ -1,6 +1,6 @@
 {
   "name": "@dn-debrief/monorepo",
-  "version": "2.26.0",
+  "version": "2.26.0-alpha.3",
   "private": true,
   "type": "module",
   "scripts": {

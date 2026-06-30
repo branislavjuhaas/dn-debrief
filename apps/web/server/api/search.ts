@@ -1,6 +1,6 @@
 import { db } from "@dn-debrief/db";
 import { clubs, events, users } from "@dn-debrief/db/schema";
-import { like, sql } from "drizzle-orm";
+import { like } from "drizzle-orm";
 import normalizeString from "#shared/utils/normalize-string";
 import * as z from "zod";
 

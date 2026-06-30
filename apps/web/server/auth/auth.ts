@@ -128,10 +128,21 @@ export const auth = betterAuth({
   },
   emailVerification: {
     sendOnSignUp: true,
-    sendVerificationEmail: async (
-      { user: _user, token: _token },
-      _request,
-    ) => {},
+    autoSignInAfterVerification: true,
+    sendVerificationEmail: async ({ user, token }, _request) => {
+      void sendEmail(
+        [user.email],
+        "Overenie účtu",
+        `Potvrďte, že ste to vy!\n\nPre potvrdenie autenticity vášho účtu kliknite, prosím, na nasledujúci odkaz: ${process.env.BETTER_AUTH_URL}/verify?token=${token}`,
+        generateActionMail(
+          "Pre aktiváciu vášho účtu, potvrďte, prosím, svoj email",
+          "Potvrďte, že ste to vy!",
+          "Pre potvrdenie autenticity vášho účtu kliknite, prosím, na nasledujúci odkaz",
+          `${process.env.BETTER_AUTH_URL}/verify?token=${token}`,
+          "Potvrdiť emailovú identitu",
+        ),
+      );
+    },
   },
   hooks: {
     before: createAuthMiddleware(async (ctx) => {
