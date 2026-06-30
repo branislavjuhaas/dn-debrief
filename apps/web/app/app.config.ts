@@ -23,6 +23,9 @@ export default defineAppConfig({
         base: "w-full",
       },
     },
+    dashboardSidebarCollapse: {
+      base: "text-highlighted",
+    },
     icons: {
       arrowDown: "i-ph-arrow-down",
       arrowLeft: "i-ph-arrow-left",
