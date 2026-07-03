@@ -12,8 +12,6 @@ services:
       - pgdata:/var/lib/postgresql
     networks:
       - dokploy-network
-    ports:
-      - "5432:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U debrief_user -d debrief_production"]
       interval: 3s
