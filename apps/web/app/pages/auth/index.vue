@@ -57,7 +57,7 @@ const loadCurrentUser = async () => {
     return;
   }
 
-  await userStore.$patch({
+  userStore.$patch({
     user,
   });
 };
