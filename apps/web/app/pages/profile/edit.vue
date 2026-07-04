@@ -388,6 +388,7 @@ onMounted(() => {
           size="xs"
           color="secondary"
           icon="i-ph-pencil-simple-line"
+          disabled
           class="absolute bottom-4 right-0 text-white font-medium ring-2 ring-bg overflow-hidden hover:bg-secondary-400 active:bg-secondary-400 dark:hover:bg-secondary-500 dark:active:bg-secondary-500" />
       </span>
     </UPageBody>
