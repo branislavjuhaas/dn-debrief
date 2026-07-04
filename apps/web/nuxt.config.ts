@@ -39,6 +39,10 @@ export default defineNuxtConfig({
     },
   },
 
+  motionV: {
+    directives: true,
+  },
+
   vite: {
     optimizeDeps: {
       include: [
