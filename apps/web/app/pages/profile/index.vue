@@ -156,7 +156,14 @@ const membershipsAlert = computed<AlertProps>(() => {
           variant="subtle">
           Upraviť profil
         </UButton>
-        <UButton icon="i-ph-password" color="neutral" variant="subtle">
+        <UButton
+          v-if="
+            userStore.user!.accounts?.some((a) => a.providerId === 'credential')
+          "
+          to="/profile/edit#change-password"
+          icon="i-ph-password"
+          color="neutral"
+          variant="subtle">
           Zmeniť heslo
         </UButton>
         <UButton icon="i-ph-plugs" color="error" @click="logout">
