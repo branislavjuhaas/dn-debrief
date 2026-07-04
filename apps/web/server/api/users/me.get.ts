@@ -16,6 +16,11 @@ export default defineEventHandler(async (event) => {
         },
       },
       managedClubs: true,
+      accounts: {
+        columns: {
+          providerId: true,
+        },
+      },
     },
   });
 
