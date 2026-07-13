@@ -1,5 +1,10 @@
 <script setup lang="ts">
 import type { AlertProps, TabsItem, TimelineItem } from "@nuxt/ui";
+import { breakpointsTailwind, useBreakpoints } from "@vueuse/core";
+
+const breakpoints = useBreakpoints(breakpointsTailwind);
+
+const mdAndLarger = breakpoints.greaterOrEqual("md");
 
 definePageMeta({
   middleware: ["auth"],
@@ -151,7 +156,14 @@ const membershipsAlert = computed<AlertProps>(() => {
           variant="subtle">
           Upraviť profil
         </UButton>
-        <UButton icon="i-ph-password" color="neutral" variant="subtle">
+        <UButton
+          v-if="
+            userStore.user!.accounts?.some((a) => a.providerId === 'credential')
+          "
+          to="/profile/edit#change-password"
+          icon="i-ph-password"
+          color="neutral"
+          variant="subtle">
           Zmeniť heslo
         </UButton>
         <UButton icon="i-ph-plugs" color="error" @click="logout">
@@ -187,10 +199,11 @@ const membershipsAlert = computed<AlertProps>(() => {
             class="mb-4" />
           <UTimeline
             :items="memberships"
-            orientation="horizontal"
+            :orientation="mdAndLarger ? 'horizontal' : 'vertical'"
             :ui="{
               item: 'flex-1 max-w-46 w-full',
-            }" />
+            }"
+            class="px-6 md:px-4" />
         </template>
       </UTabs>
     </UPageBody>
