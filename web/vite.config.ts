@@ -20,9 +20,7 @@ export default defineConfig({
     },
     overrides: [
       {
-        files: [
-          "server/**/*",
-        ],
+        files: ["server/**/*"],
         rules: {
           "no-console": "off",
         },

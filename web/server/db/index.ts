@@ -2,8 +2,14 @@ import { relations } from "./schema/relations";
 import { PGlite } from "@electric-sql/pglite";
 import { pg_trgm } from "@electric-sql/pglite/contrib/pg_trgm";
 import { unaccent } from "@electric-sql/pglite/contrib/unaccent";
-import { drizzle as drizzlePglite, type PgliteDatabase } from "drizzle-orm/pglite";
-import { drizzle as drizzlePostgresJs, type PostgresJsDatabase } from "drizzle-orm/postgres-js";
+import {
+  drizzle as drizzlePglite,
+  type PgliteDatabase,
+} from "drizzle-orm/pglite";
+import {
+  drizzle as drizzlePostgresJs,
+  type PostgresJsDatabase,
+} from "drizzle-orm/postgres-js";
 import { migrate } from "drizzle-orm/pglite/migrator";
 import fs from "node:fs";
 import path from "node:path";
@@ -22,16 +28,19 @@ const initDb = (): AppDatabase => {
       }
     }
 
-    const client = new PGlite(process.env.test ? "memory://" : "./.data/database", {
-      extensions: { pg_trgm, unaccent },
-    });
+    const client = new PGlite(
+      process.env.test ? "memory://" : "./.data/database",
+      {
+        extensions: { pg_trgm, unaccent },
+      },
+    );
 
     const db = drizzlePglite({
       client,
       relations,
     });
 
-    migrate(db, {
+    void migrate(db, {
       migrationsFolder: path.resolve(process.cwd(), "./server/db/migrations"),
     });
 

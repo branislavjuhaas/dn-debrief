@@ -2,9 +2,7 @@
   "version": "8",
   "dialect": "postgres",
   "id": "d04c8338-f7d0-4abd-ae16-4331a5e150cb",
-  "prevIds": [
-    "694d1e84-f7b5-4127-aa57-22158ee6be8c"
-  ],
+  "prevIds": ["694d1e84-f7b5-4127-aa57-22158ee6be8c"],
   "ddl": [
     {
       "values": [
@@ -21,52 +19,31 @@
       "schema": "public"
     },
     {
-      "values": [
-        "junior_student",
-        "senior_student",
-        "graduate",
-        "teacher"
-      ],
+      "values": ["junior_student", "senior_student", "graduate", "teacher"],
       "name": "club_registration_type",
       "entityType": "enums",
       "schema": "public"
     },
     {
-      "values": [
-        "junior",
-        "senior",
-        "university"
-      ],
+      "values": ["junior", "senior", "university"],
       "name": "league",
       "entityType": "enums",
       "schema": "public"
     },
     {
-      "values": [
-        "western",
-        "central",
-        "eastern"
-      ],
+      "values": ["western", "central", "eastern"],
       "name": "region",
       "entityType": "enums",
       "schema": "public"
     },
     {
-      "values": [
-        "tournament",
-        "workshop",
-        "other"
-      ],
+      "values": ["tournament", "workshop", "other"],
       "name": "event_type",
       "entityType": "enums",
       "schema": "public"
     },
     {
-      "values": [
-        "pending",
-        "completed",
-        "failed"
-      ],
+      "values": ["pending", "completed", "failed"],
       "name": "payment_status",
       "entityType": "enums",
       "schema": "public"
@@ -2266,14 +2243,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "user_id"
-      ],
+      "columns": ["user_id"],
       "schemaTo": "public",
       "tableTo": "users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "accounts_user_id_users_id_fkey",
@@ -2283,14 +2256,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "user_id"
-      ],
+      "columns": ["user_id"],
       "schemaTo": "public",
       "tableTo": "users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "awards_user_id_users_id_fkey",
@@ -2300,14 +2269,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "awarded_by"
-      ],
+      "columns": ["awarded_by"],
       "schemaTo": "public",
       "tableTo": "users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "awards_awarded_by_users_id_fkey",
@@ -2317,14 +2282,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "user_id"
-      ],
+      "columns": ["user_id"],
       "schemaTo": "public",
       "tableTo": "users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "legal_guardians_user_id_users_id_fkey",
@@ -2334,14 +2295,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "user_id"
-      ],
+      "columns": ["user_id"],
       "schemaTo": "public",
       "tableTo": "users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "sessions_user_id_users_id_fkey",
@@ -2351,14 +2308,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "club_id"
-      ],
+      "columns": ["club_id"],
       "schemaTo": "public",
       "tableTo": "clubs",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "NO ACTION",
       "name": "club_managers_club_id_clubs_id_fkey",
@@ -2368,14 +2321,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "user_id"
-      ],
+      "columns": ["user_id"],
       "schemaTo": "public",
       "tableTo": "users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "club_managers_user_id_users_id_fkey",
@@ -2385,14 +2334,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "club_id"
-      ],
+      "columns": ["club_id"],
       "schemaTo": "public",
       "tableTo": "clubs",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "NO ACTION",
       "name": "club_memberships_club_id_clubs_id_fkey",
@@ -2402,14 +2347,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "user_id"
-      ],
+      "columns": ["user_id"],
       "schemaTo": "public",
       "tableTo": "users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "club_memberships_user_id_users_id_fkey",
@@ -2419,14 +2360,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "payment_id"
-      ],
+      "columns": ["payment_id"],
       "schemaTo": "public",
       "tableTo": "payments",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "SET NULL",
       "name": "club_memberships_payment_id_payments_id_fkey",
@@ -2436,14 +2373,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "event_id"
-      ],
+      "columns": ["event_id"],
       "schemaTo": "public",
       "tableTo": "events",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "event_organizers_event_id_events_id_fkey",
@@ -2453,14 +2386,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "user_id"
-      ],
+      "columns": ["user_id"],
       "schemaTo": "public",
       "tableTo": "users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "event_organizers_user_id_users_id_fkey",
@@ -2470,14 +2399,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "event_id"
-      ],
+      "columns": ["event_id"],
       "schemaTo": "public",
       "tableTo": "events",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "event_registrations_event_id_events_id_fkey",
@@ -2487,14 +2412,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "user_id"
-      ],
+      "columns": ["user_id"],
       "schemaTo": "public",
       "tableTo": "users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "event_registrations_user_id_users_id_fkey",
@@ -2504,14 +2425,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "payment_id"
-      ],
+      "columns": ["payment_id"],
       "schemaTo": "public",
       "tableTo": "payments",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "SET NULL",
       "name": "event_registrations_payment_id_payments_id_fkey",
@@ -2521,14 +2438,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "user_id"
-      ],
+      "columns": ["user_id"],
       "schemaTo": "public",
       "tableTo": "users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "payments_user_id_users_id_fkey",
@@ -2537,11 +2450,7 @@
       "table": "payments"
     },
     {
-      "columns": [
-        "user_id",
-        "name",
-        "level"
-      ],
+      "columns": ["user_id", "name", "level"],
       "nameExplicit": false,
       "name": "awards_pkey",
       "entityType": "pks",
@@ -2549,10 +2458,7 @@
       "table": "awards"
     },
     {
-      "columns": [
-        "club_id",
-        "user_id"
-      ],
+      "columns": ["club_id", "user_id"],
       "nameExplicit": false,
       "name": "club_managers_pkey",
       "entityType": "pks",
@@ -2560,10 +2466,7 @@
       "table": "club_managers"
     },
     {
-      "columns": [
-        "user_id",
-        "season"
-      ],
+      "columns": ["user_id", "season"],
       "nameExplicit": false,
       "name": "club_memberships_pkey",
       "entityType": "pks",
@@ -2571,10 +2474,7 @@
       "table": "club_memberships"
     },
     {
-      "columns": [
-        "event_id",
-        "user_id"
-      ],
+      "columns": ["event_id", "user_id"],
       "nameExplicit": false,
       "name": "event_organizers_pkey",
       "entityType": "pks",
@@ -2582,10 +2482,7 @@
       "table": "event_organizers"
     },
     {
-      "columns": [
-        "event_id",
-        "user_id"
-      ],
+      "columns": ["event_id", "user_id"],
       "nameExplicit": false,
       "name": "event_registrations_pkey",
       "entityType": "pks",
@@ -2593,9 +2490,7 @@
       "table": "event_registrations"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "accounts_pkey",
       "schema": "public",
@@ -2603,9 +2498,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "legal_guardians_pkey",
       "schema": "public",
@@ -2613,9 +2506,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "sessions_pkey",
       "schema": "public",
@@ -2623,9 +2514,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "users_pkey",
       "schema": "public",
@@ -2633,9 +2522,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "verifications_pkey",
       "schema": "public",
@@ -2643,9 +2530,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "clubs_pkey",
       "schema": "public",
@@ -2653,9 +2538,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "events_pkey",
       "schema": "public",
@@ -2663,9 +2546,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "payments_pkey",
       "schema": "public",
@@ -2673,9 +2554,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "settings_pkey",
       "schema": "public",
@@ -2684,9 +2563,7 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "user_id"
-      ],
+      "columns": ["user_id"],
       "nullsNotDistinct": false,
       "name": "legal_guardians_user_id_key",
       "schema": "public",
@@ -2695,9 +2572,7 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "token"
-      ],
+      "columns": ["token"],
       "nullsNotDistinct": false,
       "name": "sessions_token_key",
       "schema": "public",
@@ -2706,9 +2581,7 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "email"
-      ],
+      "columns": ["email"],
       "nullsNotDistinct": false,
       "name": "users_email_key",
       "schema": "public",
@@ -2717,9 +2590,7 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "payment_id"
-      ],
+      "columns": ["payment_id"],
       "nullsNotDistinct": false,
       "name": "club_memberships_payment_id_key",
       "schema": "public",
@@ -2728,9 +2599,7 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "payment_id"
-      ],
+      "columns": ["payment_id"],
       "nullsNotDistinct": false,
       "name": "event_registrations_payment_id_key",
       "schema": "public",
@@ -2739,9 +2608,7 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "Slug"
-      ],
+      "columns": ["Slug"],
       "nullsNotDistinct": false,
       "name": "events_Slug_key",
       "schema": "public",

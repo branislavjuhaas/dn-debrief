@@ -1,4 +1,9 @@
-import type { userRoleEnum, users, legalGuardians, awards } from "#server/db/schema/auth";
+import type {
+  userRoleEnum,
+  users,
+  legalGuardians,
+  awards,
+} from "#server/db/schema/auth";
 
 export type UserRole = (typeof userRoleEnum.enumValues)[number];
 
@@ -8,7 +13,9 @@ export type Account = {
   providerId: string;
 };
 
-export type LegalGuardian = SerializeInferredDates<typeof legalGuardians.$inferSelect>;
+export type LegalGuardian = SerializeInferredDates<
+  typeof legalGuardians.$inferSelect
+>;
 
 export type User = SerializeInferredDates<typeof users.$inferSelect> & {
   awards?: Award[];
