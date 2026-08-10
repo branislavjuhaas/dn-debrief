@@ -5,17 +5,15 @@ on:
   push:
     paths:
       - "web/**"
-    paths-ignore:
-      - "README.md"
-      - "LICENSE"
-      - ".gitignore"
+      - "!web/**/*.md"
+      - "!web/LICENSE"
+      - "!web/.gitignore"
   pull_request:
     paths:
       - "web/**"
-    paths-ignore:
-      - "README.md"
-      - "LICENSE"
-      - ".gitignore"
+      - "!web/**/*.md"
+      - "!web/LICENSE"
+      - "!web/.gitignore"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -25,7 +23,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    # Directs all `run` commands inside this job to run in the /web folder
     defaults:
       run:
         working-directory: ./web
@@ -39,7 +36,6 @@ jobs:
         with:
           node-version: "24"
           cache: true
-          # Point cache to the package.json / lockfile in /web if required by setup-vp
           cwd: ./web
 
       - name: Install dependencies
