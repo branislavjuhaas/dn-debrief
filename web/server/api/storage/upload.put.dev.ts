@@ -81,7 +81,8 @@ export default defineEventHandler(async (event) => {
   const { key } = await getValidatedQuery(event, querySchema.parse);
 
   const body = await readRawBody(event, false);
-  if (!body) throw createError({ statusCode: 400, statusMessage: "No file body" });
+  if (!body)
+    throw createError({ statusCode: 400, statusMessage: "No file body" });
 
   // Compute local disk path
   const filePath = path.join(process.cwd(), ".data/uploads", key);

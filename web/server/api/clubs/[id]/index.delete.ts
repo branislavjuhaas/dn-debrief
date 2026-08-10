@@ -95,7 +95,10 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const deletedClub = await db.delete(clubs).where(eq(clubs.id, clubId)).returning();
+  const deletedClub = await db
+    .delete(clubs)
+    .where(eq(clubs.id, clubId))
+    .returning();
 
   if (deletedClub.length === 0) {
     throw createError({

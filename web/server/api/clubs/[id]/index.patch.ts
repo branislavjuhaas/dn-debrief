@@ -98,7 +98,11 @@ export default defineEventHandler(async (event) => {
   const clubId = Number.parseInt(getRouterParam(event, "id") ?? "", 10);
   const body = await readValidatedBody(event, bodySchema.parse);
 
-  const updatedClub = await db.update(clubs).set(body).where(eq(clubs.id, clubId)).returning();
+  const updatedClub = await db
+    .update(clubs)
+    .set(body)
+    .where(eq(clubs.id, clubId))
+    .returning();
 
   if (updatedClub.length === 0) {
     throw createError({

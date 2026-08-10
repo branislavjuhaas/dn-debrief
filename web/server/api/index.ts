@@ -1,5 +1,4 @@
 import { version } from "~~/package.json";
-import { db } from "#server/db";
 
 defineRouteMeta({
   openAPI: {
@@ -45,9 +44,15 @@ defineRouteMeta({
           Error: {
             type: "object",
             properties: {
-              message: { type: "string", example: "An unexpected error occurred" },
+              message: {
+                type: "string",
+                example: "An unexpected error occurred",
+              },
               statusCode: { type: "number", example: 500 },
-              statusMessage: { type: "string", example: "Internal Server Error" },
+              statusMessage: {
+                type: "string",
+                example: "Internal Server Error",
+              },
             },
           },
         },

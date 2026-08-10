@@ -79,10 +79,30 @@ defineRouteMeta({
           Club: {
             type: "object",
             properties: {
-              id: { type: "string", readOnly: true, nullable: true, example: "1" },
-              name: { type: "string", readOnly: false, nullable: false, example: "Sučany" },
-              search: { type: "string", readOnly: true, nullable: true, example: "sucany" },
-              isActive: { type: "boolean", readOnly: false, nullable: false, example: true },
+              id: {
+                type: "string",
+                readOnly: true,
+                nullable: true,
+                example: "1",
+              },
+              name: {
+                type: "string",
+                readOnly: false,
+                nullable: false,
+                example: "Sučany",
+              },
+              search: {
+                type: "string",
+                readOnly: true,
+                nullable: true,
+                example: "sucany",
+              },
+              isActive: {
+                type: "boolean",
+                readOnly: false,
+                nullable: false,
+                example: true,
+              },
               league: {
                 type: "string",
                 enum: ["junior", "senior", "university"],
@@ -128,7 +148,10 @@ export default defineEventHandler(async (event) => {
     extras: {
       membershipsCount: db.$count(
         clubMemberships,
-        and(eq(clubMemberships.clubId, clubId), eq(clubMemberships.season, currentSeason)),
+        and(
+          eq(clubMemberships.clubId, clubId),
+          eq(clubMemberships.season, currentSeason),
+        ),
       ),
     },
   });

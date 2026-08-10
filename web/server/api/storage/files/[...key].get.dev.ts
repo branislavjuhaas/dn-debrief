@@ -64,7 +64,8 @@ defineRouteMeta({
 
 export default defineEventHandler(async (event) => {
   const key = event.context.params?.key;
-  if (!key) throw createError({ statusCode: 400, statusMessage: "Missing key" });
+  if (!key)
+    throw createError({ statusCode: 400, statusMessage: "Missing key" });
 
   const filePath = path.join(process.cwd(), ".data/uploads", key);
 

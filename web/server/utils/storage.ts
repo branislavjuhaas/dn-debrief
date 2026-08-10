@@ -62,7 +62,10 @@ export const getPublicFileUrl = (key: string) => {
  * @param expiresInSeconds how long the presigned URL should be valid for (default: 3600 seconds)
  * @returns a presigned URL that can be used to download the file directly from S3
  */
-export const getPresignedDownloadUrl = async (key: string, expiresInSeconds: number = 3600) => {
+export const getPresignedDownloadUrl = async (
+  key: string,
+  expiresInSeconds: number = 3600,
+) => {
   if (import.meta.dev || import.meta.test) {
     return `${process.env.BETTER_AUTH_URL}/api/storage/files/${key}`;
   }
@@ -70,9 +73,12 @@ export const getPresignedDownloadUrl = async (key: string, expiresInSeconds: num
   const objectUrl = `${process.env.S3_PUBLIC_ENDPOINT}/debrief/${key}?X-Amz-Expires=${expiresInSeconds}`;
 
   // Sign a default GET request with signQuery: true
-  const signedRequest = await aws.sign(new Request(objectUrl, { method: "GET" }), {
-    aws: { signQuery: true },
-  });
+  const signedRequest = await aws.sign(
+    new Request(objectUrl, { method: "GET" }),
+    {
+      aws: { signQuery: true },
+    },
+  );
 
   return signedRequest.url;
 };

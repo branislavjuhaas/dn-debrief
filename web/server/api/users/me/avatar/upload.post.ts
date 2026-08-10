@@ -17,7 +17,8 @@ defineRouteMeta({
                 uploadUrl: {
                   type: "string",
                   format: "uri",
-                  example: "http://localhost:3000/api/storage/upload?key=avatars/1.jpg",
+                  example:
+                    "http://localhost:3000/api/storage/upload?key=avatars/1.jpg",
                 },
                 key: {
                   type: "string",

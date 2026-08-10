@@ -4,7 +4,12 @@ import { clubMemberships } from "#server/db/schema/clubs";
 import { differenceInYears } from "date-fns";
 
 const bodySchema = z.object({
-  registrationType: z.enum(["junior_student", "senior_student", "teacher", "graduate"]),
+  registrationType: z.enum([
+    "junior_student",
+    "senior_student",
+    "teacher",
+    "graduate",
+  ]),
 });
 
 export default defineEventHandler(async (event) => {
@@ -39,7 +44,9 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const age = Math.abs(differenceInYears(user.birthDate || new Date(), new Date()));
+  const age = Math.abs(
+    differenceInYears(user.birthDate || new Date(), new Date()),
+  );
 
   // Generate rows for every ongoing season
   const membershipRows = currentSeasons.map((season) => ({

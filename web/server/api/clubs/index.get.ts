@@ -78,7 +78,10 @@ export default defineEventHandler(async (event) => {
       membershipsCount: (t) =>
         db.$count(
           clubMemberships,
-          and(eq(clubMemberships.clubId, t.id), eq(clubMemberships.season, currentSeason)),
+          and(
+            eq(clubMemberships.clubId, t.id),
+            eq(clubMemberships.season, currentSeason),
+          ),
         ),
     },
   });
