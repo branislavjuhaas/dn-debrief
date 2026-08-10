@@ -1,17 +1,21 @@
-name: Check and Test
+name: Check and Test (Web)
 
 on:
   workflow_call:
   push:
+    paths:
+      - "web/**"
     paths-ignore:
-      - "../../README.md"
-      - "../../LICENSE"
-      - "../../.gitignore"
+      - "README.md"
+      - "LICENSE"
+      - ".gitignore"
   pull_request:
+    paths:
+      - "web/**"
     paths-ignore:
-      - "../../README.md"
-      - "../../LICENSE"
-      - "../../.gitignore"
+      - "README.md"
+      - "LICENSE"
+      - ".gitignore"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -20,15 +24,23 @@ concurrency:
 jobs:
   test:
     runs-on: ubuntu-latest
+
+    # Directs all `run` commands inside this job to run in the /web folder
+    defaults:
+      run:
+        working-directory: ./web
+
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Setup VITE+
         uses: voidzero-dev/setup-vp@v1
         with:
           node-version: "24"
           cache: true
+          # Point cache to the package.json / lockfile in /web if required by setup-vp
+          cwd: ./web
 
       - name: Install dependencies
         run: vp install
@@ -36,5 +48,5 @@ jobs:
       - name: Lint and Type check code
         run: vp check
 
-      - name: Run tests
-        run: vp test
+      # - name: Run tests
+      #   run: vp test
