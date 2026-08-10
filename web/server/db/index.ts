@@ -1,6 +1,9 @@
 import { createRequire } from "node:module";
 import { relations } from "./schema/relations";
-import { drizzle as drizzlePostgresJs, type PostgresJsDatabase } from "drizzle-orm/postgres-js";
+import {
+  drizzle as drizzlePostgresJs,
+  type PostgresJsDatabase,
+} from "drizzle-orm/postgres-js";
 import type { PgliteDatabase } from "drizzle-orm/pglite";
 
 type PGliteDb = PgliteDatabase<typeof relations>;
@@ -28,9 +31,12 @@ const initDb = (): AppDatabase => {
       }
     }
 
-    const client = new PGlite(process.env.test ? "memory://" : "./.data/database", {
-      extensions: { pg_trgm, unaccent },
-    });
+    const client = new PGlite(
+      process.env.test ? "memory://" : "./.data/database",
+      {
+        extensions: { pg_trgm, unaccent },
+      },
+    );
 
     const db = drizzlePglite({
       client,
@@ -41,7 +47,9 @@ const initDb = (): AppDatabase => {
       migrationsFolder: path.resolve(process.cwd(), "./server/db/migrations"),
     });
 
-    console.log("\x1b[32m✔\x1b[0m Successfully connected to the database and ran migrations");
+    console.log(
+      "\x1b[32m✔\x1b[0m Successfully connected to the database and ran migrations",
+    );
 
     return db;
   }

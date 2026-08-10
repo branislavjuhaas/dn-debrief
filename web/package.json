@@ -16,11 +16,13 @@
     "@aws-sdk/client-ses": "^3.1106.0",
     "@electric-sql/pglite": "^0.5.4",
     "better-auth": "^1.6.26",
+    "date-fns": "^4.4.0",
     "drizzle-orm": "1.0.0-rc.4",
     "nuxt": "^4.5.2",
     "postgres": "^3.4.9",
     "vue": "^3.5.41",
-    "vue-router": "^5.2.0"
+    "vue-router": "^5.2.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/node": "^26.2.0",
