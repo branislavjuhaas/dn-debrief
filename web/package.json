@@ -1,19 +1,32 @@
 {
   "name": "@dn-debrief/web",
   "version": "2.26.0-alpha.4",
-  "type": "module",
   "private": true,
+  "type": "module",
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate"
   },
   "dependencies": {
+    "@aws-sdk/client-ses": "^3.1106.0",
+    "@electric-sql/pglite": "^0.5.4",
+    "better-auth": "^1.6.26",
+    "drizzle-orm": "1.0.0-rc.4",
     "nuxt": "^4.5.2",
+    "postgres": "^3.4.9",
     "vue": "^3.5.41",
     "vue-router": "^5.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "drizzle-kit": "1.0.0-rc.4",
+    "vite": "catalog:",
+    "vite-plus": "catalog:"
   },
   "devEngines": {
     "packageManager": {
@@ -21,9 +34,5 @@
       "version": "11.21.0",
       "onFail": "download"
     }
-  },
-  "devDependencies": {
-    "vite": "catalog:",
-    "vite-plus": "catalog:"
   }
 }
