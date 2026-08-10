@@ -1,7 +1,6 @@
 import { db } from "#server/db";
-import { createUpdateSchema } from "drizzle-orm/zod";
-import { clubs } from "#server/db/schema/clubs";
-import { eq } from "drizzle-orm/sql/expressions/conditions";
+import { clubMemberships, clubs } from "#server/db/schema/clubs";
+import { count, eq } from "drizzle-orm";
 
 defineRouteMeta({
   openAPI: {
@@ -32,8 +31,28 @@ defineRouteMeta({
           },
         },
       },
+      403: {
+        description: "Forbidden",
+        content: {
+          "application/json": {
+            schema: {
+              $ref: "#/components/schemas/Error",
+            },
+          },
+        },
+      },
       404: {
         description: "Club not found",
+        content: {
+          "application/json": {
+            schema: {
+              $ref: "#/components/schemas/Error",
+            },
+          },
+        },
+      },
+      409: {
+        description: "Cannot delete non-empty club",
         content: {
           "application/json": {
             schema: {
@@ -61,6 +80,20 @@ export default defineEventHandler(async (event) => {
   await requireUser(event, ["developer", "admin"]);
 
   const clubId = Number.parseInt(getRouterParam(event, "id") ?? "", 10);
+
+  // Get the number of clubMemberships associated with the club
+  const clubMembershipCount = await db
+    .select({ count: count() })
+    .from(clubMemberships)
+    .where(eq(clubMemberships.clubId, clubId));
+
+  if (clubMembershipCount[0] && clubMembershipCount[0].count > 0) {
+    throw createError({
+      statusCode: 409,
+      statusMessage: "Cannot delete non-empty club",
+      message: `Cannot delete club with ID ${clubId} because it has associated members`,
+    });
+  }
 
   const deletedClub = await db.delete(clubs).where(eq(clubs.id, clubId)).returning();
 

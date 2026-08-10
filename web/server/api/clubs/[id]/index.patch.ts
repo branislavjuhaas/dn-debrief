@@ -55,6 +55,16 @@ defineRouteMeta({
           },
         },
       },
+      403: {
+        description: "Forbidden",
+        content: {
+          "application/json": {
+            schema: {
+              $ref: "#/components/schemas/Error",
+            },
+          },
+        },
+      },
       404: {
         description: "Club not found",
         content: {

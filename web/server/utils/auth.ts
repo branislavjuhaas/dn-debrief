@@ -11,13 +11,21 @@ export const requireUser = async (
   });
 
   if (!session || !session.user) {
-    throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Unauthorized",
+      message: "User must be authenticated to access this resource",
+    });
   }
 
   const role = session?.user?.role;
 
   if (roles && !roles.includes(role as UserRole)) {
-    throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
+    throw createError({
+      statusCode: 403,
+      statusMessage: "Forbidden",
+      message: "User does not have the required role to access this resource",
+    });
   }
 
   return session.user as unknown as User;
