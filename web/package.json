@@ -15,6 +15,7 @@
   "dependencies": {
     "@aws-sdk/client-ses": "^3.1106.0",
     "@electric-sql/pglite": "^0.5.4",
+    "aws4fetch": "^1.0.20",
     "better-auth": "^1.6.26",
     "date-fns": "^4.4.0",
     "drizzle-orm": "1.0.0-rc.4",
