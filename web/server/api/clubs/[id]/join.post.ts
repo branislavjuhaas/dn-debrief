@@ -4,12 +4,7 @@ import { clubMemberships } from "#server/db/schema/clubs";
 import { differenceInYears } from "date-fns";
 
 const bodySchema = z.object({
-  registrationType: z.enum([
-    "junior_student",
-    "senior_student",
-    "teacher",
-    "graduate",
-  ]),
+  registrationType: z.enum(["junior_student", "senior_student", "teacher", "graduate"]),
 });
 
 export default defineEventHandler(async (event) => {
@@ -36,9 +31,15 @@ export default defineEventHandler(async (event) => {
   const { registrationType } = await readValidatedBody(event, bodySchema.parse);
   const currentSeasons = (await getSetting("current-seasons")) ?? [];
 
-  const age = Math.abs(
-    differenceInYears(user.birthDate || new Date(), new Date()),
-  );
+  if (currentSeasons.length === 0) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Bad Request",
+      message: "No current seasons available for registration",
+    });
+  }
+
+  const age = Math.abs(differenceInYears(user.birthDate || new Date(), new Date()));
 
   // Generate rows for every ongoing season
   const membershipRows = currentSeasons.map((season) => ({
