@@ -1,24 +1,26 @@
 import { defineRelations } from "drizzle-orm";
-import { users, legalGuardians, awards, accounts } from "./auth.js";
-import { clubs, clubMemberships, clubManagers } from "./clubs.js";
-import { payments } from "./payments.js";
-import { eventOrganizers, eventRegistrations, events } from "./events.js";
-import { settings } from "./settings.js";
+import { users, legalGuardians, awards, accounts } from "./auth";
+import { clubs, clubMemberships, clubManagers } from "./clubs";
+import { payments } from "./payments";
+import { eventOrganizers, eventRegistrations, events } from "./events";
+import { settings } from "./settings";
+import { methodologyFiles } from "./methodology";
 
 export const relations = defineRelations(
   {
-    users,
-    awards,
-    legalGuardians,
     accounts,
-    clubs,
-    clubMemberships,
+    awards,
+    users,
     clubManagers,
+    clubMemberships,
+    clubs,
+    eventOrganizers,
+    eventRegistrations,
+    events,
+    legalGuardians,
+    methodologyFiles,
     payments,
     settings,
-    events,
-    eventRegistrations,
-    eventOrganizers,
   },
   (r) => ({
     users: {
@@ -60,6 +62,10 @@ export const relations = defineRelations(
         from: r.users.id,
         to: r.accounts.userId,
       }),
+      methodologyFiles: r.many.methodologyFiles({
+        from: r.users.id,
+        to: r.methodologyFiles.authorId,
+      }),
     },
     accounts: {
       user: r.one.users({
@@ -68,6 +74,12 @@ export const relations = defineRelations(
       }),
     },
     settings: {},
+    methodologyFiles: {
+      author: r.one.users({
+        from: r.methodologyFiles.authorId,
+        to: r.users.id,
+      }),
+    },
     legalGuardians: {
       user: r.one.users({
         from: r.legalGuardians.userId,
