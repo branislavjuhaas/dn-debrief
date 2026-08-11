@@ -4,7 +4,7 @@ import z from "zod";
 
 defineRouteMeta({
   openAPI: {
-    tags: ["Users"],
+    tags: ["User Awards"],
     description: "Create an award for a user",
     parameters: [
       {

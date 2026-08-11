@@ -2,7 +2,7 @@ import { db } from "#server/db";
 
 defineRouteMeta({
   openAPI: {
-    tags: ["Users"],
+    tags: ["User Awards"],
     description: "Get awards for a user",
     parameters: [
       {
