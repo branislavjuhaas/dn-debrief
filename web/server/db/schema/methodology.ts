@@ -14,7 +14,7 @@ export const methodologyFiles = pgTable(
     id: serial("id").primaryKey(),
     name: text("name").notNull(),
     isExternal: boolean("external").default(false).notNull(),
-    filePath: text("file_path"),
+    fileUrl: text("file_url").notNull(),
     authorId: integer("author_id").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
