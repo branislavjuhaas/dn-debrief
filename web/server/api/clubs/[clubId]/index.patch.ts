@@ -6,6 +6,7 @@ import { eq } from "drizzle-orm/sql/expressions/conditions";
 defineRouteMeta({
   openAPI: {
     tags: ["Clubs"],
+    summary: "Update club",
     description: "Update a specific club",
     parameters: [
       {

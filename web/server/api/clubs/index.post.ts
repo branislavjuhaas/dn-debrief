@@ -5,6 +5,7 @@ import { clubs } from "#server/db/schema/clubs";
 defineRouteMeta({
   openAPI: {
     tags: ["Clubs"],
+    summary: "Create club",
     description: "Create a new club",
     requestBody: {
       description: "The club to create",

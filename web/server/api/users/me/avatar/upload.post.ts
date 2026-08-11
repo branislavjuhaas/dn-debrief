@@ -5,6 +5,7 @@ import { eq } from "drizzle-orm";
 defineRouteMeta({
   openAPI: {
     tags: ["Users"],
+    summary: "Upload avatar",
     description: "Generate an upload URL for the authenticated user's avatar",
     responses: {
       200: {

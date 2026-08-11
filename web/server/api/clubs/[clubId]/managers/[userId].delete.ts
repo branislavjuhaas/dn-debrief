@@ -5,6 +5,7 @@ import { and, eq } from "drizzle-orm";
 defineRouteMeta({
   openAPI: {
     tags: ["Club Managers"],
+    summary: "Remove club manager",
     description: "Remove a club manager",
     parameters: [
       {

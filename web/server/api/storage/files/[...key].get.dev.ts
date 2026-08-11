@@ -4,6 +4,7 @@ import path from "node:path";
 defineRouteMeta({
   openAPI: {
     tags: ["Storage (Dev)"],
+    summary: "Download file",
     description: "Get a file from the local development storage",
     parameters: [
       {

@@ -5,6 +5,7 @@ import { and, eq } from "drizzle-orm";
 defineRouteMeta({
   openAPI: {
     tags: ["Clubs"],
+    summary: "List clubs",
     description: "Get all clubs",
     responses: {
       200: {

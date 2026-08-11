@@ -5,6 +5,7 @@ import { count, eq } from "drizzle-orm";
 defineRouteMeta({
   openAPI: {
     tags: ["Clubs"],
+    summary: "Delete club",
     description: "Delete a specific club",
     parameters: [
       {

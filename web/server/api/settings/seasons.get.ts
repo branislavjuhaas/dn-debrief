@@ -6,6 +6,7 @@ import * as z from "zod";
 defineRouteMeta({
   openAPI: {
     tags: ["Settings"],
+    summary: "List seasons",
     description: "Get the currently available seasons",
     parameters: [
       {

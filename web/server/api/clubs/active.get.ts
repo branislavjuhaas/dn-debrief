@@ -3,6 +3,7 @@ import { db } from "#server/db";
 defineRouteMeta({
   openAPI: {
     tags: ["Clubs"],
+    summary: "List active clubs",
     description: "Get all active clubs",
     responses: {
       200: {

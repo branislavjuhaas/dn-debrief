@@ -5,6 +5,7 @@ import { awards } from "#server/db/schema/auth";
 defineRouteMeta({
   openAPI: {
     tags: ["User Awards"],
+    summary: "Delete user award",
     description: "Delete an award for a user",
     parameters: [
       {

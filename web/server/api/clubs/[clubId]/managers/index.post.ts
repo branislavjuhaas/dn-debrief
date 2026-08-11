@@ -5,6 +5,7 @@ import { clubManagers } from "#server/db/schema/clubs";
 defineRouteMeta({
   openAPI: {
     tags: ["Club Managers"],
+    summary: "Add club manager",
     description: "Add a club manager",
     parameters: [
       {

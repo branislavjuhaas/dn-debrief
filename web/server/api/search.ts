@@ -9,6 +9,7 @@ import * as z from "zod";
 defineRouteMeta({
   openAPI: {
     tags: ["Search"],
+    summary: "Search content",
     description: "Search users, clubs, and events",
     parameters: [
       {

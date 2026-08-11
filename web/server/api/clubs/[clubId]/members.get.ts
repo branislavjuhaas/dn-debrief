@@ -3,6 +3,7 @@ import { db } from "#server/db";
 defineRouteMeta({
   openAPI: {
     tags: ["Clubs"],
+    summary: "List club members",
     description: "Get members of a specific club for the current season.",
     parameters: [
       {

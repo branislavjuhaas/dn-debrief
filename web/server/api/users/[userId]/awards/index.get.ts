@@ -3,13 +3,15 @@ import { db } from "#server/db";
 defineRouteMeta({
   openAPI: {
     tags: ["User Awards"],
+    summary: "List user awards",
     description: "Get awards for a user",
     parameters: [
       {
         name: "userId",
         in: "path",
         required: true,
-        description: "The ID of the user whose awards should be returned",
+        description:
+          "The ID of the user whose awards should be returned ('me' for the current user)",
         schema: {
           type: "integer",
         },

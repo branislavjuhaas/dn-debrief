@@ -6,6 +6,7 @@ import { differenceInYears } from "date-fns";
 defineRouteMeta({
   openAPI: {
     tags: ["Clubs"],
+    summary: "Join club",
     description: "Join a club for the current or upcoming seasons",
     parameters: [
       {

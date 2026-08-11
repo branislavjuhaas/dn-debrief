@@ -2,6 +2,7 @@ import { version } from "~~/package.json";
 
 defineRouteMeta({
   openAPI: {
+    summary: "Get API metadata",
     description: "Get the API metadata",
     tags: ["Metadata"],
     responses: {

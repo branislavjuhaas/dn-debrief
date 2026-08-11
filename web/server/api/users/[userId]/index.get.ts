@@ -3,6 +3,7 @@ import { db } from "#server/db";
 defineRouteMeta({
   openAPI: {
     tags: ["Users"],
+    summary: "Get user",
     description: "Get a user by ID",
     parameters: [
       {

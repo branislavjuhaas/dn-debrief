@@ -3,6 +3,7 @@ import { auth } from "#server/auth/auth";
 defineRouteMeta({
   openAPI: {
     tags: ["Authentication"],
+    summary: "Handle authentication",
     description:
       "Handle authentication requests through Better Auth API (/api/auth/docs).",
     responses: {

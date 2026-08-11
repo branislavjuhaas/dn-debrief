@@ -7,6 +7,7 @@ import { eq } from "drizzle-orm";
 defineRouteMeta({
   openAPI: {
     tags: ["Users (Dev)"],
+    summary: "Promote user",
     description: "Promote the current user to a new role",
     requestBody: {
       required: true,
