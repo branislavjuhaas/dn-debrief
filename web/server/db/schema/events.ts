@@ -11,6 +11,8 @@ import {
   pgEnum,
   primaryKey,
   boolean,
+  uniqueIndex,
+  check,
 } from "drizzle-orm/pg-core";
 
 import { leagueEnum, regionEnum } from "./clubs.js";
@@ -22,6 +24,8 @@ export const eventTypeEnum = pgEnum("event_type", [
   "workshop",
   "other",
 ]);
+
+export type UUID = string;
 
 export type FeaturedProperty = {
   icon: string;
@@ -41,7 +45,7 @@ export type SchedulePart = {
 };
 
 export type Day = {
-  date: Date;
+  date: string; // YYYY-MM-DD
   schedule: SchedulePart[];
 };
 
@@ -49,38 +53,74 @@ export type Schedule = {
   days: Day[];
 };
 
-export type RegistrationQuestion = {
-  uuid: string;
-  title: string;
-  description?: string;
-  required?: boolean;
-  type?: "text" | "date" | "select" | "multiselect";
-  options?: string[];
-};
+export type RegistrationQuestion =
+  | {
+      uuid: UUID;
+      title: string;
+      description?: string;
+      required: boolean;
+      type: "text" | "date" | "number" | "boolean";
+      deleted?: boolean;
+    }
+  | {
+      uuid: UUID;
+      title: string;
+      description?: string;
+      required: boolean;
+      type: "select" | "multiselect";
+      options: string[];
+      deleted?: boolean;
+    };
+
+export type RegistrationRule =
+  | {
+      questionUuid: UUID;
+      operator: "equals" | "not_equals";
+      value: string | number | boolean | null;
+      thenUuid: UUID;
+    }
+  | {
+      questionUuid: UUID;
+      operator: "in" | "not_in";
+      value: (string | number)[];
+      thenUuid: UUID;
+    };
 
 export type RegistrationSection = {
-  uuid: string;
+  uuid: UUID;
   title: string;
   questions: RegistrationQuestion[];
-  next?: {
-    type: "static" | "conditional";
-    then?: string;
-    rules?: { question: string; value: any; then: string }[];
-    fallback?: string;
-  } | null;
+  next:
+    | { type: "static"; thenUuid: UUID }
+    | {
+        type: "conditional";
+        rules: RegistrationRule[];
+        fallback: UUID;
+      }
+    | null;
+  deleted?: boolean;
+};
+
+export type RegistrationRole = {
+  uuid: UUID;
+  name: string;
+  cost: number;
+  credentialRequirements: "none" | "adjudicator" | "non-adjudicator";
+  roleType: "contestant" | "adjudicator" | "other";
+  hardDeadline?: string; // YYYY-MM-DD
+  deleted?: boolean;
 };
 
 export type RegistrationsConfig =
   | {
-      deadline: Date;
+      deadline: string; // YYYY-MM-DD
       href: string;
     }
   | {
-      allowedRoles?: string[];
+      roles: RegistrationRole[];
       requireAccount: boolean;
       requireMembership: boolean;
-      softDeadline?: Date;
-      hardDeadline?: Date;
+      softDeadline?: string; // YYYY-MM-DD
       collectedDetails: (
         | "name"
         | "surname"
@@ -92,21 +132,24 @@ export type RegistrationsConfig =
         | "town"
       )[];
       sections: RegistrationSection[];
-      conditionalStartSections?: { role: string; section: string }[];
-      fallbackStartSection: string;
+      conditionalStartSections?: { roleUuid: UUID; sectionUuid: UUID }[];
+      fallbackStartSection: UUID;
     };
 
 export type RegistrationData = {
-  question: string;
-  answer: any;
-}[];
+  roleUuid: UUID;
+  questions: {
+    questionUuid: UUID;
+    answer: string | string[] | number | boolean | null;
+  }[];
+};
 
 export type CollectedDetails = {
   name?: string;
   surname?: string;
   email?: string;
   phone?: string;
-  birthDate?: Date;
+  birthDate?: string; // YYYY-MM-DD
   street?: string;
   postalCode?: string;
   town?: string;
@@ -116,7 +159,7 @@ export const events = pgTable(
   "events",
   {
     id: serial("id").primaryKey(),
-    slug: text("Slug").notNull().unique(),
+    slug: text("slug").notNull().unique(),
     name: text("name").notNull(),
     search: text("search")
       .notNull()
@@ -126,6 +169,7 @@ export const events = pgTable(
       ),
     type: eventTypeEnum("type").notNull(),
     description: jsonb("description").notNull(),
+    fileUrls: text("file_urls").array().notNull().default([]),
     thumbnailUrl: text("thumbnail_url"),
     beginning: timestamp("beginning").notNull(),
     end: timestamp("end").notNull(),
@@ -150,6 +194,7 @@ export const events = pgTable(
       .notNull(),
   },
   (table) => [
+    check("events_end_after_beginning", sql`${table.end} > ${table.beginning}`),
     index("events_type_idx").on(table.type),
     index("events_beginning_end_idx").on(table.beginning, table.end),
     index("events_targetLeague_idx").on(table.targetLeague),
@@ -183,6 +228,7 @@ export const eventOrganizers = pgTable(
 export const eventRegistrations = pgTable(
   "event_registrations",
   {
+    id: serial("id").primaryKey(),
     eventId: integer("event_id")
       .references(() => events.id, { onDelete: "cascade" })
       .notNull(),
@@ -195,6 +241,8 @@ export const eventRegistrations = pgTable(
     collectedDetails: jsonb("collected_details")
       .$type<CollectedDetails>()
       .notNull(),
+    // Whether the registration has been confirmed by the legal guardian
+    // (if applicable for the current user)
     confirmed: boolean("confirmed").default(false).notNull(),
     paymentId: integer("payment_id")
       .unique()
@@ -206,7 +254,10 @@ export const eventRegistrations = pgTable(
       .notNull(),
   },
   (table) => [
-    primaryKey({ columns: [table.eventId, table.userId] }),
+    uniqueIndex("event_registrations_eventId_userId_idx").on(
+      table.eventId,
+      table.userId,
+    ),
     index("event_registrations_userId_idx").on(table.userId),
     index("event_registrations_eventId_idx").on(table.eventId),
   ],
