@@ -3,6 +3,104 @@ import * as z from "zod";
 import { clubMemberships } from "#server/db/schema/clubs";
 import { differenceInYears } from "date-fns";
 
+defineRouteMeta({
+  openAPI: {
+    tags: ["Clubs"],
+    description: "Join a club for the current or upcoming seasons",
+    parameters: [
+      {
+        name: "id",
+        in: "path",
+        required: true,
+        schema: { type: "integer" },
+        description: "The ID of the club to join",
+      },
+    ],
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              registrationType: {
+                type: "string",
+                enum: [
+                  "junior_student",
+                  "senior_student",
+                  "teacher",
+                  "graduate",
+                ],
+              },
+            },
+            required: ["registrationType"],
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: "The created club memberships",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                clubMemberships: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      userId: { type: "integer" },
+                      clubId: { type: "integer" },
+                      registrationType: { type: "string" },
+                      season: { type: "integer" },
+                      confirmed: { type: "boolean" },
+                      club: { $ref: "#/components/schemas/Club" },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      400: {
+        description: "Bad request",
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/Error" },
+          },
+        },
+      },
+      401: {
+        description: "Unauthorized",
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/Error" },
+          },
+        },
+      },
+      404: {
+        description: "Club not found",
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/Error" },
+          },
+        },
+      },
+      500: {
+        description: "Internal server error",
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/Error" },
+          },
+        },
+      },
+    },
+  },
+});
+
 const bodySchema = z.object({
   registrationType: z.enum([
     "junior_student",

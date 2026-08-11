@@ -6,6 +6,110 @@ import { like } from "drizzle-orm";
 import normalizeString from "#shared/utils/normalize-string";
 import * as z from "zod";
 
+defineRouteMeta({
+  openAPI: {
+    tags: ["Search"],
+    description: "Search users, clubs, and events",
+    parameters: [
+      {
+        name: "q",
+        in: "query",
+        required: true,
+        schema: { type: "string" },
+        description: "Search query",
+      },
+      {
+        name: "users",
+        in: "query",
+        required: false,
+        schema: { type: "boolean", default: true },
+        description: "Include users in the search results",
+      },
+      {
+        name: "clubs",
+        in: "query",
+        required: false,
+        schema: { type: "boolean", default: true },
+        description: "Include clubs in the search results",
+      },
+      {
+        name: "events",
+        in: "query",
+        required: false,
+        schema: { type: "boolean", default: true },
+        description: "Include events in the search results",
+      },
+    ],
+    responses: {
+      200: {
+        description: "Search results",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                users: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      id: { type: "integer" },
+                      name: { type: "string" },
+                      surname: { type: "string" },
+                      email: { type: "string", format: "email" },
+                      role: { type: "string" },
+                      image: { type: "string", nullable: true },
+                    },
+                    required: ["id", "name", "surname", "image"],
+                  },
+                },
+                clubs: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      id: { type: "integer" },
+                      name: { type: "string" },
+                    },
+                    required: ["id", "name"],
+                  },
+                },
+                events: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      id: { type: "integer" },
+                      name: { type: "string" },
+                    },
+                    required: ["id", "name"],
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      401: {
+        description: "Unauthorized",
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/Error" },
+          },
+        },
+      },
+      500: {
+        description: "Internal server error",
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/Error" },
+          },
+        },
+      },
+    },
+  },
+});
+
 const searchQuery = z.object({
   q: z.string(),
   users: z.stringbool().optional().default(true),

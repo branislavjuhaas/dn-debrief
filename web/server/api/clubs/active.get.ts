@@ -1,6 +1,61 @@
 import { db } from "#server/db";
 
-export default defineEventHandler(async (_event) => {
+defineRouteMeta({
+  openAPI: {
+    tags: ["Clubs"],
+    description: "Get all active clubs",
+    responses: {
+      200: {
+        description: "The active clubs",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                clubs: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      id: { type: "number" },
+                      name: { type: "string" },
+                    },
+                    required: ["id", "name"],
+                  },
+                },
+              },
+              required: ["clubs"],
+            },
+          },
+        },
+      },
+      401: {
+        description: "Unauthorized",
+        content: {
+          "application/json": {
+            schema: {
+              $ref: "#/components/schemas/Error",
+            },
+          },
+        },
+      },
+      500: {
+        description: "Internal server error",
+        content: {
+          "application/json": {
+            schema: {
+              $ref: "#/components/schemas/Error",
+            },
+          },
+        },
+      },
+    },
+  },
+});
+
+export default defineEventHandler(async (event) => {
+  await requireUser(event);
+
   const clubs = await db.query.clubs.findMany({
     columns: {
       id: true,
