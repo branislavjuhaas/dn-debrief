@@ -5,7 +5,8 @@ export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
 
-  modules: ["@nuxt/ui"],
+  modules: ["@nuxt/ui", "@nuxt/image", "@vueuse/nuxt", "motion-v/nuxt"],
+  css: ["~/assets/css/main.css"],
 
   nitro: {
     experimental: {
@@ -13,7 +14,7 @@ export default defineNuxtConfig({
     },
     openAPI: {
       route: "/_docs/openapi.json",
-      production: "prerender",
+      production: "runtime",
       meta: {
         title: "DN Debrief API",
         description: "Intelligent debate platform",
@@ -26,6 +27,27 @@ export default defineNuxtConfig({
         swagger: false,
       },
     },
+  },
+
+  app: {
+    pageTransition: { name: "page", mode: "out-in" },
+    head: {
+      charset: "utf-8",
+      title: "Inteligentná debatná platforma",
+      titleTemplate: "%s | DebRIEF II",
+      htmlAttrs: {
+        lang: "sk",
+      },
+      link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" }],
+    },
+  },
+
+  routeRules: {
+    "/manage/**": { appLayout: "manage" },
+  },
+
+  motionV: {
+    directives: true,
   },
 
   vite: {

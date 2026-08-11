@@ -6,6 +6,7 @@ catalog:
   vite-plus: 0.2.8
 overrides:
   vite: "catalog:"
+  typescript: "npm:typescript-native-bridge@6.0.3-bridge.11.tsgo.7.0.2"
 peerDependencyRules:
   allowAny:
     - vite
