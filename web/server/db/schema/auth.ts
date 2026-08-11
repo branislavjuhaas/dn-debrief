@@ -72,7 +72,7 @@ export const awards = pgTable(
       .notNull(),
     level: smallint("level").notNull(),
     awardedBy: integer("awarded_by").references(() => users.id, {
-      onDelete: "cascade",
+      onDelete: "set null",
     }),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
