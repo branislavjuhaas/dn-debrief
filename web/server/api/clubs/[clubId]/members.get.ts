@@ -6,7 +6,7 @@ defineRouteMeta({
     description: "Get members of a specific club for the current season.",
     parameters: [
       {
-        name: "id",
+        name: "clubId",
         in: "path",
         required: true,
         description: "The ID of the club",
@@ -37,6 +37,7 @@ defineRouteMeta({
                         example: "john.doe@example.com",
                       },
                       role: { type: "string", example: "user" },
+                      image: { type: "string", nullable: true, example: null },
                     },
                     required: ["id", "name", "surname", "email", "role"],
                   },
@@ -83,11 +84,7 @@ defineRouteMeta({
 
 export default defineEventHandler(async (event) => {
   const user = await requireUser(event);
-  const clubId = Number.parseInt(getRouterParam(event, "id") ?? "", 10);
-
-  if (!user) {
-    throw createError({ statusCode: 401, message: "Unauthorized" });
-  }
+  const clubId = Number.parseInt(getRouterParam(event, "clubId") ?? "", 10);
 
   // Check if the user is a developer or admin, or if they are the club manager
   if (!["developer", "admin"].includes(user.role)) {
@@ -112,6 +109,7 @@ export default defineEventHandler(async (event) => {
       surname: true,
       email: true,
       role: true,
+      image: true,
     },
     where: {
       clubMemberships: {

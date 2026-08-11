@@ -8,7 +8,7 @@ defineRouteMeta({
     description: "Get a specific club",
     parameters: [
       {
-        name: "id",
+        name: "clubId",
         in: "path",
         required: true,
         schema: {
@@ -137,7 +137,7 @@ defineRouteMeta({
 
 export default defineEventHandler(async (event) => {
   await requireUser(event);
-  const clubId = Number.parseInt(getRouterParam(event, "id") ?? "", 10);
+  const clubId = Number.parseInt(getRouterParam(event, "clubId") ?? "", 10);
 
   const currentSeason = new Date().getFullYear();
 
