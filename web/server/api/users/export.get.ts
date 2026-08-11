@@ -144,7 +144,9 @@ export default defineEventHandler(async (event) => {
     let maxLength = 0;
     if (column && column.eachCell) {
       column.eachCell({ includeEmpty: true }, (cell) => {
-        const columnLength = cell.value ? cell.value.toString().length : 10;
+        const columnLength = cell.value
+          ? String(cell.value as unknown).length
+          : 10;
         if (columnLength > maxLength) {
           maxLength = columnLength;
         }
@@ -195,7 +197,9 @@ export default defineEventHandler(async (event) => {
     let maxLength = 0;
     if (column && column.eachCell) {
       column.eachCell({ includeEmpty: true }, (cell) => {
-        const columnLength = cell.value ? cell.value.toString().length : 10;
+        const columnLength = cell.value
+          ? String(cell.value as unknown).length
+          : 10;
         if (columnLength > maxLength) {
           maxLength = columnLength;
         }
