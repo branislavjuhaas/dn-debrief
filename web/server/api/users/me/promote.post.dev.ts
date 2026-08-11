@@ -97,7 +97,11 @@ export default defineEventHandler(async (event) => {
     .returning();
 
   if (promotedUser.length === 0) {
-    throw createError({ statusCode: 404, message: "User not found" });
+    throw createError({
+      statusCode: 404,
+      statusMessage: "Not Found",
+      message: "User not found",
+    });
   }
 
   setResponseStatus(event, 202);

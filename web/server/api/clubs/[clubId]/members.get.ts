@@ -96,7 +96,11 @@ export default defineEventHandler(async (event) => {
     });
 
     if (!clubManager) {
-      throw createError({ statusCode: 403, message: "Forbidden" });
+      throw createError({
+        statusCode: 403,
+        statusMessage: "Forbidden",
+        message: "You do not have permission to view members of this club.",
+      });
     }
   }
 

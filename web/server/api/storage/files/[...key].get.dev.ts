@@ -65,12 +65,20 @@ defineRouteMeta({
 export default defineEventHandler(async (event) => {
   const key = event.context.params?.key;
   if (!key)
-    throw createError({ statusCode: 400, statusMessage: "Missing key" });
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Missing Key",
+      message: "Missing key",
+    });
 
   const filePath = path.join(process.cwd(), ".data/uploads", key);
 
   if (!existsSync(filePath)) {
-    throw createError({ statusCode: 404, statusMessage: "File not found" });
+    throw createError({
+      statusCode: 404,
+      statusMessage: "Not Found",
+      message: "File not found",
+    });
   }
 
   // Stream local disk file back to frontend

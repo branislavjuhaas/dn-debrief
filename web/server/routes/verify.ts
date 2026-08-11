@@ -16,7 +16,8 @@ defineRouteMeta({
     ],
     responses: {
       200: {
-        description: "Verification response returned by the authentication layer",
+        description:
+          "Verification response returned by the authentication layer",
       },
       400: {
         description: "Invalid or expired token",

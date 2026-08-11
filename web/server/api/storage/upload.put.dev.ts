@@ -82,7 +82,11 @@ export default defineEventHandler(async (event) => {
 
   const body = await readRawBody(event, false);
   if (!body)
-    throw createError({ statusCode: 400, statusMessage: "No file body" });
+    throw createError({
+      statusCode: 400,
+      statusMessage: "No File Body",
+      message: "Missing file body",
+    });
 
   // Compute local disk path
   const filePath = path.join(process.cwd(), ".data/uploads", key);
