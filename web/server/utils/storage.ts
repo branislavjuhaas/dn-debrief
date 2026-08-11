@@ -1,3 +1,5 @@
+import { promises as fs } from "node:fs";
+import path from "node:path";
 import { AwsClient } from "aws4fetch";
 
 const aws = new AwsClient({
@@ -81,4 +83,25 @@ export const getPresignedDownloadUrl = async (
   );
 
   return signedRequest.url;
+};
+
+/**
+ * Delete a file from the configured storage backend.
+ * In development this removes the local file from the upload directory.
+ * In production this issues a signed DELETE request to S3-compatible storage.
+ */
+export const deleteFile = async (key: string) => {
+  if (import.meta.dev || import.meta.test) {
+    const filePath = path.join(process.cwd(), ".data/uploads", key);
+    await fs.rm(filePath, { force: true });
+    return;
+  }
+
+  const objectUrl = `${process.env.S3_PUBLIC_ENDPOINT}/debrief/${key}`;
+  const signedRequest = await aws.sign(
+    new Request(objectUrl, { method: "DELETE" }),
+    { aws: { signQuery: true } },
+  );
+
+  await fetch(signedRequest.url, { method: "DELETE" });
 };
