@@ -4,6 +4,7 @@ import { auth } from "#server/auth/auth";
 defineRouteMeta({
   openAPI: {
     tags: ["Authentication"],
+    summary: "Verify email address",
     description: "Verify an email address using the provided token",
     parameters: [
       {
