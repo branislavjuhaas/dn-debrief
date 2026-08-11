@@ -53,14 +53,18 @@ defineRouteMeta({
                   items: {
                     type: "object",
                     properties: {
-                      id: { type: "integer" },
-                      name: { type: "string" },
-                      surname: { type: "string" },
-                      email: { type: "string", format: "email" },
-                      role: { type: "string" },
-                      image: { type: "string", nullable: true },
+                      id: { type: "integer", example: 1 },
+                      name: { type: "string", example: "John" },
+                      surname: { type: "string", example: "Doe" },
+                      email: {
+                        type: "string",
+                        format: "email",
+                        example: "john.doe@example.com",
+                      },
+                      role: { type: "string", example: "user" },
+                      image: { type: "string", nullable: true, example: null },
                     },
-                    required: ["id", "name", "surname", "image"],
+                    required: ["id", "name", "surname", "email", "role"],
                   },
                 },
                 clubs: {
@@ -68,8 +72,8 @@ defineRouteMeta({
                   items: {
                     type: "object",
                     properties: {
-                      id: { type: "integer" },
-                      name: { type: "string" },
+                      id: { type: "integer", example: 1 },
+                      name: { type: "string", example: "Sučany" },
                     },
                     required: ["id", "name"],
                   },
@@ -79,8 +83,8 @@ defineRouteMeta({
                   items: {
                     type: "object",
                     properties: {
-                      id: { type: "integer" },
-                      name: { type: "string" },
+                      id: { type: "integer", example: 1 },
+                      name: { type: "string", example: "DNJU Open 2027" },
                     },
                     required: ["id", "name"],
                   },

@@ -28,11 +28,15 @@ defineRouteMeta({
                   items: {
                     type: "object",
                     properties: {
-                      id: { type: "integer" },
-                      name: { type: "string" },
-                      surname: { type: "string" },
-                      email: { type: "string", format: "email" },
-                      role: { type: "string" },
+                      id: { type: "integer", example: 1 },
+                      name: { type: "string", example: "John" },
+                      surname: { type: "string", example: "Doe" },
+                      email: {
+                        type: "string",
+                        format: "email",
+                        example: "john.doe@example.com",
+                      },
+                      role: { type: "string", example: "user" },
                     },
                     required: ["id", "name", "surname", "email", "role"],
                   },

@@ -106,12 +106,12 @@ defineRouteMeta({
               league: {
                 type: "string",
                 enum: ["junior", "senior", "university"],
-                example: "junior",
+                example: "senior",
               },
               region: {
                 type: "string",
                 enum: ["western", "central", "eastern"],
-                example: "western",
+                example: "central",
               },
               createdAt: {
                 type: "string",

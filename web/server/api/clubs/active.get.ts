@@ -18,7 +18,7 @@ defineRouteMeta({
                     type: "object",
                     properties: {
                       id: { type: "number" },
-                      name: { type: "string" },
+                      name: { type: "string", example: "Sučany" },
                     },
                     required: ["id", "name"],
                   },

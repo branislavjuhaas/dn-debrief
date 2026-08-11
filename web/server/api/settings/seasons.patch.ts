@@ -14,6 +14,7 @@ defineRouteMeta({
               seasons: {
                 type: "array",
                 items: { type: "number" },
+                example: [2026, 2027],
               },
             },
             required: ["seasons"],
@@ -32,6 +33,7 @@ defineRouteMeta({
                 seasons: {
                   type: "array",
                   items: { type: "number" },
+                  example: [2026, 2027],
                 },
               },
               required: ["seasons"],
@@ -73,9 +75,9 @@ const seasonsBody = z.object({
 
 export default defineEventHandler(async (event) => {
   await requireUser(event, ["developer", "admin"]);
-  const { seasons } = await getValidatedQuery(event, seasonsBody.parse);
+  const { seasons } = await readValidatedBody(event, seasonsBody.parse);
 
   const updatedSeasons = await setSetting("current-seasons", seasons);
 
-  return { seasons: updatedSeasons };
+  return { seasons: updatedSeasons?.currentSeasons || [] };
 });

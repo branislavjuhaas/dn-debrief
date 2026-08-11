@@ -13,7 +13,8 @@ defineRouteMeta({
         in: "query",
         required: false,
         schema: { type: "boolean" },
-        description: "Include all seasons, including ones the current user already belongs to",
+        description:
+          "Include all seasons, including ones the current user already belongs to",
       },
     ],
     responses: {
@@ -27,6 +28,7 @@ defineRouteMeta({
                 seasons: {
                   type: "array",
                   items: { type: "number" },
+                  example: [2026, 2027],
                 },
               },
               required: ["seasons"],

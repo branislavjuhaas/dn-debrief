@@ -22,8 +22,11 @@ export const setSetting = async (key: "current-seasons", value: number[]) => {
     const currentSeasons =
       key === "current-seasons" ? value : [new Date().getFullYear()];
 
-    await db.insert(settings).values({ currentSeasons: currentSeasons });
-    return null;
+    const result = await db
+      .insert(settings)
+      .values({ currentSeasons: currentSeasons })
+      .returning();
+    return result[0];
   }
 
   if (key === "current-seasons") {

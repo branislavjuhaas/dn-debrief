@@ -12,14 +12,17 @@ defineRouteMeta({
             schema: {
               type: "object",
               properties: {
-                name: { type: "string" },
-                description: { type: "string" },
-                version: { type: "string" },
+                name: { type: "string", example: "DN DebRIEF API" },
+                description: {
+                  type: "string",
+                  example: "Intelligent debate platform",
+                },
+                version: { type: "string", example: "1.0.0" },
                 docs: {
                   type: "object",
                   properties: {
-                    openAPI: { type: "string" },
-                    Scalar: { type: "string" },
+                    openAPI: { type: "string", example: "/_docs/openapi.json" },
+                    Scalar: { type: "string", example: "/api/docs" },
                   },
                 },
               },
