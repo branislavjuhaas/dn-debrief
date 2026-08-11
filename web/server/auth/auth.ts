@@ -14,9 +14,10 @@ import {
   user,
 } from "#server/auth/permissions";
 import { APIError, createAuthMiddleware } from "better-auth/api";
-import { legalGuardians } from "#server/db/schema/auth";
+import { legalGuardians, users } from "#server/db/schema/auth";
 import { adminRoleRank } from "#shared/utils/user";
 import type { UserRole } from "#shared/types/user";
+import { eq } from "drizzle-orm";
 
 export const auth = betterAuth({
   // TODO: use drizzle adapter joins once it support relations v2
@@ -127,7 +128,8 @@ export const auth = betterAuth({
     },
   },
   emailVerification: {
-    sendOnSignUp: true,
+    // Send verification email on sign up in production, skip in dev/test mode
+    sendOnSignUp: !(import.meta.dev || import.meta.test),
     autoSignInAfterVerification: true,
     sendVerificationEmail: async ({ user, token }, _request) => {
       void sendEmail(
@@ -178,6 +180,14 @@ export const auth = betterAuth({
             userId: (ctx.context.returned as any).user.id,
             ...body.legalGuardian,
           });
+        }
+
+        // Auto-verify email in dev/test mode
+        if (import.meta.dev || import.meta.test) {
+          await db
+            .update(users)
+            .set({ emailVerified: true })
+            .where(eq(users.id, (ctx.context.returned as any).user.id));
         }
       }
       if (ctx.path === "/update-user") {
