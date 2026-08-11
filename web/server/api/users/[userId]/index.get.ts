@@ -17,14 +17,190 @@ defineRouteMeta({
     ],
     responses: {
       200: {
-        description: "The requested user",
+        description:
+          "The requested user (schema varies based on viewer permissions)",
         content: {
           "application/json": {
             schema: {
               type: "object",
               properties: {
                 user: {
-                  $ref: "#/components/schemas/UserPublic",
+                  type: "object",
+                  oneOf: [
+                    // Standard public profile
+                    {
+                      type: "object",
+                      properties: {
+                        id: { type: "integer", example: 1 },
+                        name: { type: "string", example: "John" },
+                        surname: { type: "string", example: "Doe" },
+                        role: {
+                          type: "string",
+                          enum: [
+                            "user",
+                            "organizer",
+                            "junior_organizer",
+                            "chief_adjudicator",
+                            "motion_committee_member",
+                            "admin",
+                            "developer",
+                          ],
+                          example: "user",
+                        },
+                        image: {
+                          type: "string",
+                          nullable: true,
+                          example: "https://example.com/avatar.jpg",
+                        },
+                      },
+                      required: ["id", "name", "surname", "role", "image"],
+                    },
+                    // Club manager view (includes email)
+                    {
+                      type: "object",
+                      properties: {
+                        id: { type: "integer", example: 1 },
+                        name: { type: "string", example: "John" },
+                        surname: { type: "string", example: "Doe" },
+                        email: {
+                          type: "string",
+                          format: "email",
+                          example: "john.doe@example.com",
+                        },
+                        role: {
+                          type: "string",
+                          enum: [
+                            "user",
+                            "organizer",
+                            "junior_organizer",
+                            "chief_adjudicator",
+                            "motion_committee_member",
+                            "admin",
+                            "developer",
+                          ],
+                          example: "user",
+                        },
+                        image: {
+                          type: "string",
+                          nullable: true,
+                          example: "https://example.com/avatar.jpg",
+                        },
+                      },
+                      required: [
+                        "id",
+                        "name",
+                        "surname",
+                        "email",
+                        "role",
+                        "image",
+                      ],
+                    },
+                    // Full admin/organizer view (all fields)
+                    {
+                      type: "object",
+                      properties: {
+                        id: { type: "integer", example: 1 },
+                        email: {
+                          type: "string",
+                          format: "email",
+                          example: "john.doe@example.com",
+                        },
+                        name: { type: "string", example: "John" },
+                        surname: { type: "string", example: "Doe" },
+                        search: { type: "string", example: "johndoe" },
+                        emailVerified: { type: "boolean", example: true },
+                        image: {
+                          type: "string",
+                          nullable: true,
+                          example: "https://example.com/avatar.jpg",
+                        },
+                        role: {
+                          type: "string",
+                          enum: [
+                            "user",
+                            "organizer",
+                            "junior_organizer",
+                            "chief_adjudicator",
+                            "motion_committee_member",
+                            "admin",
+                            "developer",
+                          ],
+                          example: "user",
+                        },
+                        birthDate: {
+                          type: "string",
+                          format: "date",
+                          nullable: true,
+                          example: "1997-04-03",
+                        },
+                        street: {
+                          type: "string",
+                          nullable: true,
+                          example: "Miloša Uhra 127",
+                        },
+                        postalCode: {
+                          type: "string",
+                          nullable: true,
+                          example: "91624",
+                        },
+                        town: {
+                          type: "string",
+                          nullable: true,
+                          example: "Horná Streda",
+                        },
+                        phone: {
+                          type: "string",
+                          nullable: true,
+                          example: "+4213567890",
+                        },
+                        credential: { type: "integer", example: 0 },
+                        claims: {
+                          type: "object",
+                          nullable: true,
+                          additionalProperties: true,
+                          example: {},
+                        },
+                        banned: {
+                          type: "boolean",
+                          nullable: true,
+                          example: false,
+                        },
+                        banReason: {
+                          type: "string",
+                          nullable: true,
+                          example: null,
+                        },
+                        banExpires: {
+                          type: "string",
+                          format: "date-time",
+                          nullable: true,
+                          example: null,
+                        },
+                        createdAt: {
+                          type: "string",
+                          format: "date-time",
+                          example: "2026-01-01T00:00:00.000Z",
+                        },
+                        updatedAt: {
+                          type: "string",
+                          format: "date-time",
+                          example: "2026-01-01T00:00:00.000Z",
+                        },
+                      },
+                      required: [
+                        "id",
+                        "email",
+                        "name",
+                        "surname",
+                        "search",
+                        "emailVerified",
+                        "role",
+                        "credential",
+                        "createdAt",
+                        "updatedAt",
+                      ],
+                    },
+                  ],
                 },
               },
               required: ["user"],
@@ -59,48 +235,6 @@ defineRouteMeta({
             schema: {
               $ref: "#/components/schemas/Error",
             },
-          },
-        },
-      },
-    },
-    $global: {
-      components: {
-        schemas: {
-          UserPublic: {
-            type: "object",
-            properties: {
-              id: {
-                type: "number",
-                example: 1,
-              },
-              name: {
-                type: "string",
-                example: "John",
-              },
-              surname: {
-                type: "string",
-                example: "Doe",
-              },
-              role: {
-                type: "string",
-                enum: [
-                  "user",
-                  "organizer",
-                  "junior_organizer",
-                  "chief_adjudicator",
-                  "motion_committee_member",
-                  "admin",
-                  "developer",
-                ],
-                example: "user",
-              },
-              image: {
-                type: "string",
-                nullable: true,
-                example: "https://example.com/avatar.jpg",
-              },
-            },
-            required: ["id", "name", "surname", "role", "image"],
           },
         },
       },
