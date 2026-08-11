@@ -105,6 +105,8 @@ export const awards: Record<string, SystemAward> = {
   },
 };
 
+export const awardNames = Object.keys(awards);
+
 export const getAward = (awardName: string): SystemAward => {
   if (awards[awardName]) {
     return awards[awardName];

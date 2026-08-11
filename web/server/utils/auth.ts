@@ -42,3 +42,24 @@ export const getUser = async (event: H3Event): Promise<User | null> => {
 
   return session.user as unknown as User;
 };
+
+export const resolveUserId = async (
+  event: H3Event,
+  userId: string,
+): Promise<number | null> => {
+  if (userId !== "me") {
+    return Number.parseInt(userId, 10);
+  }
+
+  const user = await getUser(event);
+
+  if (!user) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Unauthorized",
+      message: "User must be authenticated to access this resource",
+    });
+  }
+
+  return user.id;
+};
