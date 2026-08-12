@@ -30,7 +30,7 @@ const creatingClub = ref(false);
 
 const toast = useToast();
 
-async function onCreateSubmit(event: FormSubmitEvent<Schema>) {
+async function onSubmit(event: FormSubmitEvent<Schema>) {
   creatingClub.value = true;
 
   await $fetch("/api/clubs", {
@@ -60,7 +60,7 @@ async function onCreateSubmit(event: FormSubmitEvent<Schema>) {
         :schema="schema"
         :state="state"
         class="space-y-4"
-        @submit="onCreateSubmit">
+        @submit="onSubmit">
         <UFormField label="Názov" name="name">
           <UInput v-model="state.name" placeholder="Zadajte názov klubu" />
         </UFormField>

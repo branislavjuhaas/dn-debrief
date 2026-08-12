@@ -20,7 +20,7 @@ const overlay = useOverlay();
 
 const createClub = async () => {
   const modal = overlay.create(LazyModalCreateClub);
-  modal.open(LazyModalCreateClub);
+  modal.open();
 };
 
 const columns: TableColumn<Club>[] = [
