@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { LazyModalEditClub, LazyModalConfirm } from "#components";
+import {
+  LazyModalEditClub,
+  LazyModalConfirm,
+  LazyModalAddClubManager,
+} from "#components";
 import type { TableColumn, TabsItem } from "@nuxt/ui";
 
 const tabItems = ref<TabsItem[]>([
@@ -110,6 +114,13 @@ const deleteClub = async () => {
       },
     });
   }
+};
+
+const addClubManager = async () => {
+  const modal = overlay.create(LazyModalAddClubManager);
+  modal.open({
+    clubId: clubData?.value?.club.id as number,
+  });
 };
 
 const deleteClubManager = async (managerId: number) => {
@@ -392,7 +403,8 @@ const columns: TableColumn<{
               icon="i-ph-plus"
               variant="soft"
               color="neutral"
-              class="text-sm" />
+              class="text-sm"
+              @click="addClubManager" />
           </div>
         </div>
       </UCard>

@@ -2,7 +2,6 @@
 import type { CommandPaletteGroup } from "@nuxt/ui";
 import type { UserRole } from "#shared/types/user";
 import { refDebounced } from "@vueuse/core";
-import type { User } from "#shared/types/user";
 
 const { data: userFetch } = await useFetch("/api/users/me", {
   key: "users-me",
