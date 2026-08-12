@@ -90,7 +90,7 @@ export const translateRole = (role: UserRole) => {
   }
 };
 
-export const translateRegion = (region: "western" | "central" | "eastern") => {
+export const translateRegion = (region?: "western" | "central" | "eastern") => {
   switch (region) {
     case "western":
       return "Západoslovenský región";
@@ -103,7 +103,9 @@ export const translateRegion = (region: "western" | "central" | "eastern") => {
   }
 };
 
-export const translateLeague = (league: "junior" | "senior" | "university") => {
+export const translateLeague = (
+  league?: "junior" | "senior" | "university",
+) => {
   switch (league) {
     case "junior":
       return "Základoškolský debatný program";

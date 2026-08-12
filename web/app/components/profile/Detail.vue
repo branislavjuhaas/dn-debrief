@@ -13,7 +13,7 @@ const formatter = new Intl.DateTimeFormat("sk-SK", {
 });
 
 const formattedValue = computed(() => {
-  if (!props.value) return null;
+  if (!props.value && props.value !== 0) return null;
   if (props.type === "date")
     return formatter.format(
       parseDate(props.value.toString() ?? "").toDate("utc"),
