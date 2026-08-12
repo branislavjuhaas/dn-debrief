@@ -10,9 +10,9 @@ const { data: userFetch } = await useFetch("/api/users/me", {
 const { data: userData } = useNuxtData<typeof userFetch.value>("users-me");
 
 const logout = async () => {
+  await navigateTo("/");
   await authClient.signOut();
   await clearNuxtData("users-me");
-  navigateTo("/");
 };
 
 const navItems = computed<DropdownMenuItem[][]>(() => {

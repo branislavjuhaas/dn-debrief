@@ -26,9 +26,9 @@ useSeoMeta({
 const authClient = useAuthClient();
 
 const logout = async () => {
+  await navigateTo("/");
   await authClient.signOut();
   await clearNuxtData("users-me");
-  navigateTo("/");
 };
 
 const tabItems = ref<TabsItem[]>([
