@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { LazyModalEditClub, LazyModalConfirm } from "#components";
 import type { ButtonProps } from "@nuxt/ui";
 
 const { data: userFetch } = await useFetch("/api/users/me", {
@@ -39,6 +40,90 @@ const links = ref<ButtonProps[]>([
     color: "primary",
   },
 ]);
+
+const isUserClubManager = computed(() => {
+  if (!userData?.value?.user || !clubManagers?.value) {
+    return false;
+  }
+
+  return clubManagers.value.managers.some(
+    (manager) => manager.id === userData.value?.user?.id,
+  );
+});
+
+const overlay = useOverlay();
+const toast = useToast();
+
+const editClub = async () => {
+  const modal = overlay.create(LazyModalEditClub);
+  modal.open({
+    club: clubData?.value?.club as Club,
+  });
+};
+
+const deleteClub = async () => {
+  const modal = overlay.create(LazyModalConfirm);
+  const instance = modal.open({
+    title: "Vymazať klub",
+    description: `Naozaj chcete vymazať debatný klub ${clubData?.value?.club.name}?`,
+    color: "error",
+  });
+
+  const shouldDelete = await instance.result;
+
+  if (shouldDelete) {
+    await $fetch(`/api/clubs/${route.params.clubId as NonEmptyString}`, {
+      method: "DELETE",
+      onResponseError({ response }) {
+        toast.add({
+          title: "Nepodarilo sa vymazať klub",
+          description: "Skúste to znova.",
+          color: "error",
+        });
+      },
+      async onResponse({ response }) {
+        if (response.ok) {
+          toast.add({
+            title: `Debatný klub ${clubData?.value?.club.name} bol úspešne vymazaný`,
+            color: "success",
+          });
+          await refreshNuxtData("clubs");
+          navigateTo("/manage/clubs");
+        }
+      },
+    });
+  }
+};
+
+const deleteClubManager = async (managerId: number) => {
+  let previousManagers: typeof clubManagers.value = { managers: [] };
+
+  await $fetch(`/api/clubs/${route.params.clubId}/managers/${managerId}`, {
+    method: "DELETE",
+    onRequest() {
+      if (!clubManagers.value) {
+        return;
+      }
+
+      previousManagers = clubManagers.value;
+
+      clubManagers.value.managers = clubManagers.value?.managers.filter(
+        (m) => m.id !== managerId,
+      );
+    },
+    onResponseError() {
+      clubManagers.value = previousManagers;
+      toast.add({
+        title: "Nepodarilo sa odstrániť správcu/-kyňu klubu",
+        description: "Skúste to znova.",
+        color: "error",
+      });
+    },
+    async onResponse() {
+      await refreshNuxtData(`clubs-${route.params.clubId}-managers`);
+    },
+  });
+};
 </script>
 
 <template>
@@ -68,16 +153,25 @@ const links = ref<ButtonProps[]>([
           variant="subtle"
           color="error"
           :disabled="!clubData?.club.isDeletable"
-          class="text-sm" />
+          class="text-sm"
+          @click="deleteClub" />
         <UButton
           label="Upraviť klub"
           icon="i-ph-pencil-simple"
           variant="solid"
           color="primary"
-          class="text-sm" />
+          class="text-sm"
+          @click="editClub" />
       </template>
     </UPageHeader>
     <UPageBody>
+      <UAlert
+        v-if="!clubData?.club.isActive"
+        title="Tento klub je momentálne neaktívny a nie je možné sa stať jeho členom/-kou."
+        icon="i-ph-moon-stars-fill"
+        variant="subtle"
+        color="error"
+        class="mb-4" />
       <UCard :ui="{ body: 'flex flex-col md:flex-row gap-1 md:gap-12' }">
         <div class="flex flex-col gap-1">
           <ProfileDetail
@@ -99,7 +193,35 @@ const links = ref<ButtonProps[]>([
             <span class="font-bold">Správcovia/-kyne klubu</span>
           </span>
           <div class="flex flex-row flex-wrap gap-2">
+            <UContextMenu
+              v-if="
+                userData?.user &&
+                ['developer', 'admin'].includes(userData.user.role ?? 'user')
+              "
+              v-for="manager in clubManagers?.managers"
+              :items="[
+                {
+                  label: 'Odstrániť',
+                  icon: 'i-ph-x',
+                  color: 'error',
+                  onClick: () => deleteClubManager(manager.id),
+                },
+              ]">
+              <UUser
+                :key="manager.id"
+                :name="`${manager.name} ${manager.surname}`"
+                :to="`/users/${manager.id}`"
+                :ui="{ name: 'text-sm', avatar: 'bg-default', root: 'gap-0' }"
+                :avatar="{
+                  src: manager.image ?? undefined,
+                  alt: `${manager.name} ${manager.surname}`,
+                  loading: 'lazy',
+                }"
+                size="xs"
+                class="p-1 px-2 rounded-md bg-elevated" />
+            </UContextMenu>
             <UUser
+              v-else
               v-for="manager in clubManagers?.managers"
               :key="manager.id"
               :name="`${manager.name} ${manager.surname}`"
