@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import type { PageCardProps } from "@nuxt/ui";
 
+definePageMeta({
+  middleware: ["auth"],
+});
+
 const { data: userFetch } = await useFetch("/api/users/me", {
   key: "users-me",
 });
@@ -64,7 +68,7 @@ const filteredManagementViews = computed(() => {
 </script>
 
 <template>
-  <div>
+  <div class="w-full h-full">
     <UDashboardPanel id="home">
       <template #header>
         <UDashboardNavbar title="Panel správy" :ui="{ right: 'gap-3' }">
