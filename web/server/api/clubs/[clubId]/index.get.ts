@@ -1,6 +1,6 @@
 import { db } from "#server/db";
 import { clubMemberships } from "#server/db/schema/clubs";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 
 defineRouteMeta({
   openAPI: {
@@ -34,6 +34,7 @@ defineRouteMeta({
                       type: "object",
                       properties: {
                         membershipsCount: { type: "number" },
+                        isDeletable: { type: "boolean" },
                       },
                     },
                   ],
@@ -154,6 +155,7 @@ export default defineEventHandler(async (event) => {
           eq(clubMemberships.season, currentSeason),
         ),
       ),
+      isDeletable: sql<boolean>`select count(*) = 0 from ${clubMemberships} where ${clubMemberships.clubId} = ${clubId}`,
     },
   });
 
