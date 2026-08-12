@@ -87,7 +87,7 @@ export const clubManagers = pgTable(
   "club_managers",
   {
     clubId: integer("club_id")
-      .references(() => clubs.id)
+      .references(() => clubs.id, { onDelete: "cascade" })
       .notNull(),
     userId: integer("user_id")
       .references(() => users.id, { onDelete: "cascade" })
