@@ -36,7 +36,7 @@ const feed = useFeed();
     <UPageHeader :title="greet(userData?.user ?? null)" />
     <UPageBody>
       <div class="space-y-2">
-        <IconHeading icon="ph:newspaper-clipping-fill"
+        <IconHeading icon="i-ph-newspaper-clipping-fill"
           >Najrelevantnejšie udalosti</IconHeading
         >
         <UEmpty
@@ -62,7 +62,7 @@ const feed = useFeed();
           class="flex flex-row gap-4 w-full py-1 px-0.5 overflow-x-scroll no-scrollbar"></div> -->
       </div>
       <div class="space-y-2">
-        <IconHeading icon="ph:megaphone-fill">Pre vás</IconHeading>
+        <IconHeading icon="i-ph-megaphone-fill">Pre vás</IconHeading>
         <div class="flex flex-col gap-3 w-full py-1 px-0.5">
           <motion.div
             v-for="(item, index) in feed"

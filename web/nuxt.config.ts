@@ -29,6 +29,18 @@ export default defineNuxtConfig({
     },
   },
 
+  ui: {
+    experimental: {
+      componentDetection: true,
+    },
+  },
+
+  icon: {
+    clientBundle: {
+      scan: true,
+    },
+  },
+
   app: {
     pageTransition: { name: "page", mode: "out-in" },
     head: {

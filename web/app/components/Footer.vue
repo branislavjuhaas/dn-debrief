@@ -86,7 +86,7 @@ const footerLinks: FooterColumn[] = [
       >
       <UColorModeButton />
       <UButton
-        icon="ph:github-logo"
+        icon="i-ph-github-logo"
         color="neutral"
         variant="ghost"
         :to="source"

@@ -22,22 +22,22 @@ const navItems = computed<DropdownMenuItem[][]>(() => {
     [
       {
         label: "Môj profil",
-        icon: "ph:identification-card",
+        icon: "i-ph-identification-card",
         to: "/profile",
       },
       {
         label: "Moje platby",
-        icon: "ph:coins",
+        icon: "i-ph-coins",
         disabled: true,
       },
       {
         label: "Moje registrácie",
-        icon: "ph:books",
+        icon: "i-ph-books",
         disabled: true,
       },
       {
         label: "Moje výsledky",
-        icon: "ph:scroll",
+        icon: "i-ph-scroll",
         disabled: true,
       },
     ],
@@ -47,7 +47,7 @@ const navItems = computed<DropdownMenuItem[][]>(() => {
             {
               label: "Panel správy",
               to: "/manage",
-              icon: "ph:nut",
+              icon: "i-ph-nut",
             },
           ],
         ]
@@ -55,7 +55,7 @@ const navItems = computed<DropdownMenuItem[][]>(() => {
     [
       {
         label: "Odhlásiť sa",
-        icon: "ph:plugs",
+        icon: "i-ph-plugs",
         color: "error",
         onSelect: () => logout(),
       },
@@ -88,14 +88,19 @@ const navItems = computed<DropdownMenuItem[][]>(() => {
           sideOffset: 8,
         }">
         <UButton
-          icon="ph:sort-ascending"
+          icon="i-ph-sort-ascending"
           color="neutral"
           variant="outline"
           aria-label="Otvoriť menu" />
       </UDropdownMenu>
     </UFieldGroup>
   </template>
-  <UButton v-else to="/auth" color="neutral" variant="subtle" icon="ph:keyhole">
+  <UButton
+    v-else
+    to="/auth"
+    color="neutral"
+    variant="subtle"
+    icon="i-ph-keyhole">
     Prihlásenie
   </UButton>
 </template>
