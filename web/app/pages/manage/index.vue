@@ -64,26 +64,28 @@ const filteredManagementViews = computed(() => {
 </script>
 
 <template>
-  <UDashboardPanel id="home">
-    <template #header>
-      <UDashboardNavbar title="Panel správy" :ui="{ right: 'gap-3' }">
-        <template #leading>
-          <UDashboardSidebarCollapse />
-        </template>
-      </UDashboardNavbar>
-    </template>
-    <template #body>
-      <UAlert
-        title="TpVSÚPDND SDA ďakuje za vašu prácu pre rozvoj komunity!"
-        icon="i-ph-hand-heart-fill"
-        color="primary" />
-      <UPageGrid>
-        <UPageCard
-          v-for="item in filteredManagementViews"
-          :key="item.to?.toString()"
-          variant="subtle"
-          v-bind="item" />
-      </UPageGrid>
-    </template>
-  </UDashboardPanel>
+  <div>
+    <UDashboardPanel id="home">
+      <template #header>
+        <UDashboardNavbar title="Panel správy" :ui="{ right: 'gap-3' }">
+          <template #leading>
+            <UDashboardSidebarCollapse />
+          </template>
+        </UDashboardNavbar>
+      </template>
+      <template #body>
+        <UAlert
+          title="TpVSÚPDND SDA ďakuje za vašu prácu pre rozvoj komunity!"
+          icon="i-ph-hand-heart-fill"
+          color="primary" />
+        <UPageGrid>
+          <UPageCard
+            v-for="item in filteredManagementViews"
+            :key="item.to?.toString()"
+            variant="subtle"
+            v-bind="item" />
+        </UPageGrid>
+      </template>
+    </UDashboardPanel>
+  </div>
 </template>
