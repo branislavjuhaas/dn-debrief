@@ -25,7 +25,11 @@ defineProps<{
     <ProfileDetail
       icon="i-ph-buildings-fill"
       label="Adresa trvalého pobytu"
-      :value="`${user.street}, ${user.postalCode} ${user.town}`" />
+      :value="
+        user.street && user.postalCode && user.town
+          ? `${user.street}, ${user.postalCode} ${user.town}`
+          : null
+      " />
     <ProfileDetail
       v-if="
         Math.abs(differenceInYears(user.birthDate ?? new Date(), new Date())) <
@@ -33,7 +37,11 @@ defineProps<{
       "
       icon="i-ph-baby-fill"
       label="Zákonný/-á zástupca/-kyňa"
-      :value="`${user.legalGuardian?.name} · ${user.legalGuardian?.email}`" />
+      :value="
+        user.legalGuardian
+          ? `${user.legalGuardian.name} · ${user.legalGuardian.email}`
+          : null
+      " />
     <ProfileDetail
       v-if="user.credential > 0"
       icon="i-ph-seal-warning-fill"
