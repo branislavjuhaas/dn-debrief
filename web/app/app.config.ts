@@ -4,6 +4,9 @@ export default defineAppConfig({
       primary: "sda",
       success: "sda",
       neutral: "zinc",
+      purple: "purple",
+      rose: "rose",
+      olive: "olive",
     },
     pageHeader: {
       slots: {

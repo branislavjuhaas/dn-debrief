@@ -33,6 +33,19 @@ export default defineNuxtConfig({
     experimental: {
       componentDetection: true,
     },
+    theme: {
+      colors: [
+        "primary",
+        "secondary",
+        "purple",
+        "rose",
+        "olive",
+        "info",
+        "success",
+        "warning",
+        "error",
+      ],
+    },
   },
 
   icon: {
