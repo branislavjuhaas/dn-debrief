@@ -69,7 +69,7 @@ export const translateAuthError = (errorCode: string) => {
   }
 };
 
-export const translateRole = (role: UserRole) => {
+export const translateRole = (role?: UserRole) => {
   switch (role) {
     case "user":
       return "Používateľ/-ka";
@@ -86,7 +86,7 @@ export const translateRole = (role: UserRole) => {
     case "developer":
       return "Vývojár/-ka";
     default:
-      return "Nastala neznáma chyba. Skúste to, prosím, znova.";
+      return "N/A";
   }
 };
 
@@ -115,5 +115,26 @@ export const translateLeague = (
       return "Vysokoškolský debatný program";
     default:
       return "Neznámy debatný program";
+  }
+};
+
+export const translateRegistrationType = (
+  registrationType?:
+    | "junior_student"
+    | "senior_student"
+    | "graduate"
+    | "teacher",
+) => {
+  switch (registrationType) {
+    case "junior_student":
+      return "Základoškolský/-á debatér/-ka";
+    case "senior_student":
+      return "Stredoškolský/-á debatér/-ka";
+    case "graduate":
+      return "Absolvent/-ka";
+    case "teacher":
+      return "Učiteľ/-ka";
+    default:
+      return "Neznámy typ registrácie";
   }
 };

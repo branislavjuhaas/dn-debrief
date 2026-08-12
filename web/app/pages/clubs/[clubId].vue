@@ -65,6 +65,8 @@ const { data: clubMembers } = await useFetch(
 );
 
 const UUser = resolveComponent("UUser");
+const UButton = resolveComponent("UButton");
+const UBadge = resolveComponent("UBadge");
 
 const overlay = useOverlay();
 const toast = useToast();
@@ -141,23 +143,62 @@ const deleteClubManager = async (managerId: number) => {
 };
 
 const columns: TableColumn<{
-  id: number;
-  name: string;
-  surname: string;
-  email: string;
-  image: string | null;
-  role: UserRole;
+  confirmed: boolean;
+  registrationType:
+    | "junior_student"
+    | "senior_student"
+    | "graduate"
+    | "teacher";
+  user?: {
+    id: number;
+    name: string;
+    surname: string;
+    image?: string | null;
+    email: string;
+    role: UserRole;
+  };
 }>[] = [
   {
-    accessorKey: "id",
-    header: "ID",
-    cell: ({ row }) => `#${row.getValue("id")}`,
+    accessorKey: "user.id",
+    header: ({ column }) => {
+      const isSorted = column.getIsSorted();
+
+      return h(UButton, {
+        color: "neutral",
+        variant: "ghost",
+        label: "ID",
+        icon: isSorted
+          ? isSorted === "asc"
+            ? "i-ph-sort-ascending"
+            : "i-ph-sort-descending"
+          : "i-ph-funnel-simple",
+        class: "-mx-2.5 font-bold text-highlighted",
+        onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+      });
+    },
+    accessorFn: (row) => `#${row.user?.id ?? "N/A"}`,
   },
   {
-    header: "Meno a priezvisko",
+    id: "name",
+    header: ({ column }) => {
+      const isSorted = column.getIsSorted();
+
+      return h(UButton, {
+        color: "neutral",
+        variant: "ghost",
+        label: "Meno a priezvisko",
+        icon: isSorted
+          ? isSorted === "asc"
+            ? "i-ph-sort-ascending"
+            : "i-ph-sort-descending"
+          : "i-ph-funnel-simple",
+        class: "-mx-2.5 font-bold text-highlighted",
+        onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+      });
+    },
     cell: ({ row }) => {
-      const name = row.original.name ?? "N/A";
-      const surname = (row.original as any).surname ?? "N/A";
+      const name = row.original.user?.name ?? "N/A";
+      const surname = row.original.user?.surname ?? "N/A";
 
       return h(
         UUser,
@@ -165,10 +206,10 @@ const columns: TableColumn<{
           name: name,
           surname: surname,
           avatar: {
-            src: row.original.image ?? undefined,
+            src: row.original.user?.image ?? undefined,
             alt: `${name} ${surname}`,
           },
-          to: `/users/${row.original.id}`,
+          to: `/users/${row.original.user?.id}`,
           size: "xs",
         },
         {
@@ -176,7 +217,7 @@ const columns: TableColumn<{
             h(
               "NuxtLink",
               {
-                to: `/users/${row.original.id}`,
+                to: `/users/${row.original.user?.id}`,
                 class: "font-medium text-default hover:text-highlighted",
               },
               `${name} ${surname}`,
@@ -186,14 +227,45 @@ const columns: TableColumn<{
     },
   },
   {
-    accessorKey: "email",
+    id: "email",
     header: "Email",
-    cell: ({ row }) => row.getValue("email"),
+    accessorFn: (row) => row.user?.email ?? "N/A",
   },
   {
-    accessorKey: "role",
+    id: "registrationType",
+    header: ({ column }) => {
+      const isSorted = column.getIsSorted();
+
+      return h(UButton, {
+        color: "neutral",
+        variant: "ghost",
+        label: "Typ registrácie",
+        icon: isSorted
+          ? isSorted === "asc"
+            ? "i-ph-sort-ascending"
+            : "i-ph-sort-descending"
+          : "i-ph-funnel-simple",
+        class: "-mx-2.5 font-bold text-highlighted",
+        onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+      });
+    },
+    cell: ({ row }) => {
+      const color = {
+        junior_student: "info" as const,
+        senior_student: "olive" as const,
+        graduate: "rose" as const,
+        teacher: "violet" as const,
+      }[row.original.registrationType];
+
+      return h(UBadge, { variant: "subtle", color }, () =>
+        translateRegistrationType(row.original.registrationType),
+      );
+    },
+  },
+  {
+    id: "role",
     header: "Rola",
-    cell: ({ row }) => translateRole(row.getValue("role")),
+    accessorFn: (row) => translateRole(row.user?.role),
   },
 ];
 </script>
@@ -332,7 +404,7 @@ const columns: TableColumn<{
         }">
         <template #members>
           <UTable
-            :data="clubMembers?.members ?? []"
+            :data="clubMembers?.memberships ?? []"
             :columns="columns"
             class="flex-1" />
         </template>

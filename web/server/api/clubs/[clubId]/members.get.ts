@@ -24,27 +24,48 @@ defineRouteMeta({
             schema: {
               type: "object",
               properties: {
-                members: {
+                memberships: {
                   type: "array",
                   items: {
                     type: "object",
                     properties: {
-                      id: { type: "integer", example: 1 },
-                      name: { type: "string", example: "John" },
-                      surname: { type: "string", example: "Doe" },
-                      email: {
-                        type: "string",
-                        format: "email",
-                        example: "john.doe@example.com",
+                      user: {
+                        type: "object",
+                        properties: {
+                          id: { type: "integer" },
+                          name: { type: "string" },
+                          surname: { type: "string" },
+                          email: { type: "string" },
+                          role: {
+                            type: "string",
+                            enum: [
+                              "user",
+                              "organizer",
+                              "junior_organizer",
+                              "chief_adjudicator",
+                              "motion_committee_member",
+                              "admin",
+                              "developer",
+                            ],
+                          },
+                          image: { type: ["string", "null"] },
+                        },
                       },
-                      role: { type: "string", example: "user" },
-                      image: { type: "string", nullable: true, example: null },
+                      confirmed: { type: "boolean" },
+                      registrationType: {
+                        type: "string",
+                        enum: [
+                          "junior_student",
+                          "senior_student",
+                          "graduate",
+                          "teacher",
+                        ],
+                      },
                     },
-                    required: ["id", "name", "surname", "email", "role"],
                   },
                 },
               },
-              required: ["members"],
+              required: ["memberships"],
             },
           },
         },
@@ -107,22 +128,28 @@ export default defineEventHandler(async (event) => {
 
   const currentSeason = new Date().getFullYear();
 
-  const members = await db.query.users.findMany({
+  const memberships = await db.query.clubMemberships.findMany({
     columns: {
-      id: true,
-      name: true,
-      surname: true,
-      email: true,
-      role: true,
-      image: true,
+      confirmed: true,
+      registrationType: true,
+    },
+    with: {
+      user: {
+        columns: {
+          id: true,
+          name: true,
+          surname: true,
+          email: true,
+          role: true,
+          image: true,
+        },
+      },
     },
     where: {
-      clubMemberships: {
-        clubId: clubId,
-        season: currentSeason,
-      },
+      clubId: clubId,
+      season: currentSeason,
     },
   });
 
-  return { members };
+  return { memberships };
 });
