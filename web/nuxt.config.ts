@@ -37,7 +37,7 @@ export default defineNuxtConfig({
 
   icon: {
     clientBundle: {
-      icons: ["ph:arrow-up-right", "ph:moon", "ph:sun"],
+      icons: ["ph:arrow-up-right", "ph:moon", "ph:sun", "ph:eye"],
       scan: true,
     },
   },
