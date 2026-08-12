@@ -1,6 +1,23 @@
 <script setup lang="ts">
 import { LazyModalEditClub, LazyModalConfirm } from "#components";
-import type { ButtonProps } from "@nuxt/ui";
+import type { TableColumn, TabsItem } from "@nuxt/ui";
+
+const tabItems = ref<TabsItem[]>([
+  {
+    label: "Členovia/-ky klubu",
+    slot: "members",
+  },
+  {
+    label: "Registrácie na podujatia",
+    slot: "registrations",
+    disabled: true,
+  },
+  {
+    label: "Platby",
+    slot: "payments",
+    disabled: true,
+  },
+]);
 
 const { data: userFetch } = await useFetch("/api/users/me", {
   key: "users-me",
@@ -25,22 +42,6 @@ const { data: clubManagers } = await useFetch(
   },
 );
 
-const links = ref<ButtonProps[]>([
-  {
-    label: "Vymazať klub",
-    icon: "i-ph-x",
-    variant: "subtle",
-    color: "error",
-    disabled: !clubData?.value?.club.isDeletable,
-  },
-  {
-    label: "Upraviť klub",
-    icon: "i-ph-pencil-simple",
-    variant: "solid",
-    color: "primary",
-  },
-]);
-
 const isUserClubManager = computed(() => {
   if (!userData?.value?.user || !clubManagers?.value) {
     return false;
@@ -50,6 +51,20 @@ const isUserClubManager = computed(() => {
     (manager) => manager.id === userData.value?.user?.id,
   );
 });
+
+const { data: clubMembers } = await useFetch(
+  `/api/clubs/${route.params.clubId}/members`,
+  {
+    key: `clubs-${route.params.clubId}-members`,
+    enabled: computed(
+      () =>
+        isUserClubManager.value ||
+        ["developer", "admin"].includes(userData?.value?.user?.role ?? "user"),
+    ),
+  },
+);
+
+const UUser = resolveComponent("UUser");
 
 const overlay = useOverlay();
 const toast = useToast();
@@ -124,6 +139,63 @@ const deleteClubManager = async (managerId: number) => {
     },
   });
 };
+
+const columns: TableColumn<{
+  id: number;
+  name: string;
+  surname: string;
+  email: string;
+  image: string | null;
+  role: UserRole;
+}>[] = [
+  {
+    accessorKey: "id",
+    header: "ID",
+    cell: ({ row }) => `#${row.getValue("id")}`,
+  },
+  {
+    header: "Meno a priezvisko",
+    cell: ({ row }) => {
+      const name = row.original.name ?? "N/A";
+      const surname = (row.original as any).surname ?? "N/A";
+
+      return h(
+        UUser,
+        {
+          name: name,
+          surname: surname,
+          avatar: {
+            src: row.original.image ?? undefined,
+            alt: `${name} ${surname}`,
+          },
+          to: `/users/${row.original.id}`,
+          size: "xs",
+        },
+        {
+          default: () =>
+            h(
+              "NuxtLink",
+              {
+                to: `/users/${row.original.id}`,
+                class: "font-medium text-default hover:text-highlighted",
+              },
+              `${name} ${surname}`,
+            ),
+        },
+      );
+    },
+  },
+  {
+    accessorKey: "email",
+    header: "Email",
+    cell: ({ row }) => row.getValue("email"),
+  },
+  {
+    accessorKey: "role",
+    header: "Rola",
+    cell: ({ row }) => translateRole(row.getValue("role")),
+  },
+];
 </script>
 
 <template>
@@ -172,7 +244,11 @@ const deleteClubManager = async (managerId: number) => {
         variant="subtle"
         color="error"
         class="mb-4" />
-      <UCard :ui="{ body: 'flex flex-col md:flex-row gap-1 md:gap-12' }">
+      <UCard
+        :ui="{
+          root: 'mb-4',
+          body: 'flex flex-col md:flex-row gap-1 md:gap-12',
+        }">
         <div class="flex flex-col gap-1">
           <ProfileDetail
             label="Počet členov/-iek"
@@ -235,6 +311,11 @@ const deleteClubManager = async (managerId: number) => {
               size="xs"
               class="p-1 px-2 rounded-md bg-elevated" />
             <UButton
+              v-if="
+                userData?.user &&
+                (isUserClubManager ||
+                  ['developer', 'admin'].includes(userData.user.role ?? 'user'))
+              "
               label="Pridať"
               icon="i-ph-plus"
               variant="soft"
@@ -243,6 +324,19 @@ const deleteClubManager = async (managerId: number) => {
           </div>
         </div>
       </UCard>
+      <UTabs
+        :items="tabItems"
+        variant="link"
+        :ui="{
+          content: 'overflow-x-auto scrollbar-none',
+        }">
+        <template #members>
+          <UTable
+            :data="clubMembers?.members ?? []"
+            :columns="columns"
+            class="flex-1" />
+        </template>
+      </UTabs>
     </UPageBody>
   </UPage>
 </template>

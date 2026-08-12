@@ -36,9 +36,9 @@ const feed = useFeed();
     <UPageHeader :title="greet(userData?.user ?? null)" />
     <UPageBody>
       <div class="space-y-2">
-        <IconHeading icon="i-ph-newspaper-clipping-fill"
-          >Najrelevantnejšie udalosti</IconHeading
-        >
+        <IconHeading icon="i-ph-newspaper-clipping-fill">
+          Najrelevantnejšie udalosti
+        </IconHeading>
         <UEmpty
           title="Žiadne dostupné podujatia"
           description="Momentálne nie sú k dispozícii žiadne podujatia na zobrazenie."
