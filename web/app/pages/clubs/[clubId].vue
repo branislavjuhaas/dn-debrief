@@ -153,13 +153,13 @@ const columns: TableColumn<{
     id: number;
     name: string;
     surname: string;
-    image?: string | null;
+    image: string | null;
     email: string;
     role: UserRole;
   };
 }>[] = [
   {
-    accessorKey: "user.id",
+    accessorKey: "id",
     header: ({ column }) => {
       const isSorted = column.getIsSorted();
 
@@ -229,7 +229,7 @@ const columns: TableColumn<{
   {
     id: "email",
     header: "Email",
-    accessorFn: (row) => row.user?.email ?? "N/A",
+    cell: ({ row }) => row.original.user?.email ?? "N/A",
   },
   {
     id: "registrationType",
@@ -265,7 +265,7 @@ const columns: TableColumn<{
   {
     id: "role",
     header: "Rola",
-    accessorFn: (row) => translateRole(row.user?.role),
+    cell: ({ row }) => translateRole(row.original.user?.role),
   },
 ];
 </script>
@@ -405,7 +405,7 @@ const columns: TableColumn<{
         <template #members>
           <UTable
             :data="clubMembers?.memberships ?? []"
-            :columns="columns"
+            :columns="columns as any"
             class="flex-1" />
         </template>
       </UTabs>
