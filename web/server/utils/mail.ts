@@ -154,7 +154,7 @@ export const generateActionMail = (
           <div style="font-size: 0;">
             <!--[if mso]><td style="width: 506px"><![endif]-->
             <div style="width: 506px; max-width: 100%; display: inline-block; font-size: medium">
-              <span style="font-family: 'DM Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans', Ubuntu, Cantarell, 'Helvetica Neue', sans-serif; font-size: 14px; line-height: 20px; color: #71717a;">2024 - 2026 | Branislav Juhás & TpVSÚPDND</span>
+              <span style="font-family: 'DM Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans', Ubuntu, Cantarell, 'Helvetica Neue', sans-serif; font-size: 14px; line-height: 20px; color: #71717a;">2024 - 2026 | Branislav Juhás & VpVSÚPDND</span>
             </div>
             <!--[if mso]></td><![endif]-->
             <!--[if mso]><td style="width: 20px"><![endif]-->
@@ -266,7 +266,7 @@ export const generateMessageMail = (
           <div style="font-size: 0;">
             <!--[if mso]><td style="width: 506px"><![endif]-->
             <div style="width: 506px; max-width: 100%; display: inline-block; font-size: medium">
-              <span style="font-family: 'DM Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans', Ubuntu, Cantarell, 'Helvetica Neue', sans-serif; font-size: 14px; line-height: 20px; color: #71717a;">2024 - 2026 | Branislav Juhás & TpVSÚPDND</span>
+              <span style="font-family: 'DM Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans', Ubuntu, Cantarell, 'Helvetica Neue', sans-serif; font-size: 14px; line-height: 20px; color: #71717a;">2024 - 2026 | Branislav Juhás & VpVSÚPDND</span>
             </div>
             <!--[if mso]></td><![endif]-->
             <!--[if mso]><td style="width: 20px"><![endif]-->

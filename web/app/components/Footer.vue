@@ -77,7 +77,7 @@ const footerLinks: FooterColumn[] = [
     </template>
     <template #left>
       <p class="text-muted text-sm">
-        2024 - 2026&nbsp;&nbsp;|&nbsp;&nbsp;Branislav Juhás & TpVSÚPDND
+        2024 - 2026&nbsp;&nbsp;|&nbsp;&nbsp;Branislav Juhás & VpVSÚPDND
       </p>
     </template>
     <template #right>

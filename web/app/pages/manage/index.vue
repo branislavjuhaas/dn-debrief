@@ -75,7 +75,7 @@ const filteredManagementViews = computed(() => {
       </template>
       <template #body>
         <UAlert
-          title="TpVSÚPDND SDA ďakuje za vašu prácu pre rozvoj komunity!"
+          title="VpVSÚPDND SDA ďakuje za vašu prácu pre rozvoj komunity!"
           icon="i-ph-hand-heart-fill"
           color="primary" />
         <UPageGrid>
