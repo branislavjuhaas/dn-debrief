@@ -43,6 +43,7 @@ const results = computed<CommandPaletteGroup[]>(() => {
       items: data.value?.clubs.map((club) => ({
         id: club.id,
         label: club.name,
+        to: `/clubs/${club.id}`,
         icon: "i-ph-bank",
       })),
       ignoreFilter: true,
