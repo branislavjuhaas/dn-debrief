@@ -66,7 +66,7 @@ onMounted(() => {
           {{ user.name }} {{ user.surname }}
         </h1>
         <address class="text-base text-muted not-italic max-sm:text-center">
-          {{ user.email }}
+          {{ user.email ?? translateRole(user.role) }}
         </address>
       </div>
     </div>
