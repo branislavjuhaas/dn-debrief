@@ -2,7 +2,21 @@
 import type { PageCardProps } from "@nuxt/ui";
 
 definePageMeta({
-  middleware: ["auth"],
+  middleware: [
+    "auth",
+    async () => {
+      const { data: userFetch } = await useFetch("/api/users/me", {
+        key: "users-me",
+      });
+
+      if (
+        userFetch.value?.user?.role === "user" &&
+        !userFetch.value?.user?.managedClubs?.length
+      ) {
+        return false;
+      }
+    },
+  ],
 });
 
 const { data: userFetch } = await useFetch("/api/users/me", {

@@ -12,6 +12,6 @@ export default defineNuxtRouteMiddleware(async (to, _from) => {
   const allowedRoles = to.meta.allowedRoles as string[] | undefined;
 
   if (allowedRoles && !allowedRoles.includes(session.data?.user.role ?? "")) {
-    return navigateTo("/");
+    return false;
   }
 });
