@@ -41,7 +41,7 @@ const overlay = useOverlay();
 const editProfile = () => {
   const modal = overlay.create(LazyModalEditUser);
   modal.open({
-    user: userData?.value?.user!,
+    user: userData?.value?.user as User,
   });
 };
 
