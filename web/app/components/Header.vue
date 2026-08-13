@@ -26,7 +26,7 @@ const results = computed<CommandPaletteGroup[]>(() => {
       items: data.value?.users.map((user) => ({
         id: user.id,
         label: `${user.name} ${user.surname}`,
-        suffix: user.email ?? translateRole((user.role as UserRole) ?? "user"),
+        suffix: translateRole((user.role as UserRole) ?? "user"),
         to: `/users/${user.id}`,
         avatar: {
           src: user.image ?? undefined,

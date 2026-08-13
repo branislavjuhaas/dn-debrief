@@ -57,11 +57,6 @@ defineRouteMeta({
                       id: { type: "integer", example: 1 },
                       name: { type: "string", example: "John" },
                       surname: { type: "string", example: "Doe" },
-                      email: {
-                        type: "string",
-                        format: "email",
-                        example: "john.doe@example.com",
-                      },
                       role: { type: "string", example: "user" },
                       image: { type: "string", nullable: true, example: null },
                     },
@@ -123,7 +118,7 @@ const searchQuery = z.object({
 });
 
 export default defineEventHandler(async (event) => {
-  const user = await requireUser(event);
+  await requireUser(event);
 
   const {
     q,
@@ -139,7 +134,6 @@ export default defineEventHandler(async (event) => {
       id: number;
       name: string;
       surname: string;
-      email?: string;
       role?: string;
       image: string | null;
     }>(),
@@ -148,18 +142,14 @@ export default defineEventHandler(async (event) => {
   };
 
   if (queryUsers) {
-    const userSelection = {
-      id: users.id,
-      name: users.name,
-      surname: users.surname,
-      image: users.image,
-      ...(user.role && user.role !== "user"
-        ? { email: users.email }
-        : { role: users.role }),
-    };
-
     results.users = await db
-      .select(userSelection)
+      .select({
+        id: users.id,
+        name: users.name,
+        surname: users.surname,
+        image: users.image,
+        role: users.role,
+      })
       .from(users)
       .where(like(users.search, `%${normalizedQuery}%`))
       .limit(5);
