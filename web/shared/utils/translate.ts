@@ -110,7 +110,7 @@ export const translateLeague = (
     case "junior":
       return "Základoškolský debatný program";
     case "senior":
-      return "Stredoškolský vysoký program";
+      return "Stredoškolský debatný program";
     case "university":
       return "Vysokoškolský debatný program";
     default:
