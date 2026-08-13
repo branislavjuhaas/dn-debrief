@@ -330,9 +330,9 @@ const columns: TableColumn<{
       <UCard
         :ui="{
           root: 'mb-4',
-          body: 'flex flex-col md:flex-row gap-1 md:gap-12',
+          body: 'flex flex-col md:flex-row gap-1 md:gap-8',
         }">
-        <div class="flex flex-col gap-1">
+        <div class="flex flex-col gap-1 -m-3 p-3 rounded-lg bg-elevated">
           <ProfileDetail
             label="Počet členov/-iek"
             icon="i-ph-users-three-fill"
@@ -346,6 +346,7 @@ const columns: TableColumn<{
             icon="i-ph-globe-hemisphere-west-fill"
             :value="translateRegion(clubData?.club.region)" />
         </div>
+
         <div class="flex flex-col gap-2">
           <span class="space-x-2 text-sm items-center flex text-pretty">
             <UIcon name="i-ph-user-circle-check-fill" class="size-5" />
