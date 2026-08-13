@@ -28,6 +28,14 @@ const clubId = route.params.clubId as NonEmptyString;
 
 await useFetch(`/api/clubs/${clubId}`, {
   key: `clubs-${clubId}`,
+  onResponseError({ response }) {
+    if (response.status === 404) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: "Debatný klub nenájdený",
+      });
+    }
+  },
 });
 
 const { data: clubData } = useNuxtData<{

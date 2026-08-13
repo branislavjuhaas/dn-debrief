@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const authClient = useAuthClient();
 
-const { data: sessionData } = await useAsyncData("session", () =>
+const { data: sessionData } = await useAsyncData("auth-session", () =>
   authClient.getSession({
     fetchOptions: {
       headers: useRequestHeaders(["cookie"]) as Record<string, string>,
