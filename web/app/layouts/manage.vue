@@ -10,7 +10,7 @@ const { data: userData } = useNuxtData<typeof userFetch.value>("users-me");
 const predefinedNavigation: (NavigationMenuItem & { roles: UserRole[] })[][] = [
   [
     {
-      label: "Správa používateľov",
+      label: "Správa používateľov/-iek",
       icon: "i-ph-users-four",
       to: "/manage/users",
       roles: ["developer", "admin", "chief_adjudicator"],

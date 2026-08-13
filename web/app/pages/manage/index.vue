@@ -13,11 +13,11 @@ const { data: userData } = useNuxtData<typeof userFetch.value>("users-me");
 
 const managementViews: (PageCardProps & { roles: UserRole[] })[] = [
   {
-    title: "Správa používateľov",
+    title: "Správa používateľov/-iek",
     icon: "i-ph-users-four-bold",
     to: "/manage/users",
     description:
-      "Prehľad všetkých používateľov platformy DebRIEF s možnosťou exportu a náhľadu do používateľských profilov.",
+      "Prehľad všetkých používateľov/-iek platformy DebRIEF s možnosťou exportu a náhľadu do používateľských profilov.",
     roles: ["developer", "admin", "chief_adjudicator"],
   },
   {
