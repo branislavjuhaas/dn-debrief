@@ -30,21 +30,19 @@ const { data: userFetch } = await useFetch("/api/users/me", {
 const { data: userData } = useNuxtData<typeof userFetch.value>("users-me");
 
 const route = useRoute();
+const clubId = route.params.clubId as NonEmptyString;
 
-await useFetch(`/api/clubs/${route.params.clubId}`, {
-  key: `clubs-${route.params.clubId}`,
+await useFetch(`/api/clubs/${clubId}`, {
+  key: `clubs-${clubId}`,
 });
 
 const { data: clubData } = useNuxtData<{
   club: Club & { membershipsCount: number; isDeletable: boolean };
-}>(`clubs-${route.params.clubId}`);
+}>(`clubs-${clubId}`);
 
-const { data: clubManagers } = await useFetch(
-  `/api/clubs/${route.params.clubId}/managers`,
-  {
-    key: `clubs-${route.params.clubId}-managers`,
-  },
-);
+const { data: clubManagers } = await useFetch(`/api/clubs/${clubId}/managers`, {
+  key: `clubs-${clubId}-managers`,
+});
 
 const isUserClubManager = computed(() => {
   if (!userData?.value?.user || !clubManagers?.value) {
@@ -57,9 +55,9 @@ const isUserClubManager = computed(() => {
 });
 
 const { data: clubMembers } = await useFetch(
-  `/api/clubs/${route.params.clubId}/memberships`,
+  `/api/clubs/${clubId}/memberships`,
   {
-    key: `clubs-${route.params.clubId}-memberships`,
+    key: `clubs-${clubId}-memberships`,
     enabled: computed(
       () =>
         isUserClubManager.value ||
@@ -93,7 +91,7 @@ const deleteClub = async () => {
   const shouldDelete = await instance.result;
 
   if (shouldDelete) {
-    await $fetch(`/api/clubs/${route.params.clubId as NonEmptyString}`, {
+    await $fetch(`/api/clubs/${clubId as NonEmptyString}`, {
       method: "DELETE",
       onResponseError({ response }) {
         toast.add({
@@ -127,7 +125,7 @@ const addClubManager = async () => {
 const deleteClubManager = async (managerId: number) => {
   let previousManagers: typeof clubManagers.value = { managers: [] };
 
-  await $fetch(`/api/clubs/${route.params.clubId}/managers/${managerId}`, {
+  await $fetch(`/api/clubs/${clubId}/managers/${managerId}`, {
     method: "DELETE",
     onRequest() {
       if (!clubManagers.value) {
@@ -149,7 +147,7 @@ const deleteClubManager = async (managerId: number) => {
       });
     },
     async onResponse() {
-      await refreshNuxtData(`clubs-${route.params.clubId}-managers`);
+      await refreshNuxtData(`clubs-${clubId}-managers`);
     },
   });
 };
