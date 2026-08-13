@@ -111,7 +111,9 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
           :true-value="true"
           :false-value="false" />
 
-        <UButton type="submit" block autol> Uložiť zmeny </UButton>
+        <UButton type="submit" block :loading="editingClub">
+          Uložiť zmeny
+        </UButton>
       </UForm>
     </template>
   </UModal>

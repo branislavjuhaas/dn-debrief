@@ -97,7 +97,9 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
           </UFormField>
         </div>
 
-        <UButton type="submit" block autol> Vytvoriť klub </UButton>
+        <UButton type="submit" block :loading="creatingClub">
+          Vytvoriť klub
+        </UButton>
       </UForm>
     </template>
   </UModal>
