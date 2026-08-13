@@ -32,12 +32,12 @@ const state = reactive<Partial<Schema>>({
   isActive: props.club.isActive,
 });
 
-const creatingClub = ref(false);
+const editingClub = ref(false);
 
 const toast = useToast();
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
-  creatingClub.value = true;
+  editingClub.value = true;
 
   await $fetch(`/api/clubs/${props.club.id}`, {
     method: "PATCH",
