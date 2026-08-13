@@ -1,12 +1,18 @@
 <script lang="ts" setup>
 import { refDebounced } from "@vueuse/core";
 import type { AvatarProps } from "@nuxt/ui";
+import { UInputMenu } from "#components";
 
 const emit = defineEmits(["close"]);
 
 const props = defineProps<{
   clubId: number;
+  userRole: UserRole | undefined;
 }>();
+
+const isAdminOrDeveloper = computed(() =>
+  ["developer", "admin"].includes(props.userRole ?? ""),
+);
 
 const addingManager = ref(false);
 
@@ -31,6 +37,33 @@ const { data: clubManagers } = await useFetch(
     key: `clubs-${props.clubId}-managers`,
   },
 );
+
+const { data: clubMemberships } = await useFetch(
+  `/api/clubs/${props.clubId}/memberships`,
+  {
+    key: `clubs-${props.clubId}-memberships`,
+    enabled: isAdminOrDeveloper.value,
+  },
+);
+
+const clubMembers = clubMemberships.value
+  ? clubMemberships.value?.memberships
+      ?.filter(
+        (membership) =>
+          !clubManagers.value?.managers.some(
+            (manager) => manager.id === membership.user?.id,
+          ),
+      )
+      .map((membership) => ({
+        label: `${membership.user?.name} ${membership.user?.surname}`,
+        value: String(membership.user?.id),
+        avatar: {
+          src: membership.user?.image ?? undefined,
+          alt: `${membership.user?.name} ${membership.user?.surname}`,
+          loading: "lazy" as const,
+        },
+      }))
+  : [];
 
 const {
   data: users,
@@ -111,12 +144,39 @@ const addManager = async () => {
 <template>
   <UModal title="Pridať správcu/-kyňu klubu">
     <template #body>
+      <UAlert
+        :title="
+          isAdminOrDeveloper
+            ? 'Ako administrátor/-ka môžete pridať ľubovoľného/-ú používateľa/-ku ako správcu/-kyňu klubu.'
+            : 'Ako správca/-kyňa klubu môžete pridať za správcu/-kyňu klubu len existujúceho/-u člena/-ku klubu.'
+        "
+        :icon="isAdminOrDeveloper ? 'i-ph-seal-check' : 'i-ph-seal-warning'"
+        variant="subtle"
+        color="neutral"
+        class="mb-4" />
       <UFormField label="Používateľ/-ka" name="user">
         <UInputMenu
+          v-if="isAdminOrDeveloper"
           v-model="selectedUser"
           v-model:search-term="searchTerm"
           :items="users"
           :loading="status === 'pending'"
+          icon="i-ph-user-plus"
+          placeholder="Vyberte používateľa/-ku"
+          class="w-full"
+          @update:open="onOpen">
+          <template #leading="{ modelValue, ui }">
+            <UAvatar
+              v-if="modelValue"
+              v-bind="modelValue.avatar"
+              :size="ui.leadingAvatarSize() as AvatarProps['size']"
+              :class="ui.leadingAvatar()" />
+          </template>
+        </UInputMenu>
+        <UInputMenu
+          v-else
+          v-model="selectedUser"
+          :items="clubMembers"
           icon="i-ph-user-plus"
           placeholder="Vyberte používateľa/-ku"
           class="w-full"
@@ -136,6 +196,7 @@ const addManager = async () => {
         :loading="addingManager"
         color="primary"
         block
+        :disabled="!selectedUser"
         @click="addManager">
         Pridať správcu/-kyňu
       </UButton>

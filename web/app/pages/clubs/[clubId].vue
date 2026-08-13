@@ -57,9 +57,9 @@ const isUserClubManager = computed(() => {
 });
 
 const { data: clubMembers } = await useFetch(
-  `/api/clubs/${route.params.clubId}/members`,
+  `/api/clubs/${route.params.clubId}/memberships`,
   {
-    key: `clubs-${route.params.clubId}-members`,
+    key: `clubs-${route.params.clubId}-memberships`,
     enabled: computed(
       () =>
         isUserClubManager.value ||
@@ -120,6 +120,7 @@ const addClubManager = async () => {
   const modal = overlay.create(LazyModalAddClubManager);
   modal.open({
     clubId: clubData?.value?.club.id as number,
+    userRole: userData?.value?.user?.role,
   });
 };
 
@@ -133,7 +134,7 @@ const deleteClubManager = async (managerId: number) => {
         return;
       }
 
-      previousManagers = clubManagers.value;
+      previousManagers = { ...clubManagers.value };
 
       clubManagers.value.managers = clubManagers.value?.managers.filter(
         (m) => m.id !== managerId,
