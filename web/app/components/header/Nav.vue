@@ -3,6 +3,15 @@ import type { DropdownMenuItem } from "@nuxt/ui";
 import type { User } from "#shared/types/user";
 
 const authClient = useAuthClient();
+
+const { data: sessionData } = await useAsyncData("session", () =>
+  authClient.getSession({
+    fetchOptions: {
+      headers: useRequestHeaders(["cookie"]) as Record<string, string>,
+    },
+  }),
+);
+
 const { data: userFetch } = await useFetch("/api/users/me", {
   key: "users-me",
 });
@@ -74,7 +83,13 @@ const navItems = computed<DropdownMenuItem[][]>(() => {
         :avatar="{
           src: userData.user.image ?? undefined,
           alt: `${userData.user.name} ${userData.user.surname}`,
-          chip: false,
+          chip: sessionData?.data?.session.impersonatedBy
+            ? {
+                color: 'info',
+                position: 'bottom-right',
+                size: 'md',
+              }
+            : false,
         }"
         aria-label="Používateľský profil">
         {{ userData.user.name }}

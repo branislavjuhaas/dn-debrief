@@ -9,6 +9,7 @@ import Footer from "~/components/Footer.vue";
     <NuxtRouteAnnouncer />
     <NuxtAnnouncer />
     <NuxtLoadingIndicator color="var(--ui-primary)" />
+    <Banners />
     <Header />
     <NuxtLayout>
       <NuxtPage />

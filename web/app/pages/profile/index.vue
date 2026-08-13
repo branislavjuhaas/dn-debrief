@@ -25,10 +25,24 @@ useSeoMeta({
 
 const authClient = useAuthClient();
 
+const { data: sessionData } = await useAsyncData("session", () =>
+  authClient.getSession({
+    fetchOptions: {
+      headers: useRequestHeaders(["cookie"]) as Record<string, string>,
+    },
+  }),
+);
+
 const logout = async () => {
   await navigateTo("/");
   await authClient.signOut();
   await clearNuxtData("users-me");
+};
+
+const stopImpersonatingUser = async () => {
+  await authClient.admin.stopImpersonating();
+  await navigateTo("/");
+  await refreshNuxtData();
 };
 
 const tabItems = ref<TabsItem[]>([
@@ -172,7 +186,14 @@ const membershipsAlert = computed<AlertProps>(() => {
           variant="subtle">
           Zmeniť heslo
         </UButton>
-        <UButton icon="i-ph-plugs" color="error" @click="logout">
+        <UButton
+          v-if="sessionData?.data?.session.impersonatedBy"
+          icon="i-ph-visor"
+          color="info"
+          @click="stopImpersonatingUser">
+          Ukončiť zosobnenie
+        </UButton>
+        <UButton v-else icon="i-ph-plugs" color="error" @click="logout">
           Odhlásiť sa
         </UButton>
       </template>
