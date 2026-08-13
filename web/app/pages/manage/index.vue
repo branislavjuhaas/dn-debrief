@@ -19,6 +19,11 @@ definePageMeta({
   ],
 });
 
+useSeoMeta({
+  title: "Panel správy",
+  description: "Prehľad a správa nastavení a údajov platformy DebRIEF",
+});
+
 const { data: userFetch } = await useFetch("/api/users/me", {
   key: "users-me",
 });

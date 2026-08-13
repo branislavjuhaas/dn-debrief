@@ -7,6 +7,12 @@ definePageMeta({
   allowedRoles: ["developer", "admin", "chief_adjudicator"],
 });
 
+useSeoMeta({
+  title: "Správa používateľov/-iek",
+  description:
+    "Prehľad všetkých používateľov/-iek platformy DebRIEF s možnosťou exportu a náhľadu do používateľských profilov.",
+});
+
 const { data: stats } = await useFetch("/api/users/stats", {
   key: "users-stats",
 });

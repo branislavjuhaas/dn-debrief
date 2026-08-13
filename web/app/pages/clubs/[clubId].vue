@@ -23,12 +23,6 @@ const tabItems = ref<TabsItem[]>([
   },
 ]);
 
-const { data: userFetch } = await useFetch("/api/users/me", {
-  key: "users-me",
-});
-
-const { data: userData } = useNuxtData<typeof userFetch.value>("users-me");
-
 const route = useRoute();
 const clubId = route.params.clubId as NonEmptyString;
 
@@ -39,6 +33,17 @@ await useFetch(`/api/clubs/${clubId}`, {
 const { data: clubData } = useNuxtData<{
   club: Club & { membershipsCount: number; isDeletable: boolean };
 }>(`clubs-${clubId}`);
+
+useSeoMeta({
+  title: `Debatný klub ${clubData?.value?.club.name ?? ""}`.trim(),
+  description: `Profil debatného klubu ${clubData?.value?.club.name ?? ""} s prehľadom správcov/-kýň, členov/-iek a ďalších informácií.`,
+});
+
+const { data: userFetch } = await useFetch("/api/users/me", {
+  key: "users-me",
+});
+
+const { data: userData } = useNuxtData<typeof userFetch.value>("users-me");
 
 const { data: clubManagers } = await useFetch(`/api/clubs/${clubId}/managers`, {
   key: `clubs-${clubId}-managers`,

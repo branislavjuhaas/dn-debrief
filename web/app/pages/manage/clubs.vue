@@ -7,6 +7,12 @@ definePageMeta({
   allowedRoles: ["developer", "admin"],
 });
 
+useSeoMeta({
+  title: "Správa klubov",
+  description:
+    "Zoznam klubov registrovaných v Slovenskej debatnej asociácii s počtom členov a ostatnými informáciami.",
+});
+
 const { data: clubsFetch } = await useFetch("/api/clubs", {
   key: "clubs",
 });
