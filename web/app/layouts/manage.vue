@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from "@nuxt/ui";
-import type { User } from "#shared/types/user";
 
 const { data: userFetch } = await useFetch("/api/users/me", {
   key: "users-me",
@@ -63,9 +62,21 @@ const predefinedNavigation: (NavigationMenuItem & { roles: UserRole[] })[][] = [
 const navigation = computed(() => {
   const userRole = (userData?.value?.user?.role as UserRole) ?? "user";
 
-  return predefinedNavigation
+  const filteredNavigation: NavigationMenuItem[][] = predefinedNavigation
     .map((group) => group.filter((item) => item.roles.includes(userRole)))
     .filter((group) => group.length > 0);
+
+  const managedClubs = userData?.value?.user?.managedClubs ?? [];
+  if (managedClubs.length > 0) {
+    const clubsNavigation: NavigationMenuItem[] = managedClubs.map((club) => ({
+      label: `Správa DK ${club.name}`,
+      icon: "i-ph-bank",
+      to: `/clubs/${club.id}`,
+      trailingIcon: "i-ph-arrow-square-up-right",
+    }));
+    filteredNavigation.push(clubsNavigation);
+  }
+  return filteredNavigation;
 });
 </script>
 

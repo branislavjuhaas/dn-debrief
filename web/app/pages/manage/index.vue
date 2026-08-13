@@ -65,6 +65,18 @@ const filteredManagementViews = computed(() => {
 
   return managementViews.filter((item) => item.roles.includes(userRole));
 });
+
+const managedClubs = computed(() => {
+  const managedClubs = userData?.value?.user?.managedClubs ?? [];
+
+  return managedClubs.map((club) => ({
+    title: `Debatný klub ${club.name}`,
+    description: `Správa ${club.isActive ? "aktívneho" : "neaktívneho"} debatného klubu ${club.name}, ktorého ste správcom/-kyňou.`,
+    icon: "i-ph-bank-bold",
+    to: `/clubs/${club.id}`,
+    trailingIcon: "i-ph-arrow-square-up-right",
+  }));
+});
 </script>
 
 <template>
@@ -87,6 +99,19 @@ const filteredManagementViews = computed(() => {
             v-for="item in filteredManagementViews"
             :key="item.to?.toString()"
             variant="subtle"
+            v-bind="item" />
+        </UPageGrid>
+        <USeparator
+          v-if="
+            filteredManagementViews.length > 0 && managedClubs.length > 0
+          " />
+        <UPageGrid>
+          <UPageCard
+            v-for="item in managedClubs"
+            :key="item.to?.toString()"
+            :ui="{ leadingIcon: 'text-secondary' }"
+            variant="subtle"
+            color="secondary"
             v-bind="item" />
         </UPageGrid>
       </template>
