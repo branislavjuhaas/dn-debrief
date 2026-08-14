@@ -29,6 +29,8 @@ const greet = (user: User | null) => {
 };
 
 const feed = useFeed();
+
+const NuxtLink = resolveComponent("NuxtLink");
 </script>
 
 <template>
@@ -63,22 +65,39 @@ const feed = useFeed();
       </div>
       <div class="space-y-2">
         <IconHeading icon="i-ph-megaphone-fill">Pre vás</IconHeading>
-        <div class="flex flex-col gap-3 w-full py-1 px-0.5">
-          <motion.div
-            v-for="(item, index) in feed"
-            :key="item.title"
-            :transition="{
-              duration: 0.4,
-              ease: 'easeOut',
-              delay: index * 0.05,
-            }"
-            :initial="{ translateY: 10, opacity: 0 }"
-            :animate="{ translateY: 0, opacity: 1 }"
-            class="px-6 py-3 rounded-lg overflow-hidden drop-shadow bg-default ring ring-default">
-            <h3 class="text-sm font-bold">{{ item.title }}</h3>
-            <div class="text-sm text-muted">{{ item.content }}</div>
-          </motion.div>
-        </div>
+        <ClientOnly>
+          <ul role="list" class="flex flex-col gap-3 w-full py-1 px-0.5">
+            <motion.li
+              v-for="(item, index) in feed"
+              :key="item.title"
+              :initial="{ y: 10, opacity: 0 }"
+              :animate="{ y: 0, opacity: 1 }"
+              :transition="{
+                duration: 0.35,
+                ease: 'easeOut',
+                delay: Math.min(index * 0.04, 0.3),
+              }">
+              <component
+                :is="item.to ? NuxtLink : 'div'"
+                :to="item.to"
+                :class="[
+                  'block rounded-lg px-6 py-3 bg-default ring ring-default drop-shadow overflow-hidden transition-all duration-200',
+                  item.to
+                    ? 'hover:ring-muted/50 cursor-pointer'
+                    : 'cursor-default',
+                ]">
+                <h3 class="text-sm font-bold text-foreground">
+                  {{ item.title }}
+                </h3>
+                <p
+                  v-if="item.content"
+                  class="text-sm text-muted mt-0.5 leading-relaxed">
+                  {{ item.content }}
+                </p>
+              </component>
+            </motion.li>
+          </ul>
+        </ClientOnly>
       </div>
     </UPageBody>
   </UPage>
