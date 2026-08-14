@@ -143,8 +143,6 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
             placeholder="Zadejte obec trvalého pobytu" />
         </UFormField>
 
-        <USeparator class="md:col-span-2" />
-
         <UButton
           type="submit"
           block
