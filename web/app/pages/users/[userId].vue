@@ -240,7 +240,10 @@ watch(
           <USelect
             v-model="userRole"
             :items="roleItems"
-            :disabled="userData?.user?.role === 'developer'"
+            :disabled="
+              userData?.user?.role === 'developer' ||
+              userData?.user?.id === currentUserData?.user?.id
+            "
             variant="subtle"
             icon="i-ph-seal-check"
             :ui="{ leadingIcon: 'text-default' }"
