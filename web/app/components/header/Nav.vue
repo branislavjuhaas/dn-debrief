@@ -4,13 +4,7 @@ import type { User } from "#shared/types/user";
 
 const authClient = useAuthClient();
 
-const { data: sessionData } = await useAsyncData("auth-session", () =>
-  authClient.getSession({
-    fetchOptions: {
-      headers: useRequestHeaders(["cookie"]) as Record<string, string>,
-    },
-  }),
-);
+const { data: sessionData } = await useAuthSession();
 
 const { data: userFetch } = await useFetch("/api/users/me", {
   key: "users-me",
