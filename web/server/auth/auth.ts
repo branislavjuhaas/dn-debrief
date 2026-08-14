@@ -150,13 +150,17 @@ export const auth = betterAuth({
     before: createAuthMiddleware(async (ctx) => {
       if (ctx.path === "/admin/set-role") {
         const { userId, role } = ctx.body as { userId: number; role: UserRole };
-        const userRole = ctx.context.session?.user.role as UserRole;
 
-        if (adminRoleRank(userRole) < adminRoleRank(role)) {
-          throw new APIError("UNAUTHORIZED", {
-            statusCode: 401,
+        const session = await auth.api.getSession({
+          headers: ctx.headers!,
+        });
 
-            message: "Role above current role cannot be set",
+        const userRole = session?.user.role as UserRole;
+
+        if (!userRole || adminRoleRank(userRole) < adminRoleRank(role)) {
+          throw new APIError("FORBIDDEN", {
+            statusCode: 403,
+            message: "Role above setter user's role cannot be set",
           });
         }
 
@@ -165,8 +169,9 @@ export const auth = betterAuth({
           columns: { role: true },
         })) ?? { role: "user" };
 
-        if (adminRoleRank(role) < adminRoleRank(affectedRole)) {
-          throw new APIError("UNAUTHORIZED", {
+        if (adminRoleRank(userRole) < adminRoleRank(affectedRole)) {
+          throw new APIError("FORBIDDEN", {
+            statusCode: 403,
             message: "Role of superior user cannot be set",
           });
         }
