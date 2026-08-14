@@ -20,6 +20,7 @@ export const admin = ac.newRole({
 // Developer role (all admin permissions including impersonation)
 export const developer = ac.newRole({
   ...adminAc.statements,
+  user: ["impersonate-admins", ...adminAc.statements.user],
 });
 
 // All other roles get user permissions
