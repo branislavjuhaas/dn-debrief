@@ -30,15 +30,25 @@ else if (window.location.hostname === "barca.juhaas.eu") {
 </script>
 
 <template>
-  <div class="flex flex-col h-[3.75rem] items-center px-5">
-    <div
-      class="grid grid-rows-1 grid-cols-[auto_1fr] gap-4 justify-center items-center max-w-[1320px] h-full w-full sm:grid-cols-[1fr_31.25rem_1fr]">
-      <router-link to="/" class="flex w-fit items-center">
-        <img :src="logo" :alt="system" class="h-8" />
-      </router-link>
-      <Search />
+  <div class="flex flex-col h-auto">
+    <div class="depreciation-banner px-5 w-full bg-red text-white items-center text-center">
+      <b>DebRIEF v1 nie je viac podporovaný!</b> Použite, prosím, verziu v2 na adrese <a href="https://debrief.sda.sk" class="underline text-white">https://debrief.sda.sk</a>.
+    </div>
+    <div class="flex flex-col h-[3.75rem] items-center px-5">
+      <div
+        class="grid grid-rows-1 grid-cols-[auto_1fr] gap-4 justify-center items-center max-w-[1320px] h-full w-full sm:grid-cols-[1fr_31.25rem_1fr]">
+        <router-link to="/" class="flex w-fit items-center">
+          <img :src="logo" :alt="system" class="h-8" />
+        </router-link>
+        <Search />
+      </div>
     </div>
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.depreciation-banner {
+  padding-top: 0.9rem;
+  padding-bottom: 0.75rem;
+}
+</style>
