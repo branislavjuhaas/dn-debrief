@@ -31,6 +31,12 @@ const schema = z.object({
     .string("Obec trvalého pobytu je povinný údaj")
     .nonempty("Obec trvalého pobytu je povinný údaj"),
   phone: z.e164("Neplatné telefónne číslo"),
+  // number between 0 and 3
+  credential: z
+    .number()
+    .int("Rozhodcovská akreditácia musí byť celé číslo")
+    .min(0, "Rozhodcovská akreditácia musí byť celé číslo medzi 0 a 3")
+    .max(3, "Rozhodcovská akreditácia musí byť celé číslo medzi 0 a 3"),
 });
 
 type Schema = z.output<typeof schema>;
@@ -43,6 +49,7 @@ const state = reactive<Partial<Schema>>({
   street: props.user.street ?? undefined,
   postalCode: props.user.postalCode ?? undefined,
   town: props.user.town ?? undefined,
+  credential: props.user.credential ?? undefined,
 });
 
 const editingUser = ref(false);
@@ -64,6 +71,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
       street: event.data.street,
       postalCode: event.data.postalCode,
       town: event.data.town,
+      credential: event.data.credential ?? 0,
     },
   });
 
@@ -85,12 +93,15 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 </script>
 
 <template>
-  <UModal title="Upraviť debatný klub">
+  <UModal
+    :ui="{ content: 'max-w-3xl' }"
+    title="Upraviť profil používateľa/-ky"
+    @close="emit('close')">
     <template #body>
       <UForm
         :schema="schema"
         :state="state"
-        class="space-y-4"
+        class="space-y-4 space-x-4 md:grid grid-cols-2"
         @submit="onSubmit">
         <UFormField label="Meno" name="firstName">
           <UInput v-model="state.firstName" placeholder="Zadajte krstné meno" />
@@ -116,21 +127,29 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
             placeholder="Zadejte ulicu trvalého pobytu" />
         </UFormField>
 
-        <div class="flex space-x-4">
-          <UFormField label="PSČ" name="postalCode" required class="flex-1">
-            <UInput
-              v-model="state.postalCode"
-              placeholder="Zadejte PSČ trvalého pobytu" />
-          </UFormField>
+        <UFormField label="PSČ" name="postalCode" required class="flex-1">
+          <UInput
+            v-model="state.postalCode"
+            placeholder="Zadejte PSČ trvalého pobytu" />
+        </UFormField>
 
-          <UFormField label="Obec" name="town" required class="flex-1">
-            <UInput
-              v-model="state.town"
-              placeholder="Zadejte obec trvalého pobytu" />
-          </UFormField>
-        </div>
+        <UFormField
+          label="Obec"
+          name="town"
+          required
+          class="flex-1 md:col-span-2">
+          <UInput
+            v-model="state.town"
+            placeholder="Zadejte obec trvalého pobytu" />
+        </UFormField>
 
-        <UButton type="submit" block :loading="editingUser">
+        <USeparator class="md:col-span-2" />
+
+        <UButton
+          type="submit"
+          block
+          :loading="editingUser"
+          class="md:col-span-2">
           Uložiť zmeny
         </UButton>
       </UForm>
