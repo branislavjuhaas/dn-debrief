@@ -281,6 +281,21 @@ watch(
       </template>
     </ProfileHeader>
     <UPageBody>
+      <UAlert
+        v-if="userData?.user?.id === currentUserData?.user?.id"
+        color="info"
+        icon="i-ph-identification-card-fill"
+        orientation="horizontal"
+        title="Prezeráte svoj vlastný profil. Pre úpravu všetkých údajov odporúčame použiť stránku vášho profilu."
+        :actions="[
+          {
+            to: '/profile',
+            label: 'Prejsť na profil',
+            color: 'neutral',
+          },
+        ]"
+        class="mb-2">
+      </UAlert>
       <UTabs
         v-if="
           ['developer', 'admin', 'chief_adjudicator'].includes(
