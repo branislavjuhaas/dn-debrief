@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { LazyModalConfirm, LazyModalEditUser } from "#components";
+import type { SelectItem } from "@nuxt/ui";
 
 const route = useRoute();
 const userId = route.params.userId as NonEmptyString;
@@ -37,6 +38,41 @@ const { data: currentUserData } =
 
 const toast = useToast();
 const overlay = useOverlay();
+
+const roleOptions: SelectItem[] = [
+  { label: "Používateľ/-ka", value: "user" },
+  { label: "Organizátor/-ka", value: "organizer" },
+  { label: "Junior organizátor/-ka", value: "junior_organizer" },
+  { label: "Hlavný/-á rozhodca/-kyňa", value: "chief_adjudicator" },
+  { label: "Člen/-ka tézového výboru", value: "motion_committee_member" },
+  { label: "Administrátor/-ka", value: "admin" },
+  {
+    label: "Vývojár/-ka",
+    value: "developer",
+    disabled: true,
+    class: "hidden",
+  },
+];
+
+const changeUserRole = async (newRole: unknown) => {
+  if (typeof newRole !== "string") {
+    return;
+  }
+
+  const { error } = await authClient.admin.setRole({
+    userId: userId,
+    role: newRole as UserRole,
+  });
+
+  if (error) {
+    toast.add({
+      color: "error",
+      title: "Nepodarilo sa zmeniť rolu používateľa/-ky",
+      description: error.message,
+    });
+    return;
+  }
+};
 
 const editProfile = () => {
   const modal = overlay.create(LazyModalEditUser);
@@ -119,6 +155,15 @@ const unbanUser = async () => {
         v-if="
           ['developer', 'admin'].includes(currentUserData?.user?.role ?? 'user')
         ">
+        <USelect
+          :disabled="userData?.user?.role === 'developer'"
+          :default-value="userData?.user?.role"
+          :items="roleOptions"
+          variant="subtle"
+          icon="i-ph-seal-check"
+          :ui="{ leadingIcon: 'text-default' }"
+          class="w-52"
+          @update:modelValue="changeUserRole" />
         <UButton
           icon="i-ph-pencil-simple"
           color="neutral"
