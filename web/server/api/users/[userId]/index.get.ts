@@ -1,4 +1,5 @@
 import { db } from "#server/db";
+import { sql } from "drizzle-orm";
 
 defineRouteMeta({
   openAPI: {
@@ -53,8 +54,18 @@ defineRouteMeta({
                           nullable: true,
                           example: "https://example.com/avatar.jpg",
                         },
+                        credential: { type: "integer", example: 0 },
+                        isMember: { type: "boolean", example: true },
                       },
-                      required: ["id", "name", "surname", "role", "image"],
+                      required: [
+                        "id",
+                        "name",
+                        "surname",
+                        "role",
+                        "image",
+                        "credential",
+                        "isMember",
+                      ],
                     },
                     // Club manager view (includes email)
                     {
@@ -86,6 +97,8 @@ defineRouteMeta({
                           nullable: true,
                           example: "https://example.com/avatar.jpg",
                         },
+                        credential: { type: "integer", example: 0 },
+                        isMember: { type: "boolean", example: true },
                       },
                       required: [
                         "id",
@@ -94,6 +107,8 @@ defineRouteMeta({
                         "email",
                         "role",
                         "image",
+                        "credential",
+                        "isMember",
                       ],
                     },
                     // Full admin/organizer view (all fields)
@@ -177,6 +192,10 @@ defineRouteMeta({
                           nullable: true,
                           example: null,
                         },
+                        isMember: {
+                          type: "boolean",
+                          example: true,
+                        },
                         createdAt: {
                           type: "string",
                           format: "date-time",
@@ -197,6 +216,7 @@ defineRouteMeta({
                         "emailVerified",
                         "role",
                         "credential",
+                        "isMember",
                         "createdAt",
                         "updatedAt",
                       ],
@@ -270,6 +290,9 @@ export default defineEventHandler(async (event) => {
       where: {
         id: userId,
       },
+      extras: {
+        isMember: sql`exists (select 1 from club_memberships where user_id = ${userId} and season = extract(year from current_date) and confirmed = true)`,
+      },
     });
 
     checkUserNotFound(userData);
@@ -297,6 +320,10 @@ export default defineEventHandler(async (event) => {
           email: true,
           role: true,
           image: true,
+          credential: true,
+        },
+        extras: {
+          isMember: sql`exists (select 1 from club_memberships where user_id = ${userId} and season = extract(year from current_date) and confirmed = true)`,
         },
         where: {
           id: userId,
@@ -315,6 +342,10 @@ export default defineEventHandler(async (event) => {
       surname: true,
       role: true,
       image: true,
+      credential: true,
+    },
+    extras: {
+      isMember: sql`exists (select 1 from club_memberships where user_id = ${userId} and season = extract(year from current_date) and confirmed = true)`,
     },
     where: {
       id: userId,
