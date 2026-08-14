@@ -257,7 +257,10 @@ watch(
             Upraviť profil
           </UButton>
           <UButton
-            v-if="currentUserData?.user?.role === 'developer'"
+            v-if="
+              currentUserData?.user?.role === 'developer' &&
+              userData?.user?.id !== currentUserData?.user?.id
+            "
             icon="i-ph-visor"
             color="secondary"
             variant="subtle"
