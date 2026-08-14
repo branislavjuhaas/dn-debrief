@@ -156,9 +156,9 @@ const unbanUser = async () => {
           ['developer', 'admin'].includes(currentUserData?.user?.role ?? 'user')
         ">
         <USelect
-          :disabled="userData?.user?.role === 'developer'"
           :default-value="userData?.user?.role"
           :items="roleOptions"
+          :disabled="userData?.user?.role === 'developer'"
           variant="subtle"
           icon="i-ph-seal-check"
           :ui="{ leadingIcon: 'text-default' }"
