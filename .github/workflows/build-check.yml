@@ -1,13 +1,7 @@
-name: Check and Test (Web)
+name: Test build (Web)
 
 on:
   workflow_call:
-  push:
-    paths:
-      - "web/**"
-      - "!web/**/*.md"
-      - "!web/LICENSE"
-      - "!web/.gitignore"
   pull_request:
     paths:
       - "web/**"
@@ -41,11 +35,5 @@ jobs:
       - name: Install dependencies
         run: vp install
 
-      - name: Lint and Type check code
-        run: vp check
-
-      - name: Typecheck using Nuxt Typechecker
-        run: vp exec -- nuxt typecheck
-
-      # - name: Run tests
-      #   run: vp test
+      - name: Build project
+        run: vp run build

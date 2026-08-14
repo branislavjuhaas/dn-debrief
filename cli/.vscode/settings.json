@@ -18,6 +18,5 @@
   "editor.formatOnSaveMode": "file",
   "editor.codeActionsOnSave": {
     "source.fixAll.oxc": "explicit"
-  },
-  "pgliteExplorer.databasePaths": []
+  }
 }

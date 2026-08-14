@@ -1,0 +1,1 @@
+ALTER TABLE "club_managers" DROP CONSTRAINT "club_managers_club_id_clubs_id_fkey", ADD CONSTRAINT "club_managers_club_id_clubs_id_fkey" FOREIGN KEY ("club_id") REFERENCES "clubs"("id") ON DELETE CASCADE;
