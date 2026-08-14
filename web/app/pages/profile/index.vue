@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import type { AlertProps, TabsItem, TimelineItem } from "@nuxt/ui";
 import { breakpointsTailwind, useBreakpoints } from "@vueuse/core";
-import type { User } from "#shared/types/user";
 
 const breakpoints = useBreakpoints(breakpointsTailwind);
-
 const mdAndLarger = breakpoints.greaterOrEqual("md");
 
 definePageMeta({
@@ -216,7 +214,7 @@ const membershipsAlert = computed<AlertProps>(() => {
           <div
             class="flex flex-col lg:flex-row lg:justify-between gap-4 items-center sm:items-start">
             <ProfileDetails :user="userData?.user!" class="pl-6 w-full" />
-            <ProfileAwards :user-awards="userData?.user?.awards" />
+            <ProfileAwards :user-awards="userData?.user?.awards ?? []" />
           </div>
         </template>
         <template #memberships>

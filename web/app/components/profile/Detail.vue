@@ -6,6 +6,7 @@ const props = defineProps<{
   value?: string | number | null;
   type?: "default" | "date" | "phone";
   icon?: string;
+  hideIfMissing?: boolean;
 }>();
 
 const formatter = new Intl.DateTimeFormat("sk-SK", {
@@ -27,7 +28,9 @@ const formattedValue = computed(() => {
 </script>
 
 <template>
-  <span class="space-x-2 text-sm items-center flex text-pretty">
+  <span
+    v-if="!hideIfMissing || formattedValue"
+    class="space-x-2 text-sm items-center flex text-pretty">
     <UIcon :name="icon" class="size-5" />
     <span class="max-sm:flex flex-col">
       {{ label }}:&nbsp;

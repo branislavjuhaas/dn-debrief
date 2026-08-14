@@ -2,9 +2,17 @@
 import { computed } from "vue";
 import type { Award } from "#shared/types/user";
 
-const props = defineProps<{
-  userAwards?: Award[];
-}>();
+const props = withDefaults(
+  defineProps<{
+    userAwards: Award[];
+    altText?: string;
+    manageable?: boolean;
+  }>(),
+  {
+    altText: "Zatiaľ nemáte žiadne ocenenia.",
+    manageable: false,
+  },
+);
 
 // Clean, mutation-safe deduplication map
 const filteredAwards = computed(() => {
@@ -38,6 +46,16 @@ const levelStyles: Record<number, string> = {
       <div class="flex flex-row justify-between items-center">
         <span class="text-sm font-bold">Ocenenia</span>
         <UButton
+          v-if="manageable"
+          disabled
+          trailing-icon="i-ph-pencil-simple"
+          size="xs"
+          variant="subtle"
+          color="info">
+          Upraviť
+        </UButton>
+        <UButton
+          v-else
           to="/awards"
           trailing-icon="i-ph-arrow-square-up-right"
           size="xs"
@@ -66,7 +84,7 @@ const levelStyles: Record<number, string> = {
     </div>
 
     <span v-else class="text-sm text-muted">
-      Zatiaľ nemáte žiadne ocenenia.
+      {{ altText }}
     </span>
   </UCard>
 </template>
