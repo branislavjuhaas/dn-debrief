@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { leagueEnum, regionEnum } from "#server/db/schema/clubs";
+import { leagueEnum, regionEnum } from "~~/server/db/schema/clubs";
 
 export const featuredPropertySchema = z.object({
   icon: z.string().min(1),
