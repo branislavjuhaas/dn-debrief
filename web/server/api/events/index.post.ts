@@ -1,6 +1,5 @@
 import { db } from "#server/db";
 import { eventOrganizers, events } from "#server/db/schema/events";
-import { insertEventSchema } from "#server/utils/events";
 
 defineRouteMeta({
   openAPI: {

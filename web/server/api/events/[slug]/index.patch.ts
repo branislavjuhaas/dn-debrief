@@ -1,7 +1,6 @@
 import { db } from "#server/db";
 import { events } from "#server/db/schema/events";
 import { eq } from "drizzle-orm";
-import { updateEventSchema } from "#server/utils/events";
 
 defineRouteMeta({
   openAPI: {
