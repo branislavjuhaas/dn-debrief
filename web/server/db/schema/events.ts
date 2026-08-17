@@ -90,14 +90,7 @@ export type RegistrationSection = {
   uuid: UUID;
   title: string;
   questions: RegistrationQuestion[];
-  next:
-    | { type: "static"; thenUuid: UUID }
-    | {
-        type: "conditional";
-        rules: RegistrationRule[];
-        fallback: UUID;
-      }
-    | null;
+  visibleWhen?: RegistrationRule[];
   deleted?: boolean;
 };
 

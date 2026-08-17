@@ -6,10 +6,7 @@
     <Container class="max-w-xl p-0 py-10 sm:p-6">
       <Section class="px-6 py-5 bg-zinc-50 rounded-t-lg border border-zinc-300">
         <Link href="https://debrief.sda.sk">
-          <Img
-            src="https://v2.debrief.sda.sk/mailing/logo.png"
-            alt="Maizzle"
-            class="h-5 w-18" />
+          <Img src="https://v2.debrief.sda.sk/mailing/logo.png" alt="Maizzle" class="h-5 w-18" />
         </Link>
       </Section>
 
@@ -30,14 +27,11 @@
         <Row>
           <Column>
             <Text as="span" class="text-sm text-zinc-500 font-dm-sans"
-              >2024 - {{ new Date().getFullYear() }} | Branislav Juhás &
-              TpVSÚPDND</Text
+              >2024 - {{ new Date().getFullYear() }} | Branislav Juhás & TpVSÚPDND</Text
             >
           </Column>
           <Column class="w-5">
-            <Link
-              href="https://github.com/branislavjuhaas/dn-debrief"
-              target="_blank">
+            <Link href="https://github.com/branislavjuhaas/dn-debrief" target="_blank">
               <Img
                 src="https://v2.debrief.sda.sk/mailing/github-logo.png"
                 alt="Icon"

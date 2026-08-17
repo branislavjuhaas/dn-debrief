@@ -23,13 +23,7 @@ useSeoMeta({
 
 const authClient = useAuthClient();
 
-const { data: sessionData } = await useAsyncData("auth-session", () =>
-  authClient.getSession({
-    fetchOptions: {
-      headers: useRequestHeaders(["cookie"]) as Record<string, string>,
-    },
-  }),
-);
+const { data: sessionData } = await useAuthSession();
 
 const logout = async () => {
   await navigateTo("/");

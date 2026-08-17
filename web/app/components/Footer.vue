@@ -16,10 +16,6 @@ const footerLinks: FooterColumn[] = [
         label: "Vyhlásenie GDPR",
         to: "/privacy-policy",
       },
-      {
-        label: "Používateľský manuál",
-        to: "/docs/introduction",
-      },
     ],
   },
   {
