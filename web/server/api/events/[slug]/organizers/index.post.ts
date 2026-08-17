@@ -1,6 +1,5 @@
 import { db } from "#server/db";
 import { eventOrganizers } from "#server/db/schema/events";
-import { and, eq } from "drizzle-orm";
 import * as z from "zod";
 
 defineRouteMeta({

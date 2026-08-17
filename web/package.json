@@ -10,7 +10,9 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate"
+    "db:migrate": "drizzle-kit migrate",
+    "check": "vp check && nuxt typecheck",
+    "check:fix": "vp check --fix && nuxt typecheck"
   },
   "dependencies": {
     "@aws-sdk/client-ses": "^3.1106.0",

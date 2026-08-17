@@ -41,11 +41,8 @@ jobs:
       - name: Install dependencies
         run: vp install
 
-      - name: Lint and Type check code
-        run: vp check
-
-      - name: Typecheck using Nuxt Typechecker
-        run: vp exec -- nuxt typecheck
+      - name: Lint and Type check code (VP & Nuxt)
+        run: vp run check
 
       # - name: Run tests
       #   run: vp test

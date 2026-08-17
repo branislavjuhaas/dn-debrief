@@ -75,6 +75,19 @@ export default defineEventHandler(async (event) => {
   const slug = getRouterParam(event, "slug") ?? "";
   const userId = Number.parseInt(getRouterParam(event, "userId") ?? "", 10);
 
+  const eventRecord = await db.query.events.findFirst({
+    columns: { id: true },
+    where: { slug: slug },
+  });
+
+  if (!eventRecord) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: "Not Found",
+      message: `Event with slug "${slug}" not found`,
+    });
+  }
+
   const removed = await db
     .delete(eventOrganizers)
     .where(
