@@ -422,6 +422,10 @@ const columns: TableColumn<{
         </div>
       </UCard>
       <UTabs
+        v-if="
+          isUserClubManager ||
+          ['developer', 'admin'].includes(userData?.user?.role ?? 'user')
+        "
         :items="tabItems"
         variant="link"
         :ui="{
