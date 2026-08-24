@@ -94,6 +94,7 @@ const managedClubs = computed(() => {
     icon: "i-ph-bank-bold",
     to: `/clubs/${club.id}`,
     trailingIcon: "i-ph-arrow-square-up-right",
+    leadingIconClass: club.isActive ? "text-secondary" : "text-muted",
   }));
 });
 </script>
@@ -128,7 +129,7 @@ const managedClubs = computed(() => {
           <UPageCard
             v-for="item in managedClubs"
             :key="item.to?.toString()"
-            :ui="{ leadingIcon: 'text-secondary' }"
+            :ui="{ leadingIcon: item.leadingIconClass }"
             variant="subtle"
             color="secondary"
             v-bind="item" />

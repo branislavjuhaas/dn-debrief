@@ -71,12 +71,13 @@ const columns: TableColumn<Club>[] = [
     cell: ({ row }) => {
       const clubId = row.getValue("id");
       const clubName = row.getValue("name");
+      const isActive = row.getValue("isActive");
 
       return h(
         NuxtLink,
         {
           to: `/clubs/${clubId}`,
-          class: "text-primary font-medium hover:underline",
+          class: `${isActive ? "text-primary" : "text-muted"} font-medium hover:underline`,
         },
         () => clubName,
       );
