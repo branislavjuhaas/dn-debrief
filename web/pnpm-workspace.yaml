@@ -7,6 +7,9 @@ catalog:
 overrides:
   vite: "catalog:"
   typescript: "npm:typescript-native-bridge@6.0.3-bridge.11.tsgo.7.0.2"
+  "@tiptap/core": "3.30.2"
+  "@tiptap/vue-3": "3.30.2"
+  "@tiptap/pm": "3.30.2"
 peerDependencyRules:
   allowAny:
     - vite
