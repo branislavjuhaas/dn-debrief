@@ -29,7 +29,8 @@ export type UUID = string;
 
 export type FeaturedProperty = {
   icon: string;
-  text: string;
+  label: string;
+  value: string;
   badge?: {
     text: string;
     href: string;

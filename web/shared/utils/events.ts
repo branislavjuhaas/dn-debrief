@@ -3,7 +3,8 @@ import { leagueEnum, regionEnum } from "~~/server/db/schema/clubs";
 
 export const featuredPropertySchema = z.object({
   icon: z.string().min(1),
-  text: z.string().min(1),
+  label: z.string().min(1),
+  value: z.string().min(1),
   badge: z.object({ text: z.string().min(1), href: z.url() }).optional(),
 });
 
