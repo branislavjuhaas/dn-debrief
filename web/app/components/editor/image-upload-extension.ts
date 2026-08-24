@@ -33,7 +33,7 @@ export const ImageUpload = Node.create({
     ];
   },
   addNodeView(): NodeViewRenderer {
-    return VueNodeViewRenderer(ImageUploadNodeComponent);
+    return VueNodeViewRenderer(ImageUploadNodeComponent as any);
   },
   addCommands() {
     return {
