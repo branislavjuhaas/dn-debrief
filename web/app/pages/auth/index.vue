@@ -36,7 +36,7 @@ const fields: AuthFormField[] = [
   },
   {
     name: "password",
-    label: "Password",
+    label: "Heslo",
     type: "password",
     placeholder: "Zadajte heslo ",
     required: true,
