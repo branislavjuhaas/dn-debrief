@@ -8,7 +8,8 @@ definePageMeta({
 
 useSeoMeta({
   title: "Prihlásenie",
-  description: "Prihláste se na platformu DebRIEF a začněte využívať všetky jej funkcie.",
+  description:
+    "Prihláste se na platformu DebRIEF a začněte využívať všetky jej funkcie.",
 });
 
 const authClient = useAuthClient();
@@ -129,7 +130,9 @@ const providers = computed(() => [
       <FormBase title="Vitajte späť">
         <template #description>
           Nemáte ešte účet?
-          <ULink to="/auth/register" class="text-secondary">Vytvoriť nový.</ULink>
+          <ULink to="/auth/register" class="text-secondary"
+            >Vytvoriť nový.</ULink
+          >
         </template>
         <UAuthForm
           :schema="loginSchema"
@@ -140,20 +143,28 @@ const providers = computed(() => [
             providers: 'flex flex-col lg:flex-row space-y-0 gap-2',
           }"
           :loading="submitting"
-          @submit="emailLogin"
-        >
+          @submit="emailLogin">
           <template #password-hint>
-            <ULink to="/auth/forgot-password" class="text-secondary font-medium" tabindex="-1"
+            <ULink
+              to="/auth/forgot-password"
+              class="text-secondary font-medium"
+              tabindex="-1"
               >Zabudli ste heslo?</ULink
             >
           </template>
           <template #validation>
-            <LazyUAlert v-if="error" color="error" icon="i-ph-warning-octagon" :title="error" />
+            <LazyUAlert
+              v-if="error"
+              color="error"
+              icon="i-ph-warning-octagon"
+              :title="error" />
           </template>
         </UAuthForm>
         <template #footer>
           Prihlásením súhlasíte s
-          <ULink to="/terms-of-service" class="underline">podmienkamy používania.</ULink>
+          <ULink to="/terms-of-service" class="underline"
+            >podmienkamy používania.</ULink
+          >
         </template>
       </FormBase>
     </UPageBody>
