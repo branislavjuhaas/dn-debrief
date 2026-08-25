@@ -6,6 +6,7 @@ CREATE TYPE "event_type" AS ENUM('tournament', 'workshop', 'other');--> statemen
 CREATE TYPE "payment_status" AS ENUM('pending', 'completed', 'failed');--> statement-breakpoint
 CREATE TABLE "accounts" (
 	"id" serial PRIMARY KEY,
+	"issuer" text NOT NULL,
 	"account_id" text NOT NULL,
 	"provider_id" text NOT NULL,
 	"user_id" integer NOT NULL,
@@ -182,6 +183,7 @@ CREATE TABLE "settings" (
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+CREATE UNIQUE INDEX "accounts_issuer_accountId_uidx" ON "accounts" ("issuer","account_id");--> statement-breakpoint
 CREATE INDEX "accounts_userId_idx" ON "accounts" ("user_id");--> statement-breakpoint
 CREATE INDEX "awards_userId_idx" ON "awards" ("user_id");--> statement-breakpoint
 CREATE INDEX "supervisors_userId_idx" ON "legal_guardians" ("user_id");--> statement-breakpoint
