@@ -7,8 +7,9 @@ export const sendEmail = async (
   html?: string,
 ) => {
   if (import.meta.dev || import.meta.test) {
+    const recipients = Array.isArray(to) ? to.join(", ") : to;
     console.log(
-      `[MAIL] Sending email to: ${to}, subject: ${subject}, text: ${text}, html: ${html}`,
+      `[MAIL] Sending email to: ${recipients}, subject: ${subject}, text: ${text}, html: ${html}`,
     );
     return;
   }
