@@ -13,7 +13,17 @@ export const ac = createAccessControl(statement);
 
 // Admin role (all admin permissions except impersonation)
 export const admin = ac.newRole({
-  user: ["create", "list", "set-role", "ban", "delete", "set-password"],
+  user: [
+    "create",
+    "list",
+    "set-role",
+    "ban",
+    "delete",
+    "set-password",
+    "set-email",
+    "get",
+    "update",
+  ],
   session: ["list", "revoke", "delete"],
 });
 

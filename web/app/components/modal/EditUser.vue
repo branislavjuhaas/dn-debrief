@@ -79,11 +79,12 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     toast.add({
       title: "Nastala chyba",
       description: "Nastala chyba pri aktualizácii používateľa.",
+      color: "error",
     });
   } else {
     toast.add({
-      title: "Používateľ aktualizovaný",
-      description: "Používateľ bol úspešne aktualizovaný.",
+      title: "Používateľ/-ka aktualizovaný",
+      description: "Používateľ/-ka bol úspešne aktualizovaný.",
     });
     await refreshNuxtData(`users-${props.user.id}`);
   }

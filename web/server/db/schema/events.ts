@@ -29,7 +29,8 @@ export type UUID = string;
 
 export type FeaturedProperty = {
   icon: string;
-  text: string;
+  label: string;
+  value: string;
   badge?: {
     text: string;
     href: string;
@@ -161,8 +162,7 @@ export const events = pgTable(
           sql`(lower(regexp_replace(public.immutable_unaccent(${events.name}), '[^a-zA-Z0-9]', '', 'g')))`,
       ),
     type: eventTypeEnum("type").notNull(),
-    description: jsonb("description").notNull(),
-    fileUrls: text("file_urls").array().notNull().default([]),
+    description: text("description").notNull(),
     thumbnailUrl: text("thumbnail_url"),
     beginning: timestamp("beginning").notNull(),
     end: timestamp("end").notNull(),

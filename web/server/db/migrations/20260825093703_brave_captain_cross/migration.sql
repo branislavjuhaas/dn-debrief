@@ -6,6 +6,7 @@ CREATE TYPE "event_type" AS ENUM('tournament', 'workshop', 'other');--> statemen
 CREATE TYPE "payment_status" AS ENUM('pending', 'completed', 'failed');--> statement-breakpoint
 CREATE TABLE "accounts" (
 	"id" serial PRIMARY KEY,
+	"issuer" text NOT NULL,
 	"account_id" text NOT NULL,
 	"provider_id" text NOT NULL,
 	"user_id" integer NOT NULL,
@@ -123,24 +124,24 @@ CREATE TABLE "event_organizers" (
 );
 --> statement-breakpoint
 CREATE TABLE "event_registrations" (
-	"event_id" integer,
+	"id" serial PRIMARY KEY,
+	"event_id" integer NOT NULL,
 	"user_id" integer,
 	"registration_data" jsonb NOT NULL,
 	"collected_details" jsonb NOT NULL,
 	"confirmed" boolean DEFAULT false NOT NULL,
 	"payment_id" integer UNIQUE,
 	"created_at" timestamp DEFAULT now() NOT NULL,
-	"updated_at" timestamp DEFAULT now() NOT NULL,
-	CONSTRAINT "event_registrations_pkey" PRIMARY KEY("event_id","user_id")
+	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "events" (
 	"id" serial PRIMARY KEY,
-	"Slug" text NOT NULL UNIQUE,
+	"slug" text NOT NULL UNIQUE,
 	"name" text NOT NULL,
 	"search" text GENERATED ALWAYS AS ((lower(regexp_replace(public.immutable_unaccent("events"."name"), '[^a-zA-Z0-9]', '', 'g')))) STORED NOT NULL,
 	"type" "event_type" NOT NULL,
-	"description" jsonb NOT NULL,
+	"description" text NOT NULL,
 	"thumbnail_url" text,
 	"beginning" timestamp NOT NULL,
 	"end" timestamp NOT NULL,
@@ -150,6 +151,17 @@ CREATE TABLE "events" (
 	"featured_properties" jsonb DEFAULT '[]' NOT NULL,
 	"schedule" jsonb DEFAULT '{"days":[]}' NOT NULL,
 	"registration_config" jsonb NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "events_end_after_beginning" CHECK ("end" > "beginning")
+);
+--> statement-breakpoint
+CREATE TABLE "methodology_files" (
+	"id" serial PRIMARY KEY,
+	"name" text NOT NULL,
+	"external" boolean DEFAULT false NOT NULL,
+	"file_url" text NOT NULL,
+	"author_id" integer NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
@@ -166,10 +178,11 @@ CREATE TABLE "payments" (
 --> statement-breakpoint
 CREATE TABLE "settings" (
 	"id" serial PRIMARY KEY,
-	"current_seasons" integer[] NOT NULL,
+	"current_seasons" integer[] DEFAULT '{}'::integer[] NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+CREATE UNIQUE INDEX "accounts_issuer_accountId_uidx" ON "accounts" ("issuer","account_id");--> statement-breakpoint
 CREATE INDEX "accounts_userId_idx" ON "accounts" ("user_id");--> statement-breakpoint
 CREATE INDEX "awards_userId_idx" ON "awards" ("user_id");--> statement-breakpoint
 CREATE INDEX "supervisors_userId_idx" ON "legal_guardians" ("user_id");--> statement-breakpoint
@@ -187,6 +200,7 @@ CREATE INDEX "clubs_isActive_idx" ON "clubs" ("is_active");--> statement-breakpo
 CREATE INDEX "clubs_search_idx" ON "clubs" USING gin ("search" gin_trgm_ops);--> statement-breakpoint
 CREATE INDEX "event_organizers_userId_idx" ON "event_organizers" ("user_id");--> statement-breakpoint
 CREATE INDEX "event_organizers_eventId_idx" ON "event_organizers" ("event_id");--> statement-breakpoint
+CREATE UNIQUE INDEX "event_registrations_eventId_userId_idx" ON "event_registrations" ("event_id","user_id");--> statement-breakpoint
 CREATE INDEX "event_registrations_userId_idx" ON "event_registrations" ("user_id");--> statement-breakpoint
 CREATE INDEX "event_registrations_eventId_idx" ON "event_registrations" ("event_id");--> statement-breakpoint
 CREATE INDEX "events_type_idx" ON "events" ("type");--> statement-breakpoint
@@ -194,13 +208,14 @@ CREATE INDEX "events_beginning_end_idx" ON "events" ("beginning","end");--> stat
 CREATE INDEX "events_targetLeague_idx" ON "events" ("target_league");--> statement-breakpoint
 CREATE INDEX "events_targetRegion_idx" ON "events" ("target_region");--> statement-breakpoint
 CREATE INDEX "events_search_idx" ON "events" USING gin ("search" gin_trgm_ops);--> statement-breakpoint
+CREATE INDEX "users_author_id_idx" ON "methodology_files" ("author_id");--> statement-breakpoint
 CREATE INDEX "payments_user_id_idx" ON "payments" ("user_id");--> statement-breakpoint
 ALTER TABLE "accounts" ADD CONSTRAINT "accounts_user_id_users_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE;--> statement-breakpoint
 ALTER TABLE "awards" ADD CONSTRAINT "awards_user_id_users_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE;--> statement-breakpoint
-ALTER TABLE "awards" ADD CONSTRAINT "awards_awarded_by_users_id_fkey" FOREIGN KEY ("awarded_by") REFERENCES "users"("id") ON DELETE CASCADE;--> statement-breakpoint
+ALTER TABLE "awards" ADD CONSTRAINT "awards_awarded_by_users_id_fkey" FOREIGN KEY ("awarded_by") REFERENCES "users"("id") ON DELETE SET NULL;--> statement-breakpoint
 ALTER TABLE "legal_guardians" ADD CONSTRAINT "legal_guardians_user_id_users_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE;--> statement-breakpoint
 ALTER TABLE "sessions" ADD CONSTRAINT "sessions_user_id_users_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE;--> statement-breakpoint
-ALTER TABLE "club_managers" ADD CONSTRAINT "club_managers_club_id_clubs_id_fkey" FOREIGN KEY ("club_id") REFERENCES "clubs"("id");--> statement-breakpoint
+ALTER TABLE "club_managers" ADD CONSTRAINT "club_managers_club_id_clubs_id_fkey" FOREIGN KEY ("club_id") REFERENCES "clubs"("id") ON DELETE CASCADE;--> statement-breakpoint
 ALTER TABLE "club_managers" ADD CONSTRAINT "club_managers_user_id_users_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE;--> statement-breakpoint
 ALTER TABLE "club_memberships" ADD CONSTRAINT "club_memberships_club_id_clubs_id_fkey" FOREIGN KEY ("club_id") REFERENCES "clubs"("id");--> statement-breakpoint
 ALTER TABLE "club_memberships" ADD CONSTRAINT "club_memberships_user_id_users_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE;--> statement-breakpoint

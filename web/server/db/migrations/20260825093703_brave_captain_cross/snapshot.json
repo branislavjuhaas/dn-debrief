@@ -1,7 +1,7 @@
 {
   "version": "8",
   "dialect": "postgres",
-  "id": "d04c8338-f7d0-4abd-ae16-4331a5e150cb",
+  "id": "19566b98-294d-47ac-ac2a-3e9204f66928",
   "prevIds": ["694d1e84-f7b5-4127-aa57-22158ee6be8c"],
   "ddl": [
     {
@@ -122,6 +122,12 @@
     },
     {
       "isRlsEnabled": false,
+      "name": "methodology_files",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
       "name": "payments",
       "entityType": "tables",
       "schema": "public"
@@ -141,6 +147,19 @@
       "generated": null,
       "identity": null,
       "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "accounts"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "issuer",
       "entityType": "columns",
       "schema": "public",
       "table": "accounts"
@@ -1231,6 +1250,19 @@
       "table": "event_organizers"
     },
     {
+      "type": "serial",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "event_registrations"
+    },
+    {
       "type": "integer",
       "typeSchema": null,
       "notNull": true,
@@ -1246,7 +1278,7 @@
     {
       "type": "integer",
       "typeSchema": null,
-      "notNull": true,
+      "notNull": false,
       "dimensions": 0,
       "default": null,
       "generated": null,
@@ -1355,7 +1387,7 @@
       "default": null,
       "generated": null,
       "identity": null,
-      "name": "Slug",
+      "name": "slug",
       "entityType": "columns",
       "schema": "public",
       "table": "events"
@@ -1403,7 +1435,7 @@
       "table": "events"
     },
     {
-      "type": "jsonb",
+      "type": "text",
       "typeSchema": null,
       "notNull": true,
       "dimensions": 0,
@@ -1569,6 +1601,97 @@
       "name": "id",
       "entityType": "columns",
       "schema": "public",
+      "table": "methodology_files"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "name",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "methodology_files"
+    },
+    {
+      "type": "boolean",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "false",
+      "generated": null,
+      "identity": null,
+      "name": "external",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "methodology_files"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "file_url",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "methodology_files"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "author_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "methodology_files"
+    },
+    {
+      "type": "timestamp",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "methodology_files"
+    },
+    {
+      "type": "timestamp",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "methodology_files"
+    },
+    {
+      "type": "serial",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
       "table": "payments"
     },
     {
@@ -1667,7 +1790,7 @@
       "typeSchema": null,
       "notNull": true,
       "dimensions": 1,
-      "default": null,
+      "default": "'{}'",
       "generated": null,
       "identity": null,
       "name": "current_seasons",
@@ -1687,6 +1810,34 @@
       "entityType": "columns",
       "schema": "public",
       "table": "settings"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "issuer",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "account_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "accounts_issuer_accountId_uidx",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "accounts"
     },
     {
       "nameExplicit": true,
@@ -2070,6 +2221,34 @@
       "nameExplicit": true,
       "columns": [
         {
+          "value": "event_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "user_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "event_registrations_eventId_userId_idx",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "event_registrations"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
           "value": "user_id",
           "isExpression": false,
           "asc": true,
@@ -2224,6 +2403,27 @@
       "nameExplicit": true,
       "columns": [
         {
+          "value": "author_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "users_author_id_idx",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "methodology_files"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
           "value": "user_id",
           "isExpression": false,
           "asc": true,
@@ -2274,7 +2474,7 @@
       "tableTo": "users",
       "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
-      "onDelete": "CASCADE",
+      "onDelete": "SET NULL",
       "name": "awards_awarded_by_users_id_fkey",
       "entityType": "fks",
       "schema": "public",
@@ -2313,7 +2513,7 @@
       "tableTo": "clubs",
       "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
-      "onDelete": "NO ACTION",
+      "onDelete": "CASCADE",
       "name": "club_managers_club_id_clubs_id_fkey",
       "entityType": "fks",
       "schema": "public",
@@ -2482,14 +2682,6 @@
       "table": "event_organizers"
     },
     {
-      "columns": ["event_id", "user_id"],
-      "nameExplicit": false,
-      "name": "event_registrations_pkey",
-      "entityType": "pks",
-      "schema": "public",
-      "table": "event_registrations"
-    },
-    {
       "columns": ["id"],
       "nameExplicit": false,
       "name": "accounts_pkey",
@@ -2540,9 +2732,25 @@
     {
       "columns": ["id"],
       "nameExplicit": false,
+      "name": "event_registrations_pkey",
+      "schema": "public",
+      "table": "event_registrations",
+      "entityType": "pks"
+    },
+    {
+      "columns": ["id"],
+      "nameExplicit": false,
       "name": "events_pkey",
       "schema": "public",
       "table": "events",
+      "entityType": "pks"
+    },
+    {
+      "columns": ["id"],
+      "nameExplicit": false,
+      "name": "methodology_files_pkey",
+      "schema": "public",
+      "table": "methodology_files",
       "entityType": "pks"
     },
     {
@@ -2608,12 +2816,19 @@
     },
     {
       "nameExplicit": false,
-      "columns": ["Slug"],
+      "columns": ["slug"],
       "nullsNotDistinct": false,
-      "name": "events_Slug_key",
+      "name": "events_slug_key",
       "schema": "public",
       "table": "events",
       "entityType": "uniques"
+    },
+    {
+      "value": "\"end\" > \"beginning\"",
+      "name": "events_end_after_beginning",
+      "entityType": "checks",
+      "schema": "public",
+      "table": "events"
     }
   ],
   "renames": []

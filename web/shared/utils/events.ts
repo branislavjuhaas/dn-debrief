@@ -3,7 +3,8 @@ import { leagueEnum, regionEnum } from "~~/server/db/schema/clubs";
 
 export const featuredPropertySchema = z.object({
   icon: z.string().min(1),
-  text: z.string().min(1),
+  label: z.string().min(1),
+  value: z.string().min(1),
   badge: z.object({ text: z.string().min(1), href: z.url() }).optional(),
 });
 
@@ -106,7 +107,7 @@ export const eventSchema = z.object({
   slug: z.string().min(1),
   name: z.string().min(1),
   type: z.enum(["tournament", "workshop", "other"]),
-  description: z.unknown(),
+  description: z.string(),
   fileUrls: z.array(z.url()).default([]),
   thumbnailUrl: z.url().optional(),
   beginning: z.coerce.date(),

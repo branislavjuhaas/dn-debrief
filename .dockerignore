@@ -1,8 +1,0 @@
-node_modules
-.pnpm-store
-**/.nuxt
-**/.output
-**/dist
-**/.env
-.git
-README.md
