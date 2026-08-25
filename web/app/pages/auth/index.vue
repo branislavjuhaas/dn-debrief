@@ -96,7 +96,15 @@ const githubLogin = async () => {
 };
 
 const googleLogin = async () => {
-  // TODO: Implement Google login
+  submitting.value = true;
+  error.value = null;
+
+  const next = useRoute().query.next;
+
+  await authClient.signIn.social({
+    provider: "google",
+    callbackURL: next ? `${next as string}` : "/",
+  });
 };
 
 const providers = computed(() => [
