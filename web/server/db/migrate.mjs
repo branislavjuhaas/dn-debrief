@@ -9,24 +9,25 @@ if (!databaseUrl) {
   process.exit(1);
 }
 
-// Initialize a single, dedicated connection for the migration run
+const sanitizedUrl = databaseUrl.replace(/:[^:@]+@/, ":***@");
+console.log(`🔗 Migrator connecting to: ${sanitizedUrl}`);
+
 const sql = postgres(databaseUrl, {
   max: 1,
-  onnotice: () => {}, // Suppress noisy PG notices during migrations
+  onnotice: () => {},
 });
 
-const db = drizzle(sql);
+// PASS CLIENT OPTION HERE
+const db = drizzle({ client: sql });
 
 console.log("⏳ Applying database migrations...");
 
 try {
-  // Points to the ./migrations directory copied into /app in Stage 3
   await migrate(db, { migrationsFolder: "./migrations" });
   console.log("✅ Migrations applied successfully!");
 } catch (error) {
   console.error("❌ Migration execution failed:", error);
   process.exit(1);
 } finally {
-  // Ensure the database connection pool is explicitly closed
   await sql.end({ timeout: 5 });
 }
