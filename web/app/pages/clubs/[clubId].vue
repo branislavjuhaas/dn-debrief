@@ -281,7 +281,7 @@ const columns: TableColumn<{
         junior_student: "info" as const,
         senior_student: "olive" as const,
         graduate: "rose" as const,
-        teacher: "violet" as const,
+        teacher: "purple" as const,
       }[row.original.registrationType];
 
       return h(UBadge, { variant: "subtle", color }, () =>
