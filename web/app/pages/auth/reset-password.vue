@@ -62,13 +62,13 @@ const createPassword = async (payload: FormSubmitEvent<ResetFormData>) => {
     return;
   }
 
-  const { data, error: createError } = await authClient.resetPassword({
+  const { data, error: creationError } = await authClient.resetPassword({
     newPassword: payload.data.password,
     token: route.query.token as string,
   });
 
-  if (createError || !data) {
-    error.value = translateAuthError(createError?.code || "UNKNOWN_ERROR");
+  if (creationError || !data) {
+    error.value = translateAuthError(creationError?.code || "UNKNOWN_ERROR");
     submitting.value = false;
     return;
   }
