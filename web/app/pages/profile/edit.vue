@@ -376,7 +376,7 @@ onMounted(() => {
       </div>
 
       <span
-        class="relative mx-auto inline-flex items-center justify-center shrink-0 select-none rounded-full align-middle bg-elevated size-40 text-4xl"
+        class="relative mx-auto inline-flex items-center justify-center shrink-0 select-none rounded-full align-middle bg-elevated size-40 text-6xl"
         aria-hidden="true">
         <NuxtImg
           v-if="userData?.user?.image"
@@ -387,7 +387,10 @@ onMounted(() => {
           class="h-full w-full rounded-[inherit] object-cover" />
 
         <span v-else class="font-medium truncate">
-          {{ userData?.user?.name }} {{ userData?.user?.surname }}
+          {{
+            (userData?.user?.name?.charAt(0) ?? "") +
+            (userData?.user?.surname?.charAt(0) ?? "")
+          }}
         </span>
 
         <UButton
