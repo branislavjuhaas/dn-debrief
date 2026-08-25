@@ -1,8 +1,10 @@
 {
   "version": "8",
   "dialect": "postgres",
-  "id": "d04c8338-f7d0-4abd-ae16-4331a5e150cb",
-  "prevIds": ["694d1e84-f7b5-4127-aa57-22158ee6be8c"],
+  "id": "03d0e206-fe80-43cc-8bd8-99607cda5578",
+  "prevIds": [
+    "694d1e84-f7b5-4127-aa57-22158ee6be8c"
+  ],
   "ddl": [
     {
       "values": [
@@ -19,31 +21,52 @@
       "schema": "public"
     },
     {
-      "values": ["junior_student", "senior_student", "graduate", "teacher"],
+      "values": [
+        "junior_student",
+        "senior_student",
+        "graduate",
+        "teacher"
+      ],
       "name": "club_registration_type",
       "entityType": "enums",
       "schema": "public"
     },
     {
-      "values": ["junior", "senior", "university"],
+      "values": [
+        "junior",
+        "senior",
+        "university"
+      ],
       "name": "league",
       "entityType": "enums",
       "schema": "public"
     },
     {
-      "values": ["western", "central", "eastern"],
+      "values": [
+        "western",
+        "central",
+        "eastern"
+      ],
       "name": "region",
       "entityType": "enums",
       "schema": "public"
     },
     {
-      "values": ["tournament", "workshop", "other"],
+      "values": [
+        "tournament",
+        "workshop",
+        "other"
+      ],
       "name": "event_type",
       "entityType": "enums",
       "schema": "public"
     },
     {
-      "values": ["pending", "completed", "failed"],
+      "values": [
+        "pending",
+        "completed",
+        "failed"
+      ],
       "name": "payment_status",
       "entityType": "enums",
       "schema": "public"
@@ -117,6 +140,12 @@
     {
       "isRlsEnabled": false,
       "name": "events",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "methodology_files",
       "entityType": "tables",
       "schema": "public"
     },
@@ -1231,6 +1260,19 @@
       "table": "event_organizers"
     },
     {
+      "type": "serial",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "event_registrations"
+    },
+    {
       "type": "integer",
       "typeSchema": null,
       "notNull": true,
@@ -1246,7 +1288,7 @@
     {
       "type": "integer",
       "typeSchema": null,
-      "notNull": true,
+      "notNull": false,
       "dimensions": 0,
       "default": null,
       "generated": null,
@@ -1355,7 +1397,7 @@
       "default": null,
       "generated": null,
       "identity": null,
-      "name": "Slug",
+      "name": "slug",
       "entityType": "columns",
       "schema": "public",
       "table": "events"
@@ -1411,6 +1453,19 @@
       "generated": null,
       "identity": null,
       "name": "description",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "events"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 1,
+      "default": "'{}'",
+      "generated": null,
+      "identity": null,
+      "name": "file_urls",
       "entityType": "columns",
       "schema": "public",
       "table": "events"
@@ -1569,6 +1624,97 @@
       "name": "id",
       "entityType": "columns",
       "schema": "public",
+      "table": "methodology_files"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "name",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "methodology_files"
+    },
+    {
+      "type": "boolean",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "false",
+      "generated": null,
+      "identity": null,
+      "name": "external",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "methodology_files"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "file_url",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "methodology_files"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "author_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "methodology_files"
+    },
+    {
+      "type": "timestamp",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "methodology_files"
+    },
+    {
+      "type": "timestamp",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "methodology_files"
+    },
+    {
+      "type": "serial",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
       "table": "payments"
     },
     {
@@ -1667,7 +1813,7 @@
       "typeSchema": null,
       "notNull": true,
       "dimensions": 1,
-      "default": null,
+      "default": "'{}'",
       "generated": null,
       "identity": null,
       "name": "current_seasons",
@@ -2070,6 +2216,34 @@
       "nameExplicit": true,
       "columns": [
         {
+          "value": "event_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "user_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "event_registrations_eventId_userId_idx",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "event_registrations"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
           "value": "user_id",
           "isExpression": false,
           "asc": true,
@@ -2224,6 +2398,27 @@
       "nameExplicit": true,
       "columns": [
         {
+          "value": "author_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "users_author_id_idx",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "methodology_files"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
           "value": "user_id",
           "isExpression": false,
           "asc": true,
@@ -2243,10 +2438,14 @@
     },
     {
       "nameExplicit": false,
-      "columns": ["user_id"],
+      "columns": [
+        "user_id"
+      ],
       "schemaTo": "public",
       "tableTo": "users",
-      "columnsTo": ["id"],
+      "columnsTo": [
+        "id"
+      ],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "accounts_user_id_users_id_fkey",
@@ -2256,10 +2455,14 @@
     },
     {
       "nameExplicit": false,
-      "columns": ["user_id"],
+      "columns": [
+        "user_id"
+      ],
       "schemaTo": "public",
       "tableTo": "users",
-      "columnsTo": ["id"],
+      "columnsTo": [
+        "id"
+      ],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "awards_user_id_users_id_fkey",
@@ -2269,12 +2472,16 @@
     },
     {
       "nameExplicit": false,
-      "columns": ["awarded_by"],
+      "columns": [
+        "awarded_by"
+      ],
       "schemaTo": "public",
       "tableTo": "users",
-      "columnsTo": ["id"],
+      "columnsTo": [
+        "id"
+      ],
       "onUpdate": "NO ACTION",
-      "onDelete": "CASCADE",
+      "onDelete": "SET NULL",
       "name": "awards_awarded_by_users_id_fkey",
       "entityType": "fks",
       "schema": "public",
@@ -2282,10 +2489,14 @@
     },
     {
       "nameExplicit": false,
-      "columns": ["user_id"],
+      "columns": [
+        "user_id"
+      ],
       "schemaTo": "public",
       "tableTo": "users",
-      "columnsTo": ["id"],
+      "columnsTo": [
+        "id"
+      ],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "legal_guardians_user_id_users_id_fkey",
@@ -2295,10 +2506,14 @@
     },
     {
       "nameExplicit": false,
-      "columns": ["user_id"],
+      "columns": [
+        "user_id"
+      ],
       "schemaTo": "public",
       "tableTo": "users",
-      "columnsTo": ["id"],
+      "columnsTo": [
+        "id"
+      ],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "sessions_user_id_users_id_fkey",
@@ -2308,12 +2523,16 @@
     },
     {
       "nameExplicit": false,
-      "columns": ["club_id"],
+      "columns": [
+        "club_id"
+      ],
       "schemaTo": "public",
       "tableTo": "clubs",
-      "columnsTo": ["id"],
+      "columnsTo": [
+        "id"
+      ],
       "onUpdate": "NO ACTION",
-      "onDelete": "NO ACTION",
+      "onDelete": "CASCADE",
       "name": "club_managers_club_id_clubs_id_fkey",
       "entityType": "fks",
       "schema": "public",
@@ -2321,10 +2540,14 @@
     },
     {
       "nameExplicit": false,
-      "columns": ["user_id"],
+      "columns": [
+        "user_id"
+      ],
       "schemaTo": "public",
       "tableTo": "users",
-      "columnsTo": ["id"],
+      "columnsTo": [
+        "id"
+      ],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "club_managers_user_id_users_id_fkey",
@@ -2334,10 +2557,14 @@
     },
     {
       "nameExplicit": false,
-      "columns": ["club_id"],
+      "columns": [
+        "club_id"
+      ],
       "schemaTo": "public",
       "tableTo": "clubs",
-      "columnsTo": ["id"],
+      "columnsTo": [
+        "id"
+      ],
       "onUpdate": "NO ACTION",
       "onDelete": "NO ACTION",
       "name": "club_memberships_club_id_clubs_id_fkey",
@@ -2347,10 +2574,14 @@
     },
     {
       "nameExplicit": false,
-      "columns": ["user_id"],
+      "columns": [
+        "user_id"
+      ],
       "schemaTo": "public",
       "tableTo": "users",
-      "columnsTo": ["id"],
+      "columnsTo": [
+        "id"
+      ],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "club_memberships_user_id_users_id_fkey",
@@ -2360,10 +2591,14 @@
     },
     {
       "nameExplicit": false,
-      "columns": ["payment_id"],
+      "columns": [
+        "payment_id"
+      ],
       "schemaTo": "public",
       "tableTo": "payments",
-      "columnsTo": ["id"],
+      "columnsTo": [
+        "id"
+      ],
       "onUpdate": "NO ACTION",
       "onDelete": "SET NULL",
       "name": "club_memberships_payment_id_payments_id_fkey",
@@ -2373,10 +2608,14 @@
     },
     {
       "nameExplicit": false,
-      "columns": ["event_id"],
+      "columns": [
+        "event_id"
+      ],
       "schemaTo": "public",
       "tableTo": "events",
-      "columnsTo": ["id"],
+      "columnsTo": [
+        "id"
+      ],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "event_organizers_event_id_events_id_fkey",
@@ -2386,10 +2625,14 @@
     },
     {
       "nameExplicit": false,
-      "columns": ["user_id"],
+      "columns": [
+        "user_id"
+      ],
       "schemaTo": "public",
       "tableTo": "users",
-      "columnsTo": ["id"],
+      "columnsTo": [
+        "id"
+      ],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "event_organizers_user_id_users_id_fkey",
@@ -2399,10 +2642,14 @@
     },
     {
       "nameExplicit": false,
-      "columns": ["event_id"],
+      "columns": [
+        "event_id"
+      ],
       "schemaTo": "public",
       "tableTo": "events",
-      "columnsTo": ["id"],
+      "columnsTo": [
+        "id"
+      ],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "event_registrations_event_id_events_id_fkey",
@@ -2412,10 +2659,14 @@
     },
     {
       "nameExplicit": false,
-      "columns": ["user_id"],
+      "columns": [
+        "user_id"
+      ],
       "schemaTo": "public",
       "tableTo": "users",
-      "columnsTo": ["id"],
+      "columnsTo": [
+        "id"
+      ],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "event_registrations_user_id_users_id_fkey",
@@ -2425,10 +2676,14 @@
     },
     {
       "nameExplicit": false,
-      "columns": ["payment_id"],
+      "columns": [
+        "payment_id"
+      ],
       "schemaTo": "public",
       "tableTo": "payments",
-      "columnsTo": ["id"],
+      "columnsTo": [
+        "id"
+      ],
       "onUpdate": "NO ACTION",
       "onDelete": "SET NULL",
       "name": "event_registrations_payment_id_payments_id_fkey",
@@ -2438,10 +2693,14 @@
     },
     {
       "nameExplicit": false,
-      "columns": ["user_id"],
+      "columns": [
+        "user_id"
+      ],
       "schemaTo": "public",
       "tableTo": "users",
-      "columnsTo": ["id"],
+      "columnsTo": [
+        "id"
+      ],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "payments_user_id_users_id_fkey",
@@ -2450,7 +2709,11 @@
       "table": "payments"
     },
     {
-      "columns": ["user_id", "name", "level"],
+      "columns": [
+        "user_id",
+        "name",
+        "level"
+      ],
       "nameExplicit": false,
       "name": "awards_pkey",
       "entityType": "pks",
@@ -2458,7 +2721,10 @@
       "table": "awards"
     },
     {
-      "columns": ["club_id", "user_id"],
+      "columns": [
+        "club_id",
+        "user_id"
+      ],
       "nameExplicit": false,
       "name": "club_managers_pkey",
       "entityType": "pks",
@@ -2466,7 +2732,10 @@
       "table": "club_managers"
     },
     {
-      "columns": ["user_id", "season"],
+      "columns": [
+        "user_id",
+        "season"
+      ],
       "nameExplicit": false,
       "name": "club_memberships_pkey",
       "entityType": "pks",
@@ -2474,7 +2743,10 @@
       "table": "club_memberships"
     },
     {
-      "columns": ["event_id", "user_id"],
+      "columns": [
+        "event_id",
+        "user_id"
+      ],
       "nameExplicit": false,
       "name": "event_organizers_pkey",
       "entityType": "pks",
@@ -2482,15 +2754,9 @@
       "table": "event_organizers"
     },
     {
-      "columns": ["event_id", "user_id"],
-      "nameExplicit": false,
-      "name": "event_registrations_pkey",
-      "entityType": "pks",
-      "schema": "public",
-      "table": "event_registrations"
-    },
-    {
-      "columns": ["id"],
+      "columns": [
+        "id"
+      ],
       "nameExplicit": false,
       "name": "accounts_pkey",
       "schema": "public",
@@ -2498,7 +2764,9 @@
       "entityType": "pks"
     },
     {
-      "columns": ["id"],
+      "columns": [
+        "id"
+      ],
       "nameExplicit": false,
       "name": "legal_guardians_pkey",
       "schema": "public",
@@ -2506,7 +2774,9 @@
       "entityType": "pks"
     },
     {
-      "columns": ["id"],
+      "columns": [
+        "id"
+      ],
       "nameExplicit": false,
       "name": "sessions_pkey",
       "schema": "public",
@@ -2514,7 +2784,9 @@
       "entityType": "pks"
     },
     {
-      "columns": ["id"],
+      "columns": [
+        "id"
+      ],
       "nameExplicit": false,
       "name": "users_pkey",
       "schema": "public",
@@ -2522,7 +2794,9 @@
       "entityType": "pks"
     },
     {
-      "columns": ["id"],
+      "columns": [
+        "id"
+      ],
       "nameExplicit": false,
       "name": "verifications_pkey",
       "schema": "public",
@@ -2530,7 +2804,9 @@
       "entityType": "pks"
     },
     {
-      "columns": ["id"],
+      "columns": [
+        "id"
+      ],
       "nameExplicit": false,
       "name": "clubs_pkey",
       "schema": "public",
@@ -2538,7 +2814,19 @@
       "entityType": "pks"
     },
     {
-      "columns": ["id"],
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "event_registrations_pkey",
+      "schema": "public",
+      "table": "event_registrations",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
       "nameExplicit": false,
       "name": "events_pkey",
       "schema": "public",
@@ -2546,7 +2834,19 @@
       "entityType": "pks"
     },
     {
-      "columns": ["id"],
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "methodology_files_pkey",
+      "schema": "public",
+      "table": "methodology_files",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
       "nameExplicit": false,
       "name": "payments_pkey",
       "schema": "public",
@@ -2554,7 +2854,9 @@
       "entityType": "pks"
     },
     {
-      "columns": ["id"],
+      "columns": [
+        "id"
+      ],
       "nameExplicit": false,
       "name": "settings_pkey",
       "schema": "public",
@@ -2563,7 +2865,9 @@
     },
     {
       "nameExplicit": false,
-      "columns": ["user_id"],
+      "columns": [
+        "user_id"
+      ],
       "nullsNotDistinct": false,
       "name": "legal_guardians_user_id_key",
       "schema": "public",
@@ -2572,7 +2876,9 @@
     },
     {
       "nameExplicit": false,
-      "columns": ["token"],
+      "columns": [
+        "token"
+      ],
       "nullsNotDistinct": false,
       "name": "sessions_token_key",
       "schema": "public",
@@ -2581,7 +2887,9 @@
     },
     {
       "nameExplicit": false,
-      "columns": ["email"],
+      "columns": [
+        "email"
+      ],
       "nullsNotDistinct": false,
       "name": "users_email_key",
       "schema": "public",
@@ -2590,7 +2898,9 @@
     },
     {
       "nameExplicit": false,
-      "columns": ["payment_id"],
+      "columns": [
+        "payment_id"
+      ],
       "nullsNotDistinct": false,
       "name": "club_memberships_payment_id_key",
       "schema": "public",
@@ -2599,7 +2909,9 @@
     },
     {
       "nameExplicit": false,
-      "columns": ["payment_id"],
+      "columns": [
+        "payment_id"
+      ],
       "nullsNotDistinct": false,
       "name": "event_registrations_payment_id_key",
       "schema": "public",
@@ -2608,12 +2920,21 @@
     },
     {
       "nameExplicit": false,
-      "columns": ["Slug"],
+      "columns": [
+        "slug"
+      ],
       "nullsNotDistinct": false,
-      "name": "events_Slug_key",
+      "name": "events_slug_key",
       "schema": "public",
       "table": "events",
       "entityType": "uniques"
+    },
+    {
+      "value": "\"end\" > \"beginning\"",
+      "name": "events_end_after_beginning",
+      "entityType": "checks",
+      "schema": "public",
+      "table": "events"
     }
   ],
   "renames": []
