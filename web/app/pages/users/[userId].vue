@@ -9,6 +9,10 @@ const mdAndLarger = breakpoints.greaterOrEqual("md");
 const route = useRoute();
 const userId = route.params.userId as NonEmptyString;
 
+definePageMeta({
+  middleware: ["auth"],
+});
+
 await useFetch(`/api/users/${userId}`, {
   key: `users-${userId}`,
   onResponseError({ response }) {

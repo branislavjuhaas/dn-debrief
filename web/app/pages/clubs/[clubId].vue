@@ -6,6 +6,10 @@ import {
 } from "#components";
 import type { TableColumn, TabsItem } from "@nuxt/ui";
 
+definePageMeta({
+  middleware: ["auth"],
+});
+
 const tabItems = ref<TabsItem[]>([
   {
     label: "Členovia/-ky klubu",
@@ -41,6 +45,13 @@ await useFetch(`/api/clubs/${clubId}`, {
 const { data: clubData } = useNuxtData<{
   club: Club & { membershipsCount: number; isDeletable: boolean };
 }>(`clubs-${clubId}`);
+
+if (!clubData?.value?.club) {
+  throw createError({
+    statusCode: 404,
+    statusMessage: "Debatný klub nenájdený",
+  });
+}
 
 useSeoMeta({
   title: `Debatný klub ${clubData?.value?.club.name ?? ""}`.trim(),
