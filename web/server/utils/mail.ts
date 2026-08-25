@@ -6,6 +6,13 @@ export const sendEmail = async (
   text: string,
   html?: string,
 ) => {
+  if (import.meta.dev || import.meta.test) {
+    console.log(
+      `[MAIL] Sending email to: ${to}, subject: ${subject}, text: ${text}, html: ${html}`,
+    );
+    return;
+  }
+
   const sesClient = new SESClient({
     region: process.env.AWS_REGION,
     credentials: {
