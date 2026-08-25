@@ -196,6 +196,36 @@ defineRouteMeta({
                           type: "boolean",
                           example: true,
                         },
+                        legalGuardian: {
+                          type: "object",
+                          nullable: true,
+                          properties: {
+                            id: { type: "integer", example: 1 },
+                            name: { type: "string", example: "Jane Doe" },
+                            email: {
+                              type: "string",
+                              format: "email",
+                              example: "jane.doe@example.com",
+                            },
+                            createdAt: {
+                              type: "string",
+                              format: "date-time",
+                              example: "2026-01-01T00:00:00.000Z",
+                            },
+                            updatedAt: {
+                              type: "string",
+                              format: "date-time",
+                              example: "2026-01-01T00:00:00.000Z",
+                            },
+                          },
+                          required: [
+                            "id",
+                            "name",
+                            "email",
+                            "createdAt",
+                            "updatedAt",
+                          ],
+                        },
                         createdAt: {
                           type: "string",
                           format: "date-time",
@@ -217,6 +247,7 @@ defineRouteMeta({
                         "role",
                         "credential",
                         "isMember",
+                        "legalGuardian",
                         "createdAt",
                         "updatedAt",
                       ],
@@ -292,6 +323,9 @@ export default defineEventHandler(async (event) => {
       },
       extras: {
         isMember: sql`exists (select 1 from club_memberships where user_id = ${userId} and season = extract(year from current_date) and confirmed = true)`,
+      },
+      with: {
+        legalGuardian: true,
       },
     });
 
