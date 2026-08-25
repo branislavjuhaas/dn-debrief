@@ -1,7 +1,7 @@
 {
   "version": "8",
   "dialect": "postgres",
-  "id": "5bd3091e-c578-4acd-9902-9049d85c1445",
+  "id": "19566b98-294d-47ac-ac2a-3e9204f66928",
   "prevIds": [
     "694d1e84-f7b5-4127-aa57-22158ee6be8c"
   ],
@@ -1458,7 +1458,7 @@
       "table": "events"
     },
     {
-      "type": "jsonb",
+      "type": "text",
       "typeSchema": null,
       "notNull": true,
       "dimensions": 0,
@@ -1466,19 +1466,6 @@
       "generated": null,
       "identity": null,
       "name": "description",
-      "entityType": "columns",
-      "schema": "public",
-      "table": "events"
-    },
-    {
-      "type": "text",
-      "typeSchema": null,
-      "notNull": true,
-      "dimensions": 1,
-      "default": "'{}'",
-      "generated": null,
-      "identity": null,
-      "name": "file_urls",
       "entityType": "columns",
       "schema": "public",
       "table": "events"
