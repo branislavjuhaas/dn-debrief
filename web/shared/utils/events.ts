@@ -107,7 +107,7 @@ export const eventSchema = z.object({
   slug: z.string().min(1),
   name: z.string().min(1),
   type: z.enum(["tournament", "workshop", "other"]),
-  description: z.unknown(),
+  description: z.string(),
   fileUrls: z.array(z.url()).default([]),
   thumbnailUrl: z.url().optional(),
   beginning: z.coerce.date(),
