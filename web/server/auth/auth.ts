@@ -53,6 +53,20 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
+    sendResetPassword: async ({ user, url, token }, _request) => {
+      void sendEmail(
+        [user.email],
+        "Obnovenie hesla",
+        `Kliknite na nasledujúci odkaz pre obnovenie hesla: ${url}`,
+        generateActionMail(
+          "Obnovte si heslo na platforme DebRIEF a získajte prístup k svojmu účtu.",
+          "Obnovte si heslo na platforme DebRIEF",
+          "Kliknite na nasledujúci odkaz pre obnovenie hesla",
+          `${process.env.BETTER_AUTH_URL}/auth/reset-password?token=${token}`,
+          "Obnoviť heslo",
+        ),
+      );
+    },
   },
   socialProviders: {
     google: {
