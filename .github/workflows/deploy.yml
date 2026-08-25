@@ -58,4 +58,19 @@ jobs:
 
       - name: Trigger Dokploy Deployment
         run: |
-          curl -X POST "${{ secrets.DOKPLOY_WEBHOOK_URL }}"
+          RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" -X POST \
+            "${{ secrets.DOKPLOY_URL }}/api/compose.deploy" \
+            -H "accept: application/json" \
+            -H "Content-Type: application/json" \
+            -H "x-api-key: ${{ secrets.DOKPLOY_API_KEY }}" \
+            -d "{\"composeId\": \"${{ secrets.DOKPLOY_COMPOSE_ID }}\"}")
+
+          HTTP_STATUS=$(echo "$RESPONSE" | grep "HTTP_STATUS" | cut -d':' -f2)
+          BODY=$(echo "$RESPONSE" | sed -e 's/HTTP_STATUS:.*//g')
+
+          echo "Dokploy Response: $BODY"
+
+          if [ "$HTTP_STATUS" -ne 200 ]; then
+            echo "::error::Deployment failed with status code $HTTP_STATUS"
+            exit 1
+          fi
