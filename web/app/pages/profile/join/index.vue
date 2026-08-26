@@ -77,6 +77,7 @@ const membershipState = reactive<Partial<MembershipSchema>>({
 });
 
 const requestError = ref<string | null>(null);
+const pending = ref(false);
 const loading = ref(false);
 
 // FORM SUBMISSION HANDLER
@@ -106,7 +107,12 @@ const onSubmit = async (event: FormSubmitEvent<MembershipSchema>) => {
   });
 
   await refreshNuxtData("users-me");
+  await refreshNuxtData("filtered-seasons");
 
+  if (!data.clubMemberships?.[0]?.confirmed) {
+    pending.value = true;
+    return;
+  }
   navigateTo("/profile/join/finished");
 };
 </script>
@@ -154,6 +160,14 @@ const onSubmit = async (event: FormSubmitEvent<MembershipSchema>) => {
             color="error"
             icon="i-ph-warning-octagon"
             :title="requestError" />
+
+          <LazyUAlert
+            v-if="pending"
+            color="success"
+            variant="subtle"
+            icon="i-ph-hourglass-medium"
+            title="Čakáme na potvrdenie"
+            description="Na email vášho zákonného zástupcu bol odoslaný odkaz na potvrdenie registrácie." />
 
           <UFormField
             label="Debatný klub"
