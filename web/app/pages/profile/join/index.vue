@@ -7,6 +7,12 @@ definePageMeta({
   middleware: ["auth"],
 });
 
+useSeoMeta({
+  title: "Registrácia do SDA",
+  description:
+    "Registrujte sa do Slovenskej debatnej asociácie a získajte prístup k všetkým výhodám členstva.",
+});
+
 const { data: userFetch } = await useFetch("/api/users/me", {
   key: "users-me",
 });

@@ -3,6 +3,12 @@ definePageMeta({
   middleware: ["auth"],
 });
 
+useSeoMeta({
+  title: "Ďakujeme za registráciu",
+  description:
+    "Ďakujeme za registráciu do Slovenskej debatnej asociácie. Môžete začať využívať všetky výhody členstva.",
+});
+
 const { data: userFetch } = await useFetch("/api/users/me", {
   key: "users-me",
 });
