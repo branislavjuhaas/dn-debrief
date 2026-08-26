@@ -152,7 +152,7 @@ export default defineEventHandler(async (event) => {
       })
       .from(users)
       .where(like(users.search, `%${normalizedQuery}%`))
-      .limit(5);
+      .limit(10);
   }
 
   if (queryClubs) {
@@ -163,7 +163,7 @@ export default defineEventHandler(async (event) => {
       })
       .from(clubs)
       .where(like(clubs.search, `%${normalizedQuery}%`))
-      .limit(5);
+      .limit(10);
   }
 
   if (queryEvents) {
@@ -174,7 +174,7 @@ export default defineEventHandler(async (event) => {
       })
       .from(events)
       .where(like(events.search, `%${normalizedQuery}%`))
-      .limit(5);
+      .limit(10);
   }
 
   return { ...results };

@@ -1,5 +1,5 @@
-// A random 32-bit number of your choice to scramble the ID
-const MASK = 123456789;
+// Time of the Initial commit to the dn-debrief git repository :)
+const MASK = 1715247497;
 
 export const obfuscateId = (id: number): string => {
   // XOR the ID with the mask, then convert to a hex string

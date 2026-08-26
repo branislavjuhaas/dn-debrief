@@ -9,21 +9,25 @@ const mdAndLarger = breakpoints.greaterOrEqual("md");
 const route = useRoute();
 const userId = route.params.userId as NonEmptyString;
 
+definePageMeta({
+  middleware: ["auth"],
+});
+
 await useFetch(`/api/users/${userId}`, {
   key: `users-${userId}`,
-  onResponseError({ response }) {
-    if (response.status === 404) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: "Používateľ/-ka nenájdený/-á",
-      });
-    }
-  },
 });
 
 const { data: userData } = useNuxtData<{
   user: User & { isMember?: boolean };
 }>(`users-${userId}`);
+
+if (!userData?.value?.user) {
+  throw createError({
+    statusCode: 404,
+    statusMessage: "Používateľ/-ka nenájdená",
+    message: `Používateľ/-ka s identifkačným číslom ${userId} zatiaľ neexistuje.`,
+  });
+}
 
 useSeoMeta({
   title:

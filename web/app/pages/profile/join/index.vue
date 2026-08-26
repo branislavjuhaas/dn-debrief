@@ -7,6 +7,12 @@ definePageMeta({
   middleware: ["auth"],
 });
 
+useSeoMeta({
+  title: "Registrácia do SDA",
+  description:
+    "Registrujte sa do Slovenskej debatnej asociácie a získajte prístup k všetkým výhodám členstva.",
+});
+
 const { data: userFetch } = await useFetch("/api/users/me", {
   key: "users-me",
 });
@@ -71,6 +77,7 @@ const membershipState = reactive<Partial<MembershipSchema>>({
 });
 
 const requestError = ref<string | null>(null);
+const pending = ref(false);
 const loading = ref(false);
 
 // FORM SUBMISSION HANDLER
@@ -100,8 +107,13 @@ const onSubmit = async (event: FormSubmitEvent<MembershipSchema>) => {
   });
 
   await refreshNuxtData("users-me");
+  await refreshNuxtData("filtered-seasons");
 
-  navigateTo("/profile/join/finished");
+  if (!data.clubMemberships?.[0]?.confirmed) {
+    await navigateTo("/profile/join/finished?pending=true");
+    return;
+  }
+  await navigateTo("/profile/join/finished");
 };
 </script>
 

@@ -6,6 +6,10 @@ import {
 } from "#components";
 import type { TableColumn, TabsItem } from "@nuxt/ui";
 
+definePageMeta({
+  middleware: ["auth"],
+});
+
 const tabItems = ref<TabsItem[]>([
   {
     label: "Členovia/-ky klubu",
@@ -28,19 +32,19 @@ const clubId = route.params.clubId as NonEmptyString;
 
 await useFetch(`/api/clubs/${clubId}`, {
   key: `clubs-${clubId}`,
-  onResponseError({ response }) {
-    if (response.status === 404) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: "Debatný klub nenájdený",
-      });
-    }
-  },
 });
 
 const { data: clubData } = useNuxtData<{
   club: Club & { membershipsCount: number; isDeletable: boolean };
 }>(`clubs-${clubId}`);
+
+if (!clubData?.value?.club) {
+  throw createError({
+    statusCode: 404,
+    statusMessage: "Debatný klub nenájdený",
+    message: `Debatný klub s identifkačným číslom ${clubId} zatiaľ neexistuje.`,
+  });
+}
 
 useSeoMeta({
   title: `Debatný klub ${clubData?.value?.club.name ?? ""}`.trim(),
@@ -277,7 +281,7 @@ const columns: TableColumn<{
         junior_student: "info" as const,
         senior_student: "olive" as const,
         graduate: "rose" as const,
-        teacher: "violet" as const,
+        teacher: "purple" as const,
       }[row.original.registrationType];
 
       return h(UBadge, { variant: "subtle", color }, () =>

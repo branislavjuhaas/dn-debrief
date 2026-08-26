@@ -3,6 +3,7 @@ export default defineAppConfig({
     colors: {
       primary: "sda",
       success: "sda",
+      secondary: "rose",
       neutral: "zinc",
       purple: "purple",
       rose: "rose",
