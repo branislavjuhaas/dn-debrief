@@ -4,7 +4,15 @@ import type { StepperItem } from "@nuxt/ui";
 import { useStepper } from "@vueuse/core";
 import { CalendarDate, parseDate } from "@internationalized/date";
 import { differenceInYears } from "date-fns";
-import type { User } from "#shared/types/user";
+
+const route = useRoute();
+const completionOnly = ref<boolean>(route.query.completion === "true");
+
+useSeoMeta({
+  title: completionOnly.value ? "Doplnenie údajov" : "Registrácia",
+  description:
+    "Vytvorte svoj účet na platforme DebRIEF a začněte využívať všetky jej funkcie.",
+});
 
 // STEPPER CONFIGURATION
 const items = ref<StepperItem[]>([
@@ -24,8 +32,6 @@ const items = ref<StepperItem[]>([
     icon: "i-ph-confetti-bold",
   },
 ]);
-
-const route = useRoute();
 
 const { current, isCurrent, goTo, goToNext } = useStepper({
   "account-info": {
@@ -310,7 +316,12 @@ const continueFromEmailVerified = () => {
 
 <template>
   <UPage>
-    <UPageHeader title="Registrácia na platformu DebRIEF" />
+    <UPageHeader
+      :title="
+        completionOnly
+          ? 'Doplnenie osobných údajov'
+          : 'Registrácia na platformu DebRIEF'
+      " />
 
     <UPageBody>
       <FormBase
