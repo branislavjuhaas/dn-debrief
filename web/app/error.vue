@@ -21,7 +21,7 @@ const displayError = computed(() => {
         : message
       : "Vyskytla sa neznáma chyba. Na jej odstránení pracujeme. Skúste to prosím neskôr.",
     statusMessage:
-      status === 404
+      String(status)?.[0] === "4"
         ? "Tu argumenty nestačia!"
         : "O tomto radšej nebudeme debatovať!",
   };
