@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import { version } from "~~/package.json";
+import { version, repository } from "~~/package.json";
 import type { FooterColumn } from "@nuxt/ui";
-
-const source = "https://github.com/branislavjuhaas/dn-debrief";
 
 const footerLinks: FooterColumn[] = [
   {
@@ -42,7 +40,7 @@ const footerLinks: FooterColumn[] = [
       },
       {
         label: "Zdrojový kód",
-        to: source,
+        to: repository.url,
         target: "_blank",
       },
     ],
@@ -85,7 +83,7 @@ const footerLinks: FooterColumn[] = [
         icon="i-ph-github-logo"
         color="neutral"
         variant="ghost"
-        :to="source"
+        :to="repository.url"
         target="_blank"
         aria-label="GitHub" />
     </template>
