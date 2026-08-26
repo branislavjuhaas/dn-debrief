@@ -193,8 +193,8 @@ export default defineEventHandler(async (event) => {
         "Overte registráciu vášho dieťaťa",
         "Potvrdenie registrácie",
         `Dobrý deň, ${legalGuardian!.name.split(" ")[0]}.`,
+        `${process.env.BETTER_AUTH_URL}/profile/join/confirm?token=${obfuscateId(user.id)}`,
         "Potvrdiť registráciu",
-        `${process.env.BETTER_AUTH_URL}/profile/join/verify?token=${obfuscateId(user.id)}`,
       ),
     );
   }
