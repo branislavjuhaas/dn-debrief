@@ -160,30 +160,39 @@ const dedications = [
         Inteligentná
         <span class="text-primary">debatná platforma</span>
       </template>
-      <div class="flex flex-row w-full items-center justify-center gap-10">
-        <UCard>
-          <UIcon
-            name="i-ph-users-three"
-            class="size-16 line-clamp-none opacity-84" />
-        </UCard>
-        <UCard>
-          <UIcon
-            name="i-ph-ticket"
-            class="size-16 line-clamp-none opacity-71" />
-        </UCard>
+      <div
+        class="flex flex-col sm:flex-row w-full items-center justify-center gap-10">
+        <div class="flex flex-row sm:flex-col lg:flex-row gap-10">
+          <UCard>
+            <UIcon
+              name="i-ph-users-three"
+              class="size-16 line-clamp-none opacity-84" />
+          </UCard>
+          <UCard>
+            <UIcon
+              name="i-ph-ticket"
+              class="size-16 line-clamp-none opacity-71" />
+          </UCard>
+        </div>
+
         <UCard class="ring-primary ring-1">
           <UIcon
             name="i-ph-brain"
             class="size-20 line-clamp-none text-primary" />
         </UCard>
-        <UCard>
-          <UIcon name="i-ph-bank" class="size-16 line-clamp-none opacity-82" />
-        </UCard>
-        <UCard>
-          <UIcon
-            name="i-ph-newspaper-clipping"
-            class="size-16 line-clamp-none opacity-76" />
-        </UCard>
+
+        <div class="flex flex-row sm:flex-col lg:flex-row gap-10">
+          <UCard>
+            <UIcon
+              name="i-ph-bank"
+              class="size-16 line-clamp-none opacity-82" />
+          </UCard>
+          <UCard>
+            <UIcon
+              name="i-ph-newspaper-clipping"
+              class="size-16 line-clamp-none opacity-76" />
+          </UCard>
+        </div>
       </div>
     </UPageHero>
 
