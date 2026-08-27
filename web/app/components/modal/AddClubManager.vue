@@ -83,6 +83,7 @@ const {
       name: string;
       surname: string;
       image: string | null;
+      email?: string;
     }[];
   }) => {
     // filter out users that are already club managers
@@ -96,6 +97,7 @@ const {
       .map((user) => ({
         label: `${user.name} ${user.surname}`,
         value: String(user.id),
+        description: user.email ?? null,
         avatar: {
           src: user.image ?? undefined,
           alt: `${user.name} ${user.surname}`,
