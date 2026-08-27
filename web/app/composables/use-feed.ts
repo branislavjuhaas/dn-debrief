@@ -17,6 +17,7 @@ export const useFeed = () => {
         title: `Predstavujeme DebRIEF v${version}`,
         content:
           "Vitajte na inteligentnej debatnej platforme. Všetky chyby a návrhy funkcií, prosíme, ohláste!",
+        to: "/about",
       },
     ];
 
