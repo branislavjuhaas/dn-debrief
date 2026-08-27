@@ -130,9 +130,7 @@ const providers = computed(() => [
       <FormBase title="Vitajte späť">
         <template #description>
           Nemáte ešte účet?
-          <ULink to="/auth/register" class="text-secondary"
-            >Vytvoriť nový.</ULink
-          >
+          <ULink to="/auth/register" class="text-info">Vytvoriť nový.</ULink>
         </template>
         <UAuthForm
           :schema="loginSchema"
@@ -147,7 +145,7 @@ const providers = computed(() => [
           <template #password-hint>
             <ULink
               to="/auth/forgot-password"
-              class="text-secondary font-medium"
+              class="text-info font-medium"
               tabindex="-1"
               >Zabudli ste heslo?</ULink
             >

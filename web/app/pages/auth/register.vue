@@ -330,7 +330,7 @@ const continueFromEmailVerified = () => {
         :icon="current.icon">
         <template v-if="isCurrent('account-info')" #description>
           Máte už účet?
-          <ULink to="/auth" class="text-secondary">Prihláste sa.</ULink>
+          <ULink to="/auth" class="text-info">Prihláste sa.</ULink>
         </template>
 
         <USeparator

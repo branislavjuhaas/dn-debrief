@@ -59,6 +59,12 @@ defineRouteMeta({
                       surname: { type: "string", example: "Doe" },
                       role: { type: "string", example: "user" },
                       image: { type: "string", nullable: true, example: null },
+                      email: {
+                        type: "string",
+                        example: "john.doe@example.com",
+                        description:
+                          "Email address of the user (only included for users with role 'developer' or 'admin')",
+                      },
                     },
                     required: ["id", "name", "surname", "email", "role"],
                   },
@@ -118,7 +124,7 @@ const searchQuery = z.object({
 });
 
 export default defineEventHandler(async (event) => {
-  await requireUser(event);
+  const user = await requireUser(event);
 
   const {
     q,
@@ -136,6 +142,7 @@ export default defineEventHandler(async (event) => {
       surname: string;
       role?: string;
       image: string | null;
+      email?: string;
     }>(),
     clubs: Array<{ id: number; name: string }>(),
     events: Array<{ id: number; name: string }>(),
@@ -149,6 +156,9 @@ export default defineEventHandler(async (event) => {
         surname: users.surname,
         image: users.image,
         role: users.role,
+        ...(["developer", "admin"].includes(user.role)
+          ? { email: users.email }
+          : {}),
       })
       .from(users)
       .where(like(users.search, `%${normalizedQuery}%`))

@@ -386,6 +386,7 @@ const columns: TableColumn<{
               <UUser
                 :key="manager.id"
                 :name="`${manager.name} ${manager.surname}`"
+                :description="manager.email ?? undefined"
                 :to="`/users/${manager.id}`"
                 :ui="{ name: 'text-sm', avatar: 'bg-default', root: 'gap-0' }"
                 :avatar="{

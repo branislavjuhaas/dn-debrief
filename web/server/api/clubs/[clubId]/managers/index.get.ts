@@ -104,6 +104,35 @@ defineRouteMeta({
                 format: "date-time",
                 example: "2023-01-01T00:00:00Z",
               },
+              user: {
+                type: "object",
+                properties: {
+                  id: {
+                    type: "number",
+                    example: 1,
+                  },
+                  name: {
+                    type: "string",
+                    example: "John",
+                  },
+                  surname: {
+                    type: "string",
+                    example: "Doe",
+                  },
+                  image: {
+                    type: "string",
+                    nullable: true,
+                    example: "https://example.com/avatar.jpg",
+                  },
+                  email: {
+                    type: "string",
+                    example: "john.doe@example.com",
+                    description:
+                      "Email address of the user (only included for users with role 'developer' or 'admin')",
+                  },
+                },
+                required: ["id", "name", "surname", "image"],
+              },
             },
             required: ["clubId", "userId", "createdAt", "updatedAt"],
           },
@@ -113,8 +142,16 @@ defineRouteMeta({
   },
 });
 
+type ManagerSummary = {
+  id: number;
+  name: string;
+  surname: string;
+  image: string | null;
+  email?: string;
+};
+
 export default defineEventHandler(async (event) => {
-  await requireUser(event);
+  const user = await requireUser(event);
   const clubId = Number.parseInt(getRouterParam(event, "clubId") ?? "", 10);
 
   const managers = await db.query.users.findMany({
@@ -123,6 +160,7 @@ export default defineEventHandler(async (event) => {
       name: true,
       surname: true,
       image: true,
+      ...(["developer", "admin"].includes(user.role) ? { email: true } : {}),
     },
     where: {
       managedClubs: {
@@ -131,5 +169,5 @@ export default defineEventHandler(async (event) => {
     },
   });
 
-  return { managers };
+  return { managers: managers as ManagerSummary[] };
 });

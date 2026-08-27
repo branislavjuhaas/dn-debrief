@@ -266,7 +266,7 @@ watch(
               userData?.user?.id !== currentUserData?.user?.id
             "
             icon="i-ph-visor"
-            color="secondary"
+            color="info"
             variant="subtle"
             @click="impersonateUser">
             Zosobniť

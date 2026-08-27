@@ -355,7 +355,7 @@ onMounted(() => {
               }
             "
             icon="i-ph-password"
-            :color="changingPassword ? 'primary' : 'secondary'"
+            :color="changingPassword ? 'primary' : 'info'"
             block
             class="w-full" />
           <UButton
@@ -396,10 +396,10 @@ onMounted(() => {
         <UButton
           label="Zmeniť"
           size="xs"
-          color="secondary"
+          color="info"
           icon="i-ph-pencil-simple-line"
           disabled
-          class="absolute bottom-4 right-0 text-white font-medium ring-2 ring-bg overflow-hidden hover:bg-secondary-400 active:bg-secondary-400 dark:hover:bg-secondary-500 dark:active:bg-secondary-500" />
+          class="absolute bottom-4 right-0 text-white font-medium ring-2 ring-bg overflow-hidden hover:bg-info-400 active:bg-info-400 dark:hover:bg-info-500 dark:active:bg-info-500" />
       </span>
     </UPageBody>
   </UPage>

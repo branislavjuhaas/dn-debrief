@@ -24,6 +24,7 @@ const searchTermDebounced = refDebounced(searchTerm, 200);
 const selectedUser = ref<{
   label: string;
   value: string;
+  description: string | undefined;
   avatar: {
     src: string | undefined;
     alt: string;
@@ -57,6 +58,7 @@ const clubMembers = clubMemberships.value
       .map((membership) => ({
         label: `${membership.user?.name} ${membership.user?.surname}`,
         value: String(membership.user?.id),
+        description: undefined as string | undefined,
         avatar: {
           src: membership.user?.image ?? undefined,
           alt: `${membership.user?.name} ${membership.user?.surname}`,
@@ -83,6 +85,7 @@ const {
       name: string;
       surname: string;
       image: string | null;
+      email?: string;
     }[];
   }) => {
     // filter out users that are already club managers
@@ -96,6 +99,7 @@ const {
       .map((user) => ({
         label: `${user.name} ${user.surname}`,
         value: String(user.id),
+        description: user.email ?? undefined,
         avatar: {
           src: user.image ?? undefined,
           alt: `${user.name} ${user.surname}`,
