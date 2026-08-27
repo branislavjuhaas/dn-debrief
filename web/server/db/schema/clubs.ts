@@ -11,8 +11,8 @@ import {
   primaryKey,
 } from "drizzle-orm/pg-core";
 import { type SQL, sql } from "drizzle-orm";
-import { users } from "./auth.js";
-import { payments } from "./payments.js";
+import { users } from "./auth";
+import { payments } from "./payments";
 
 export const leagueEnum = pgEnum("league", ["junior", "senior", "university"]);
 export const regionEnum = pgEnum("region", ["western", "central", "eastern"]);

@@ -7,6 +7,7 @@ import {
   index,
   serial,
 } from "drizzle-orm/pg-core";
+import { users } from "./auth";
 
 export const methodologyFiles = pgTable(
   "methodology_files",
@@ -15,7 +16,9 @@ export const methodologyFiles = pgTable(
     name: text("name").notNull(),
     isExternal: boolean("external").default(false).notNull(),
     fileUrl: text("file_url").notNull(),
-    authorId: integer("author_id").notNull(),
+    authorId: integer("author_id")
+      .references(() => users.id, { onDelete: "cascade" })
+      .notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
