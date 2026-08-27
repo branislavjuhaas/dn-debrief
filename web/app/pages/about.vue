@@ -18,6 +18,7 @@ const heroLinks = ref<ButtonProps[]>([
   {
     label: "Buďte jej budúcnosťou",
     to: repository.url,
+    target: "_blank",
     color: "neutral",
     variant: "subtle",
     trailingIcon: "i-ph-github-logo",
@@ -51,6 +52,7 @@ const featureLinks = ref<ButtonProps[]>([
   {
     label: "API špecifikácia",
     to: "/api/docs",
+    target: "_blank",
     external: true,
     color: "neutral",
     variant: "subtle",
@@ -59,7 +61,7 @@ const featureLinks = ref<ButtonProps[]>([
   {
     label: "Prejsť na platformu",
     to: "/",
-    trailingIcon: "i-ph-sailboat",
+    trailingIcon: "i-ph-airplane-takeoff",
   },
 ]);
 
@@ -70,52 +72,60 @@ const oss = ref<PageFeatureProps[]>([
     title: "Nuxt & Nuxt UI",
     description: "The Full-Stack Vue Framework",
     to: "https://nuxt.com",
+    target: "_blank",
     icon: "i-simple-icons-nuxt",
   },
   {
     title: "Better Auth",
     description: "Najkomplexnejší autentifikačný framework",
     to: "https://better-auth.com/",
+    target: "_blank",
     icon: "i-simple-icons-betterauth",
   },
   {
     title: "Drizzle",
     description: "Headless ORM pre TypeScript",
     to: "https://orm.drizzle.team/",
+    target: "_blank",
     icon: "i-simple-icons-drizzle",
   },
   {
     title: "Vite+",
     description: "Zjednotený toolchain pre web",
     to: "https://viteplus.dev/",
+    target: "_blank",
     icon: "i-simple-icons-vite",
   },
   {
     title: "Docker",
     description: "Akcelerovaný vývoj aplikácií v kontajneroch",
     to: "https://www.docker.com/",
+    target: "_blank",
     icon: "i-simple-icons-docker",
   },
   {
     title: "VueUse",
     description: "Zbierka Vue Composition utilít",
     to: "https://vueuse.org/",
+    target: "_blank",
     icon: "i-simple-icons-vueuse",
   },
 ]);
 
 const ossLinks = ref<ButtonProps[]>([
   {
-    label: "Nuxt komunita",
-    to: "https://github.com/nuxt",
-    color: "neutral",
-    variant: "subtle",
-    trailingIcon: "i-simple-icons-nuxt",
-  },
-  {
     label: "Zdrojový kód",
     to: repository.url,
-    trailingIcon: "i-ph-github-logo-bold",
+    color: "neutral",
+    variant: "subtle",
+    trailingIcon: "i-ph-github-logo",
+    target: "_blank",
+  },
+  {
+    label: "Navrhnúť zlepšenie",
+    to: `${repository.url}/issues/new`,
+    trailingIcon: "i-ph-pipe-wrench",
+    target: "_blank",
   },
 ]);
 
@@ -160,30 +170,39 @@ const dedications = [
         Inteligentná
         <span class="text-primary">debatná platforma</span>
       </template>
-      <div class="flex flex-row w-full items-center justify-center gap-10">
-        <UCard>
-          <UIcon
-            name="i-ph-users-three"
-            class="size-16 line-clamp-none opacity-84" />
-        </UCard>
-        <UCard>
-          <UIcon
-            name="i-ph-ticket"
-            class="size-16 line-clamp-none opacity-71" />
-        </UCard>
+      <div
+        class="flex flex-col sm:flex-row w-full items-center justify-center gap-10">
+        <div class="flex flex-row sm:flex-col lg:flex-row gap-10">
+          <UCard>
+            <UIcon
+              name="i-ph-users-three"
+              class="size-16 line-clamp-none opacity-84" />
+          </UCard>
+          <UCard>
+            <UIcon
+              name="i-ph-ticket"
+              class="size-16 line-clamp-none opacity-71" />
+          </UCard>
+        </div>
+
         <UCard class="ring-primary ring-1">
           <UIcon
             name="i-ph-brain"
             class="size-20 line-clamp-none text-primary" />
         </UCard>
-        <UCard>
-          <UIcon name="i-ph-bank" class="size-16 line-clamp-none opacity-82" />
-        </UCard>
-        <UCard>
-          <UIcon
-            name="i-ph-newspaper-clipping"
-            class="size-16 line-clamp-none opacity-76" />
-        </UCard>
+
+        <div class="flex flex-row sm:flex-col lg:flex-row gap-10">
+          <UCard>
+            <UIcon
+              name="i-ph-bank"
+              class="size-16 line-clamp-none opacity-82" />
+          </UCard>
+          <UCard>
+            <UIcon
+              name="i-ph-newspaper-clipping"
+              class="size-16 line-clamp-none opacity-76" />
+          </UCard>
+        </div>
       </div>
     </UPageHero>
 
@@ -226,7 +245,7 @@ const dedications = [
 
     <UPageSection
       title="Srdcom open source"
-      description="Konštruovaný výhradne na otvorenom softvéri so sľubom zostať sám otvoreným celému civilizovanému svetu."
+      description="Konštruovaný výhradne na slobodnom softvéri so sľubom zostať sám otvoreným celému civilizovanému svetu. Dostupný online pre všetkých len vďaka nasledujúcim projektom:"
       icon="i-ph-git-merge-fill"
       :features="oss"
       :links="ossLinks">
