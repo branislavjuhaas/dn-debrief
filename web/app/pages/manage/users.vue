@@ -79,7 +79,7 @@ const columns: TableColumn<UserWithRole>[] = [
 
       const color = (role: UserRole) => {
         if (role === "developer" || role === "admin") return "primary";
-        if (role === "user") return "secondary";
+        if (role === "user") return "info";
         if (role === "chief_adjudicator") return "warning";
         return "info";
       };
