@@ -142,6 +142,14 @@ defineRouteMeta({
   },
 });
 
+type ManagerSummary = {
+  id: number;
+  name: string;
+  surname: string;
+  image: string | null;
+  email?: string;
+};
+
 export default defineEventHandler(async (event) => {
   const user = await requireUser(event);
   const clubId = Number.parseInt(getRouterParam(event, "clubId") ?? "", 10);
@@ -161,5 +169,5 @@ export default defineEventHandler(async (event) => {
     },
   });
 
-  return { managers };
+  return { managers: managers as ManagerSummary[] };
 });
