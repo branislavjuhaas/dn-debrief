@@ -225,7 +225,7 @@ const dedications = [
 
     <UPageSection
       title="Z lásky ku komunite"
-      description="Vytvorený s poďakovaním jadru spoločenstva SDA a jej dobrovoľíckym štruktúram. Venovaný:"
+      description="Vytvorený s poďakovaním jadru spoločenstva SDA a jej dobrovoľníckym štruktúram. Venovaný:"
       icon="i-ph-hand-heart-fill"
       :ui="{ container: 'sm:gap-8' }">
       <div
