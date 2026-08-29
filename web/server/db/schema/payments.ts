@@ -38,6 +38,7 @@ export const payments = pgTable(
     amount: integer("amount").notNull(),
     currency: text("currency").default("eur").notNull(),
     status: paymentStatusEnum("status").default("pending").notNull(),
+    checkoutAttempt: integer("checkout_attempt").notNull().default(0),
     resolution: paymentResolutionEnum("resolution"),
     stripeCheckoutSessionId: text("stripe_checkout_session_id"),
     stripePaymentIntentId: text("stripe_payment_intent_id"),

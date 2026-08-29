@@ -1,0 +1,1 @@
+ALTER TABLE "payments" ADD COLUMN "checkout_attempt" integer DEFAULT 0 NOT NULL;
