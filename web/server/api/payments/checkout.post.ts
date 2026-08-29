@@ -43,7 +43,8 @@ defineRouteMeta({
                 url: {
                   type: "string",
                   format: "uri",
-                  description: "Stripe Checkout URL for the user to complete payment",
+                  description:
+                    "Stripe Checkout URL for the user to complete payment",
                 },
               },
               required: ["url"],
