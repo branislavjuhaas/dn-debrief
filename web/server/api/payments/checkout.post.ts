@@ -180,7 +180,7 @@ export default defineEventHandler(async (event) => {
         },
         success_url: `${process.env.BETTER_AUTH_URL}/payments/return?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${process.env.BETTER_AUTH_URL}/payments/cancel`,
-        expires_at: Math.floor(Date.now() / 1000) + 5 * 60, // 5 minutes from now
+        expires_at: Math.floor(Date.now() / 1000) + 30 * 60, // 30 minutes from now
       },
       { idempotencyKey },
     );
