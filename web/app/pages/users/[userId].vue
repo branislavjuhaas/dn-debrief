@@ -55,7 +55,23 @@ const roleItems: SelectItem[] = [
   },
 ];
 
-const tabItems = ref<TabsItem[]>([
+const { data: membershipsData } = await useFetch(
+  `/api/users/${userId}/memberships`,
+  {
+    key: `users-${userId}-memberships`,
+  },
+);
+
+const { data: currentUserFetch } = await useFetch("/api/users/me", {
+  key: "users-me",
+});
+
+const { data: currentUserData } =
+  useNuxtData<typeof currentUserFetch.value>("users-me");
+
+const selectedTab = ref("0");
+
+const tabItems = computed<TabsItem[]>(() => [
   {
     label: "Osobné údaje",
     slot: "details",
@@ -70,23 +86,12 @@ const tabItems = ref<TabsItem[]>([
   },
   {
     label: "Platby",
-    disabled: true,
+    slot: "payments",
+    disabled: !["developer", "admin"].includes(
+      currentUserData.value?.user?.role ?? "user",
+    ),
   },
 ]);
-
-const { data: membershipsData } = await useFetch(
-  `/api/users/${userId}/memberships`,
-  {
-    key: `users-${userId}-memberships`,
-  },
-);
-
-const { data: currentUserFetch } = await useFetch("/api/users/me", {
-  key: "users-me",
-});
-
-const { data: currentUserData } =
-  useNuxtData<typeof currentUserFetch.value>("users-me");
 
 const memberships = computed<TimelineItem[]>(() => {
   return (membershipsData.value?.memberships ?? [])
@@ -111,7 +116,6 @@ const memberships = computed<TimelineItem[]>(() => {
 
 const {
   data: paymentsData,
-  pending: paymentsPending,
   execute: fetchPayments,
   status: paymentsStatus,
 } = await useFetch(`/api/users/${userId}/payments`, {
@@ -240,6 +244,16 @@ watch(
   },
   { immediate: true },
 );
+
+watch(
+  selectedTab,
+  async (newTab) => {
+    if (newTab === "3" && !paymentsData.value) {
+      await fetchPayments();
+    }
+  },
+  { immediate: true },
+);
 </script>
 
 <template>
@@ -323,6 +337,7 @@ watch(
             currentUserData?.user?.role ?? 'user',
           )
         "
+        v-model="selectedTab"
         :items="tabItems"
         variant="link"
         color="neutral"
@@ -370,6 +385,11 @@ watch(
           <div v-else class="text-center text-sm text-muted">
             Používateľ/-ka nemá žiadne historické ani aktuálne členstvá v SDA.
           </div>
+        </template>
+        <template #payments>
+          <ProfilePayments
+            :payments="paymentsData?.payments ?? []"
+            :isPending="paymentsStatus !== 'success'" />
         </template>
       </UTabs>
       <template v-else>
