@@ -68,7 +68,7 @@ defineRouteMeta({
 });
 
 const markPaymentsAsPaid = async (session: Stripe.Checkout.Session) => {
-  const ids = session.metadata?.payment_ids?.split(",").map(Number) ?? [];
+  const ids = session.metadata?.payment_ids?.split(",") ?? [];
 
   await db
     .update(payments)
@@ -90,7 +90,7 @@ const markPaymentsAsPaid = async (session: Stripe.Checkout.Session) => {
 const releasePaymentsBackToPending = async (
   session: Stripe.Checkout.Session,
 ) => {
-  const ids = session.metadata?.payment_ids?.split(",").map(Number) ?? [];
+  const ids = session.metadata?.payment_ids?.split(",") ?? [];
 
   await db
     .update(payments)

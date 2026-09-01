@@ -5,7 +5,7 @@ import { db } from "#server/db";
 import { payments } from "#server/db/schema/payments";
 
 const paymentsBody = z.object({
-  paymentIds: z.array(z.number().int().positive()).min(1),
+  paymentIds: z.array(z.uuidv7()).min(1, "At least one payment ID is required"),
 });
 
 defineRouteMeta({
@@ -23,8 +23,11 @@ defineRouteMeta({
             properties: {
               paymentIds: {
                 type: "array",
-                items: { type: "integer", minimum: 1 },
-                example: [12, 17],
+                items: { type: "string", format: "uuid" },
+                example: [
+                  "123e4567-e89b-12d3-a456-426614174000",
+                  "123e4567-e89b-12d3-a456-426614174001",
+                ],
               },
             },
             required: ["paymentIds"],
@@ -159,7 +162,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const sortedIds = claimed.map((p) => p.id).sort((a, b) => a - b);
+  const sortedIds = claimed.map((p) => p.id).sort();
 
   const attempt = claimed[0]?.checkoutAttempt ?? 0;
   const idempotencyKey = `checkout-${user.id}-${sortedIds.join("-")}-attempt-${attempt}`;
@@ -205,7 +208,7 @@ export default defineEventHandler(async (event) => {
   return { url: session.url };
 });
 
-async function rollbackClaim(ids: number[]) {
+async function rollbackClaim(ids: string[]) {
   await db
     .update(payments)
     .set({ status: "pending" })

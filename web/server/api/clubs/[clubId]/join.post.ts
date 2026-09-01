@@ -63,7 +63,8 @@ defineRouteMeta({
                   },
                 },
                 paymentId: {
-                  type: "integer",
+                  type: "string",
+                  format: "uuid",
                   nullable: true,
                   description:
                     "The ID of the payment record if created, otherwise null",
@@ -175,7 +176,7 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  let paymentId: number | undefined = undefined;
+  let paymentId: string | undefined = undefined;
 
   if (registrationType === "junior_student") {
     const paymentRow = await db
