@@ -1,6 +1,6 @@
+import { and, eq, inArray, sql } from "drizzle-orm";
 import Stripe from "stripe";
-import z from "zod";
-import { inArray, eq, and } from "drizzle-orm";
+import * as z from "zod";
 import { db } from "#server/db";
 import { payments } from "#server/db/schema/payments";
 
@@ -13,7 +13,7 @@ defineRouteMeta({
     tags: ["Payments"],
     summary: "Create checkout session",
     description:
-      "Create a Stripe checkout session for pending payments owned by the authenticated user.",
+      "Create a Stripe checkout session for pending, processing, or failed payments owned by the authenticated user.",
     requestBody: {
       required: true,
       content: {
@@ -91,20 +91,33 @@ defineRouteMeta({
   },
 });
 
+const rollbackClaim = async (ids: string[]) => {
+  if (ids.length === 0) return;
+  await db
+    .update(payments)
+    .set({ status: "failed", updatedAt: sql`now()` })
+    .where(inArray(payments.id, ids));
+};
+
 export default defineEventHandler(async (event) => {
   const user = await requireUser(event);
   const body = await readValidatedBody(event, paymentsBody.parse);
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
+  // Claim payments for processing & increment checkoutAttempt counter
   const claimed = await db
     .update(payments)
-    .set({ status: "processing" })
+    .set({
+      status: "processing",
+      checkoutAttempt: sql`${payments.checkoutAttempt} + 1`,
+      updatedAt: sql`now()`,
+    })
     .where(
       and(
         inArray(payments.id, body.paymentIds),
         eq(payments.userId, user.id),
-        eq(payments.status, "pending"),
+        inArray(payments.status, ["pending", "processing", "failed"]),
       ),
     )
     .returning();
@@ -163,8 +176,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const sortedIds = claimed.map((p) => p.id).sort();
-
-  const attempt = claimed[0]?.checkoutAttempt ?? 0;
+  const attempt = claimed[0]?.checkoutAttempt ?? 1;
   const idempotencyKey = `checkout-${user.id}-${sortedIds.join("-")}-attempt-${attempt}`;
 
   let session: Stripe.Checkout.Session;
@@ -183,7 +195,7 @@ export default defineEventHandler(async (event) => {
         },
         success_url: `${process.env.BETTER_AUTH_URL}/payments/return?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${process.env.BETTER_AUTH_URL}/payments/cancel`,
-        expires_at: Math.floor(Date.now() / 1000) + 30 * 60, // 30 minutes from now
+        expires_at: Math.floor(Date.now() / 1000) + 30 * 60, // 30 minutes expiration window
       },
       { idempotencyKey },
     );
@@ -207,10 +219,3 @@ export default defineEventHandler(async (event) => {
 
   return { url: session.url };
 });
-
-async function rollbackClaim(ids: string[]) {
-  await db
-    .update(payments)
-    .set({ status: "pending" })
-    .where(inArray(payments.id, ids));
-}
