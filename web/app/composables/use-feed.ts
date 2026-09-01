@@ -49,6 +49,20 @@ export const useFeed = () => {
       });
     }
 
+    if (
+      user.payments?.some(
+        (payment) =>
+          !["paid", "forgiven", "processing"].includes(payment.status),
+      )
+    ) {
+      feed.push({
+        title: "Zaplatiť neuhradené platby",
+        content:
+          "Pre vyrovnanie vašich neuhradených platieb, prejdite na stránku profilu.",
+        to: "/profile#payments",
+      });
+    }
+
     return feed;
   });
 };

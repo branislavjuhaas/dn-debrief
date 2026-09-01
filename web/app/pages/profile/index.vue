@@ -37,6 +37,8 @@ const stopImpersonatingUser = async () => {
   await refreshNuxtData();
 };
 
+const selectedTab = ref("0");
+
 const tabItems = ref<TabsItem[]>([
   {
     label: "Osobné údaje",
@@ -264,6 +266,13 @@ const paymentColumns: TableColumn<Payment>[] = [
     },
   },
 ];
+
+onMounted(async () => {
+  const route = useRoute();
+  if (route.hash === "#payments") {
+    selectedTab.value = "3";
+  }
+});
 </script>
 
 <template>
@@ -301,6 +310,7 @@ const paymentColumns: TableColumn<Payment>[] = [
     </ProfileHeader>
     <UPageBody>
       <UTabs
+        v-model="selectedTab"
         :items="tabItems"
         variant="link"
         color="neutral"
