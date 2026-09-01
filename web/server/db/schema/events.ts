@@ -13,6 +13,7 @@ import {
   boolean,
   uniqueIndex,
   check,
+  uuid,
 } from "drizzle-orm/pg-core";
 
 import { leagueEnum, regionEnum } from "./clubs.js";
@@ -237,7 +238,7 @@ export const eventRegistrations = pgTable(
     // Whether the registration has been confirmed by the legal guardian
     // (if applicable for the current user)
     confirmed: boolean("confirmed").default(false).notNull(),
-    paymentId: integer("payment_id")
+    paymentId: uuid("payment_id")
       .unique()
       .references(() => payments.id, { onDelete: "set null" }),
     createdAt: timestamp("created_at").defaultNow().notNull(),

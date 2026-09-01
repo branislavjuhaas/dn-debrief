@@ -2,12 +2,13 @@ import {
   pgEnum,
   pgTable,
   integer,
-  serial,
   text,
   timestamp,
   index,
+  uuid,
 } from "drizzle-orm/pg-core";
 import { users } from "./auth";
+import { sql } from "drizzle-orm";
 
 export const paymentTypeEnum = pgEnum("payment_type", ["event", "membership"]);
 
@@ -29,7 +30,9 @@ export const paymentResolutionEnum = pgEnum("payment_resolution", [
 export const payments = pgTable(
   "payments",
   {
-    id: serial("id").primaryKey(),
+    id: uuid("id")
+      .primaryKey()
+      .default(sql`uuidv7()`),
     userId: integer("user_id")
       .references(() => users.id, { onDelete: "cascade" })
       .notNull(),

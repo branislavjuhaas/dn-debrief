@@ -9,6 +9,7 @@ import {
   timestamp,
   index,
   primaryKey,
+  uuid,
 } from "drizzle-orm/pg-core";
 import { type SQL, sql } from "drizzle-orm";
 import { users } from "./auth";
@@ -61,7 +62,7 @@ export const clubMemberships = pgTable(
     season: smallint("season").notNull(),
     registrationType: clubMembershipTypeEnum("registration_type").notNull(),
     confirmed: boolean("confirmed").default(false).notNull(),
-    paymentId: integer("payment_id")
+    paymentId: uuid("payment_id")
       .unique()
       .references(() => payments.id, { onDelete: "set null" }),
     createdAt: timestamp("created_at").defaultNow().notNull(),
