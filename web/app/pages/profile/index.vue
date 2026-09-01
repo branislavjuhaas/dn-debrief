@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { AlertProps, TabsItem, TimelineItem } from "@nuxt/ui";
+import type { AlertProps, TableColumn, TabsItem, TimelineItem } from "@nuxt/ui";
 import { breakpointsTailwind, useBreakpoints } from "@vueuse/core";
 
 const breakpoints = useBreakpoints(breakpointsTailwind);
@@ -52,7 +52,7 @@ const tabItems = ref<TabsItem[]>([
   },
   {
     label: "Platby",
-    disabled: true,
+    slot: "payments",
   },
 ]);
 
@@ -155,6 +155,115 @@ const membershipsAlert = computed<AlertProps>(() => {
     color: "success",
   };
 });
+
+const debt = computed(() => {
+  return userData.value?.user?.payments?.reduce((acc, payment) => {
+    if (!["paid", "forgiven", "processing"].includes(payment.status)) {
+      return acc + payment.amount;
+    }
+    return acc;
+  }, 0);
+});
+
+const paying = ref(false);
+
+const payDebt = async () => {
+  const unpaidPayments = userData.value?.user?.payments?.filter(
+    (payment) => !["paid", "forgiven", "processing"].includes(payment.status),
+  );
+  if (!unpaidPayments || unpaidPayments.length === 0) return;
+  paying.value = true;
+  try {
+    const response = await $fetch("/api/payments/checkout", {
+      method: "POST",
+      body: {
+        paymentIds: unpaidPayments.map((p) => p.id),
+      },
+    });
+
+    if (response?.url) {
+      await navigateTo(response.url, {
+        external: true,
+      });
+      return;
+    }
+  } catch (error) {
+    const toast = useToast();
+    toast.add({
+      title: "Chyba pri platbe",
+      description:
+        "Nepodarilo sa presmerovať na platobnú bránu. kontaktujte, prosím, administrátora/-ku.",
+      color: "error",
+    });
+    paying.value = false;
+  }
+};
+
+const UButton = resolveComponent("UButton");
+const UBadge = resolveComponent("UBadge");
+
+const currencyFormatter = new Intl.NumberFormat("sk-SK", {
+  style: "currency",
+  currency: "EUR",
+});
+
+const dateFormatter = new Intl.DateTimeFormat("sk-SK", {
+  dateStyle: "medium",
+  timeStyle: "short",
+});
+
+const paymentColumns: TableColumn<Payment>[] = [
+  {
+    accessorKey: "description",
+    header: "Popis",
+  },
+  {
+    accessorKey: "amount",
+    header: "Suma",
+    cell: ({ row }) => currencyFormatter.format(row.original.amount / 100),
+  },
+  {
+    accessorKey: "status",
+    header: "Stav platby",
+    cell: ({ row }) => {
+      const colorMap: Record<
+        Payment["status"],
+        "warning" | "success" | "info" | "error" | "neutral"
+      > = {
+        pending: "warning",
+        processing: "warning",
+        paid: "success",
+        forgiven: "info",
+        cancelled: "error",
+        failed: "error",
+      };
+
+      const color = colorMap[row.original.status] ?? "neutral";
+
+      return h(UBadge, { variant: "subtle", color }, () =>
+        translatePaymentStatus(row.original.status),
+      );
+    },
+  },
+  {
+    accessorKey: "createdAt",
+    header: "Vytvorená",
+    cell: ({ row }) => {
+      const date = row.original.createdAt
+        ? new Date(row.original.createdAt)
+        : null;
+      return date && !isNaN(date.getTime()) ? dateFormatter.format(date) : "—";
+    },
+  },
+  {
+    accessorKey: "paidAt",
+    header: "Zaplatená",
+    cell: ({ row }) => {
+      const date = row.original.paidAt ? new Date(row.original.paidAt) : null;
+      return date && !isNaN(date.getTime()) ? dateFormatter.format(date) : "—";
+    },
+  },
+];
 </script>
 
 <template>
@@ -223,6 +332,36 @@ const membershipsAlert = computed<AlertProps>(() => {
               item: 'flex-1 max-w-46 w-full',
             }"
             class="px-6 md:px-4" />
+        </template>
+        <template #payments>
+          <UAlert
+            v-if="debt && debt > 0"
+            color="error"
+            icon="i-ph-warning"
+            variant="subtle"
+            title="Neuhradené platby"
+            orientation="horizontal"
+            :actions="[
+              {
+                label: 'Zaplatiť teraz',
+                size: 'md',
+                variant: 'solid',
+                color: 'error',
+                trailingIcon: 'i-ph-credit-card',
+                loading: paying,
+                onClick: payDebt,
+              },
+            ]"
+            class="mb-4">
+            <template #description>
+              Momentálne máte nezaplatené platby vo výške
+              <b>{{ currencyFormatter.format(debt / 100) }}</b
+              >. Prosím, uhradiť ich čo najskôr.
+            </template>
+          </UAlert>
+          <UTable
+            :columns="paymentColumns"
+            :data="userData?.user?.payments ?? []" />
         </template>
       </UTabs>
     </UPageBody>
