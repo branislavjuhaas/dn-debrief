@@ -370,8 +370,14 @@ onMounted(async () => {
             </template>
           </UAlert>
           <UTable
+            v-if="
+              userData?.user?.payments && userData?.user?.payments.length > 0
+            "
             :columns="paymentColumns"
             :data="userData?.user?.payments ?? []" />
+          <span v-else class="pt-2 text-center text-sm text-muted block">
+            Momentálne nemáte žiadne platby na zobrazenie
+          </span>
         </template>
       </UTabs>
     </UPageBody>
