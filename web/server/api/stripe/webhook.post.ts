@@ -87,17 +87,16 @@ const markPaymentsAsPaid = async (session: Stripe.Checkout.Session) => {
     );
 };
 
-const releasePaymentsBackToPending = async (
-  session: Stripe.Checkout.Session,
-) => {
+const markPaymentsAsFailed = async (session: Stripe.Checkout.Session) => {
   const ids = session.metadata?.payment_ids?.split(",") ?? [];
 
   await db
     .update(payments)
     .set({
-      status: "pending",
+      status: "failed",
+      resolution: "stripe",
       checkoutAttempt: sql`${payments.checkoutAttempt} + 1`,
-      stripeCheckoutSessionId: null,
+      stripePaymentIntentId: session.payment_intent as string,
     })
     .where(
       and(
@@ -136,15 +135,13 @@ export default defineEventHandler(async (event) => {
       if (session.payment_status === "paid") {
         await markPaymentsAsPaid(session);
       }
-      // if payment_status is 'unpaid' here it means an async method just
-      // started processing — wait for async_payment_succeeded/failed
       break;
     }
 
     case "checkout.session.async_payment_failed":
     case "checkout.session.expired": {
       const session = stripeEvent.data.object as Stripe.Checkout.Session;
-      await releasePaymentsBackToPending(session);
+      await markPaymentsAsFailed(session);
       break;
     }
   }
