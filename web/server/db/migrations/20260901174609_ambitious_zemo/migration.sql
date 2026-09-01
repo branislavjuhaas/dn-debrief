@@ -1,0 +1,1 @@
+ALTER TABLE "club_memberships" DROP CONSTRAINT "club_memberships_payment_id_key";

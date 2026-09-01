@@ -62,9 +62,9 @@ export const clubMemberships = pgTable(
     season: smallint("season").notNull(),
     registrationType: clubMembershipTypeEnum("registration_type").notNull(),
     confirmed: boolean("confirmed").default(false).notNull(),
-    paymentId: uuid("payment_id")
-      .unique()
-      .references(() => payments.id, { onDelete: "set null" }),
+    paymentId: uuid("payment_id").references(() => payments.id, {
+      onDelete: "set null",
+    }),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
