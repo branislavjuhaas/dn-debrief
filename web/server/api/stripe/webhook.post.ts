@@ -8,15 +8,14 @@ defineRouteMeta({
     tags: ["Payments", "Stripe"],
     summary: "Process Stripe webhooks",
     description:
-      "Receive Stripe checkout events, validate the webhook signature, and update payment records.",
+      "Receive Stripe checkout and payment intent events, validate signature, and update payment records.",
     parameters: [
       {
         name: "stripe-signature",
         in: "header",
         required: true,
         schema: { type: "string" },
-        description:
-          "Stripe webhook signature used to verify the event payload",
+        description: "Stripe webhook signature",
       },
     ],
     requestBody: {
@@ -25,8 +24,6 @@ defineRouteMeta({
         "application/json": {
           schema: {
             type: "object",
-            description:
-              "Stripe event payload sent by Stripe for checkout updates",
             additionalProperties: true,
           },
         },
@@ -39,9 +36,7 @@ defineRouteMeta({
           "application/json": {
             schema: {
               type: "object",
-              properties: {
-                received: { type: "boolean", example: true },
-              },
+              properties: { received: { type: "boolean", example: true } },
               required: ["received"],
             },
           },
@@ -56,7 +51,7 @@ defineRouteMeta({
         },
       },
       500: {
-        description: "Internal server error while processing the webhook",
+        description: "Internal server error",
         content: {
           "application/json": {
             schema: { $ref: "#/components/schemas/Error" },
@@ -68,27 +63,85 @@ defineRouteMeta({
 });
 
 const markPaymentsAsPaid = async (session: Stripe.Checkout.Session) => {
-  const ids = session.metadata?.payment_ids?.split(",") ?? [];
+  const ids = session.metadata?.payment_ids?.split(",").filter(Boolean) ?? [];
+  const intentId =
+    typeof session.payment_intent === "string"
+      ? session.payment_intent
+      : session.payment_intent?.id;
+
+  // Fallback: update by session ID if metadata IDs are missing
+  const whereCondition =
+    ids.length > 0
+      ? and(
+          inArray(payments.id, ids),
+          eq(payments.stripeCheckoutSessionId, session.id),
+          not(eq(payments.status, "paid")),
+        )
+      : and(
+          eq(payments.stripeCheckoutSessionId, session.id),
+          not(eq(payments.status, "paid")),
+        );
 
   await db
     .update(payments)
     .set({
       status: "paid",
       resolution: "stripe",
-      stripePaymentIntentId: session.payment_intent as string,
+      stripePaymentIntentId: intentId ?? null,
       paidAt: sql`now()`,
+      updatedAt: sql`now()`,
     })
-    .where(
-      and(
-        inArray(payments.id, ids),
-        eq(payments.stripeCheckoutSessionId, session.id),
-        not(eq(payments.status, "paid")),
-      ),
-    );
+    .where(whereCondition);
+};
+
+const markPaymentsAsProcessing = async (session: Stripe.Checkout.Session) => {
+  const ids = session.metadata?.payment_ids?.split(",").filter(Boolean) ?? [];
+  const intentId =
+    typeof session.payment_intent === "string"
+      ? session.payment_intent
+      : session.payment_intent?.id;
+
+  const whereCondition =
+    ids.length > 0
+      ? and(
+          inArray(payments.id, ids),
+          eq(payments.stripeCheckoutSessionId, session.id),
+          eq(payments.status, "pending"),
+        )
+      : and(
+          eq(payments.stripeCheckoutSessionId, session.id),
+          eq(payments.status, "pending"),
+        );
+
+  await db
+    .update(payments)
+    .set({
+      status: "processing",
+      resolution: "stripe",
+      stripePaymentIntentId: intentId ?? null,
+      updatedAt: sql`now()`,
+    })
+    .where(whereCondition);
 };
 
 const markPaymentsAsFailed = async (session: Stripe.Checkout.Session) => {
-  const ids = session.metadata?.payment_ids?.split(",") ?? [];
+  const ids = session.metadata?.payment_ids?.split(",").filter(Boolean) ?? [];
+  const intentId =
+    typeof session.payment_intent === "string"
+      ? session.payment_intent
+      : session.payment_intent?.id;
+
+  const whereCondition =
+    ids.length > 0
+      ? and(
+          inArray(payments.id, ids),
+          eq(payments.stripeCheckoutSessionId, session.id),
+          not(eq(payments.status, "paid")),
+        )
+      : and(
+          eq(payments.stripeCheckoutSessionId, session.id),
+          not(eq(payments.status, "paid")),
+        );
 
   await db
     .update(payments)
@@ -96,12 +149,27 @@ const markPaymentsAsFailed = async (session: Stripe.Checkout.Session) => {
       status: "failed",
       resolution: "stripe",
       checkoutAttempt: sql`${payments.checkoutAttempt} + 1`,
-      stripePaymentIntentId: session.payment_intent as string,
+      stripePaymentIntentId: intentId ?? null,
+      updatedAt: sql`now()`,
+    })
+    .where(whereCondition);
+};
+
+const markPaymentsFailedByIntent = async (
+  paymentIntent: Stripe.PaymentIntent,
+) => {
+  await db
+    .update(payments)
+    .set({
+      status: "failed",
+      resolution: "stripe",
+      checkoutAttempt: sql`${payments.checkoutAttempt} + 1`,
+      stripePaymentIntentId: paymentIntent.id,
+      updatedAt: sql`now()`,
     })
     .where(
       and(
-        inArray(payments.id, ids),
-        eq(payments.stripeCheckoutSessionId, session.id),
+        eq(payments.stripePaymentIntentId, paymentIntent.id),
         not(eq(payments.status, "paid")),
       ),
     );
@@ -129,12 +197,20 @@ export default defineEventHandler(async (event) => {
   }
 
   switch (stripeEvent.type) {
-    case "checkout.session.completed":
-    case "checkout.session.async_payment_succeeded": {
+    case "checkout.session.completed": {
       const session = stripeEvent.data.object as Stripe.Checkout.Session;
       if (session.payment_status === "paid") {
         await markPaymentsAsPaid(session);
+      } else if (session.payment_status === "unpaid") {
+        // Delayed payments (SEPA, bank transfer)
+        await markPaymentsAsProcessing(session);
       }
+      break;
+    }
+
+    case "checkout.session.async_payment_succeeded": {
+      const session = stripeEvent.data.object as Stripe.Checkout.Session;
+      await markPaymentsAsPaid(session);
       break;
     }
 
@@ -142,6 +218,12 @@ export default defineEventHandler(async (event) => {
     case "checkout.session.expired": {
       const session = stripeEvent.data.object as Stripe.Checkout.Session;
       await markPaymentsAsFailed(session);
+      break;
+    }
+
+    case "payment_intent.payment_failed": {
+      const paymentIntent = stripeEvent.data.object as Stripe.PaymentIntent;
+      await markPaymentsFailedByIntent(paymentIntent);
       break;
     }
   }
