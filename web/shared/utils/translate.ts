@@ -138,3 +138,30 @@ export const translateRegistrationType = (
       return "Neznámy typ registrácie";
   }
 };
+
+export const translatePaymentStatus = (
+  status?:
+    | "pending"
+    | "processing"
+    | "paid"
+    | "forgiven"
+    | "cancelled"
+    | "failed",
+) => {
+  switch (status) {
+    case "pending":
+      return "Čakajúca";
+    case "processing":
+      return "Spracúvaná";
+    case "paid":
+      return "Zaplatená";
+    case "forgiven":
+      return "Odpustená";
+    case "cancelled":
+      return "Zrušená";
+    case "failed":
+      return "Zlyhala";
+    default:
+      return "Neznámy stav";
+  }
+};
