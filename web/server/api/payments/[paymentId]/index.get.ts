@@ -23,83 +23,7 @@ defineRouteMeta({
             schema: {
               type: "object",
               properties: {
-                payment: {
-                  type: "object",
-                  properties: {
-                    id: {
-                      type: "string",
-                      format: "uuid",
-                      example: "123e4567-e89b-12d3-a456-426614174000",
-                    },
-                    userId: {
-                      type: "number",
-                      example: 1,
-                    },
-                    paymentType: {
-                      type: "string",
-                      enum: ["event", "membership"],
-                      example: "event",
-                    },
-                    description: { type: "string", example: "DNJU Open 2027" },
-                    amount: { type: "integer", example: 1500 },
-                    currency: { type: "string", example: "eur" },
-                    status: {
-                      type: "string",
-                      enum: [
-                        "pending",
-                        "processing",
-                        "paid",
-                        "cancelled",
-                        "forgiven",
-                        "failed",
-                      ],
-                      example: "pending",
-                    },
-                    resolution: {
-                      type: "string",
-                      nullable: true,
-                      enum: ["stripe", "manual", "waived"],
-                      example: null,
-                    },
-                    stripeCheckoutSessionId: {
-                      type: "string",
-                      nullable: true,
-                      example: "cs_test_123",
-                    },
-                    stripePaymentIntentId: {
-                      type: "string",
-                      nullable: true,
-                      example: "pi_123",
-                    },
-                    paidAt: {
-                      type: "string",
-                      format: "date-time",
-                      nullable: true,
-                      example: null,
-                    },
-                    createdAt: {
-                      type: "string",
-                      format: "date-time",
-                      example: "2026-09-01T08:00:00.000Z",
-                    },
-                    updatedAt: {
-                      type: "string",
-                      format: "date-time",
-                      example: "2026-09-01T08:00:00.000Z",
-                    },
-                  },
-                  required: [
-                    "id",
-                    "userId",
-                    "paymentType",
-                    "description",
-                    "amount",
-                    "currency",
-                    "status",
-                    "createdAt",
-                    "updatedAt",
-                  ],
-                },
+                payment: { $ref: "#/components/schemas/Payment" },
               },
               required: ["payment"],
             },
@@ -127,6 +51,89 @@ defineRouteMeta({
         content: {
           "application/json": {
             schema: { $ref: "#/components/schemas/Error" },
+          },
+        },
+      },
+    },
+    $global: {
+      components: {
+        schemas: {
+          Payment: {
+            type: "object",
+            properties: {
+              id: {
+                type: "string",
+                format: "uuid",
+                example: "123e4567-e89b-12d3-a456-426614174000",
+              },
+              userId: {
+                type: "number",
+                example: 1,
+              },
+              paymentType: {
+                type: "string",
+                enum: ["event", "membership"],
+                example: "event",
+              },
+              description: { type: "string", example: "DNJU Open 2027" },
+              amount: { type: "integer", example: 1500 },
+              currency: { type: "string", example: "eur" },
+              status: {
+                type: "string",
+                enum: [
+                  "pending",
+                  "processing",
+                  "paid",
+                  "cancelled",
+                  "forgiven",
+                  "failed",
+                ],
+                example: "pending",
+              },
+              resolution: {
+                type: "string",
+                nullable: true,
+                enum: ["stripe", "manual", "waived"],
+                example: null,
+              },
+              stripeCheckoutSessionId: {
+                type: "string",
+                nullable: true,
+                example: "cs_test_123",
+              },
+              stripePaymentIntentId: {
+                type: "string",
+                nullable: true,
+                example: "pi_123",
+              },
+              paidAt: {
+                type: "string",
+                format: "date-time",
+                nullable: true,
+                example: null,
+              },
+              createdAt: {
+                type: "string",
+                format: "date-time",
+                example: "2026-09-01T08:00:00.000Z",
+              },
+              updatedAt: {
+                type: "string",
+                format: "date-time",
+                example: "2026-09-01T08:00:00.000Z",
+              },
+            },
+            required: [
+              "id",
+              "userId",
+              "paymentType",
+              "description",
+              "amount",
+              "currency",
+              "status",
+              "createdAt",
+              "updatedAt",
+            ],
           },
         },
       },
