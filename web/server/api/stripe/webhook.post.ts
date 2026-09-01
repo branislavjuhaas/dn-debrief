@@ -76,7 +76,7 @@ const markPaymentsAsPaid = async (session: Stripe.Checkout.Session) => {
       status: "paid",
       resolution: "stripe",
       stripePaymentIntentId: session.payment_intent as string,
-      paidAt: new Date(),
+      paidAt: sql`now()`,
     })
     .where(
       and(
