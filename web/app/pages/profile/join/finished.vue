@@ -48,16 +48,34 @@ const { data: paymentData } = await useFetch(
 
 const { data: userData } = useNuxtData<typeof userFetch.value>("users-me");
 
+const paying = ref(false);
+
 const pay = async () => {
   if (!paymentData.value?.payment) return;
-  const { data } = await useFetch("/api/payments/checkout", {
-    method: "POST",
-    body: {
-      paymentIds: [paymentData.value.payment.id],
-    },
-  });
-  if (data.value?.url) {
-    await navigateTo(data.value.url);
+  paying.value = true;
+  try {
+    const response = await $fetch("/api/payments/checkout", {
+      method: "POST",
+      body: {
+        paymentIds: [paymentData.value.payment.id],
+      },
+    });
+
+    if (response?.url) {
+      await navigateTo(response.url, {
+        external: true,
+      });
+      return;
+    }
+  } catch (error) {
+    const toast = useToast();
+    toast.add({
+      title: "Chyba pri platbe",
+      description:
+        "Nepodarilo sa presmerovať na platobnú bránu. kontaktujte, prosím, administrátora/-ku.",
+      color: "error",
+    });
+    paying.value = false;
   }
 };
 </script>
@@ -92,6 +110,7 @@ const pay = async () => {
               v-if="paymentData?.payment"
               @click="pay"
               color="primary"
+              :loading="paying"
               block>
               Prejsť k platbe {{ paymentData.payment.amount / 100 }}€
             </UButton>
