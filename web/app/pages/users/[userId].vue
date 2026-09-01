@@ -109,6 +109,17 @@ const memberships = computed<TimelineItem[]>(() => {
     }));
 });
 
+const {
+  data: paymentsData,
+  pending: paymentsPending,
+  execute: fetchPayments,
+  status: paymentsStatus,
+} = await useFetch(`/api/users/${userId}/payments`, {
+  key: `users-${userId}-payments`,
+  lazy: true,
+  immediate: false,
+});
+
 const changeUserRole = async (newRole: unknown) => {
   if (typeof newRole !== "string") {
     return;
