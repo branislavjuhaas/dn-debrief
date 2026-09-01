@@ -39,7 +39,7 @@ const { data: userFetch } = await useFetch("/api/users/me", {
 });
 
 const { data: paymentData } = await useFetch(
-  `/api/payments/${route.query.pay}`,
+  `/api/payments/${route.query.pay as NonEmptyString}`,
   {
     key: `payments-${route.query.pay}`,
     enabled: !!route.query.pay,
