@@ -2,12 +2,14 @@
 const route = useRoute();
 const pending = route.query.pending === "true";
 const verified = route.query.verified === "true";
+const paid = route.query.paid === "true";
 const error = route.query.error === "true";
 
 const getTitle = () => {
   if (error) return "Chyba pri registrácii";
   if (pending) return "Čakáme na potvrdenie";
   if (verified) return "Registrácia úspešne potvrdená";
+  if (paid) return "Registrácia úspešne zaplatená";
   return "Registrácia úspešná";
 };
 
@@ -25,6 +27,7 @@ const getIcon = () => {
   if (error) return "i-ph-warning-octagon";
   if (pending) return "i-ph-hourglass-medium";
   if (verified) return "i-ph-checks";
+  if (paid) return "i-ph-hand-coins";
   return "i-ph-cheers";
 };
 
@@ -88,7 +91,7 @@ const pay = async () => {
         :icon="getIcon()"
         :title="
           !pending && !verified && !error
-            ? `Vitajte v SDA, ${userData?.user?.name}!`
+            ? `${paid ? 'Platba úspešná' : 'Vitajte v SDA'}, ${userData?.user?.name}!`
             : getTitle()
         "
         :description="getDescription()">
