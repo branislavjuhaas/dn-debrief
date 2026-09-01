@@ -13,7 +13,7 @@ useSeoMeta({
         title="Platba neúspešná"
         description="Váš pokus o platbu sa nepodarilo úspešne zrealizovať. Skúste to, prosím, znova zo sekcie platby na stránke profilu alebo kontaktujte administrátora/-ku.">
         <USeparator />
-        <UButton to="/profile#payments" color="primary" block>
+        <UButton to="/profile" color="primary" block>
           Prejsť na stránku profilu
         </UButton>
       </FormBase>
