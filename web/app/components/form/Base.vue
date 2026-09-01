@@ -40,11 +40,11 @@ const slots = defineSlots<{
           <UIcon :name="icon" class="size-16 shrink-0 inline-block" />
         </div>
 
-        <div
+        <h2
           v-if="title || !!slots.title"
           class="text-xl text-pretty font-semibold text-highlighted">
           <slot name="title">{{ title }}</slot>
-        </div>
+        </h2>
 
         <div
           v-if="description || !!slots.description"
