@@ -93,7 +93,6 @@ defineRouteMeta({
 const bodySchema = createUpdateSchema(clubs);
 
 export default defineEventHandler(async (event) => {
-  // Authentication & parameter resolution
   await requireUser(event, ["developer", "admin"]);
 
   const clubId = Number.parseInt(getRouterParam(event, "clubId") ?? "", 10);
