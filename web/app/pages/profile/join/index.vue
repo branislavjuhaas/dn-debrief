@@ -110,10 +110,13 @@ const onSubmit = async (event: FormSubmitEvent<MembershipSchema>) => {
   await refreshNuxtData("filtered-seasons");
 
   if (!data.clubMemberships?.[0]?.confirmed) {
-    await navigateTo("/profile/join/finished?pending=true");
+    const paymentSuffix = data.paymentId ? `&pay=${data.paymentId}` : "";
+    await navigateTo(`/profile/join/finished?pending=true${paymentSuffix}`);
     return;
   }
-  await navigateTo("/profile/join/finished");
+
+  const paymentSuffix = data.paymentId ? `?pay=${data.paymentId}` : "";
+  await navigateTo(`/profile/join/finished${paymentSuffix}`);
 };
 </script>
 

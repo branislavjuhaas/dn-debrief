@@ -35,10 +35,31 @@ useSeoMeta({
 
 const { data: userFetch } = await useFetch("/api/users/me", {
   key: "users-me",
-  enabled: verified,
+  enabled: !verified,
 });
 
+const { data: paymentData } = await useFetch(
+  `/api/payments/${route.query.pay}`,
+  {
+    key: `payments-${route.query.pay}`,
+    enabled: !!route.query.pay,
+  },
+);
+
 const { data: userData } = useNuxtData<typeof userFetch.value>("users-me");
+
+const pay = async () => {
+  if (!paymentData.value?.payment) return;
+  const { data } = await useFetch("/api/payments/checkout", {
+    method: "POST",
+    body: {
+      paymentIds: [paymentData.value.payment.id],
+    },
+  });
+  if (data.value?.url) {
+    await navigateTo(data.value.url);
+  }
+};
 </script>
 
 <template>
@@ -54,9 +75,27 @@ const { data: userData } = useNuxtData<typeof userFetch.value>("users-me");
         "
         :description="getDescription()">
         <USeparator />
+        <UAlert
+          v-if="paymentData?.payment"
+          color="info"
+          icon="i-ph-info"
+          variant="subtle"
+          title="Požadovaná platba členského poplatku">
+          <template #description>
+            Pre úspešné dokončenie registrácie je potrebné uhradiť členský
+            poplatok vo výške <b>{{ paymentData.payment.amount / 100 }}€</b>.
+          </template>
+        </UAlert>
         <div class="flex flex-row items-stretch gap-4">
-          <template v-if="verified || pending">
-            <UButton to="/" block> Návrat na domovskú stránku </UButton>
+          <template v-if="verified || pending || route.query.pay">
+            <UButton
+              v-if="paymentData?.payment"
+              @click="pay"
+              color="primary"
+              block>
+              Prejsť k platbe {{ paymentData.payment.amount / 100 }}€
+            </UButton>
+            <UButton v-else to="/" block> Návrat na domovskú stránku </UButton>
           </template>
           <template v-else-if="error">
             <UButton
