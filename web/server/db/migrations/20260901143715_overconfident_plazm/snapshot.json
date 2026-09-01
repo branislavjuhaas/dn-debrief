@@ -1,8 +1,8 @@
 {
   "version": "8",
   "dialect": "postgres",
-  "id": "734e3dfc-f093-430e-a3b3-f8294e0bec54",
-  "prevIds": ["3e1c922f-77bd-478e-a589-cc37936c5ffb"],
+  "id": "4f74cf49-6bdc-4bce-ba8b-b056fddcf0ce",
+  "prevIds": ["19566b98-294d-47ac-ac2a-3e9204f66928"],
   "ddl": [
     {
       "values": [
@@ -1071,7 +1071,7 @@
       "table": "club_memberships"
     },
     {
-      "type": "integer",
+      "type": "uuid",
       "typeSchema": null,
       "notNull": false,
       "dimensions": 0,
@@ -1347,7 +1347,7 @@
       "table": "event_registrations"
     },
     {
-      "type": "integer",
+      "type": "uuid",
       "typeSchema": null,
       "notNull": false,
       "dimensions": 0,
@@ -1701,11 +1701,11 @@
       "table": "methodology_files"
     },
     {
-      "type": "serial",
+      "type": "uuid",
       "typeSchema": null,
       "notNull": true,
       "dimensions": 0,
-      "default": null,
+      "default": "uuidv7()",
       "generated": null,
       "identity": null,
       "name": "id",
