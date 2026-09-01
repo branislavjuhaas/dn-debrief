@@ -85,7 +85,6 @@ const pay = async () => {
 
 <template>
   <UPage>
-    <UPageHeader :title="getTitle()" />
     <UPageBody>
       <FormBase
         :icon="getIcon()"
