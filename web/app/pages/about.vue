@@ -225,7 +225,7 @@ const dedications = [
 
     <UPageSection
       title="Z lásky ku komunite"
-      description="Vytvorený s poďakovaním jadru spoločenstva SDA a jej dobrovoľníckym štruktúram. Venovaný:"
+      description="Vytvorená s poďakovaním jadru spoločenstva SDA a jej dobrovoľníckym štruktúram. Venovaná:"
       icon="i-ph-hand-heart-fill"
       :ui="{ container: 'sm:gap-8' }">
       <div
@@ -245,7 +245,7 @@ const dedications = [
 
     <UPageSection
       title="Srdcom open source"
-      description="Konštruovaný výhradne na slobodnom softvéri so sľubom zostať sám otvoreným celému civilizovanému svetu. Dostupný online pre všetkých len vďaka nasledujúcim projektom:"
+      description="Konštruovaná výhradne na slobodnom softvéri so sľubom zostať sám otvoreným celému civilizovanému svetu. Dostupná online pre všetkých len vďaka nasledujúcim projektom:"
       icon="i-ph-git-merge-fill"
       :features="oss"
       :links="ossLinks">
@@ -265,9 +265,9 @@ const dedications = [
           d="M4.98358 36C2.66232 35.1927 1.43861 32.6684 2.25125 30.3624L11.0927 5.26479C12.7668 0.512655 18.5977 -1.63834 23.1236 1.42373C23.6676 1.79166 24.1601 2.23507 24.5793 2.73912C26.4474 4.97637 26.948 7.8484 26.0282 10.4576L25.1708 12.8916C26.8327 12.6976 28.5435 13.0386 30.0928 13.9186C30.9583 14.4106 31.7221 15.075 32.3272 15.8621C34.0095 18.0562 34.4328 20.7988 33.5523 23.3002L31.9772 27.772C29.6559 26.9647 28.4322 24.4404 29.2449 22.1344L29.3222 21.9148C29.5406 21.2948 29.618 20.6223 29.4701 19.9821C29.1472 18.5805 28.0673 17.5629 26.6631 17.3149C24.9822 17.0184 23.3488 18.0656 22.7858 19.6667L19.9313 27.772C17.6101 26.9647 16.3864 24.4404 17.199 22.1344L21.8266 8.99668C22.4561 7.20823 21.5051 5.24457 19.7048 4.61922C17.9031 3.99252 15.9278 4.93863 15.2983 6.72708L4.98358 36Z"
           fill="var(--ui-primary)" />
       </svg>
-      <span
-        >Platforma DebRIEF je hrdou súčasťou <b>Softvérovej rodiny DN</b></span
-      >
+      <span>
+        Platforma DebRIEF je hrdou súčasťou <b>Softvérovej rodiny DN</b>
+      </span>
     </div>
   </UPage>
 </template>
