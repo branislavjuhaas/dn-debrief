@@ -389,6 +389,7 @@ watch(
         <template #payments>
           <ProfilePayments
             :payments="paymentsData?.payments ?? []"
+            :userId="userId"
             :isPending="paymentsStatus !== 'success'" />
         </template>
       </UTabs>

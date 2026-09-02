@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import LazyModalInput from "~/components/modal/Input.vue";
-import { LazyModalResolvePayments } from "#components";
+import { LazyModalResolvePayments, LazyModalCreatePayment } from "#components";
 import type { TableColumn } from "@nuxt/ui";
+import type { RowSelectionState } from "@tanstack/vue-table";
 
-defineProps<{
+const props = defineProps<{
   payments: Payment[];
+  userId: string;
   isPending: boolean;
 }>();
 
@@ -33,14 +35,14 @@ const paymentColumns: TableColumn<Payment>[] = [
           : table.getIsAllPageRowsSelected(),
         "onUpdate:modelValue": (value: boolean | "indeterminate") =>
           table.toggleAllPageRowsSelected(!!value),
-        "aria-label": "Select all",
+        "aria-label": "Vybrať všetky",
       }),
     cell: ({ row }) =>
       h(UCheckbox, {
         modelValue: row.getIsSelected(),
         "onUpdate:modelValue": (value: boolean | "indeterminate") =>
           row.toggleSelected(!!value),
-        "aria-label": "Select row",
+        "aria-label": "Vybrať riadok",
       }),
   },
   {
@@ -143,10 +145,10 @@ const getRowItems = (row: any) => {
             status: result.status,
             note: result.note,
           },
-          onResponseError: (error) => {
+          onResponseError: ({ error }) => {
             toast.add({
               title: "Chyba",
-              description: "Nepodarilo sa zmeniť stav platby",
+              description: `Nepodarilo sa zmeniť stav platby: ${error?.message ?? "neznáma chyba"}`,
               color: "error",
             });
             row.original.status = originalStatus;
@@ -159,8 +161,6 @@ const getRowItems = (row: any) => {
       icon: "i-ph-currency-eur",
       onSelect: async () => {
         const overlay = useOverlay();
-
-        // Create instances for different data types
         const modal = overlay.create(LazyModalInput<number>);
 
         const instance = modal.open({
@@ -186,10 +186,10 @@ const getRowItems = (row: any) => {
             paymentIds: [row.original.id],
             amount: processedAmount,
           },
-          onResponseError: (error) => {
+          onResponseError: ({ error }) => {
             toast.add({
               title: "Chyba",
-              description: "Nepodarilo sa zmeniť sumu platby",
+              description: `Nepodarilo sa zmeniť sumu platby: ${error?.message ?? "neznáma chyba"}`,
               color: "error",
             });
             row.original.amount = originalAmount;
@@ -199,10 +199,100 @@ const getRowItems = (row: any) => {
     },
   ];
 };
+
+const rowSelection = ref<RowSelectionState>({});
+
+const addPayment = async () => {
+  const overlay = useOverlay();
+  const modal = overlay.create(LazyModalCreatePayment);
+  const instance = modal.open();
+  const result = await instance.result;
+
+  if (!result) return;
+
+  const { amount, description } = result;
+
+  await $fetch("/api/payments", {
+    method: "POST",
+    body: {
+      userId: Number(props.userId),
+      amount: amount * 100,
+      description,
+    },
+    onResponseError: ({ error }) => {
+      toast.add({
+        title: "Chyba",
+        description: `Nepodarilo sa pridať platbu: ${error?.message ?? "neznáma chyba"}`,
+        color: "error",
+      });
+    },
+    onResponse: async () => {
+      await refreshNuxtData(`users-${props.userId}-payments`);
+    },
+  });
+};
+
+const changePaymentsStatus = async () => {
+  const overlay = useOverlay();
+  const modal = overlay.create(LazyModalResolvePayments);
+  const instance = modal.open();
+
+  const result = await instance.result;
+
+  if (!result) return;
+
+  const selectedIds = Object.keys(rowSelection.value)
+    .filter((id) => rowSelection.value[id])
+    .map((id) => props.payments[Number(id)]?.id)
+    .filter((id): id is string => id !== undefined);
+
+  await $fetch("/api/payments/resolve", {
+    method: "PATCH",
+    body: {
+      paymentIds: selectedIds,
+      status: result.status,
+      note: result.note,
+    },
+    onResponseError: ({ error }) => {
+      toast.add({
+        title: "Chyba",
+        description: `Nepodarilo sa zmeniť stav platby: ${error?.message ?? "neznáma chyba"}`,
+        color: "error",
+      });
+    },
+    onResponse: async ({ response }) => {
+      if (response.ok) {
+        await refreshNuxtData(`users-${props.userId}-payments`);
+      }
+    },
+  });
+};
 </script>
 
 <template>
-  <UTable :columns="paymentColumns" :data="payments" :loading="isPending">
-    <template #empty> Platby sa načítavajú... </template>
-  </UTable>
+  <div class="flex flex-col w-full gap-4">
+    <div class="flex flex-row justify-end gap-4">
+      <UButton
+        label="Zmeniť stav platieb"
+        icon="i-ph-seal-check"
+        color="neutral"
+        variant="subtle"
+        :disabled="Object.keys(rowSelection).length === 0"
+        :loading="isPending"
+        @click="changePaymentsStatus" />
+      <UButton
+        label="Nárokovať novú platbu"
+        icon="i-ph-credit-card"
+        variant="subtle"
+        :loading="isPending"
+        @click="addPayment" />
+    </div>
+    <UTable
+      v-model:row-selection="rowSelection"
+      :columns="paymentColumns"
+      :data="payments"
+      :loading="isPending">
+      <template #empty> Platby sa načítavajú... </template>
+    </UTable>
+  </div>
 </template>

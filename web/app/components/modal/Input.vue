@@ -27,6 +27,7 @@ const model = ref<T | undefined>(props.initialValue) as Ref<T | undefined>;
         v-if="props.type === 'number'"
         v-model="model as number"
         :step-snapping="false"
+        :min="0"
         :format-options="{
           minimumFractionDigits: 2,
         }"

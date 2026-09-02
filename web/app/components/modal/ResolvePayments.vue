@@ -38,14 +38,10 @@ const handleConfirm = () => {
     :close="{ onClick: () => emit('close', undefined) }"
     title="Zmeniť stav platby">
     <template #body>
-      <p class="text-sm text-neutral-500 mb-4">
-        Zadajte, prosím, nový stav pre zvolené platby a vyberte poznámku.
-      </p>
-
       <UFormField label="Stav platby" required>
         <USelect v-model="model" :items="items" class="w-full" />
       </UFormField>
-      <UFormField label="Poznámka">
+      <UFormField label="Poznámka" class="mt-4">
         <UInput v-model="note" />
       </UFormField>
     </template>
