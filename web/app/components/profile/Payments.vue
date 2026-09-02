@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import LazyModalInput from "~/components/modal/Input.vue";
+import { LazyModalResolvePayments } from "#components";
 import type { TableColumn } from "@nuxt/ui";
 
 defineProps<{
@@ -119,64 +120,43 @@ const toast = useToast();
 const getRowItems = (row: any) => {
   return [
     {
-      label: "Odpustiť platbu",
-      icon: "i-ph-prohibit-inset",
+      label: "Zmeniť stav",
+      icon: "i-ph-seal-check",
       onSelect: async () => {
-        try {
-          const response = await $fetch(
-            `/api/payments/${row.original.id as NonEmptyString}`,
-            {
-              method: "PATCH",
-              body: {
-                status: "forgiven",
-              },
-            },
-          );
+        const overlay = useOverlay();
+        const modal = overlay.create(LazyModalResolvePayments);
+        const instance = modal.open({
+          initialValue: row.original.status,
+        });
 
-          if (response) {
-            row.original.status = "forgiven";
-          }
-        } catch (error) {
-          toast.add({
-            title: "Nepodarilo sa odpustiť platbu.",
-            color: "error",
-          });
-        }
-      },
-    },
-    {
-      label: "Označiť ako zaplatenú",
-      icon: "i-ph-checks",
-      onSelect: async () => {
-        try {
-          const response = await $fetch(
-            `/api/payments/${row.original.id as NonEmptyString}`,
-            {
-              method: "PATCH",
-              body: {
-                status: "paid",
-              },
-            },
-          );
+        const result = await instance.result;
 
-          if (response) {
-            row.original.status = "paid";
-          }
-        } catch (error) {
-          toast.add({
-            title: "Nepodarilo sa označiť platbu ako zaplatenú.",
-            color: "error",
-          });
-        }
+        if (!result) return;
+
+        let originalStatus = row.original.status;
+        row.original.status = result.status;
+
+        await $fetch("/api/payments/resolve", {
+          method: "PATCH",
+          body: {
+            paymentIds: [row.original.id],
+            status: result.status,
+            note: result.note,
+          },
+          onResponseError: (error) => {
+            toast.add({
+              title: "Chyba",
+              description: "Nepodarilo sa zmeniť stav platby",
+              color: "error",
+            });
+            row.original.status = originalStatus;
+          },
+        });
       },
-    },
-    {
-      type: "separator",
     },
     {
       label: "Zmeniť sumu",
-      icon: "i-ph-pencil-simple",
-      color: "info",
+      icon: "i-ph-currency-eur",
       onSelect: async () => {
         const overlay = useOverlay();
 
@@ -193,32 +173,28 @@ const getRowItems = (row: any) => {
 
         const newAmount = await instance.result;
 
-        if (!newAmount) {
-          return;
-        }
+        if (!newAmount) return;
 
         const processedAmount = Math.round(newAmount * 100);
 
-        try {
-          const response = await $fetch(
-            `/api/payments/${row.original.id as NonEmptyString}`,
-            {
-              method: "PATCH",
-              body: {
-                amount: processedAmount,
-              },
-            },
-          );
+        let originalAmount = row.original.amount;
+        row.original.amount = processedAmount;
 
-          if (response) {
-            row.original.amount = processedAmount;
-          }
-        } catch (error) {
-          toast.add({
-            title: "Nepodarilo sa zmeniť sumu platby",
-            color: "error",
-          });
-        }
+        await $fetch("/api/payments/adjust", {
+          method: "PATCH",
+          body: {
+            paymentIds: [row.original.id],
+            amount: processedAmount,
+          },
+          onResponseError: (error) => {
+            toast.add({
+              title: "Chyba",
+              description: "Nepodarilo sa zmeniť sumu platby",
+              color: "error",
+            });
+            row.original.amount = originalAmount;
+          },
+        });
       },
     },
   ];
