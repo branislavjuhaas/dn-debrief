@@ -165,3 +165,33 @@ export const translatePaymentStatus = (
       return "Neznámy stav";
   }
 };
+
+export const translatePaymentType = (
+  type: string | null | undefined,
+): string => {
+  switch (type) {
+    case "event":
+      return "Podujatie";
+    case "membership":
+      return "Členský poplatok";
+    case "other":
+      return "Iné";
+    default:
+      return type || "";
+  }
+};
+
+export const translatePaymentResolution = (
+  resolution: string | null | undefined,
+): string => {
+  switch (resolution) {
+    case "stripe":
+      return "Stripe (Automaticky)";
+    case "manual":
+      return "Manuálne";
+    case "waived":
+      return "Odpustené";
+    default:
+      return resolution || "";
+  }
+};

@@ -1,6 +1,5 @@
 import ExcelJS from "@zklogic/exceljs";
 import { db } from "#server/db";
-import { parseDate } from "@internationalized/date";
 
 defineRouteMeta({
   openAPI: {
@@ -47,35 +46,6 @@ defineRouteMeta({
     },
   },
 });
-
-// Helper translation functions
-function translatePaymentType(type: string | null | undefined): string {
-  switch (type) {
-    case "event":
-      return "Podujatie";
-    case "membership":
-      return "Členský poplatok";
-    case "other":
-      return "Iné";
-    default:
-      return type || "";
-  }
-}
-
-function translatePaymentResolution(
-  resolution: string | null | undefined,
-): string {
-  switch (resolution) {
-    case "stripe":
-      return "Stripe (Automaticky)";
-    case "manual":
-      return "Manuálne";
-    case "waived":
-      return "Odpustené";
-    default:
-      return resolution || "";
-  }
-}
 
 export default defineEventHandler(async (event) => {
   await requireUser(event, ["developer", "admin"]);
