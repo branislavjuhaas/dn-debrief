@@ -294,7 +294,7 @@ defineRouteMeta({
   },
 });
 
-const checkUserNotFound = (user: any) => {
+const checkUserNotFound = (user: unknown) => {
   if (!user) {
     throw createError({
       statusCode: 404,
@@ -308,6 +308,11 @@ export default defineEventHandler(async (event) => {
   const user = await requireUser(event);
   const userId = Number.parseInt(getRouterParam(event, "userId") ?? "", 10);
 
+  const isMemberExtra = {
+    isMember: sql`exists (select 1 from club_memberships where user_id = ${userId} and season = extract(year from current_date) and confirmed = true)`,
+  };
+
+  // Privileged roles see full profile data including legal guardian
   if (
     [
       "organizer",
@@ -321,9 +326,7 @@ export default defineEventHandler(async (event) => {
       where: {
         id: userId,
       },
-      extras: {
-        isMember: sql`exists (select 1 from club_memberships where user_id = ${userId} and season = extract(year from current_date) and confirmed = true)`,
-      },
+      extras: isMemberExtra,
       with: {
         legalGuardian: true,
       },
@@ -331,44 +334,42 @@ export default defineEventHandler(async (event) => {
 
     checkUserNotFound(userData);
     return { user: userData };
-  } else {
-    // If there is a club where the queried user is a member and the current user
-    // is a manager of that club, allow access to the limited queried user's data
-    const clubMembership = await db.query.clubMemberships.findFirst({
-      where: {
-        userId: userId,
-        club: {
-          managers: {
-            id: user.id,
-          },
+  }
+
+  // Club managers see contact details (email) for members of their club
+  const clubMembership = await db.query.clubMemberships.findFirst({
+    where: {
+      userId: userId,
+      club: {
+        managers: {
+          id: user.id,
         },
+      },
+    },
+  });
+
+  if (clubMembership) {
+    const userData = await db.query.users.findFirst({
+      columns: {
+        id: true,
+        name: true,
+        surname: true,
+        email: true,
+        role: true,
+        image: true,
+        credential: true,
+      },
+      extras: isMemberExtra,
+      where: {
+        id: userId,
       },
     });
 
-    if (clubMembership) {
-      const userData = await db.query.users.findFirst({
-        columns: {
-          id: true,
-          name: true,
-          surname: true,
-          email: true,
-          role: true,
-          image: true,
-          credential: true,
-        },
-        extras: {
-          isMember: sql`exists (select 1 from club_memberships where user_id = ${userId} and season = extract(year from current_date) and confirmed = true)`,
-        },
-        where: {
-          id: userId,
-        },
-      });
-
-      checkUserNotFound(userData);
-      return { user: userData };
-    }
+    checkUserNotFound(userData);
+    return { user: userData };
   }
 
+  // Standard public profile view
   const userData = await db.query.users.findFirst({
     columns: {
       id: true,
@@ -378,9 +379,7 @@ export default defineEventHandler(async (event) => {
       image: true,
       credential: true,
     },
-    extras: {
-      isMember: sql`exists (select 1 from club_memberships where user_id = ${userId} and season = extract(year from current_date) and confirmed = true)`,
-    },
+    extras: isMemberExtra,
     where: {
       id: userId,
     },
