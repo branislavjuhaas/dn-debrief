@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import LazyModalInput from "~/components/modal/Input.vue";
-import { LazyModalResolvePayments } from "#components";
 import type { TableColumn } from "@nuxt/ui";
 
+// Page metadata & access control
 definePageMeta({
   middleware: ["auth"],
   allowedRoles: ["developer", "admin"],
@@ -11,9 +10,10 @@ definePageMeta({
 useSeoMeta({
   title: "Správa platieb",
   description:
-    "Správa a štatistické údaje platieb za členstvo v SDA a registrácie na podujatia na platforme DebRIEF. ",
+    "Správa a štatistické údaje platieb za členstvo v SDA a registrácie na podujatia na platforme DebRIEF.",
 });
 
+// Data fetching
 const { data: paymentsFetch } = await useFetch("/api/payments", {
   key: "payments",
 });
@@ -21,18 +21,33 @@ const { data: paymentsFetch } = await useFetch("/api/payments", {
 const { data: paymentsData } =
   useNuxtData<typeof paymentsFetch.value>("payments");
 
+// Resolved UI components for table cells
 const UBadge = resolveComponent("UBadge");
 const UUser = resolveComponent("UUser");
 const UButton = resolveComponent("UButton");
 const UDropdownMenu = resolveComponent("UDropdownMenu");
-const overlay = useOverlay();
 
-const currencyFormatter = new Intl.NumberFormat("sk-SK", {
-  style: "currency",
-  currency: "EUR",
+// Computed payment statistics for toolbar summary
+const paymentStats = computed(() => {
+  const all = Number(paymentsData.value?.stats.all ?? 0);
+  const unpaid = Number(paymentsData.value?.stats.unpaid ?? 0);
+  const forgiven = Number(paymentsData.value?.stats.forgiven ?? 0);
+
+  const unpaidPercentage = all > 0 ? ((unpaid / all) * 100).toFixed(2) : "0.00";
+  const forgivenPercentage =
+    all > 0 ? ((forgiven / all) * 100).toFixed(2) : "0.00";
+
+  return {
+    allFormatted: `${all / 100} €`,
+    unpaidFormatted: `${unpaid / 100} €`,
+    unpaidPercentage: `${unpaidPercentage} %`,
+    forgivenFormatted: `${forgiven / 100} €`,
+    forgivenPercentage: `${forgivenPercentage} %`,
+  };
 });
 
-const columns: TableColumn<{
+// Table columns configuration
+type ManagePaymentRow = {
   id: string;
   description: string;
   createdAt: string;
@@ -43,7 +58,9 @@ const columns: TableColumn<{
     surname: string;
     image: string | null;
   } | null;
-}>[] = [
+};
+
+const columns: TableColumn<ManagePaymentRow>[] = [
   {
     id: "name",
     accessorFn: (row) => `${row.user?.name ?? ""} ${row.user?.surname ?? ""}`,
@@ -116,26 +133,14 @@ const columns: TableColumn<{
       });
     },
     cell: ({ row }) => {
-      return currencyFormatter.format((row.getValue("amount") as number) / 100);
+      return formatCurrency(row.getValue("amount") as number);
     },
   },
   {
     accessorKey: "status",
     header: "Stav platby",
     cell: ({ row }) => {
-      const colorMap: Record<
-        PaymentStatus,
-        "warning" | "success" | "info" | "error" | "neutral"
-      > = {
-        pending: "warning",
-        processing: "warning",
-        paid: "success",
-        forgiven: "info",
-        cancelled: "error",
-        failed: "error",
-      };
-
-      const color = colorMap[row.original.status] ?? "neutral";
+      const color = paymentStatusColors[row.original.status] ?? "neutral";
 
       return h(UBadge, { variant: "subtle", color }, () =>
         translatePaymentStatus(row.original.status),
@@ -156,7 +161,9 @@ const columns: TableColumn<{
           content: {
             align: "end",
           },
-          items: getRowItems(row),
+          items: getPaymentRowItems(row.original, {
+            onUpdated: () => refreshNuxtData("payments"),
+          }),
           "aria-label": "Akcie",
         },
         () =>
@@ -170,88 +177,6 @@ const columns: TableColumn<{
     },
   },
 ];
-
-const toast = useToast();
-
-const getRowItems = (row: any) => {
-  return [
-    {
-      label: "Zmeniť sumu",
-      icon: "i-ph-currency-eur",
-      onSelect: async () => {
-        const overlay = useOverlay();
-        const modal = overlay.create(LazyModalInput<number>);
-
-        const instance = modal.open({
-          title: "Zmeniť sumu platby",
-          description: `Zadajte, prosím novú sumu pre položku: "${row.original.description}"`,
-          type: "number",
-          initialValue: row.original.amount / 100,
-          confirmLabel: "Zmeniť",
-        });
-
-        const newAmount = await instance.result;
-
-        if (!newAmount) return;
-
-        const processedAmount = Math.round(newAmount * 100);
-
-        await $fetch("/api/payments/adjust", {
-          method: "PATCH",
-          body: {
-            paymentIds: [row.original.id],
-            amount: processedAmount,
-          },
-          onResponseError: ({ error }) => {
-            toast.add({
-              title: "Chyba",
-              description: `Nepodarilo sa zmeniť sumu platby: ${error?.message ?? "neznáma chyba"}`,
-              color: "error",
-            });
-          },
-          onResponse: () => {
-            refreshNuxtData("payments");
-          },
-        });
-      },
-    },
-    {
-      label: "Zmeniť stav",
-      icon: "i-ph-seal-check",
-      onSelect: async () => {
-        const modal = overlay.create(LazyModalResolvePayments);
-        const instance = modal.open({
-          initialValue: row.original.status,
-        });
-
-        const result = await instance.result;
-
-        if (!result) return;
-
-        await $fetch("/api/payments/resolve", {
-          method: "PATCH",
-          body: {
-            paymentIds: [row.original.id],
-            status: result.status,
-            note: result.note,
-          },
-          onResponseError: ({ error }) => {
-            toast.add({
-              title: "Chyba",
-              description: `Nepodarilo sa zmeniť stav platby: ${error?.message ?? "neznáma chyba"}`,
-              color: "error",
-            });
-          },
-          onResponse: async ({ response }) => {
-            if (!response.ok) return;
-
-            await refreshNuxtData(`payments`);
-          },
-        });
-      },
-    },
-  ];
-};
 </script>
 
 <template>
@@ -276,35 +201,21 @@ const getRowItems = (row: any) => {
               <span>
                 Všetky:
                 <UBadge size="lg" color="info">
-                  {{ Number(paymentsData?.stats.all ?? 0) / 100 }} €
+                  {{ paymentStats.allFormatted }}
                 </UBadge>
               </span>
               <span>
                 Nezaplatené:
                 <UBadge size="lg" color="error">
-                  {{ Number(paymentsData?.stats.unpaid ?? 0) / 100 }} € ·
-                  {{
-                    (
-                      (Number(paymentsData?.stats.unpaid ?? 0) /
-                        Number(paymentsData?.stats.all ?? 0)) *
-                      100
-                    ).toFixed(2)
-                  }}
-                  %
+                  {{ paymentStats.unpaidFormatted }} ·
+                  {{ paymentStats.unpaidPercentage }}
                 </UBadge>
               </span>
               <span>
                 Odpustené:
                 <UBadge size="lg" color="warning">
-                  {{ Number(paymentsData?.stats.forgiven ?? 0) / 100 }} € ·
-                  {{
-                    (
-                      (Number(paymentsData?.stats.forgiven ?? 0) /
-                        Number(paymentsData?.stats.all ?? 0)) *
-                      100
-                    ).toFixed(2)
-                  }}
-                  %
+                  {{ paymentStats.forgivenFormatted }} ·
+                  {{ paymentStats.forgivenPercentage }}
                 </UBadge>
               </span>
             </div>

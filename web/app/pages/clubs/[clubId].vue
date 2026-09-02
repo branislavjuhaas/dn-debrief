@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import {
-  LazyModalEditClub,
-  LazyModalConfirm,
   LazyModalAddClubManager,
-  LazyModalResolvePayments,
+  LazyModalConfirm,
+  LazyModalEditClub,
 } from "#components";
 import type { TableColumn, TabsItem } from "@nuxt/ui";
 import type { RowSelectionState } from "@tanstack/vue-table";
 
+// Page metadata & route parameters
 definePageMeta({
   middleware: ["auth"],
 });
@@ -15,6 +15,7 @@ definePageMeta({
 const route = useRoute();
 const clubId = route.params.clubId as NonEmptyString;
 
+// Club details data fetching
 await useFetch(`/api/clubs/${clubId}`, {
   key: `clubs-${clubId}`,
 });
@@ -36,6 +37,7 @@ useSeoMeta({
   description: `Profil debatného klubu ${clubData?.value?.club.name ?? ""} s prehľadom správcov/-kýň, členov/-iek a ďalších informácií.`,
 });
 
+// Current user & club permissions
 const { data: userFetch } = await useFetch("/api/users/me", {
   key: "users-me",
 });
@@ -44,16 +46,6 @@ const { data: userData } = useNuxtData<typeof userFetch.value>("users-me");
 
 const { data: clubManagers } = await useFetch(`/api/clubs/${clubId}/managers`, {
   key: `clubs-${clubId}-managers`,
-});
-
-const {
-  data: clubPayments,
-  execute: fetchPayments,
-  status: paymentsStatus,
-} = await useFetch(`/api/clubs/${clubId}/payments`, {
-  key: `clubs-${clubId}-payments`,
-  lazy: true,
-  immediate: false,
 });
 
 const isUserClubManager = computed(() => {
@@ -66,18 +58,34 @@ const isUserClubManager = computed(() => {
   );
 });
 
+const isAdminOrDeveloper = computed(() =>
+  ["developer", "admin"].includes(userData?.value?.user?.role ?? "user"),
+);
+
+const canManageClub = computed(
+  () => isUserClubManager.value || isAdminOrDeveloper.value,
+);
+
+// Club members & unpaid payments data
 const { data: clubMembers } = await useFetch(
   `/api/clubs/${clubId}/memberships`,
   {
     key: `clubs-${clubId}-memberships`,
-    enabled: computed(
-      () =>
-        isUserClubManager.value ||
-        ["developer", "admin"].includes(userData?.value?.user?.role ?? "user"),
-    ),
+    enabled: canManageClub,
   },
 );
 
+const {
+  data: clubPayments,
+  execute: fetchPayments,
+  status: paymentsStatus,
+} = await useFetch(`/api/clubs/${clubId}/payments`, {
+  key: `clubs-${clubId}-payments`,
+  lazy: true,
+  immediate: false,
+});
+
+// Tabs navigation & lifecycle
 const selectedTab = ref("0");
 
 const tabItems = computed<TabsItem[]>(() => [
@@ -93,12 +101,21 @@ const tabItems = computed<TabsItem[]>(() => [
   {
     label: "Neuhradené platby",
     slot: "payments",
-    disabled:
-      !isUserClubManager.value &&
-      !["developer", "admin"].includes(userData?.value?.user?.role ?? "user"),
+    disabled: !canManageClub.value,
   },
 ]);
 
+watch(
+  selectedTab,
+  async (newTab) => {
+    if (newTab === "2" && !clubPayments.value) {
+      await fetchPayments();
+    }
+  },
+  { immediate: true },
+);
+
+// Resolved UI components
 const UUser = resolveComponent("UUser");
 const UButton = resolveComponent("UButton");
 const UBadge = resolveComponent("UBadge");
@@ -108,6 +125,7 @@ const UDropdownMenu = resolveComponent("UDropdownMenu");
 const overlay = useOverlay();
 const toast = useToast();
 
+// Club administration actions
 const editClub = async () => {
   const modal = overlay.create(LazyModalEditClub);
   modal.open({
@@ -128,7 +146,7 @@ const deleteClub = async () => {
   if (shouldDelete) {
     await $fetch(`/api/clubs/${clubId as NonEmptyString}`, {
       method: "DELETE",
-      onResponseError({ response }) {
+      onResponseError() {
         toast.add({
           title: "Nepodarilo sa vymazať klub",
           description: "Skúste to znova.",
@@ -187,6 +205,7 @@ const deleteClubManager = async (managerId: number) => {
   });
 };
 
+// Members table configuration
 const membersColumns: TableColumn<{
   confirmed: boolean;
   registrationType:
@@ -314,12 +333,8 @@ const membersColumns: TableColumn<{
   },
 ];
 
-const dateFormatter = new Intl.DateTimeFormat("sk-SK", {
-  dateStyle: "medium",
-  timeStyle: "short",
-});
-
-const paymentsColumns: TableColumn<{
+// Club payments table & batch resolution
+type ClubPaymentRow = {
   id: string;
   description: string;
   createdAt: string;
@@ -329,7 +344,33 @@ const paymentsColumns: TableColumn<{
     surname: string;
     image: string | null;
   };
-}>[] = [
+};
+
+const rowSelection = ref<RowSelectionState>({});
+
+const selectedPaymentIds = computed<string[]>(() =>
+  Object.keys(rowSelection.value)
+    .filter((id) => rowSelection.value[id])
+    .map((id) => clubPayments.value?.payments[Number(id)]?.id)
+    .filter((id): id is string => id !== undefined),
+);
+
+const hasPaymentSelection = computed(() => selectedPaymentIds.value.length > 0);
+
+const refreshClubPayments = async () => {
+  await refreshNuxtData(`clubs-${clubId}-payments`);
+};
+
+const changePaymentsStatus = async () => {
+  await promptBatchResolvePayments(selectedPaymentIds.value, {
+    onUpdated: async () => {
+      await refreshClubPayments();
+      rowSelection.value = {};
+    },
+  });
+};
+
+const paymentsColumns: TableColumn<ClubPaymentRow>[] = [
   {
     id: "select",
     header: ({ table }) =>
@@ -404,12 +445,7 @@ const paymentsColumns: TableColumn<{
   {
     accessorKey: "createdAt",
     header: "Vytvorená",
-    cell: ({ row }) => {
-      const date = row.original.createdAt
-        ? new Date(row.original.createdAt)
-        : null;
-      return date && !isNaN(date.getTime()) ? dateFormatter.format(date) : "—";
-    },
+    cell: ({ row }) => formatDate(row.original.createdAt),
   },
   {
     id: "actions",
@@ -425,7 +461,10 @@ const paymentsColumns: TableColumn<{
           content: {
             align: "end",
           },
-          items: getRowItems(row),
+          items: getPaymentRowItems(row.original, {
+            canAdjustAmount: false,
+            onUpdated: refreshClubPayments,
+          }),
           "aria-label": "Akcie",
         },
         () =>
@@ -433,116 +472,19 @@ const paymentsColumns: TableColumn<{
             icon: "i-lucide-ellipsis-vertical",
             color: "neutral",
             variant: "ghost",
-            disabled: !["developer", "admin"].includes(
-              userData.value?.user?.role ?? "user",
-            ),
+            disabled: !isAdminOrDeveloper.value,
             "aria-label": "Akcie",
           }),
       );
     },
   },
 ];
-
-const getRowItems = (row: any) => {
-  return [
-    {
-      label: "Zmeniť stav",
-      icon: "i-ph-seal-check",
-      onSelect: async () => {
-        const overlay = useOverlay();
-        const modal = overlay.create(LazyModalResolvePayments);
-        const instance = modal.open({
-          initialValue: row.original.status,
-        });
-
-        const result = await instance.result;
-
-        if (!result) return;
-
-        await $fetch("/api/payments/resolve", {
-          method: "PATCH",
-          body: {
-            paymentIds: [row.original.id],
-            status: result.status,
-            note: result.note,
-          },
-          onResponseError: ({ error }) => {
-            toast.add({
-              title: "Chyba",
-              description: `Nepodarilo sa zmeniť stav platby: ${error?.message ?? "neznáma chyba"}`,
-              color: "error",
-            });
-          },
-          onResponse: async ({ response }) => {
-            if (!response.ok) return;
-
-            await refreshNuxtData(`clubs-${clubId}-payments`);
-          },
-        });
-      },
-    },
-  ];
-};
-
-const rowSelection = ref<RowSelectionState>({});
-
-const changePaymentsStatus = async () => {
-  const overlay = useOverlay();
-  const modal = overlay.create(LazyModalResolvePayments);
-  const instance = modal.open();
-
-  const result = await instance.result;
-
-  if (!result) return;
-
-  const selectedIds = Object.keys(rowSelection.value)
-    .filter((id) => rowSelection.value[id])
-    .map((id) => clubPayments.value?.payments[Number(id)]?.id)
-    .filter((id): id is string => id !== undefined);
-
-  await $fetch("/api/payments/resolve", {
-    method: "PATCH",
-    body: {
-      paymentIds: selectedIds,
-      status: result.status,
-      note: result.note,
-    },
-    onResponseError: ({ error }) => {
-      toast.add({
-        title: "Chyba",
-        description: `Nepodarilo sa zmeniť stav platby: ${error?.message ?? "neznáma chyba"}`,
-        color: "error",
-      });
-    },
-    onResponse: async ({ response }) => {
-      if (response.ok) {
-        await refreshNuxtData(`clubs-${clubId}-payments`);
-        rowSelection.value = {};
-      }
-    },
-  });
-};
-
-watch(
-  selectedTab,
-  async (newTab) => {
-    if (newTab === "2" && !clubPayments.value) {
-      await fetchPayments();
-    }
-  },
-  { immediate: true },
-);
 </script>
 
 <template>
   <UPage>
     <UPageHeader :title="`Debatný klub ${clubData?.club.name}`">
-      <template
-        #links
-        v-if="
-          userData?.user &&
-          ['developer', 'admin'].includes(userData.user.role ?? 'user')
-        ">
+      <template #links v-if="userData?.user && isAdminOrDeveloper">
         <UTooltip
           v-if="!clubData?.club.isDeletable"
           text="Klub je možné vymazať len v prípade, že nikdy nemal žiadnych/-e členov/-ky">
@@ -607,10 +549,7 @@ watch(
           </span>
           <div class="flex flex-row flex-wrap gap-2">
             <UContextMenu
-              v-if="
-                userData?.user &&
-                ['developer', 'admin'].includes(userData.user.role ?? 'user')
-              "
+              v-if="userData?.user && isAdminOrDeveloper"
               v-for="manager in clubManagers?.managers"
               :items="[
                 {
@@ -649,11 +588,7 @@ watch(
               size="xs"
               class="p-1 px-2 rounded-md bg-elevated" />
             <UButton
-              v-if="
-                userData?.user &&
-                (isUserClubManager ||
-                  ['developer', 'admin'].includes(userData.user.role ?? 'user'))
-              "
+              v-if="userData?.user && canManageClub"
               label="Pridať"
               icon="i-ph-plus"
               variant="soft"
@@ -664,10 +599,7 @@ watch(
         </div>
       </UCard>
       <UTabs
-        v-if="
-          isUserClubManager ||
-          ['developer', 'admin'].includes(userData?.user?.role ?? 'user')
-        "
+        v-if="canManageClub"
         v-model="selectedTab"
         :items="tabItems"
         variant="link"
@@ -693,7 +625,7 @@ watch(
               icon="i-ph-seal-check"
               color="neutral"
               variant="subtle"
-              :disabled="Object.keys(rowSelection).length === 0"
+              :disabled="!hasPaymentSelection"
               :loading="paymentsStatus !== 'success'"
               auto-loading
               @click="changePaymentsStatus" />

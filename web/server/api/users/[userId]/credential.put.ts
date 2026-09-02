@@ -97,14 +97,14 @@ defineRouteMeta({
   },
 });
 
-const awardBody = z.object({
+const credentialBody = z.object({
   credential: z.number().int().min(0).max(3),
 });
 
 export default defineEventHandler(async (event) => {
   await requireUser(event, ["developer", "admin", "chief_adjudicator"]);
   const userId = Number.parseInt(getRouterParam(event, "userId") ?? "", 10);
-  const { credential } = await readValidatedBody(event, awardBody.parse);
+  const { credential } = await readValidatedBody(event, credentialBody.parse);
 
   const updatedUser = await db
     .update(users)

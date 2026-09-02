@@ -18,7 +18,7 @@ defineRouteMeta({
           ],
         },
         description:
-          "The ID of the user whose memberships should be returned or 'me' for the current user",
+          "The ID of the user whose payments should be returned or 'me' for the current user",
       },
     ],
     responses: {
@@ -77,7 +77,18 @@ defineRouteMeta({
 
 export default defineEventHandler(async (event) => {
   await requireUser(event, ["developer", "admin"]);
-  const userId = Number.parseInt(getRouterParam(event, "userId") ?? "", 10);
+  const userId = await resolveUserId(
+    event,
+    getRouterParam(event, "userId") ?? "",
+  );
+
+  if (!userId) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: "Not Found",
+      message: "User not found",
+    });
+  }
 
   const userPayments = await db.query.payments.findMany({
     where: {

@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import LazyModalInput from "~/components/modal/Input.vue";
-import { LazyModalResolvePayments, LazyModalCreatePayment } from "#components";
 import type { TableColumn } from "@nuxt/ui";
 import type { RowSelectionState } from "@tanstack/vue-table";
 
@@ -10,21 +8,46 @@ const props = defineProps<{
   isPending: boolean;
 }>();
 
+// Resolved UI components for TanStack table cell render functions
 const UButton = resolveComponent("UButton");
 const UCheckbox = resolveComponent("UCheckbox");
 const UDropdownMenu = resolveComponent("UDropdownMenu");
 const UBadge = resolveComponent("UBadge");
 
-const currencyFormatter = new Intl.NumberFormat("sk-SK", {
-  style: "currency",
-  currency: "EUR",
-});
+// Row selection state & helpers
+const rowSelection = ref<RowSelectionState>({});
 
-const dateFormatter = new Intl.DateTimeFormat("sk-SK", {
-  dateStyle: "medium",
-  timeStyle: "short",
-});
+const selectedPaymentIds = computed<string[]>(() =>
+  Object.keys(rowSelection.value)
+    .filter((id) => rowSelection.value[id])
+    .map((id) => props.payments[Number(id)]?.id)
+    .filter((id): id is string => id !== undefined),
+);
 
+const hasSelection = computed(() => selectedPaymentIds.value.length > 0);
+
+// Data refresh helper
+const refreshPayments = async () => {
+  await refreshNuxtData(`users-${props.userId}-payments`);
+};
+
+// Payment action handlers
+const addPayment = async () => {
+  await promptCreatePayment(props.userId, {
+    onUpdated: refreshPayments,
+  });
+};
+
+const changePaymentsStatus = async () => {
+  await promptBatchResolvePayments(selectedPaymentIds.value, {
+    onUpdated: async () => {
+      await refreshPayments();
+      rowSelection.value = {};
+    },
+  });
+};
+
+// Table columns configuration
 const paymentColumns: TableColumn<Payment>[] = [
   {
     id: "select",
@@ -52,26 +75,13 @@ const paymentColumns: TableColumn<Payment>[] = [
   {
     accessorKey: "amount",
     header: "Suma",
-    cell: ({ row }) => currencyFormatter.format(row.original.amount / 100),
+    cell: ({ row }) => formatCurrency(row.original.amount),
   },
   {
     accessorKey: "status",
     header: "Stav platby",
     cell: ({ row }) => {
-      const colorMap: Record<
-        Payment["status"],
-        "warning" | "success" | "info" | "error" | "neutral"
-      > = {
-        pending: "warning",
-        processing: "warning",
-        paid: "success",
-        forgiven: "info",
-        cancelled: "error",
-        failed: "error",
-      };
-
-      const color = colorMap[row.original.status] ?? "neutral";
-
+      const color = paymentStatusColors[row.original.status] ?? "neutral";
       return h(UBadge, { variant: "subtle", color }, () =>
         translatePaymentStatus(row.original.status),
       );
@@ -80,12 +90,7 @@ const paymentColumns: TableColumn<Payment>[] = [
   {
     accessorKey: "createdAt",
     header: "Vytvorená",
-    cell: ({ row }) => {
-      const date = row.original.createdAt
-        ? new Date(row.original.createdAt)
-        : null;
-      return date && !isNaN(date.getTime()) ? dateFormatter.format(date) : "—";
-    },
+    cell: ({ row }) => formatDate(row.original.createdAt),
   },
   {
     id: "actions",
@@ -101,7 +106,9 @@ const paymentColumns: TableColumn<Payment>[] = [
           content: {
             align: "end",
           },
-          items: getRowItems(row),
+          items: getPaymentRowItems(row.original, {
+            onUpdated: refreshPayments,
+          }),
           "aria-label": "Akcie",
         },
         () =>
@@ -116,157 +123,6 @@ const paymentColumns: TableColumn<Payment>[] = [
     },
   },
 ];
-
-const toast = useToast();
-
-const getRowItems = (row: any) => {
-  return [
-    {
-      label: "Zmeniť sumu",
-      icon: "i-ph-currency-eur",
-      onSelect: async () => {
-        const overlay = useOverlay();
-        const modal = overlay.create(LazyModalInput<number>);
-
-        const instance = modal.open({
-          title: "Zmeniť sumu platby",
-          description: `Zadajte, prosím novú sumu pre položku: "${row.original.description}"`,
-          type: "number",
-          initialValue: row.original.amount / 100,
-          confirmLabel: "Zmeniť",
-        });
-
-        const newAmount = await instance.result;
-
-        if (!newAmount) return;
-
-        const processedAmount = Math.round(newAmount * 100);
-
-        let originalAmount = row.original.amount;
-        row.original.amount = processedAmount;
-
-        await $fetch("/api/payments/adjust", {
-          method: "PATCH",
-          body: {
-            paymentIds: [row.original.id],
-            amount: processedAmount,
-          },
-          onResponseError: ({ error }) => {
-            toast.add({
-              title: "Chyba",
-              description: `Nepodarilo sa zmeniť sumu platby: ${error?.message ?? "neznáma chyba"}`,
-              color: "error",
-            });
-            row.original.amount = originalAmount;
-          },
-        });
-      },
-    },
-    {
-      label: "Zmeniť stav",
-      icon: "i-ph-seal-check",
-      onSelect: async () => {
-        const overlay = useOverlay();
-        const modal = overlay.create(LazyModalResolvePayments);
-        const instance = modal.open({
-          initialValue: row.original.status,
-        });
-
-        const result = await instance.result;
-
-        if (!result) return;
-
-        let originalStatus = row.original.status;
-        row.original.status = result.status;
-
-        await $fetch("/api/payments/resolve", {
-          method: "PATCH",
-          body: {
-            paymentIds: [row.original.id],
-            status: result.status,
-            note: result.note,
-          },
-          onResponseError: ({ error }) => {
-            toast.add({
-              title: "Chyba",
-              description: `Nepodarilo sa zmeniť stav platby: ${error?.message ?? "neznáma chyba"}`,
-              color: "error",
-            });
-            row.original.status = originalStatus;
-          },
-        });
-      },
-    },
-  ];
-};
-
-const rowSelection = ref<RowSelectionState>({});
-
-const addPayment = async () => {
-  const overlay = useOverlay();
-  const modal = overlay.create(LazyModalCreatePayment);
-  const instance = modal.open();
-  const result = await instance.result;
-
-  if (!result) return;
-
-  const { amount, description } = result;
-
-  await $fetch("/api/payments", {
-    method: "POST",
-    body: {
-      userId: Number(props.userId),
-      amount: amount * 100,
-      description,
-    },
-    onResponseError: ({ error }) => {
-      toast.add({
-        title: "Chyba",
-        description: `Nepodarilo sa pridať platbu: ${error?.message ?? "neznáma chyba"}`,
-        color: "error",
-      });
-    },
-    onResponse: async () => {
-      await refreshNuxtData(`users-${props.userId}-payments`);
-    },
-  });
-};
-
-const changePaymentsStatus = async () => {
-  const overlay = useOverlay();
-  const modal = overlay.create(LazyModalResolvePayments);
-  const instance = modal.open();
-
-  const result = await instance.result;
-
-  if (!result) return;
-
-  const selectedIds = Object.keys(rowSelection.value)
-    .filter((id) => rowSelection.value[id])
-    .map((id) => props.payments[Number(id)]?.id)
-    .filter((id): id is string => id !== undefined);
-
-  await $fetch("/api/payments/resolve", {
-    method: "PATCH",
-    body: {
-      paymentIds: selectedIds,
-      status: result.status,
-      note: result.note,
-    },
-    onResponseError: ({ error }) => {
-      toast.add({
-        title: "Chyba",
-        description: `Nepodarilo sa zmeniť stav platby: ${error?.message ?? "neznáma chyba"}`,
-        color: "error",
-      });
-    },
-    onResponse: async ({ response }) => {
-      if (response.ok) {
-        await refreshNuxtData(`users-${props.userId}-payments`);
-      }
-    },
-  });
-};
 </script>
 
 <template>
@@ -305,7 +161,7 @@ const changePaymentsStatus = async () => {
         icon="i-ph-seal-check"
         color="neutral"
         variant="subtle"
-        :disabled="Object.keys(rowSelection).length === 0"
+        :disabled="!hasSelection"
         :loading="isPending"
         @click="changePaymentsStatus" />
       <UButton
