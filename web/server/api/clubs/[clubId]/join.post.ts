@@ -186,7 +186,6 @@ export default defineEventHandler(async (event) => {
         paymentType: "membership",
         description: `Registrácia do SDA na kalendárny rok ${currentSeasons.join(", ")}`,
         amount: 2000, // Amount in cents
-        currency: "eur",
       })
       .returning();
 

@@ -43,7 +43,6 @@ export const payments = pgTable(
     paymentType: paymentTypeEnum("payment_type").notNull(),
     description: text("description").notNull(),
     amount: integer("amount").notNull(),
-    currency: text("currency").default("eur").notNull(),
     status: paymentStatusEnum("status").default("pending").notNull(),
     checkoutAttempt: integer("checkout_attempt").notNull().default(0),
     resolution: paymentResolutionEnum("resolution"),

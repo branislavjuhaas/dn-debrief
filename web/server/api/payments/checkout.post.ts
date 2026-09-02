@@ -129,32 +129,10 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const currency = claimed[0]?.currency.toLowerCase();
-  if (!currency) {
-    await rollbackClaim(claimed.map((p) => p.id));
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Currency is required for checkout.",
-    });
-  }
-
-  const hasMixedCurrencies = claimed.some(
-    (p) => p.currency.toLowerCase() !== currency,
-  );
-
-  if (hasMixedCurrencies) {
-    await rollbackClaim(claimed.map((p) => p.id));
-    throw createError({
-      statusCode: 400,
-      statusMessage:
-        "Cannot mix multiple currencies in a single checkout session.",
-    });
-  }
-
   const lineItems = claimed.map((p) => ({
     quantity: 1,
     price_data: {
-      currency,
+      currency: "eur",
       unit_amount: p.amount,
       product_data: {
         name: p.description,
