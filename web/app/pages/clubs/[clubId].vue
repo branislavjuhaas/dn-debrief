@@ -3,29 +3,14 @@ import {
   LazyModalEditClub,
   LazyModalConfirm,
   LazyModalAddClubManager,
+  LazyModalResolvePayments,
 } from "#components";
 import type { TableColumn, TabsItem } from "@nuxt/ui";
+import type { RowSelectionState } from "@tanstack/vue-table";
 
 definePageMeta({
   middleware: ["auth"],
 });
-
-const tabItems = ref<TabsItem[]>([
-  {
-    label: "Členovia/-ky klubu",
-    slot: "members",
-  },
-  {
-    label: "Registrácie na podujatia",
-    slot: "registrations",
-    disabled: true,
-  },
-  {
-    label: "Platby",
-    slot: "payments",
-    disabled: true,
-  },
-]);
 
 const route = useRoute();
 const clubId = route.params.clubId as NonEmptyString;
@@ -61,6 +46,16 @@ const { data: clubManagers } = await useFetch(`/api/clubs/${clubId}/managers`, {
   key: `clubs-${clubId}-managers`,
 });
 
+const {
+  data: clubPayments,
+  execute: fetchPayments,
+  status: paymentsStatus,
+} = await useFetch(`/api/clubs/${clubId}/payments`, {
+  key: `clubs-${clubId}-payments`,
+  lazy: true,
+  immediate: false,
+});
+
 const isUserClubManager = computed(() => {
   if (!userData?.value?.user || !clubManagers?.value) {
     return false;
@@ -83,9 +78,32 @@ const { data: clubMembers } = await useFetch(
   },
 );
 
+const selectedTab = ref("0");
+
+const tabItems = computed<TabsItem[]>(() => [
+  {
+    label: "Členovia/-ky klubu",
+    slot: "members",
+  },
+  {
+    label: "Registrácie na podujatia",
+    slot: "registrations",
+    disabled: true,
+  },
+  {
+    label: "Neuhradené platby",
+    slot: "payments",
+    disabled:
+      !isUserClubManager.value &&
+      !["developer", "admin"].includes(userData?.value?.user?.role ?? "user"),
+  },
+]);
+
 const UUser = resolveComponent("UUser");
 const UButton = resolveComponent("UButton");
 const UBadge = resolveComponent("UBadge");
+const UCheckbox = resolveComponent("UCheckbox");
+const UDropdownMenu = resolveComponent("UDropdownMenu");
 
 const overlay = useOverlay();
 const toast = useToast();
@@ -169,7 +187,7 @@ const deleteClubManager = async (managerId: number) => {
   });
 };
 
-const columns: TableColumn<{
+const membersColumns: TableColumn<{
   confirmed: boolean;
   registrationType:
     | "junior_student"
@@ -295,6 +313,230 @@ const columns: TableColumn<{
     cell: ({ row }) => translateRole(row.original.user?.role),
   },
 ];
+
+const dateFormatter = new Intl.DateTimeFormat("sk-SK", {
+  dateStyle: "medium",
+  timeStyle: "short",
+});
+
+const paymentsColumns: TableColumn<{
+  id: string;
+  description: string;
+  createdAt: string;
+  user?: {
+    id: number;
+    name: string;
+    surname: string;
+    image: string | null;
+  };
+}>[] = [
+  {
+    id: "select",
+    header: ({ table }) =>
+      h(UCheckbox, {
+        modelValue: table.getIsSomePageRowsSelected()
+          ? "indeterminate"
+          : table.getIsAllPageRowsSelected(),
+        "onUpdate:modelValue": (value: boolean | "indeterminate") =>
+          table.toggleAllPageRowsSelected(!!value),
+        "aria-label": "Vybrať všetky",
+      }),
+    cell: ({ row }) =>
+      h(UCheckbox, {
+        modelValue: row.getIsSelected(),
+        "onUpdate:modelValue": (value: boolean | "indeterminate") =>
+          row.toggleSelected(!!value),
+        "aria-label": "Vybrať riadok",
+      }),
+  },
+  {
+    id: "name",
+    header: ({ column }) => {
+      const isSorted = column.getIsSorted();
+
+      return h(UButton, {
+        color: "neutral",
+        variant: "ghost",
+        label: "Meno a priezvisko",
+        icon: isSorted
+          ? isSorted === "asc"
+            ? "i-ph-sort-ascending"
+            : "i-ph-sort-descending"
+          : "i-ph-funnel-simple",
+        class: "-mx-2.5 font-bold text-highlighted",
+        onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+      });
+    },
+    cell: ({ row }) => {
+      const name = row.original.user?.name ?? "N/A";
+      const surname = row.original.user?.surname ?? "N/A";
+
+      return h(
+        UUser,
+        {
+          name: name,
+          surname: surname,
+          avatar: {
+            src: row.original.user?.image ?? undefined,
+            alt: `${name} ${surname}`,
+          },
+          to: `/users/${row.original.user?.id}`,
+          size: "xs",
+        },
+        {
+          default: () =>
+            h(
+              "NuxtLink",
+              {
+                to: `/users/${row.original.user?.id}`,
+                class: "font-medium text-default hover:text-highlighted",
+              },
+              `${name} ${surname}`,
+            ),
+        },
+      );
+    },
+  },
+  {
+    accessorKey: "description",
+    header: "Popis",
+  },
+  {
+    accessorKey: "createdAt",
+    header: "Vytvorená",
+    cell: ({ row }) => {
+      const date = row.original.createdAt
+        ? new Date(row.original.createdAt)
+        : null;
+      return date && !isNaN(date.getTime()) ? dateFormatter.format(date) : "—";
+    },
+  },
+  {
+    id: "actions",
+    meta: {
+      class: {
+        td: "text-right",
+      },
+    },
+    cell: ({ row }) => {
+      return h(
+        UDropdownMenu,
+        {
+          content: {
+            align: "end",
+          },
+          items: getRowItems(row),
+          "aria-label": "Actions dropdown",
+        },
+        () =>
+          h(UButton, {
+            icon: "i-lucide-ellipsis-vertical",
+            color: "neutral",
+            variant: "ghost",
+            disabled: !["developer", "admin"].includes(
+              userData.value?.user?.role ?? "user",
+            ),
+            "aria-label": "Actions dropdown",
+          }),
+      );
+    },
+  },
+];
+
+const getRowItems = (row: any) => {
+  return [
+    {
+      label: "Detail",
+      icon: "i-ph-file-text",
+      to: `manage/payments/${row.original.id}`,
+    },
+    {
+      label: "Zmeniť stav",
+      icon: "i-ph-seal-check",
+      onSelect: async () => {
+        const overlay = useOverlay();
+        const modal = overlay.create(LazyModalResolvePayments);
+        const instance = modal.open({
+          initialValue: row.original.status,
+        });
+
+        const result = await instance.result;
+
+        if (!result) return;
+
+        await $fetch("/api/payments/resolve", {
+          method: "PATCH",
+          body: {
+            paymentIds: [row.original.id],
+            status: result.status,
+            note: result.note,
+          },
+          onResponseError: ({ error }) => {
+            toast.add({
+              title: "Chyba",
+              description: `Nepodarilo sa zmeniť stav platby: ${error?.message ?? "neznáma chyba"}`,
+              color: "error",
+            });
+          },
+          onResponse: async ({ response }) => {
+            if (!response.ok) return;
+
+            await refreshNuxtData(`clubs-${clubId}-payments`);
+          },
+        });
+      },
+    },
+  ];
+};
+
+const rowSelection = ref<RowSelectionState>({});
+
+const changePaymentsStatus = async () => {
+  const overlay = useOverlay();
+  const modal = overlay.create(LazyModalResolvePayments);
+  const instance = modal.open();
+
+  const result = await instance.result;
+
+  if (!result) return;
+
+  const selectedIds = Object.keys(rowSelection.value)
+    .filter((id) => rowSelection.value[id])
+    .map((id) => clubPayments.value?.payments[Number(id)]?.id)
+    .filter((id): id is string => id !== undefined);
+
+  await $fetch("/api/payments/resolve", {
+    method: "PATCH",
+    body: {
+      paymentIds: selectedIds,
+      status: result.status,
+      note: result.note,
+    },
+    onResponseError: ({ error }) => {
+      toast.add({
+        title: "Chyba",
+        description: `Nepodarilo sa zmeniť stav platby: ${error?.message ?? "neznáma chyba"}`,
+        color: "error",
+      });
+    },
+    onResponse: async ({ response }) => {
+      if (response.ok) {
+        await refreshNuxtData(`clubs-${clubId}-payments`);
+        rowSelection.value = {};
+      }
+    },
+  });
+};
+
+watch(
+  selectedTab,
+  async (newTab) => {
+    if (newTab === "2" && !clubPayments.value) {
+      await fetchPayments();
+    }
+  },
+  { immediate: true },
+);
 </script>
 
 <template>
@@ -348,7 +590,7 @@ const columns: TableColumn<{
           root: 'mb-4',
           body: 'flex flex-col md:flex-row gap-1 md:gap-8',
         }">
-        <div class="flex flex-col gap-1 -m-3 p-3 rounded-lg bg-elevated">
+        <div class="flex flex-col gap-1 -m-3 p-3 rounded-lg md:bg-elevated">
           <ProfileDetail
             label="Počet členov/-iek"
             icon="i-ph-users-three-fill"
@@ -431,6 +673,7 @@ const columns: TableColumn<{
           isUserClubManager ||
           ['developer', 'admin'].includes(userData?.user?.role ?? 'user')
         "
+        v-model="selectedTab"
         :items="tabItems"
         variant="link"
         :ui="{
@@ -439,8 +682,27 @@ const columns: TableColumn<{
         <template #members>
           <UTable
             :data="clubMembers?.memberships ?? []"
-            :columns="columns as any"
+            :columns="membersColumns as any"
             class="flex-1" />
+        </template>
+        <template #payments>
+          <UTable
+            v-model:row-selection="rowSelection"
+            :data="clubPayments?.payments ?? []"
+            :columns="paymentsColumns as any"
+            :loading="paymentsStatus !== 'success'"
+            class="flex-1" />
+          <div class="flex flex-row justify-end gap-4 mt-4">
+            <UButton
+              label="Zmeniť stav platieb"
+              icon="i-ph-seal-check"
+              color="neutral"
+              variant="subtle"
+              :disabled="Object.keys(rowSelection).length === 0"
+              :loading="paymentsStatus !== 'success'"
+              auto-loading
+              @click="changePaymentsStatus" />
+          </div>
         </template>
       </UTabs>
     </UPageBody>
