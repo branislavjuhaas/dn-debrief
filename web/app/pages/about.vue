@@ -254,7 +254,7 @@ const dedications = [
     <USeparator />
 
     <div
-      class="text-base sm:text-lg text-muted text-center items-center flex flex-col py-16 gap-8">
+      class="text-base sm:text-lg text-muted text-center items-center flex flex-col py-16 px-5 gap-8">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="40"
