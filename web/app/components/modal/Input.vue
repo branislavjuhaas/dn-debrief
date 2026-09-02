@@ -7,16 +7,29 @@ const props = defineProps<{
   confirmLabel: string;
 }>();
 
-// Emit 'close' with the confirmed value (or undefined if cancelled)
 const emit = defineEmits<{
   (e: "close", value: T | undefined): void;
 }>();
 
-const model = ref<T | undefined>(props.initialValue) as Ref<T | undefined>;
+const model = ref<T | undefined>(props.initialValue);
+
+const numberModel = computed({
+  get: () => model.value as number | undefined,
+  set: (val) => {
+    model.value = val as T;
+  },
+});
+
+// Bridge 'model' as a string safely for UInput
+const stringModel = computed({
+  get: () => model.value as string | undefined,
+  set: (val) => {
+    model.value = val as T;
+  },
+});
 </script>
 
 <template>
-  <!-- Emit undefined when the user clicks the top-right X button or backdrop -->
   <UModal :close="{ onClick: () => emit('close', undefined) }" :title="title">
     <template #body>
       <p v-if="description" class="text-sm text-neutral-500 mb-4">
@@ -25,14 +38,14 @@ const model = ref<T | undefined>(props.initialValue) as Ref<T | undefined>;
 
       <UInputNumber
         v-if="props.type === 'number'"
-        v-model="model as number"
+        v-model="numberModel"
         :step-snapping="false"
         :min="0"
         :format-options="{
           minimumFractionDigits: 2,
         }"
         class="w-full" />
-      <UInput v-else v-model="model as string" type="text" />
+      <UInput v-else v-model="stringModel" type="text" />
     </template>
 
     <template #footer>
@@ -47,7 +60,7 @@ const model = ref<T | undefined>(props.initialValue) as Ref<T | undefined>;
           :label="confirmLabel"
           color="success"
           block
-          @click="emit('close', model)" />
+          @click="emit('close', model.value)" />
       </div>
     </template>
   </UModal>
