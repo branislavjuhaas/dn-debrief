@@ -292,7 +292,14 @@ const processAccount = () => {
       ...(age.value < 18 ? { legalGuardian: profileState.legalGuardian } : {}),
     } as any,
     {
-      onSuccess: () => {
+      onSuccess: ({ response }) => {
+        if (!response.ok) {
+          error.value = translateAuthError(
+            response.statusText || "UNKNOWN_ERROR",
+          );
+          processingAccount.value = false;
+          return;
+        }
         processingAccount.value = false;
         goTo("email-verification");
       },
