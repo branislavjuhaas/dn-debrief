@@ -122,41 +122,6 @@ const toast = useToast();
 const getRowItems = (row: any) => {
   return [
     {
-      label: "Zmeniť stav",
-      icon: "i-ph-seal-check",
-      onSelect: async () => {
-        const overlay = useOverlay();
-        const modal = overlay.create(LazyModalResolvePayments);
-        const instance = modal.open({
-          initialValue: row.original.status,
-        });
-
-        const result = await instance.result;
-
-        if (!result) return;
-
-        let originalStatus = row.original.status;
-        row.original.status = result.status;
-
-        await $fetch("/api/payments/resolve", {
-          method: "PATCH",
-          body: {
-            paymentIds: [row.original.id],
-            status: result.status,
-            note: result.note,
-          },
-          onResponseError: ({ error }) => {
-            toast.add({
-              title: "Chyba",
-              description: `Nepodarilo sa zmeniť stav platby: ${error?.message ?? "neznáma chyba"}`,
-              color: "error",
-            });
-            row.original.status = originalStatus;
-          },
-        });
-      },
-    },
-    {
       label: "Zmeniť sumu",
       icon: "i-ph-currency-eur",
       onSelect: async () => {
@@ -193,6 +158,41 @@ const getRowItems = (row: any) => {
               color: "error",
             });
             row.original.amount = originalAmount;
+          },
+        });
+      },
+    },
+    {
+      label: "Zmeniť stav",
+      icon: "i-ph-seal-check",
+      onSelect: async () => {
+        const overlay = useOverlay();
+        const modal = overlay.create(LazyModalResolvePayments);
+        const instance = modal.open({
+          initialValue: row.original.status,
+        });
+
+        const result = await instance.result;
+
+        if (!result) return;
+
+        let originalStatus = row.original.status;
+        row.original.status = result.status;
+
+        await $fetch("/api/payments/resolve", {
+          method: "PATCH",
+          body: {
+            paymentIds: [row.original.id],
+            status: result.status,
+            note: result.note,
+          },
+          onResponseError: ({ error }) => {
+            toast.add({
+              title: "Chyba",
+              description: `Nepodarilo sa zmeniť stav platby: ${error?.message ?? "neznáma chyba"}`,
+              color: "error",
+            });
+            row.original.status = originalStatus;
           },
         });
       },
