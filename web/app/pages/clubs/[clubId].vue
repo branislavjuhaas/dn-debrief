@@ -448,7 +448,7 @@ const getRowItems = (row: any) => {
     {
       label: "Detail",
       icon: "i-ph-file-text",
-      to: `manage/payments/${row.original.id}`,
+      to: `/manage/payments/${row.original.id}`,
     },
     {
       label: "Zmeniť stav",

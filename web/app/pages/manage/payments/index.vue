@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import LazyModalInput from "~/components/modal/Input.vue";
 import { LazyModalResolvePayments } from "#components";
-import type { TableColumn, ProgressGroupItem } from "@nuxt/ui";
-import type { RowSelectionState } from "@tanstack/vue-table";
+import type { TableColumn } from "@nuxt/ui";
 
 definePageMeta({
   middleware: ["auth"],
@@ -179,7 +178,7 @@ const getRowItems = (row: any) => {
     {
       label: "Detail",
       icon: "i-ph-file-text",
-      to: `manage/payments/${row.original.id}`,
+      to: `/manage/payments/${row.original.id}`,
     },
     {
       label: "Zmeniť sumu",
