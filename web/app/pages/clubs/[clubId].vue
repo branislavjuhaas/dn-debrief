@@ -446,11 +446,6 @@ const paymentsColumns: TableColumn<{
 const getRowItems = (row: any) => {
   return [
     {
-      label: "Detail",
-      icon: "i-ph-file-text",
-      to: `/manage/payments/${row.original.id}`,
-    },
-    {
       label: "Zmeniť stav",
       icon: "i-ph-seal-check",
       onSelect: async () => {

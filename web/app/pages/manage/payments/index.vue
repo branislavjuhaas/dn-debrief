@@ -176,11 +176,6 @@ const toast = useToast();
 const getRowItems = (row: any) => {
   return [
     {
-      label: "Detail",
-      icon: "i-ph-file-text",
-      to: `/manage/payments/${row.original.id}`,
-    },
-    {
       label: "Zmeniť sumu",
       icon: "i-ph-currency-eur",
       onSelect: async () => {
