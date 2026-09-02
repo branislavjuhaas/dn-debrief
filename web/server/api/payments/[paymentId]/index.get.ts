@@ -4,8 +4,7 @@ defineRouteMeta({
   openAPI: {
     tags: ["Payments"],
     summary: "Get payment",
-    description:
-      "Get a payment by ID. Regular users can only access their own payments.",
+    description: "Get payment details by ID including user information.",
     parameters: [
       {
         name: "paymentId",
@@ -23,7 +22,32 @@ defineRouteMeta({
             schema: {
               type: "object",
               properties: {
-                payment: { $ref: "#/components/schemas/Payment" },
+                payment: {
+                  type: "object",
+                  allOf: [
+                    { $ref: "#/components/schemas/Payment" },
+                    {
+                      type: "object",
+                      properties: {
+                        user: {
+                          type: "object",
+                          properties: {
+                            id: { type: "integer", example: 1 },
+                            name: { type: "string", example: "John" },
+                            surname: { type: "string", example: "Doe" },
+                            image: {
+                              type: "string",
+                              nullable: true,
+                              example: "https://example.com/image.jpg",
+                            },
+                          },
+                          required: ["id", "name", "surname", "image"],
+                        },
+                      },
+                      required: ["user"],
+                    },
+                  ],
+                },
               },
               required: ["payment"],
             },
@@ -142,13 +166,22 @@ defineRouteMeta({
 });
 
 export default defineEventHandler(async (event) => {
-  const user = await requireUser(event);
+  await requireUser(event, ["developer", "admin"]);
   const paymentId = getRouterParam(event, "paymentId")!;
 
   const payment = await db.query.payments.findFirst({
     where: {
       id: paymentId,
-      ...(!["developer", "admin"].includes(user.role) && { userId: user.id }),
+    },
+    with: {
+      user: {
+        columns: {
+          id: true,
+          name: true,
+          surname: true,
+          image: true,
+        },
+      },
     },
   });
 
