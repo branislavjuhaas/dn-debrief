@@ -1,5 +1,6 @@
 import { db } from "#server/db";
 import { payments } from "#server/db/schema/payments";
+import { id } from "date-fns/locale";
 import { eq, inArray, sum } from "drizzle-orm";
 
 defineRouteMeta({
@@ -15,9 +16,38 @@ defineRouteMeta({
             schema: {
               type: "object",
               properties: {
-                payment: { $ref: "#/components/schemas/Payment" },
+                stats: {
+                  type: "object",
+                  properties: {
+                    all: { type: "integer" },
+                    paid: { type: "integer" },
+                    forgiven: { type: "integer" },
+                    unpaid: { type: "integer" },
+                  },
+                  required: ["all", "paid", "forgiven"],
+                },
+                payments: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      id: { type: "string", format: "uuid" },
+                      amount: {
+                        type: "integer",
+                        description: "Amount in cents",
+                        example: 1000,
+                      },
+                      description: {
+                        type: "string",
+                        example: "Registration fee for the 2026/2027 season",
+                      },
+                      createdAt: { type: "string", format: "date-time" },
+                    },
+                    required: ["id", "amount", "description", "createdAt"],
+                  },
+                },
               },
-              required: ["payment"],
+              required: ["stats", ""],
             },
           },
         },
@@ -47,89 +77,6 @@ defineRouteMeta({
         },
       },
     },
-    $global: {
-      components: {
-        schemas: {
-          Payment: {
-            type: "object",
-            properties: {
-              id: {
-                type: "string",
-                format: "uuid",
-                example: "123e4567-e89b-12d3-a456-426614174000",
-              },
-              userId: {
-                type: "number",
-                example: 1,
-              },
-              paymentType: {
-                type: "string",
-                enum: ["event", "membership"],
-                example: "event",
-              },
-              description: { type: "string", example: "DNJU Open 2027" },
-              amount: { type: "integer", example: 1500 },
-              currency: { type: "string", example: "eur" },
-              status: {
-                type: "string",
-                enum: [
-                  "pending",
-                  "processing",
-                  "paid",
-                  "cancelled",
-                  "forgiven",
-                  "failed",
-                ],
-                example: "pending",
-              },
-              resolution: {
-                type: "string",
-                nullable: true,
-                enum: ["stripe", "manual", "waived"],
-                example: null,
-              },
-              stripeCheckoutSessionId: {
-                type: "string",
-                nullable: true,
-                example: "cs_test_123",
-              },
-              stripePaymentIntentId: {
-                type: "string",
-                nullable: true,
-                example: "pi_123",
-              },
-              paidAt: {
-                type: "string",
-                format: "date-time",
-                nullable: true,
-                example: null,
-              },
-              createdAt: {
-                type: "string",
-                format: "date-time",
-                example: "2026-09-01T08:00:00.000Z",
-              },
-              updatedAt: {
-                type: "string",
-                format: "date-time",
-                example: "2026-09-01T08:00:00.000Z",
-              },
-            },
-            required: [
-              "id",
-              "userId",
-              "paymentType",
-              "description",
-              "amount",
-              "currency",
-              "status",
-              "createdAt",
-              "updatedAt",
-            ],
-          },
-        },
-      },
-    },
   },
 });
 
@@ -149,6 +96,11 @@ export default defineEventHandler(async (event) => {
     .select({ sum: sum(payments.amount) })
     .from(payments)
     .where(eq(payments.status, "forgiven"));
+
+  const sumOfUnpaidPayments = await db
+    .select({ sum: sum(payments.amount) })
+    .from(payments)
+    .where(inArray(payments.status, ["failed", "cancelled", "pending"]));
 
   const allUnpaidPayments = await db.query.payments.findMany({
     columns: {
@@ -177,9 +129,10 @@ export default defineEventHandler(async (event) => {
 
   return {
     stats: {
-      all: sumOfPayments,
-      paid: sumOfPaidPayments,
-      forgiven: sumOfForgivenPayments,
+      all: sumOfPayments[0]?.sum ?? 0,
+      paid: sumOfPaidPayments[0]?.sum ?? 0,
+      unpaid: sumOfUnpaidPayments[0]?.sum ?? 0,
+      forgiven: sumOfForgivenPayments[0]?.sum ?? 0,
     },
     payments: allUnpaidPayments,
   };
