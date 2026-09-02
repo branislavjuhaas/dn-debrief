@@ -426,7 +426,7 @@ const paymentsColumns: TableColumn<{
             align: "end",
           },
           items: getRowItems(row),
-          "aria-label": "Actions dropdown",
+          "aria-label": "Akcie",
         },
         () =>
           h(UButton, {
@@ -436,7 +436,7 @@ const paymentsColumns: TableColumn<{
             disabled: !["developer", "admin"].includes(
               userData.value?.user?.role ?? "user",
             ),
-            "aria-label": "Actions dropdown",
+            "aria-label": "Akcie",
           }),
       );
     },

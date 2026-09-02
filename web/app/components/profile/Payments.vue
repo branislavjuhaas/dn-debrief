@@ -102,7 +102,7 @@ const paymentColumns: TableColumn<Payment>[] = [
             align: "end",
           },
           items: getRowItems(row),
-          "aria-label": "Actions dropdown",
+          "aria-label": "Akcie",
         },
         () =>
           h(UButton, {
@@ -110,7 +110,7 @@ const paymentColumns: TableColumn<Payment>[] = [
             color: "neutral",
             variant: "ghost",
             disabled: ["paid", "forgiven"].includes(row.original.status),
-            "aria-label": "Actions dropdown",
+            "aria-label": "Akcie",
           }),
       );
     },
