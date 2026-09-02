@@ -290,9 +290,30 @@ const changePaymentsStatus = async () => {
     <UTable
       v-model:row-selection="rowSelection"
       :columns="paymentColumns"
-      :data="payments"
-      :loading="isPending">
-      <template #empty> Platby sa načítavajú... </template>
+      :loading="isPending"
+      :data="payments">
+      <template #loading>
+        <div
+          class="grid grid-cols-[1.5rem_0.95fr_0.95fr_1.9fr_2.2fr] pl-3 pr-20 gap-x-18 space-y-6">
+          <USkeleton class="h-6" />
+          <USkeleton class="h-6" />
+          <USkeleton class="h-6 w-2/3" />
+          <USkeleton class="h-6 w-3/5" />
+          <USkeleton class="h-6 w-7/8" />
+
+          <USkeleton class="h-6" />
+          <USkeleton class="h-6 w-2/3" />
+          <USkeleton class="h-6" />
+          <USkeleton class="h-6 w-3/5" />
+          <USkeleton class="h-6 w-5/8" />
+
+          <USkeleton class="h-6" />
+          <USkeleton class="h-6 w-4/5" />
+          <USkeleton class="h-6 w-6/7" />
+          <USkeleton class="h-6 w-1/2" />
+          <USkeleton class="h-6" />
+        </div>
+      </template>
     </UTable>
   </div>
 </template>
