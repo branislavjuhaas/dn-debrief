@@ -97,4 +97,8 @@ export default defineNuxtConfig({
       exclude: ["@aws-sdk/client-ses"],
     },
   },
+
+  build: {
+    transpile: ["@tanstack/vue-table"],
+  },
 });
