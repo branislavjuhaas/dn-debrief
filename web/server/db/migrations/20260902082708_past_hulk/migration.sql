@@ -1,0 +1,1 @@
+ALTER TYPE "payment_type" ADD VALUE 'other';

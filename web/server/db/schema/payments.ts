@@ -10,7 +10,11 @@ import {
 import { users } from "./auth";
 import { sql } from "drizzle-orm";
 
-export const paymentTypeEnum = pgEnum("payment_type", ["event", "membership"]);
+export const paymentTypeEnum = pgEnum("payment_type", [
+  "event",
+  "membership",
+  "other",
+]);
 
 export const paymentStatusEnum = pgEnum("payment_status", [
   "pending",
