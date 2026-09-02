@@ -5,7 +5,7 @@ import { db } from "#server/db";
 import { payments } from "#server/db/schema/payments";
 
 const paymentsBody = z.object({
-  paymentIds: z.array(z.uuidv7()).min(1, "At least one payment ID is required"),
+  paymentIds: z.array(z.uuidv7()).min(1),
 });
 
 defineRouteMeta({
