@@ -105,6 +105,9 @@ services:
       AWS_REGION: ${AWS_REGION}
       AWS_FROM_EMAIL: ${AWS_FROM_EMAIL}
       AWS_FROM_NAME: ${AWS_FROM_NAME}
+      # STRIPE Configuration
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
     networks:
       - dokploy-network
     depends_on:

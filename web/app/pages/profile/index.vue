@@ -1,14 +1,16 @@
 <script setup lang="ts">
-import type { AlertProps, TabsItem, TimelineItem } from "@nuxt/ui";
+import type { AlertProps, TableColumn, TabsItem, TimelineItem } from "@nuxt/ui";
 import { breakpointsTailwind, useBreakpoints } from "@vueuse/core";
 
-const breakpoints = useBreakpoints(breakpointsTailwind);
-const mdAndLarger = breakpoints.greaterOrEqual("md");
-
+// Page setup & responsive layout
 definePageMeta({
   middleware: ["auth"],
 });
 
+const breakpoints = useBreakpoints(breakpointsTailwind);
+const mdAndLarger = breakpoints.greaterOrEqual("md");
+
+// Current user profile data
 const { data: userFetch } = await useFetch("/api/users/me", {
   key: "users-me",
 });
@@ -21,8 +23,8 @@ useSeoMeta({
   description: "Profil aktuálne prihláseného/-ej používateľa/-ky",
 });
 
+// Auth & session handling
 const authClient = useAuthClient();
-
 const { data: sessionData } = await useAuthSession();
 
 const logout = async () => {
@@ -36,6 +38,9 @@ const stopImpersonatingUser = async () => {
   await navigateTo("/");
   await refreshNuxtData();
 };
+
+// Navigation tabs
+const selectedTab = ref("0");
 
 const tabItems = ref<TabsItem[]>([
   {
@@ -52,31 +57,18 @@ const tabItems = ref<TabsItem[]>([
   },
   {
     label: "Platby",
-    disabled: true,
+    slot: "payments",
   },
 ]);
 
-const memberships = computed<TimelineItem[]>(() => {
-  return (userData.value?.user?.clubMemberships ?? [])
-    .sort((a, b) => (b.season ?? 0) - (a.season ?? 0))
-    ?.map((m) => ({
-      date: m.season.toString(),
-      title: m.club?.name,
-      icon: m.confirmed
-        ? "i-ph-seal-check-bold"
-        : new Date().getFullYear() > m.season
-          ? "i-ph-seal-bold"
-          : "i-ph-seal-question-bold",
-      avatar: {
-        class: m.confirmed
-          ? "text-inverted! bg-success!"
-          : new Date().getFullYear() > m.season
-            ? "text-muted!"
-            : "text-inverted! bg-warning!",
-      },
-    }));
+onMounted(() => {
+  const route = useRoute();
+  if (route.hash === "#payments") {
+    selectedTab.value = "3";
+  }
 });
 
+// Tab: Personal Details
 const { data: seasonsData } = await useFetch("/api/settings/seasons", {
   key: "filtered-seasons",
 });
@@ -121,8 +113,29 @@ const alert = computed<AlertProps | null>(() => {
   return null;
 });
 
+// Tab: SDA Memberships
+const memberships = computed<TimelineItem[]>(() => {
+  return (userData.value?.user?.clubMemberships ?? [])
+    .sort((a, b) => (b.season ?? 0) - (a.season ?? 0))
+    ?.map((m) => ({
+      date: m.season.toString(),
+      title: m.club?.name,
+      icon: m.confirmed
+        ? "i-ph-seal-check-bold"
+        : new Date().getFullYear() > m.season
+          ? "i-ph-seal-bold"
+          : "i-ph-seal-question-bold",
+      avatar: {
+        class: m.confirmed
+          ? "text-inverted! bg-success!"
+          : new Date().getFullYear() > m.season
+            ? "text-muted!"
+            : "text-inverted! bg-warning!",
+      },
+    }));
+});
+
 const membershipsAlert = computed<AlertProps>(() => {
-  // check if there is a value with season equal to current year
   const currentMembership = userData.value?.user?.clubMemberships?.find(
     (m) => m.season === new Date().getFullYear(),
   );
@@ -155,6 +168,84 @@ const membershipsAlert = computed<AlertProps>(() => {
     color: "success",
   };
 });
+
+// Tab: Payments & Debt Checkout
+const UButton = resolveComponent("UButton");
+const UBadge = resolveComponent("UBadge");
+
+const debt = computed(() => {
+  return (
+    userData.value?.user?.payments?.reduce((acc, payment) => {
+      if (!["paid", "forgiven", "processing"].includes(payment.status)) {
+        return acc + payment.amount;
+      }
+      return acc;
+    }, 0) ?? 0
+  );
+});
+
+const paying = ref(false);
+
+const payDebt = async () => {
+  const unpaidPayments = userData.value?.user?.payments?.filter(
+    (payment) => !["paid", "forgiven", "processing"].includes(payment.status),
+  );
+  if (!unpaidPayments || unpaidPayments.length === 0) return;
+
+  paying.value = true;
+  try {
+    const response = await checkoutPayments(unpaidPayments.map((p) => p.id));
+
+    if (response?.url) {
+      await navigateTo(response.url, {
+        external: true,
+      });
+      return;
+    }
+  } catch {
+    const toast = useToast();
+    toast.add({
+      title: "Chyba pri platbe",
+      description:
+        "Nepodarilo sa presmerovať na platobnú bránu. kontaktujte, prosím, administrátora/-ku.",
+      color: "error",
+    });
+    paying.value = false;
+  }
+};
+
+const paymentColumns: TableColumn<Payment>[] = [
+  {
+    accessorKey: "description",
+    header: "Popis",
+  },
+  {
+    accessorKey: "amount",
+    header: "Suma",
+    cell: ({ row }) => formatCurrency(row.original.amount),
+  },
+  {
+    accessorKey: "status",
+    header: "Stav platby",
+    cell: ({ row }) => {
+      const color = paymentStatusColors[row.original.status] ?? "neutral";
+
+      return h(UBadge, { variant: "subtle", color }, () =>
+        translatePaymentStatus(row.original.status),
+      );
+    },
+  },
+  {
+    accessorKey: "createdAt",
+    header: "Vytvorená",
+    cell: ({ row }) => formatDate(row.original.createdAt),
+  },
+  {
+    accessorKey: "paidAt",
+    header: "Zaplatená",
+    cell: ({ row }) => formatDate(row.original.paidAt),
+  },
+];
 </script>
 
 <template>
@@ -192,6 +283,7 @@ const membershipsAlert = computed<AlertProps>(() => {
     </ProfileHeader>
     <UPageBody>
       <UTabs
+        v-model="selectedTab"
         :items="tabItems"
         variant="link"
         color="neutral"
@@ -223,6 +315,42 @@ const membershipsAlert = computed<AlertProps>(() => {
               item: 'flex-1 max-w-46 w-full',
             }"
             class="px-6 md:px-4" />
+        </template>
+        <template #payments>
+          <UAlert
+            v-if="debt && debt > 0"
+            color="error"
+            icon="i-ph-warning"
+            variant="subtle"
+            title="Neuhradené platby"
+            orientation="horizontal"
+            :actions="[
+              {
+                label: 'Zaplatiť teraz',
+                size: 'md',
+                variant: 'solid',
+                color: 'error',
+                trailingIcon: 'i-ph-credit-card',
+                loading: paying,
+                onClick: payDebt,
+              },
+            ]"
+            class="mb-4">
+            <template #description>
+              Momentálne máte nezaplatené platby vo výške
+              <b>{{ formatCurrency(debt) }}</b
+              >. Prosím, uhradiť ich čo najskôr.
+            </template>
+          </UAlert>
+          <UTable
+            v-if="
+              userData?.user?.payments && userData?.user?.payments.length > 0
+            "
+            :columns="paymentColumns"
+            :data="userData?.user?.payments ?? []" />
+          <span v-else class="pt-2 text-center text-sm text-muted block">
+            Momentálne nemáte žiadne platby na zobrazenie
+          </span>
         </template>
       </UTabs>
     </UPageBody>

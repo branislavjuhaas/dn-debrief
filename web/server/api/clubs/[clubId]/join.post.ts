@@ -2,6 +2,7 @@ import { db } from "#server/db";
 import * as z from "zod";
 import { clubMemberships } from "#server/db/schema/clubs";
 import { differenceInYears } from "date-fns";
+import { payments } from "#server/db/schema/payments";
 
 defineRouteMeta({
   openAPI: {
@@ -60,6 +61,13 @@ defineRouteMeta({
                       club: { $ref: "#/components/schemas/Club" },
                     },
                   },
+                },
+                paymentId: {
+                  type: "string",
+                  format: "uuid",
+                  nullable: true,
+                  description:
+                    "The ID of the payment record if created, otherwise null",
                 },
               },
             },
@@ -168,12 +176,37 @@ export default defineEventHandler(async (event) => {
     }
   }
 
+  let paymentId: string | undefined = undefined;
+
+  if (registrationType === "junior_student") {
+    const paymentRow = await db
+      .insert(payments)
+      .values({
+        userId: user.id,
+        paymentType: "membership",
+        description: `Registrácia do SDA na kalendárny rok ${currentSeasons.join(", ")}`,
+        amount: 2000, // Amount in cents
+      })
+      .returning();
+
+    paymentId = paymentRow[0]?.id;
+
+    if (!paymentId) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: "Internal Server Error",
+        message: "Failed to create payment record",
+      });
+    }
+  }
+
   // Generate rows for every ongoing season
   const membershipRows = currentSeasons.map((season) => ({
     userId: user.id,
     clubId,
     registrationType,
     season,
+    paymentId,
     confirmed: age >= 18,
   }));
 
@@ -208,5 +241,6 @@ export default defineEventHandler(async (event) => {
   setResponseStatus(event, 201);
   return {
     clubMemberships: clubMembershipsWithClub,
+    paymentId: paymentId ?? null,
   };
 });

@@ -138,3 +138,60 @@ export const translateRegistrationType = (
       return "Neznámy typ registrácie";
   }
 };
+
+export const translatePaymentStatus = (
+  status?:
+    | "pending"
+    | "processing"
+    | "paid"
+    | "forgiven"
+    | "cancelled"
+    | "failed",
+) => {
+  switch (status) {
+    case "pending":
+      return "Čakajúca";
+    case "processing":
+      return "Spracúvaná";
+    case "paid":
+      return "Zaplatená";
+    case "forgiven":
+      return "Odpustená";
+    case "cancelled":
+      return "Zrušená";
+    case "failed":
+      return "Zlyhala";
+    default:
+      return "Neznámy stav";
+  }
+};
+
+export const translatePaymentType = (
+  type: string | null | undefined,
+): string => {
+  switch (type) {
+    case "event":
+      return "Podujatie";
+    case "membership":
+      return "Členský poplatok";
+    case "other":
+      return "Iné";
+    default:
+      return type || "";
+  }
+};
+
+export const translatePaymentResolution = (
+  resolution: string | null | undefined,
+): string => {
+  switch (resolution) {
+    case "stripe":
+      return "Stripe (Automaticky)";
+    case "manual":
+      return "Manuálne";
+    case "waived":
+      return "Odpustené";
+    default:
+      return resolution || "";
+  }
+};

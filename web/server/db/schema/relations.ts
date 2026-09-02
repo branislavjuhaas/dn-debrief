@@ -132,6 +132,10 @@ export const relations = defineRelations(
         from: r.payments.userId,
         to: r.users.id,
       }),
+      resolvedByUser: r.one.users({
+        from: r.payments.resolvedByUserId,
+        to: r.users.id,
+      }),
       clubMemberships: r.many.clubMemberships({
         from: r.payments.id,
         to: r.clubMemberships.paymentId,

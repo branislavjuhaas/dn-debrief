@@ -17,6 +17,7 @@ export const useFeed = () => {
         title: `Predstavujeme DebRIEF v${version}`,
         content:
           "Vitajte na inteligentnej debatnej platforme. Všetky chyby a návrhy funkcií, prosíme, ohláste!",
+        to: "/about",
       },
     ];
 
@@ -45,6 +46,20 @@ export const useFeed = () => {
         content:
           "Pre prehľad o vašom klube a jeho údajoch, prejdite na panel správy.",
         to: "/manage",
+      });
+    }
+
+    if (
+      user.payments?.some(
+        (payment) =>
+          !["paid", "forgiven", "processing"].includes(payment.status),
+      )
+    ) {
+      feed.push({
+        title: "Zaplatiť neuhradené platby",
+        content:
+          "Pre vyrovnanie vašich neuhradených platieb, prejdite na stránku profilu.",
+        to: "/profile#payments",
       });
     }
 

@@ -4,7 +4,7 @@ import { db } from "#server/db";
 defineRouteMeta({
   openAPI: {
     tags: ["Users"],
-    summary: "Get current user profile",
+    summary: "Get current user's profile",
     description: "Get the authenticated user's profile",
     responses: {
       200: {

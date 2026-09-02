@@ -161,7 +161,7 @@ const providers = computed(() => [
         <template #footer>
           Prihlásením súhlasíte s
           <ULink to="/terms-of-service" class="underline"
-            >podmienkamy používania.</ULink
+            >podmienkami používania.</ULink
           >
         </template>
       </FormBase>
