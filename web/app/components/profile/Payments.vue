@@ -271,22 +271,6 @@ const changePaymentsStatus = async () => {
 
 <template>
   <div class="flex flex-col w-full gap-4">
-    <div class="flex flex-row justify-end gap-4">
-      <UButton
-        label="Zmeniť stav platieb"
-        icon="i-ph-seal-check"
-        color="neutral"
-        variant="subtle"
-        :disabled="Object.keys(rowSelection).length === 0"
-        :loading="isPending"
-        @click="changePaymentsStatus" />
-      <UButton
-        label="Nárokovať novú platbu"
-        icon="i-ph-credit-card"
-        variant="subtle"
-        :loading="isPending"
-        @click="addPayment" />
-    </div>
     <UTable
       v-model:row-selection="rowSelection"
       :columns="paymentColumns"
@@ -315,5 +299,21 @@ const changePaymentsStatus = async () => {
         </div>
       </template>
     </UTable>
+    <div class="flex flex-row justify-end gap-4">
+      <UButton
+        label="Zmeniť stav platieb"
+        icon="i-ph-seal-check"
+        color="neutral"
+        variant="subtle"
+        :disabled="Object.keys(rowSelection).length === 0"
+        :loading="isPending"
+        @click="changePaymentsStatus" />
+      <UButton
+        label="Nárokovať novú platbu"
+        icon="i-ph-credit-card"
+        variant="subtle"
+        :loading="isPending"
+        @click="addPayment" />
+    </div>
   </div>
 </template>
