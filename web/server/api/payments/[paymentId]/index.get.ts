@@ -166,7 +166,7 @@ defineRouteMeta({
 });
 
 export default defineEventHandler(async (event) => {
-  await requireUser(event, ["developer", "admin"]);
+  const user = await requireUser(event);
   const paymentId = getRouterParam(event, "paymentId")!;
 
   const payment = await db.query.payments.findFirst({
@@ -185,7 +185,10 @@ export default defineEventHandler(async (event) => {
     },
   });
 
-  if (!payment) {
+  if (
+    !payment ||
+    !(["developer", "admin"].includes(user.role) || payment.userId === user.id)
+  ) {
     throw createError({
       statusCode: 404,
       statusMessage: "Not Found",
