@@ -121,7 +121,7 @@ const pay = async () => {
               color="primary"
               :loading="paying"
               block>
-              Prejsť k platbe {{ paymentData.payment.amount / 100 }}€
+              Prejsť k platbe {{ (paymentData?.payment.amount || 0) / 100 }}€
             </UButton>
             <UButton v-else to="/" block> Návrat na domovskú stránku </UButton>
           </template>
