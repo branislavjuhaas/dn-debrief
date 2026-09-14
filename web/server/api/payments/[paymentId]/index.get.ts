@@ -189,7 +189,7 @@ export default defineEventHandler(async (event) => {
     !payment ||
     !(
       ["developer", "admin"].includes(user.role) ||
-      payment.userId === Number.parseInt(user.id)
+      payment.userId === Number.parseInt(user.id.toString())
     )
   ) {
     throw createError({
