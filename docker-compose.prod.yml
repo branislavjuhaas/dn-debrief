@@ -59,7 +59,7 @@ services:
 
   # --- MinIO Provisioner & Permissions Sidecar ---
   minio-init:
-    image: minio/mc:latest
+    image: quay.io/minio/mc:latest
     container_name: debrief-minio-init
     networks:
       - dokploy-network
