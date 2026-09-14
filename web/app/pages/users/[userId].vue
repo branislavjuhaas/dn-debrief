@@ -233,6 +233,22 @@ const updateUserCredential = async (newCredential: number) => {
   });
 };
 
+const confirmMemberships = async () => {
+  await $fetch(`/api/users/${userId}/confirm-memberships`, {
+    method: "PATCH",
+    onResponseError({ response }) {
+      toast.add({
+        color: "error",
+        title: "Nepodarilo sa potvrdiť členstvo",
+        description: `Chyba ${response.status}: ${response.statusText}`,
+      });
+    },
+    onResponse() {
+      refreshNuxtData(`users-${userId}-memberships`);
+    },
+  });
+};
+
 const userCredential = ref(userData?.value?.user.credential ?? 0);
 const userRole = ref(userData?.value?.user.role ?? "user");
 
@@ -374,6 +390,25 @@ watch(
           </div>
         </template>
         <template #memberships>
+          <UAlert
+            v-if="membershipsData?.memberships?.some((m) => !m.confirmed)"
+            icon="i-ph-seal-question"
+            title="Nepotvrdené členstvá"
+            description="Používateľ/-ka má členstvá v SDA, ktoré ešte neboli potvrdené zákonným/-ou zástupcom/-kyňou."
+            :actions="[
+              {
+                label: 'Potvrdiť manuálne',
+                icon: 'i-ph-check',
+                color: 'warning',
+                size: 'md',
+                onClick: confirmMemberships,
+              },
+            ]"
+            orientation="horizontal"
+            variant="subtle"
+            color="warning"
+            class="mb-4">
+          </UAlert>
           <UTimeline
             v-if="memberships.length > 0"
             :items="memberships ?? []"

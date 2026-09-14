@@ -3,6 +3,7 @@ import * as z from "zod";
 import { clubMemberships } from "#server/db/schema/clubs";
 import { differenceInYears } from "date-fns";
 import { payments } from "#server/db/schema/payments";
+import { eq } from "drizzle-orm";
 
 defineRouteMeta({
   openAPI: {
@@ -119,6 +120,26 @@ const bodySchema = z.object({
   ]),
 });
 
+/**
+ * Maps a registration type and seasons to a payment price in cents
+ *
+ * @param registrationType - The type of registration
+ * @param seasons - The seasons for which the registration is valid
+ * @returns The payment price in cents
+ */
+const paymentPrice = (registrationType: string, seasons: number[]): number => {
+  if (registrationType === "junior_student") {
+    return 3000;
+  } else if (registrationType === "senior_student") {
+    if (seasons.length > 1) {
+      return 800;
+    }
+    return 500;
+  }
+
+  return 0;
+};
+
 export default defineEventHandler(async (event) => {
   // Authentication & parameter resolution
   const user = await requireUser(event);
@@ -143,7 +164,17 @@ export default defineEventHandler(async (event) => {
   const { registrationType } = await readValidatedBody(event, bodySchema.parse);
   const currentSeasons = (await getSetting("current-seasons")) ?? [];
 
-  if (currentSeasons.length === 0) {
+  const memberships = await db
+    .select({ season: clubMemberships.season })
+    .from(clubMemberships)
+    .where(eq(clubMemberships.userId, user.id));
+
+  // filter out seasons that are in memberships
+  const filteredSeasons = currentSeasons.filter(
+    (s) => !memberships.map((m) => m.season).includes(s),
+  );
+
+  if (filteredSeasons.length === 0) {
     throw createError({
       statusCode: 400,
       statusMessage: "Bad Request",
@@ -178,14 +209,15 @@ export default defineEventHandler(async (event) => {
 
   let paymentId: string | undefined = undefined;
 
-  if (registrationType === "junior_student") {
+  const price = paymentPrice(registrationType, filteredSeasons);
+  if (price > 0) {
     const paymentRow = await db
       .insert(payments)
       .values({
         userId: user.id,
         paymentType: "membership",
         description: `Registrácia do SDA na kalendárny rok ${currentSeasons.join(", ")}`,
-        amount: 2000, // Amount in cents
+        amount: price,
       })
       .returning();
 
@@ -201,7 +233,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Generate rows for every ongoing season
-  const membershipRows = currentSeasons.map((season) => ({
+  const membershipRows = filteredSeasons.map((season) => ({
     userId: user.id,
     clubId,
     registrationType,

@@ -197,6 +197,7 @@ export const auth = betterAuth({
         if (body && "legalGuardian" in body) {
           await db.insert(legalGuardians).values({
             userId: (ctx.context.returned as any).user.id,
+            createdAt: undefined,
             ...body.legalGuardian,
           });
         }
