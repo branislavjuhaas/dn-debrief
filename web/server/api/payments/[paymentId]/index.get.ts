@@ -187,7 +187,10 @@ export default defineEventHandler(async (event) => {
 
   if (
     !payment ||
-    !(["developer", "admin"].includes(user.role) || payment.userId === user.id)
+    !(
+      ["developer", "admin"].includes(user.role) ||
+      payment.userId === Number.parseInt(user.id)
+    )
   ) {
     throw createError({
       statusCode: 404,
