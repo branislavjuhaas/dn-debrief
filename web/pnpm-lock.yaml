@@ -302,6 +302,9 @@ importers:
       vue:
         specifier: ^3.5.41
         version: 3.5.41(typescript-native-bridge@6.0.3-bridge.11.tsgo.7.0.2)
+      vue-advanced-cropper:
+        specifier: ^2.8.9
+        version: 2.8.9(vue@3.5.41(typescript-native-bridge@6.0.3-bridge.11.tsgo.7.0.2))
       vue-router:
         specifier: ^5.2.0
         version: 5.2.0(@voidzero-dev/vite-plus-core@0.2.8(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(typescript-native-bridge@6.0.3-bridge.11.tsgo.7.0.2)(yaml@2.9.0))(@vue/compiler-sfc@3.5.41)(esbuild@0.28.2)(rolldown@1.2.3)(rollup@4.62.5)(vue@3.5.41(typescript-native-bridge@6.0.3-bridge.11.tsgo.7.0.2))
@@ -1416,8 +1419,8 @@ packages:
     peerDependencies:
       vue: ^3
 
-  '@nuxt/cli@4.0.0-alpha.0':
-    resolution: {integrity: sha512-dz0lVDA8o+1LD+bscjQvK7cnYeVtSzxpStrmVToAsRDi91T7t58iWmZe25kqVLKaaI3y1BGf9HB4FSrfDN252A==}
+  '@nuxt/cli@4.0.0-alpha.1':
+    resolution: {integrity: sha512-AmW+ke8n9R86Y2ntnNNXIBNpH5WeY9k7EvE0FbM5QV15mfYthJuODGIVLDTMKd+Qxws+Cn5whTCImiJr1G93rA==}
     engines: {node: ^22.19.0 || ^24.11.0 || >=26.0.0}
     hasBin: true
     peerDependencies:
@@ -3519,8 +3522,11 @@ packages:
   citty@0.2.2:
     resolution: {integrity: sha512-+6vJA3L98yv+IdfKGZHBNiGW5KHn22e/JwID0Strsz8h4S/csAu/OuICwxrg44k5MRiZHWIo8XXuJgQTriRP4w==}
 
-  clickable-path@0.0.1:
-    resolution: {integrity: sha512-PkJJGbxFRoWoxyYImJPPyd/RW+aVe0HQVBPhbp2KUaYZdpVNcIopUcE9UmCNAwdbj9frP5SzundqaePJF4ZWrw==}
+  classnames@2.5.1:
+    resolution: {integrity: sha512-saHYOzhIQs6wy2sVxTM6bUDsQO4F50V9RQ22qBpEdCW+I+/Wmke2HOl6lS6dTpdxVhb88/I6+Hs+438c3lfUow==}
+
+  clickable-path@0.1.1:
+    resolution: {integrity: sha512-ROn/mdV2pR8WFdpJjFDCSouLRg9myf95xacO1iy8G/AVO/x5y124pjF3EaoWrTBRWC3vh0DPqa/MhKyx3mMeKg==}
     engines: {node: '>=22.1.0'}
 
   cliui@9.0.1:
@@ -3695,6 +3701,9 @@ packages:
         optional: true
       sqlite3:
         optional: true
+
+  debounce@1.2.1:
+    resolution: {integrity: sha512-XRRe6Glud4rd/ZGQfiV1ruXSfbvfJedlV9Y6zOlP+2K04vBYiJEte6stfFkCP03aMnY5tsipamumUjL14fofug==}
 
   debug@4.4.3:
     resolution: {integrity: sha512-RGwwWnwQvkVfavKVt22FGLw+xYSdzARwm0ru6DhTVA3umU5hZc28V3kO4stgYryrTlLpuvgI9GiijltAjNbcqA==}
@@ -3932,6 +3941,9 @@ packages:
 
   eastasianwidth@0.2.0:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
+
+  easy-bem@1.1.1:
+    resolution: {integrity: sha512-GJRqdiy2h+EXy6a8E6R+ubmqUM08BK0FWNq41k24fup6045biQ8NXxoXimiwegMQvFFV3t1emADdGNL1TlS61A==}
 
   ee-first@1.1.1:
     resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
@@ -6106,6 +6118,12 @@ packages:
   vscode-uri@3.1.0:
     resolution: {integrity: sha512-/BpdSx+yCQGnCvecbyXdxHDkuk55/G3xwnC0GqY4gmQ3j+A+g8kzzgB4Nk/SINjqn6+waqw3EgbVF2QKExkRxQ==}
 
+  vue-advanced-cropper@2.8.9:
+    resolution: {integrity: sha512-1jc5gO674kVGpJKekoaol6ZlwaF5VYDLSBwBOUpViW0IOrrRsyLw6XNszjEqgbavvqinlKNS6Kqlom3B5M72Tw==}
+    engines: {node: '>=8', npm: '>=5'}
+    peerDependencies:
+      vue: ^3.0.0
+
   vue-bundle-renderer@2.3.2:
     resolution: {integrity: sha512-BtazFw0lm3N/ZE4+tre2g8G+c5wolfizu+e5jxZAcao0gcy5KJei9Yopl1svDato2poeFldVLfmLMk57Sg8rLg==}
 
@@ -7242,11 +7260,11 @@ snapshots:
       number-flow: 0.6.2
       vue: 3.5.41(typescript-native-bridge@6.0.3-bridge.11.tsgo.7.0.2)
 
-  '@nuxt/cli@4.0.0-alpha.0(@nuxt/schema@4.5.2)(jiti@2.7.0)(rolldown@1.2.3)':
+  '@nuxt/cli@4.0.0-alpha.1(@nuxt/schema@4.5.2)(jiti@2.7.0)(rolldown@1.2.3)':
     dependencies:
       '@clack/prompts': 1.7.0
       args-tokenizer: 0.3.0
-      clickable-path: 0.0.1
+      clickable-path: 0.1.1
       confbox: 0.2.4
       consola: 3.4.2
       defu: 6.1.7
@@ -9391,7 +9409,9 @@ snapshots:
 
   citty@0.2.2: {}
 
-  clickable-path@0.0.1: {}
+  classnames@2.5.1: {}
+
+  clickable-path@0.1.1: {}
 
   cliui@9.0.1:
     dependencies:
@@ -9558,6 +9578,8 @@ snapshots:
       '@electric-sql/pglite': 0.5.6
       drizzle-orm: 1.0.0-rc.4(@electric-sql/pglite@0.5.6)(postgres@3.4.9)(zod@4.4.3)
 
+  debounce@1.2.1: {}
+
   debug@4.4.3(supports-color@10.2.2):
     dependencies:
       ms: 2.1.3
@@ -9638,6 +9660,8 @@ snapshots:
   duplexer@0.1.2: {}
 
   eastasianwidth@0.2.0: {}
+
+  easy-bem@1.1.1: {}
 
   ee-first@1.1.1: {}
 
@@ -10689,7 +10713,7 @@ snapshots:
   nuxt@4.5.2(636b6227a77ee9ba96dc70d69b2d5cd9):
     dependencies:
       '@dxup/nuxt': 0.5.10(@voidzero-dev/vite-plus-core@0.2.8(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(typescript-native-bridge@6.0.3-bridge.11.tsgo.7.0.2)(yaml@2.9.0))(esbuild@0.28.2)(magicast@0.5.4)(rolldown@1.2.3)(rollup@4.62.5)
-      '@nuxt/cli': 4.0.0-alpha.0(@nuxt/schema@4.5.2)(jiti@2.7.0)(rolldown@1.2.3)
+      '@nuxt/cli': 4.0.0-alpha.1(@nuxt/schema@4.5.2)(jiti@2.7.0)(rolldown@1.2.3)
       '@nuxt/devtools': 3.4.1(@voidzero-dev/vite-plus-core@0.2.8(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(typescript-native-bridge@6.0.3-bridge.11.tsgo.7.0.2)(yaml@2.9.0))(aws4fetch@1.0.20)(db0@0.3.4(@electric-sql/pglite@0.5.6)(drizzle-orm@1.0.0-rc.4(@electric-sql/pglite@0.5.6)(postgres@3.4.9)(zod@4.4.3)))(ioredis@5.11.1(supports-color@10.2.2))(magic-string@1.2.2)(rolldown@1.2.3)(supports-color@10.2.2)(unplugin@3.3.0(@voidzero-dev/vite-plus-core@0.2.8(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(typescript-native-bridge@6.0.3-bridge.11.tsgo.7.0.2)(yaml@2.9.0))(esbuild@0.28.2)(rolldown@1.2.3)(rollup@4.62.5))(vue@3.5.41(typescript-native-bridge@6.0.3-bridge.11.tsgo.7.0.2))
       '@nuxt/kit': 4.5.2(magic-string@1.2.2)(magicast@0.5.4)(rolldown@1.2.3)(unplugin@3.3.0(@voidzero-dev/vite-plus-core@0.2.8(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(typescript-native-bridge@6.0.3-bridge.11.tsgo.7.0.2)(yaml@2.9.0))(esbuild@0.28.2)(rolldown@1.2.3)(rollup@4.62.5))
       '@nuxt/nitro-server': 4.5.2(522009128c1d911c29fe77beeafa89c8)
@@ -12132,6 +12156,13 @@ snapshots:
       - msw
 
   vscode-uri@3.1.0: {}
+
+  vue-advanced-cropper@2.8.9(vue@3.5.41(typescript-native-bridge@6.0.3-bridge.11.tsgo.7.0.2)):
+    dependencies:
+      classnames: 2.5.1
+      debounce: 1.2.1
+      easy-bem: 1.1.1
+      vue: 3.5.41(typescript-native-bridge@6.0.3-bridge.11.tsgo.7.0.2)
 
   vue-bundle-renderer@2.3.2:
     dependencies:
