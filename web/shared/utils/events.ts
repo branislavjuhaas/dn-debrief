@@ -114,7 +114,7 @@ export const eventSchema = z.object({
   end: z.coerce.date(),
   targetLeague: z.enum(leagueEnum.enumValues).optional(),
   targetRegion: z.enum(regionEnum.enumValues).optional(),
-  place: z.string().optional(),
+  place: z.string(),
   featuredProperties: z.array(featuredPropertySchema).default([]),
   schedule: scheduleSchema.optional(),
   registrationConfig: registrationConfigSchema,

@@ -169,7 +169,7 @@ export const events = pgTable(
     end: timestamp("end").notNull(),
     targetLeague: leagueEnum("target_league"),
     targetRegion: regionEnum("target_region"),
-    place: text("place"),
+    place: text("place").notNull(),
     featuredProperties: jsonb("featured_properties")
       .$type<FeaturedProperty[]>()
       .notNull()
