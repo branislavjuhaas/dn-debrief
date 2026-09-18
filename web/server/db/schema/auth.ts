@@ -13,7 +13,6 @@ import {
   pgEnum,
   smallint,
   primaryKey,
-  uniqueIndex,
 } from "drizzle-orm/pg-core";
 
 export const userRoleEnum = pgEnum("role", [
