@@ -1,8 +1,29 @@
+import { z } from "zod";
+
 defineRouteMeta({
   openAPI: {
     tags: ["Events"],
     summary: "Upload event file",
     description: "Generate a presigned upload URL for an event image file.",
+    requestBody: {
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              contentType: {
+                type: "string",
+                example: "image/jpeg",
+              },
+              fileExtension: {
+                type: "string",
+                example: "jpg",
+              },
+            },
+          },
+        },
+      },
+    },
     responses: {
       200: {
         description: "Upload URL generated successfully",
@@ -62,6 +83,11 @@ defineRouteMeta({
   },
 });
 
+const bodySchema = z.object({
+  contentType: z.string(),
+  fileExtension: z.string(),
+});
+
 export default defineEventHandler(async (event) => {
   const user = await requireUser(event, [
     "developer",
@@ -71,10 +97,12 @@ export default defineEventHandler(async (event) => {
     "junior_organizer",
   ]);
 
-  const guid = crypto.randomUUID();
-  const objectKey = `events/files/${user.id}-${guid}.jpg`;
+  const body = await readValidatedBody(event, bodySchema.parse);
 
-  const uploadUrl = await getPresignedUploadUrl(objectKey, "image/jpeg");
+  const guid = crypto.randomUUID();
+  const objectKey = `events/files/${user.id}-${guid}.${body.fileExtension}`;
+
+  const uploadUrl = await getPresignedUploadUrl(objectKey, body.contentType);
 
   const publicUrl = getPublicFileUrl(objectKey);
 

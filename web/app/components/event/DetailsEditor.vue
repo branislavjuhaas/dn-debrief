@@ -13,16 +13,37 @@ const model = defineModel<Partial<Event>>({
 });
 
 const sideForm = useTemplateRef("sideForm");
+const mainForm = useTemplateRef("mainForm");
 
 const validate = async () => {
-  if (!sideForm.value) return false;
+  if (!sideForm.value || !mainForm.value) return false;
 
-  const result = await sideForm.value.validate({ silent: true });
-  return result;
+  const sideResult = await sideForm.value.validate({ silent: true });
+  const mainResult = await mainForm.value.validate({ silent: true });
+  return sideResult && mainResult;
 };
 
 defineExpose({
   validate,
+});
+
+const mainSchema = z.object({
+  slug: z
+    .string("ID podujatia je povinný údaj")
+    .min(3, "ID podujatia musí mať aspoň 3 znaky"),
+  name: z
+    .string("Názov podujatia je povinný údaj")
+    .min(1, "Názov podujatia je povinný údaj"),
+  address: z
+    .string("Adresa podujatia je povinný údaj")
+    .min(1, "Adresa podujatia je povinný údaj"),
+  motion: z
+    .object({
+      text: z.string().min(1, "Text tézy je povinný údaj"),
+      href: z.url("URL tézy musí byť URL").nullish(),
+    })
+    .optional()
+    .nullable(),
 });
 
 const sideSchema = z.object({
@@ -32,9 +53,32 @@ const sideSchema = z.object({
       message: "Neplatný typ podujatia",
     })
     .optional(),
-  place: z.string().min(1, "Miesto konania podujatia je povinný údaj"),
+  place: z
+    .string("Miesto konania podujatia je povinný údaj")
+    .min(1, "Miesto konania podujatia je povinný údaj"),
   targetRegion: z.enum(regionEnum.enumValues).nullish(),
   targetLeague: z.enum(leagueEnum.enumValues).nullish(),
+});
+
+// Computed properties for safe binding to nested motion object
+const motionText = computed({
+  get: () => model.value.motion?.text ?? "",
+  set: (val: string) => {
+    model.value.motion = {
+      text: val,
+      href: model.value.motion?.href ?? undefined,
+    };
+  },
+});
+
+const motionHref = computed({
+  get: () => model.value.motion?.href ?? "",
+  set: (val: string) => {
+    model.value.motion = {
+      text: model.value.motion?.text ?? "",
+      href: val || undefined,
+    };
+  },
 });
 
 const uploadThumbnail = async (file: File | null | undefined) => {
@@ -76,17 +120,79 @@ const uploadThumbnail = async (file: File | null | undefined) => {
 </script>
 
 <template>
-  <div class="grid grid-cols-1 lg:grid-cols-[1fr_31rem]">
-    <div></div>
+  <div class="flex flex-col gap-4 xl:flex-row w-full">
+    <div class="flex flex-col gap-4 w-full">
+      <UForm
+        ref="mainForm"
+        :schema="mainSchema"
+        :state="model"
+        class="flex flex-col gap-4">
+        <div class="flex flex-col gap-4 md:flex-row">
+          <UFormField
+            label="Názov podujatia"
+            name="name"
+            required
+            class="flex-1">
+            <UInput
+              v-model="model.name"
+              placeholder="Zadajte názov podujatia"
+              class="w-full" />
+          </UFormField>
+
+          <UFormField
+            label="ID podujatia"
+            name="slug"
+            required
+            class="w-full md:w-64">
+            <UInput
+              v-model="model.slug"
+              placeholder="napr. sc271"
+              class="w-full" />
+          </UFormField>
+        </div>
+
+        <UFormField label="Adresa podujatia" name="address" required>
+          <UInput
+            v-model="model.address"
+            placeholder="Zadajte presnú adresu (napr. Národná 12, Banská Bystrica)"
+            class="w-full" />
+        </UFormField>
+
+        <template v-if="model.type === 'tournament'">
+          <USeparator class="my-2" label="Pripravovaná téza" />
+
+          <UFormField label="Text tézy" name="motion.text">
+            <UTextarea
+              v-model="motionText"
+              placeholder="Zadajte znenie debatnej tézy..."
+              :rows="3"
+              class="w-full" />
+          </UFormField>
+
+          <UFormField label="Odkaz na podklady k téze" name="motion.href">
+            <UInput
+              v-model="motionHref"
+              placeholder="https://example.com/podklady-k-teze"
+              class="w-full" />
+          </UFormField>
+        </template>
+      </UForm>
+
+      <USeparator class="my-2" label="Popis podujatia" />
+
+      <EventDescriptionEditor v-model="model.description" />
+
+      <USeparator class="my-2" label="Časový harmonogram" />
+
+      <EventScheduleEditor v-model="model.schedule" />
+    </div>
+
     <UForm
       ref="sideForm"
       :schema="sideSchema"
       :state="model"
-      class="flex flex-col gap-4 border-l border-default pl-4">
-      <UFormField
-        label="Náhľadová snímka podujatia"
-        :ui="{ container: 'h-full' }"
-        class="row-span-3 h-full">
+      class="flex flex-col gap-4 border-l border-default pl-4 min-w-104">
+      <UFormField label="Náhľadová snímka podujatia" class="row-span-3">
         <UCard
           v-if="model.thumbnailUrl"
           class="aspect-21/9 flex"

@@ -16,9 +16,21 @@ const newEvent = ref<Partial<Event>>({
   targetLeague: undefined,
   targetRegion: undefined,
   place: undefined,
-  featuredProperties: [],
+  address: undefined,
+  motion: undefined,
   schedule: {
-    days: [],
+    days: [
+      {
+        date: "2026-09-19",
+        schedule: [
+          {
+            beginning: 780, // 13:00 expressed in minutes from midnight (13 * 60)
+            duration: 30, // Duration in minutes (13:00 to 13:30)
+            text: "Otvorenie podujatia",
+          },
+        ],
+      },
+    ],
   },
   registrationConfig: {
     deadline: undefined,
@@ -75,11 +87,11 @@ const activeTab = ref("basic");
         </UDashboardToolbar>
       </template>
       <template #body>
-        <UAlert
+        <!-- <UAlert
           icon="i-ph-warning"
           title="Neimplementovaná stránka"
           description="Táto stránka nebola zatiaľ implementovaná a na jej vývoji pracujeme. Pri vytvorení podujatia, prosím, vypíšte štandardu papierovú pozvánku s odkazom na registračný formulár."
-          color="warning" />
+          color="warning" /> -->
         <div v-if="activeTab === 'basic'">
           <UPageHeader title="Základné informácie" class="mb-4" />
           <EventDetailsEditor ref="detailsEditor" v-model="newEvent" />
