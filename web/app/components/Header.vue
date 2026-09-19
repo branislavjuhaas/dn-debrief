@@ -52,8 +52,9 @@ const results = computed<CommandPaletteGroup[]>(() => {
       label: "Podujatia",
       items:
         data.value?.events.map((event) => ({
-          id: event.id,
+          id: event.slug,
           label: event.name,
+          to: `/events/${event.slug}`,
           icon: "i-ph-ticket",
         })) ?? [],
       ignoreFilter: true,
