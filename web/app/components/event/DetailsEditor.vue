@@ -49,7 +49,6 @@ const uploadThumbnail = async (file: File | null | undefined) => {
   if (!result) return;
 
   try {
-    // 1. Get presigned upload URL from API
     const data = await $fetch("/api/events/thumbnails/upload", {
       method: "POST",
     });
@@ -57,12 +56,14 @@ const uploadThumbnail = async (file: File | null | undefined) => {
     if (!data?.uploadUrl) return;
 
     // 2. Upload cropped image blob directly to storage bucket (R2/S3)
-    await $fetch(data.uploadUrl, {
+    await fetch(data.uploadUrl, {
       method: "PUT",
+      headers: {
+        "Content-Type": result.type,
+      },
       body: result,
     });
 
-    // 3. Update the component model value with the public URL
     model.value.thumbnailUrl = data.publicUrl;
   } catch (error) {
     toast.add({

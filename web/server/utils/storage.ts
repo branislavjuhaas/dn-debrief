@@ -31,7 +31,6 @@ export const getPresignedUploadUrl = async (
       method: "PUT",
       headers: {
         "Content-Type": contentType,
-        "Cache-Control": "no-cache, must-revalidate",
       },
     }),
     { aws: { signQuery: true } },
