@@ -85,10 +85,10 @@ defineRouteMeta({
                   items: {
                     type: "object",
                     properties: {
-                      id: { type: "integer", example: 1 },
+                      slug: { type: "string", example: "dnju27" },
                       name: { type: "string", example: "DNJU Open 2027" },
                     },
-                    required: ["id", "name"],
+                    required: ["slug", "name"],
                   },
                 },
               },
@@ -145,7 +145,7 @@ export default defineEventHandler(async (event) => {
       email?: string;
     }>(),
     clubs: Array<{ id: number; name: string }>(),
-    events: Array<{ id: number; name: string }>(),
+    events: Array<{ slug: string; name: string }>(),
   };
 
   if (queryUsers) {
@@ -179,7 +179,7 @@ export default defineEventHandler(async (event) => {
   if (queryEvents) {
     results.events = await db
       .select({
-        id: events.id,
+        slug: events.slug,
         name: events.name,
       })
       .from(events)
