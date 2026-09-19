@@ -42,7 +42,7 @@ const newEvent = ref<Partial<Event>>({
   },
   organizers: [
     {
-      id: (userData.value?.user?.id ?? 0).toString(),
+      id: userData.value?.user?.id ?? 0,
     },
   ],
 });
