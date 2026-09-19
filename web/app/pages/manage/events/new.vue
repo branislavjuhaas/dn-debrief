@@ -5,6 +5,10 @@ import z from "zod";
 
 const detailsEditor = useTemplateRef("detailsEditor");
 
+const { data: userData } = await useFetch("/api/users/me", {
+  key: "users-me",
+});
+
 const newEvent = ref<Partial<Event>>({
   slug: "",
   name: "",
@@ -36,15 +40,20 @@ const newEvent = ref<Partial<Event>>({
     deadline: undefined,
     href: undefined,
   },
+  organizers: [
+    {
+      id: (userData.value?.user?.id ?? 0).toString(),
+    },
+  ],
 });
 
 const createEvent = async () => {
-  if (!(await detailsEditor.value?.validate())) {
+  if (!(await detailsEditor.value!.validate())) {
     return;
   }
 };
 
-const items = computed<TabsItem[]>(() => [
+const items = [
   {
     label: "Základné informácie",
     icon: "i-ph-sliders",
@@ -56,13 +65,7 @@ const items = computed<TabsItem[]>(() => [
     icon: "i-ph-ticket",
     value: "registration-details",
   },
-  {
-    label: "Registračný formulár",
-    icon: "i-ph-text-align-left",
-    value: "registration-form",
-    disabled: true,
-  },
-]);
+];
 
 const activeTab = ref("basic");
 </script>
@@ -98,12 +101,10 @@ const activeTab = ref("basic");
         </div>
         <div v-else-if="activeTab === 'organizers'">
           <UPageHeader title="Organizátori/-ky" class="mb-4" />
+          <EventOrganizers v-model="newEvent" />
         </div>
         <div v-else-if="activeTab === 'registration-details'">
           <UPageHeader title="Detaily registrácie" class="mb-4" />
-        </div>
-        <div v-else-if="activeTab === 'registration-form'">
-          <UPageHeader title="Registračný formulár" class="mb-4" />
         </div>
       </template>
     </UDashboardPanel>

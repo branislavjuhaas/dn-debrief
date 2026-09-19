@@ -5,4 +5,5 @@ export type Event = Omit<
   "address"
 > & {
   address: string;
+  organizers: Array<{ id: number }>;
 };
