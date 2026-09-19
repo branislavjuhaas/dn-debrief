@@ -90,11 +90,6 @@ const activeTab = ref("basic");
         </UDashboardToolbar>
       </template>
       <template #body>
-        <!-- <UAlert
-          icon="i-ph-warning"
-          title="Neimplementovaná stránka"
-          description="Táto stránka nebola zatiaľ implementovaná a na jej vývoji pracujeme. Pri vytvorení podujatia, prosím, vypíšte štandardu papierovú pozvánku s odkazom na registračný formulár."
-          color="warning" /> -->
         <div v-if="activeTab === 'basic'">
           <UPageHeader title="Základné informácie" class="mb-4" />
           <EventDetailsEditor ref="detailsEditor" v-model="newEvent" />
@@ -105,6 +100,7 @@ const activeTab = ref("basic");
         </div>
         <div v-else-if="activeTab === 'registration-details'">
           <UPageHeader title="Detaily registrácie" class="mb-4" />
+          <EventRegistrationConfig v-model="newEvent" />
         </div>
       </template>
     </UDashboardPanel>
