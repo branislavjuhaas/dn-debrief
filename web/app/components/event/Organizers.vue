@@ -18,9 +18,13 @@ const organizers = computed<string[]>({
   },
 });
 
-const { data: organizersData } = await useFetch("/api/events/organizers", {
-  key: "organizers",
-});
+const { data: organizersData, status } = await useFetch(
+  "/api/events/organizers",
+  {
+    key: "organizers",
+    getCachedData: (key) => useNuxtData(key).data.value,
+  },
+);
 
 const items = computed<CheckboxGroupItem[]>(
   () =>
@@ -34,6 +38,7 @@ const items = computed<CheckboxGroupItem[]>(
 
 <template>
   <UCheckboxGroup
+    v-if="status === 'success'"
     v-model="organizers"
     color="primary"
     variant="card"
@@ -41,4 +46,9 @@ const items = computed<CheckboxGroupItem[]>(
     :ui="{
       fieldset: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
     }" />
+  <div
+    v-else
+    class="gap-x-2 gap-y-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <USkeleton v-for="i in 11" :key="i" class="h-17.5" />
+  </div>
 </template>
