@@ -28,16 +28,6 @@ export const eventTypeEnum = pgEnum("event_type", [
 
 export type UUID = string;
 
-export type FeaturedProperty = {
-  icon: string;
-  label: string;
-  value: string;
-  badge?: {
-    text: string;
-    href: string;
-  };
-};
-
 export type SchedulePart = {
   // Beginning time in minutes from the start of the day (e.g. 540 for 9:00 AM)
   beginning: number;
@@ -150,6 +140,11 @@ export type CollectedDetails = {
   town?: string;
 };
 
+export type Motion = {
+  text: string;
+  href?: string;
+};
+
 export const events = pgTable(
   "events",
   {
@@ -170,10 +165,8 @@ export const events = pgTable(
     targetLeague: leagueEnum("target_league"),
     targetRegion: regionEnum("target_region"),
     place: text("place").notNull(),
-    featuredProperties: jsonb("featured_properties")
-      .$type<FeaturedProperty[]>()
-      .notNull()
-      .default([]),
+    address: text("address").notNull(),
+    motion: jsonb("motion").$type<Motion>(),
     schedule: jsonb("schedule")
       .$type<Schedule>()
       .notNull()

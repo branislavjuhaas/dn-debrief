@@ -1,11 +1,9 @@
 import { z } from "zod";
 import { leagueEnum, regionEnum } from "~~/server/db/schema/clubs";
 
-export const featuredPropertySchema = z.object({
-  icon: z.string().min(1),
-  label: z.string().min(1),
-  value: z.string().min(1),
-  badge: z.object({ text: z.string().min(1), href: z.url() }).optional(),
+export const motionSchema = z.object({
+  text: z.string().min(1),
+  href: z.url().optional(),
 });
 
 export const scheduleSchema = z.object({
@@ -115,7 +113,8 @@ export const eventSchema = z.object({
   targetLeague: z.enum(leagueEnum.enumValues).optional(),
   targetRegion: z.enum(regionEnum.enumValues).optional(),
   place: z.string(),
-  featuredProperties: z.array(featuredPropertySchema).default([]),
+  address: z.string(),
+  motion: motionSchema.optional(),
   schedule: scheduleSchema.optional(),
   registrationConfig: registrationConfigSchema,
 });
