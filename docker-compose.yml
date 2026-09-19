@@ -56,7 +56,7 @@ services:
 
   # --- MinIO Provisioner & Permissions Sidecar ---
   minio-init:
-    image: minio/mc:latest
+    image: quay.io/minio/mc:latest
     container_name: debrief-minio-init
     environment:
       MINIO_ROOT_USER: debrief_user
@@ -69,7 +69,8 @@ services:
       sleep 2;
       /usr/bin/mc alias set myminio http://debrief-minio:9000 $$MINIO_ROOT_USER $$MINIO_ROOT_PASSWORD;
       /usr/bin/mc mb --ignore-existing myminio/debrief;
-      /usr/bin/mc anonymous set-json '{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"PublicReadAvatarsAndEvents\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":[\"s3:GetObject\"],\"Resource\":[\"arn:aws:s3:::debrief/avatars/*\",\"arn:aws:s3:::debrief/events/*\"]}]}' myminio/debrief;
+      /usr/bin/mc anonymous set download myminio/debrief/events;
+      /usr/bin/mc anonymous set download myminio/debrief/avatars;
       exit 0;
       "
 
