@@ -1,5 +1,6 @@
 import { z } from "zod";
-import { leagueEnum, regionEnum } from "~~/server/db/schema/clubs";
+import { leagueEnum, regionEnum } from "#server/db/schema/clubs";
+import type { Schedule } from "#server/db/schema/events";
 
 export const motionSchema = z.object({
   text: z.string().min(1),
@@ -75,7 +76,7 @@ export const registrationRoleSchema = z.object({
 });
 
 export const registrationConfigSchema = z.union([
-  z.object({ deadline: z.iso.date(), href: z.url() }),
+  z.object({ deadline: z.iso.datetime(), href: z.url() }),
   z.object({
     roles: z.array(registrationRoleSchema),
     requireAccount: z.boolean(),
@@ -108,10 +109,10 @@ export const eventSchema = z.object({
   description: z.string(),
   fileUrls: z.array(z.url()).default([]),
   thumbnailUrl: z.url().optional(),
-  beginning: z.coerce.date(),
-  end: z.coerce.date(),
-  targetLeague: z.enum(leagueEnum.enumValues).optional(),
-  targetRegion: z.enum(regionEnum.enumValues).optional(),
+  beginning: z.iso.datetime().transform((val) => new Date(val)),
+  end: z.iso.datetime().transform((val) => new Date(val)),
+  targetLeague: z.enum(["junior", "senior", "university"]).optional(),
+  targetRegion: z.enum(["western", "central", "eastern"]).optional(),
   place: z.string(),
   address: z.string(),
   motion: motionSchema.optional(),
@@ -124,3 +125,57 @@ export const insertEventSchema = eventSchema.extend({
 });
 
 export const updateEventSchema = eventSchema.partial();
+
+export type ScheduleBounds = {
+  beginning: Date | null;
+  end: Date | null;
+};
+
+/**
+ * Returns the earliest start datetime and latest end datetime across all parts in a schedule.
+ */
+export const getScheduleBounds = (schedule: Schedule): ScheduleBounds => {
+  let minStart: Date | null = null;
+  let maxEnd: Date | null = null;
+
+  for (const day of schedule.days) {
+    if (!day.date || !day.schedule || day.schedule.length === 0) {
+      continue;
+    }
+
+    const [year, month, dateNum] = day.date.split("-").map(Number);
+
+    if (!year || !month || !dateNum) {
+      continue;
+    }
+
+    for (const part of day.schedule) {
+      // JavaScript Date constructor automatically handles minute overflow into hours/days
+      const partStart = new Date(
+        year,
+        month - 1,
+        dateNum,
+        0,
+        part.beginning,
+        0,
+      );
+      const partEnd = new Date(
+        year,
+        month - 1,
+        dateNum,
+        0,
+        part.beginning + part.duration,
+        0,
+      );
+
+      if (!minStart || partStart < minStart) {
+        minStart = partStart;
+      }
+      if (!maxEnd || partEnd > maxEnd) {
+        maxEnd = partEnd;
+      }
+    }
+  }
+
+  return { beginning: minStart, end: maxEnd };
+};

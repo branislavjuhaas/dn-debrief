@@ -2,6 +2,7 @@
 import { z } from "zod";
 import {
   CalendarDateTime,
+  getLocalTimeZone,
   parseAbsoluteToLocal,
   toCalendarDateTime,
 } from "@internationalized/date";
@@ -41,13 +42,27 @@ const externalConfigSchema = z.object({
 const deadline = computed<CalendarDateTime>({
   get: () => {
     const raw = model.value.registrationConfig?.deadline;
-    const isoString = raw ?? new Date().toISOString();
-    return toCalendarDateTime(parseAbsoluteToLocal(isoString));
+    if (!raw) {
+      return toCalendarDateTime(parseAbsoluteToLocal(new Date().toISOString()));
+    }
+    try {
+      const iso =
+        raw.endsWith("Z") || raw.includes("+")
+          ? raw
+          : new Date(raw).toISOString();
+      return toCalendarDateTime(parseAbsoluteToLocal(iso));
+    } catch {
+      return toCalendarDateTime(parseAbsoluteToLocal(new Date().toISOString()));
+    }
   },
   set: (val: CalendarDateTime) => {
+    if (!val) return;
+
+    const jsDate = val.toDate(getLocalTimeZone());
+
     model.value.registrationConfig = {
       ...model.value.registrationConfig,
-      deadline: val.toString(), // converts CalendarDateTime to ISO string
+      deadline: jsDate.toISOString(),
     };
   },
 });

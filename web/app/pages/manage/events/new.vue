@@ -3,6 +3,7 @@ import type { Event } from "#shared/types/event";
 import type { TabsItem } from "@nuxt/ui";
 import z from "zod";
 import { breakpointsTailwind, useBreakpoints } from "@vueuse/core";
+import { getScheduleBounds } from "#shared/utils/events";
 
 const breakpoints = useBreakpoints(breakpointsTailwind);
 const mdAndLarger = breakpoints.greaterOrEqual("md");
@@ -26,7 +27,7 @@ const newEvent = ref<Partial<Event>>({
   targetRegion: undefined,
   place: undefined,
   address: undefined,
-  motion: undefined,
+  motion: { text: "Všetky tézy tohoto turnaja sú improvizované" },
   schedule: {
     days: [
       {
@@ -67,6 +68,48 @@ const createEvent = async () => {
     });
     return;
   }
+
+  const ne = newEvent.value;
+  const scheduleBounds = getScheduleBounds(ne.schedule);
+
+  if (!scheduleBounds || !scheduleBounds.beginning || !scheduleBounds.end) {
+    toast.add({
+      title: "Neplatný harmonogram podujatia",
+      description:
+        "Z časového harmonogramu nie je možné určiť začiatok a koniec podujatia.",
+      color: "error",
+    });
+    return;
+  }
+
+  const event = {
+    ...ne,
+    motion: ne.type === "tournament" ? ne.motion : undefined,
+    targetLeague:
+      ne.type === "tournament" ? ne.targetLeague || undefined : undefined,
+    targetRegion:
+      ne.type === "tournament" ? ne.targetRegion || undefined : undefined,
+    beginning: (scheduleBounds.beginning as Date).toISOString(),
+    end: (scheduleBounds.end as Date).toISOString(),
+    organizers: ne.organizers?.map((o) => o.id) ?? [],
+  };
+
+  await $fetch("/api/events", {
+    method: "POST",
+    body: event,
+    onResponseError: ({ response }) => {
+      toast.add({
+        title: "Chyba",
+        description: `Pri tvorbe podujatia nastala chyba: ${response.status} ${response.statusText}`,
+        color: "error",
+      });
+    },
+    onResponse: async ({ response }) => {
+      if (!response.ok) return;
+
+      await navigateTo(`/events/${newEvent.value?.slug}`);
+    },
+  });
 };
 
 const items = [

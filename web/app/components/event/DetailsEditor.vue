@@ -202,7 +202,8 @@ const uploadThumbnail = async (file: File | null | undefined) => {
           <NuxtImg
             :src="model.thumbnailUrl"
             alt="Náhľadová snímka podujatia"
-            width="645" />
+            width="645"
+            class="w-full h-full object-cover" />
         </UCard>
         <UFileUpload
           v-else
