@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { leagueEnum, regionEnum } from "#server/db/schema/clubs";
 import type { Schedule } from "#server/db/schema/events";
 
 export const motionSchema = z.object({
@@ -107,7 +106,6 @@ export const eventSchema = z.object({
   name: z.string().min(1),
   type: z.enum(["tournament", "workshop", "other"]),
   description: z.string(),
-  fileUrls: z.array(z.url()).default([]),
   thumbnailUrl: z.url().optional(),
   beginning: z.iso.datetime().transform((val) => new Date(val)),
   end: z.iso.datetime().transform((val) => new Date(val)),

@@ -40,13 +40,14 @@ defineRouteMeta({
           EventSummary: {
             type: "object",
             properties: {
+              id: { type: "number", example: 1 },
               slug: { type: "string", example: "dnju-open-2026" },
               name: { type: "string", example: "DNJU Open 2026" },
-              place: { type: "string", nullable: true, example: "Bratislava" },
               beginning: { type: "string", format: "date-time" },
               end: { type: "string", format: "date-time" },
+              thumbnailUrl: { type: "string", nullable: true },
             },
-            required: ["slug", "name", "beginning", "end"],
+            required: ["id", "slug", "name", "beginning", "end"],
           },
         },
       },
@@ -57,11 +58,13 @@ defineRouteMeta({
 export default defineEventHandler(async (_event) => {
   const events = await db.query.events.findMany({
     columns: {
+      id: true,
       slug: true,
       name: true,
       place: true,
       beginning: true,
       end: true,
+      thumbnailUrl: true,
     },
     where: {
       end: {

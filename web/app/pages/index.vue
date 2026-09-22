@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { motion } from "motion-v";
-import type { User, UserRole } from "#shared/types/user";
+import type { User } from "#shared/types/user";
 
 const { data: userFetch } = await useFetch("/api/users/me", {
   key: "users-me",
@@ -29,6 +29,7 @@ const greet = (user: User | null) => {
 };
 
 const feed = useFeed();
+const events = useFeaturedEvents();
 
 const NuxtLink = resolveComponent("NuxtLink");
 </script>
@@ -42,6 +43,7 @@ const NuxtLink = resolveComponent("NuxtLink");
           Najrelevantnejšie udalosti
         </IconHeading>
         <UEmpty
+          v-if="events.length === 0"
           title="Žiadne dostupné podujatia"
           description="Momentálne nie sú k dispozícii žiadne podujatia na zobrazenie."
           :actions="
@@ -60,8 +62,10 @@ const NuxtLink = resolveComponent("NuxtLink");
               : undefined
           "
           :ui="{ header: 'max-w-lg' }" />
-        <!-- <div
-          class="flex flex-row gap-4 w-full py-1 px-0.5 overflow-x-scroll no-scrollbar"></div> -->
+        <div
+          class="flex flex-row gap-4 w-full py-1 px-0.5 overflow-x-scroll no-scrollbar">
+          <EventCard v-for="event in events" :key="event.slug" :event="event" />
+        </div>
       </div>
       <div class="space-y-2">
         <IconHeading icon="i-ph-megaphone-fill">Pre vás</IconHeading>

@@ -3,7 +3,7 @@ import formatRange from "#shared/utils/format-range";
 import type { Event } from "#shared/types/event";
 
 const props = defineProps<{
-  event: Event;
+  event: FeaturedEvent;
 }>();
 </script>
 
@@ -16,27 +16,19 @@ const props = defineProps<{
       :ui="{ body: 'sm:p-0' }">
       <div class="aspect-7/3 w-full overflow-hidden">
         <NuxtImg
-          :src="props.event.thumbnailUrl || '/images/event-placeholder.png'"
+          :src="
+            props.event.thumbnailUrl ||
+            `/assets/events/thumbnails/${(props.event.id % 5) + 1}.jpg`
+          "
           alt="Event thumbnail"
           class="object-cover aspect-7/3 w-full transition-transform duration-300" />
       </div>
 
       <template #footer>
         <div class="flex flex-row items-start justify-between">
-          <span class="text-sm font-semibold mt-0.5">
+          <span class="text-sm font-semibold mt-0.5 truncate">
             {{ props.event.name }}
           </span>
-          <div class="flex flex-row gap-1">
-            <!-- TODO: Add badge assignment algorithm -->
-            <!-- <UBadge -->
-            <!--   v-for="badge in props.badges" -->
-            <!--   :key="badge.text" -->
-            <!--   :color="badge.color" -->
-            <!--   :variant="badge.variant ?? 'subtle'" -->
-            <!--   class="text-nowrap"> -->
-            <!--   {{ badge.text }} -->
-            <!-- </UBadge> -->
-          </div>
         </div>
         <span class="text-sm text-muted">
           {{
@@ -55,6 +47,6 @@ const props = defineProps<{
 
 <style scoped>
 .event-card:hover :deep(img) {
-  transform: scale(1.2);
+  transform: scale(1.1);
 }
 </style>

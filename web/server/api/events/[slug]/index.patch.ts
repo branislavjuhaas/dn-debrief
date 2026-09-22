@@ -86,11 +86,7 @@ defineRouteMeta({
                 type: "string",
                 enum: ["tournament", "workshop", "other"],
               },
-              description: { type: "object" },
-              fileUrls: {
-                type: "array",
-                items: { type: "string", format: "uri" },
-              },
+              description: { type: "string" },
               thumbnailUrl: { type: "string", format: "uri", nullable: true },
               beginning: { type: "string", format: "date-time" },
               end: { type: "string", format: "date-time" },
@@ -104,11 +100,8 @@ defineRouteMeta({
                 nullable: true,
                 enum: ["western", "central", "eastern"],
               },
-              place: { type: "string", nullable: true },
-              featuredProperties: {
-                type: "array",
-                items: { type: "object", additionalProperties: true },
-              },
+              place: { type: "string" },
+              address: { type: "string" },
               schedule: {
                 type: "object",
                 additionalProperties: true,
@@ -126,18 +119,14 @@ defineRouteMeta({
               slug: { type: "string" },
               name: { type: "string" },
               type: { type: "string" },
-              description: { type: "object" },
-              fileUrls: {
-                type: "array",
-                items: { type: "string", format: "uri" },
-              },
+              description: { type: "string" },
               thumbnailUrl: { type: "string", format: "uri", nullable: true },
               beginning: { type: "string", format: "date-time" },
               end: { type: "string", format: "date-time" },
               targetLeague: { type: "string", nullable: true },
               targetRegion: { type: "string", nullable: true },
-              place: { type: "string", nullable: true },
-              featuredProperties: { type: "array", items: { type: "object" } },
+              place: { type: "string" },
+              address: { type: "string", nullable: true },
               schedule: { type: "object" },
               registrationConfig: { type: "object" },
             },
@@ -158,7 +147,11 @@ export default defineEventHandler(async (event) => {
   ]);
 
   const slug = getRouterParam(event, "slug") ?? "";
-  const body = await readValidatedBody(event, updateEventSchema.parse);
+
+  // 1. Ošetrenie arrow funkcie pre korektný kontekst Zod validation
+  const body = await readValidatedBody(event, (b) =>
+    updateEventSchema.parse(b),
+  );
 
   const existingEvent = await db.query.events.findFirst({
     where: { slug },
