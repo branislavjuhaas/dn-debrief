@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-ses": "^3.1133.0",
+    "@comark/nuxt": "0.7.0",
     "@electric-sql/pglite": "^0.5.8",
     "@iconify-json/lucide": "^1.2.133",
     "@iconify-json/ph": "^1.2.2",
