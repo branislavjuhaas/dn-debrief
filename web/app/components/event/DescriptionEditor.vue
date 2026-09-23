@@ -232,6 +232,11 @@ const imageToolbarItems = (editor: Editor): EditorToolbarItem[][] => {
     v-slot="{ editor }"
     v-model="model"
     content-type="markdown"
+    :starter-kit="{
+      heading: {
+        levels: [2, 3, 4, 5, 6],
+      },
+    }"
     :extensions="[
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
       ImageUpload,

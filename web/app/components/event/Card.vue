@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import formatRange from "#shared/utils/format-range";
-import type { Event } from "#shared/types/event";
 
 const props = defineProps<{
   event: FeaturedEvent;

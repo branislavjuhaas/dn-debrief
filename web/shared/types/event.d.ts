@@ -6,13 +6,17 @@ export type Event = Omit<
   "address"
 > & {
   address: string;
-  organizers: Array<{
-    id: number;
-    name: string;
-    surname: string;
-    role: UserRole;
-    email: string;
-    phone: string;
-    image: string | null;
-  }>;
+  organizers:
+    | Array<{
+        id: number;
+        name: string;
+        surname: string;
+        role: UserRole;
+        email: string;
+        phone: string;
+        image: string | null;
+      }>
+    | Array<{
+        id: number;
+      }>;
 };
