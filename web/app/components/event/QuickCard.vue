@@ -11,7 +11,7 @@ const formatter = new Intl.DateTimeFormat("sk-SK", {
 
 <template>
   <UCard :ui="{ body: 'p-0 sm:p-0 grid lg:grid-cols-[auto_1fr]' }">
-    <div class="aspect-7/3 overflow-hidden h-full">
+    <div class="aspect-7/3 overflow-hidden h-full max-h-full!">
       <NuxtImg
         :src="
           props.event.thumbnailUrl ||
