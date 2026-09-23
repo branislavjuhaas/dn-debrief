@@ -98,8 +98,10 @@ export type RegistrationRole = {
 
 export type RegistrationsConfig =
   | {
-      deadline: string; // YYYY-MM-DD
+      deadline: string; // ISO Date
       href: string;
+      cost: number;
+      requireMembership: boolean;
     }
   | {
       roles: RegistrationRole[];

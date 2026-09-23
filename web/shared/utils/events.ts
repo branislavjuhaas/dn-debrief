@@ -75,7 +75,12 @@ export const registrationRoleSchema = z.object({
 });
 
 export const registrationConfigSchema = z.union([
-  z.object({ deadline: z.iso.datetime(), href: z.url() }),
+  z.object({
+    deadline: z.iso.datetime(),
+    href: z.url(),
+    cost: z.number(),
+    requireMembership: z.boolean(),
+  }),
   z.object({
     roles: z.array(registrationRoleSchema),
     requireAccount: z.boolean(),
