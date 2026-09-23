@@ -36,6 +36,10 @@ const externalConfigSchema = z.object({
       "Dátum je povinný údaj",
     ),
   href: z.url("Link na registračný formulár musí byť platný URL"),
+  cost: z
+    .number("Cena podujatia je povinný údaj")
+    .min(0, "Cena podujatia musí byť nezáporná hodnota"),
+  requireMembership: z.boolean(),
 });
 
 // Writable computed property for Deadline
@@ -82,6 +86,8 @@ const href = computed<string>({
 const formState = computed(() => ({
   deadline: deadline.value,
   href: href.value,
+  cost: model.value.registrationConfig.cost,
+  requireMembership: model.value.registrationConfig.requireMembership,
 }));
 </script>
 
@@ -115,15 +121,34 @@ const formState = computed(() => ({
       :schema="externalConfigSchema"
       :state="formState"
       class="space-y-4">
-      <UFormField name="href" label="Registračný formulár">
+      <UFormField
+        name="href"
+        label="Registračný formulár"
+        orientation="horizontal">
         <UInput
           v-model="href"
           type="url"
-          placeholder="https://forms.ju.dev/YgmJX2MSeJqw2w8K9" />
+          placeholder="https://forms.ju.dev/YgmJX2MSeJqw2w8K9"
+          class="lg:min-w-200" />
       </UFormField>
 
-      <UFormField name="deadline" label="Deadline">
+      <UFormField name="deadline" label="Deadline" orientation="horizontal">
         <UInputDate v-model="deadline" granularity="minute" class="w-full" />
+      </UFormField>
+
+      <UFormField
+        name="cost"
+        label="Registračný poplatok"
+        hint="(v mene EUR)"
+        orientation="horizontal">
+        <UInputNumber v-model="model.registrationConfig.cost" class="w-full" />
+      </UFormField>
+
+      <UFormField
+        name="cost"
+        label="Vyžadovať v členstvo v SDA"
+        orientation="horizontal">
+        <USwitch v-model="model.registrationConfig.requireMembership" />
       </UFormField>
     </UForm>
   </div>

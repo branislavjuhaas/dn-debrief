@@ -45,6 +45,8 @@ const newEvent = ref<Partial<Event>>({
   registrationConfig: {
     deadline: new Date().toISOString(),
     href: undefined,
+    cost: 30,
+    requireMembership: true,
   },
   organizers: [
     {
