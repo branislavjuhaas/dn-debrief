@@ -44,19 +44,20 @@ const plugins = [
   }),
 ];
 
-const canRegister = computed<boolean>(() => {
+const registrationError = computed<string | null>(() => {
   const config = event.value?.registrationConfig;
-  if (!config) return false;
+  if (!config) {
+    return "Chýba konfigurácia podujatia a nemožno sa naň preto zaregistrovať.";
+  }
 
   // 1. Check deadline
   if (config.deadline) {
     const deadlineTime = new Date(config.deadline).getTime();
 
-    // Returns false if deadline date is invalid or has already passed
     if (Number.isNaN(deadlineTime) || Date.now() > deadlineTime) {
-      return false;
+      return "Registrácia na podujatie je už po stanovenom deadline.";
     }
-  }
+  } // <-- Added missing closing brace here
 
   // 2. Check active membership for current season
   if (config.requireMembership) {
@@ -66,10 +67,12 @@ const canRegister = computed<boolean>(() => {
       (m) => Number(m.season) === currentYear && m.confirmed === true,
     );
 
-    if (!hasActiveMembership) return false;
+    if (!hasActiveMembership) {
+      return "Na registráciu je potrebné potvrdené členstvo v SDA pre aktuálnu sezónu.";
+    }
   }
 
-  return true;
+  return null; // Null means no error (can register)
 });
 </script>
 
@@ -122,6 +125,14 @@ const canRegister = computed<boolean>(() => {
             loading: 'lazy',
           }" />
       </div>
+      <template v-if="registrationError">
+        <USeparator />
+        <UAlert
+          color="error"
+          title="Registrácia na podujatie nie je možná"
+          :description="registrationError"
+          icon="i-ph-warning" />
+      </template>
       <div class="flex flex-row justify-end gap-4">
         <UModal title="Pravidlá registrácie a účasti na podujatiach">
           <UButton
@@ -154,7 +165,7 @@ const canRegister = computed<boolean>(() => {
         </UModal>
         <UButton
           :to="event!.registrationConfig.href"
-          :disabled="!canRegister"
+          :disabled="!!registrationError"
           label="Registrovať sa na podujatie"
           icon="i-ph-ticket" />
       </div>
