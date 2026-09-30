@@ -8,6 +8,7 @@ description: Guidelines and patterns for creating Nitro server API routes, reque
 This project uses Nuxt Nitro for server-side API endpoints, paired with Zod validation and OpenAPI auto-documentation.
 
 ## Key Files & Layout
+
 - `server/api/`: API endpoint routes following file-based routing:
   - Format: `[feature]/[subpath].[method].ts` (e.g. `events/index.get.ts`, `events/[slug]/index.patch.ts`).
 - OpenAPI docs:

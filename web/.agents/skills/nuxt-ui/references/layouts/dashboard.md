@@ -30,25 +30,30 @@ UApp
 
 ```vue [layouts/dashboard.vue]
 <script setup lang="ts">
-import type { NavigationMenuItem } from '@nuxt/ui'
+import type { NavigationMenuItem } from "@nuxt/ui";
 
-const items = computed<NavigationMenuItem[]>(() => [{
-  label: 'Home',
-  icon: 'i-lucide-house',
-  to: '/dashboard'
-}, {
-  label: 'Inbox',
-  icon: 'i-lucide-inbox',
-  to: '/dashboard/inbox'
-}, {
-  label: 'Users',
-  icon: 'i-lucide-users',
-  to: '/dashboard/users'
-}, {
-  label: 'Settings',
-  icon: 'i-lucide-settings',
-  to: '/dashboard/settings'
-}])
+const items = computed<NavigationMenuItem[]>(() => [
+  {
+    label: "Home",
+    icon: "i-lucide-house",
+    to: "/dashboard",
+  },
+  {
+    label: "Inbox",
+    icon: "i-lucide-inbox",
+    to: "/dashboard/inbox",
+  },
+  {
+    label: "Users",
+    icon: "i-lucide-users",
+    to: "/dashboard/users",
+  },
+  {
+    label: "Settings",
+    icon: "i-lucide-settings",
+    to: "/dashboard/settings",
+  },
+]);
 </script>
 
 <template>
@@ -62,8 +67,7 @@ const items = computed<NavigationMenuItem[]>(() => [{
         <UNavigationMenu
           :collapsed="collapsed"
           :items="items"
-          orientation="vertical"
-        />
+          orientation="vertical" />
       </template>
 
       <template #footer="{ collapsed }">
@@ -72,8 +76,7 @@ const items = computed<NavigationMenuItem[]>(() => [{
           :label="collapsed ? undefined : 'Sign out'"
           color="neutral"
           variant="ghost"
-          block
-        />
+          block />
       </template>
     </UDashboardSidebar>
 
@@ -86,7 +89,7 @@ const items = computed<NavigationMenuItem[]>(() => [{
 
 ```vue [pages/dashboard/index.vue]
 <script setup lang="ts">
-definePageMeta({ layout: 'dashboard' })
+definePageMeta({ layout: "dashboard" });
 </script>
 
 <template>
@@ -121,21 +124,21 @@ definePageMeta({ layout: 'dashboard' })
 
 Root wrapper. Manages sidebar state and persistence.
 
-| Prop | Default | Purpose |
-|---|---|---|
-| `storage` | `'cookie'` | `'cookie'`, `'localStorage'`, `false` |
-| `storage-key` | `'dashboard'` | Storage key name |
+| Prop          | Default       | Purpose                               |
+| ------------- | ------------- | ------------------------------------- |
+| `storage`     | `'cookie'`    | `'cookie'`, `'localStorage'`, `false` |
+| `storage-key` | `'dashboard'` | Storage key name                      |
 
 ### DashboardSidebar
 
 Resizable, collapsible sidebar. Must be inside `DashboardGroup`.
 
-| Prop | Default | Purpose |
-|---|---|---|
-| `resizable` | `false` | Drag to resize |
-| `collapsible` | `false` | Collapse when dragged to edge |
-| `side` | `'left'` | `'left'` or `'right'` |
-| `mode` | `'slideover'` | Mobile: `'modal'`, `'slideover'`, `'drawer'` |
+| Prop          | Default       | Purpose                                      |
+| ------------- | ------------- | -------------------------------------------- |
+| `resizable`   | `false`       | Drag to resize                               |
+| `collapsible` | `false`       | Collapse when dragged to edge                |
+| `side`        | `'left'`      | `'left'` or `'right'`                        |
+| `mode`        | `'slideover'` | Mobile: `'modal'`, `'slideover'`, `'drawer'` |
 
 All slots receive `{ collapsed, collapse }` — `collapsed` is the boolean state, `collapse(value)` toggles it programmatically. Use `v-model:collapsed` and `v-model:open` (mobile) for state control.
 
@@ -156,7 +159,7 @@ Always pass `:collapsed="collapsed"` to `UNavigationMenu` inside a collapsible s
 
 ```vue [pages/dashboard/inbox.vue]
 <script setup lang="ts">
-definePageMeta({ layout: 'dashboard' })
+definePageMeta({ layout: "dashboard" });
 </script>
 
 <template>

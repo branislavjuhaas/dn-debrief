@@ -9,6 +9,7 @@ This project uses **Drizzle ORM v1 RC** (`drizzle-orm@1.0.0-rc.4` and `drizzle-k
 **CRITICAL**: Do NOT use legacy Drizzle v0 syntax (`relations(table, ({ one, many }) => ...)`). Drizzle v1 uses the new `defineRelations` API.
 
 ## Directory Structure
+
 - `server/db/index.ts`: Database client initialization. Uses `@electric-sql/pglite` in local dev/test with automated migration, and `postgres` (Postgres.js) in production.
 - `server/db/schema/`: Schema table modules:
   - `auth.ts`: Users, sessions, accounts, verifications (Better-Auth tables)
@@ -57,16 +58,18 @@ export const relations = defineRelations(
         to: r.users.id,
       }),
     },
-  })
+  }),
 );
 ```
 
 ### Prohibited Legacy Syntax
+
 - **NEVER** use `relations(table, ({ one, many }) => ...)` (v0 syntax).
 - **NEVER** use `fields: [...]` or `references: [...]` inside relation configs.
 - **NEVER** import or call `one(...)` or `many(...)` helper functions directly.
 
 ## Primary Keys & Columns
+
 - UUID primary keys use UUIDv7: `uuid("id").primaryKey().default(sql`uuidv7()`)`.
 - Integer serial IDs use `serial("id").primaryKey()`.
 - Enums are created with `pgEnum("enum_name", [...])`.

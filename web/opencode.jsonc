@@ -4,24 +4,19 @@
   "formatter": true,
   // Ignore build caches and artifacts from filesystem watcher
   "watcher": {
-    "ignore": [
-      ".nuxt/**",
-      ".output/**",
-      "dist/**",
-      "node_modules/**"
-    ]
+    "ignore": [".nuxt/**", ".output/**", "dist/**", "node_modules/**"],
   },
   // Safeguards for sensitive operations
   "permissions": [
     {
       "action": "shell",
       "resource": "git push *",
-      "effect": "ask"
+      "effect": "ask",
     },
     {
       "action": "shell",
       "resource": "*db:migrate*",
-      "effect": "ask"
-    }
-  ]
+      "effect": "ask",
+    },
+  ],
 }

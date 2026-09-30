@@ -208,6 +208,7 @@ GUIDE|.nuxt-docs/3.guide/6.going-further/index.md|guide,going further,index
 # Project Overview & Architecture Guide
 
 ## Tech Stack
+
 - **Framework**: Nuxt 4 (v4.5.2) with Vue 3 (Composition API, `<script setup lang="ts">`)
 - **UI & Design**: Nuxt UI v4 (`@nuxt/ui`), Tailwind CSS v4, Motion V (`motion-v`), Lucide/Phosphor icons (`ph:*`)
 - **Database & ORM**: PostgreSQL via Drizzle ORM (`drizzle-orm`, `drizzle-kit`), Postgres.js driver
