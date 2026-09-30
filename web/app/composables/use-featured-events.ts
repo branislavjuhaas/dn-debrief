@@ -9,7 +9,7 @@ export type FeaturedEvent = {
 };
 
 export const useFeaturedEvents = () => {
-  const { data } = useFetch("/api/events", {
+  const { data } = useFetch("/api/events/upcoming", {
     key: "upcoming-events",
   });
 
