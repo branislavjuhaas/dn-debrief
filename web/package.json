@@ -53,6 +53,7 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@nuxt/docs": "^4.5.2",
     "@types/node": "^26.6.1",
     "drizzle-kit": "1.0.0-rc.4",
     "typescript": "npm:typescript-native-bridge@6.0.3-bridge.11.tsgo.7.0.2",
