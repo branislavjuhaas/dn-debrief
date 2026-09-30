@@ -1,6 +1,6 @@
 import { db } from "#server/db";
-import { events as eventsTable } from "#server/db/schema";
-import { count, gte } from "drizzle-orm";
+import { events as eventsTable } from "#server/db/schema/events";
+import { count } from "drizzle-orm";
 import { getQuery } from "h3";
 
 defineRouteMeta({
@@ -93,14 +93,15 @@ export default defineEventHandler(async (event) => {
   const query = getQuery(event);
 
   // Safe integer parsing with default values and bounds constraints
-  const page = Math.max(1, parseInt(String(query.page || "1"), 10) || 1);
+  const page = Math.max(
+    1,
+    parseInt(String((query.page as string) || "1"), 10) || 1,
+  );
   const pageSize = Math.min(
     100,
-    Math.max(1, parseInt(String(query.pageSize || "10"), 10) || 10),
+    Math.max(1, parseInt(String((query.pageSize as string) || "10"), 10) || 10),
   );
   const offset = (page - 1) * pageSize;
-
-  const now = new Date();
 
   // Execute database query and total count in parallel
   const [eventsList, totalResult] = await Promise.all([
@@ -109,6 +110,7 @@ export default defineEventHandler(async (event) => {
         id: true,
         slug: true,
         name: true,
+        type: true,
         place: true,
         beginning: true,
         end: true,
@@ -118,10 +120,7 @@ export default defineEventHandler(async (event) => {
       limit: pageSize,
       offset,
     }),
-    db
-      .select({ total: count() })
-      .from(eventsTable)
-      .where(gte(eventsTable.end, now)),
+    db.select({ total: count() }).from(eventsTable),
   ]);
 
   const total = totalResult[0]?.total ?? 0;

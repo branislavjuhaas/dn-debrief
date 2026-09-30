@@ -164,6 +164,12 @@ const parseSchedule = (scheduleText: string): Schedule => {
 const scheduleText = ref(createSchedule(model.value));
 const parsingError = ref<string | null>(null);
 
+// Computed schedule preview bounds
+const scheduleBounds = computed(() => getScheduleBounds(model.value));
+const scheduleFormatted = computed(() =>
+  formatScheduleBounds(scheduleBounds.value),
+);
+
 // Watch text input: updates model when valid or captures error when invalid
 watch(
   scheduleText,
@@ -231,12 +237,26 @@ const items = [
         variant="subtle"
         icon="i-ph-textbox"
         class="mb-4" />
+      <UAlert
+        v-else-if="scheduleFormatted"
+        color="primary"
+        :title="`Harmonogram podujatia úspešne spracovaný s rozsahom: ${scheduleFormatted}`"
+        variant="subtle"
+        icon="i-ph-calendar-check"
+        class="mb-4" />
+      <UAlert
+        v-else
+        color="warning"
+        title="Nepodarilo sa detekovať rozsah podujatia"
+        variant="subtle"
+        icon="i-ph-calendar-blank"
+        class="mb-4" />
       <UTextarea
         v-model="scheduleText"
         class="font-mono w-full"
         :rows="10"
         autoresize
-        placeholder="# 23.1.2027&#10;- 14:00 - 14:15 = Otvorenie podujatia" />
+        placeholder="# 23. 1. 2027&#10;- 14:00 - 14:15 = Otvorenie podujatia" />
     </template>
 
     <template #preview>

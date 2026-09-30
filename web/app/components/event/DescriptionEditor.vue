@@ -22,19 +22,19 @@ const fixedToolbarItems = [
   [
     {
       kind: "undo",
-      icon: "i-lucide-undo",
-      tooltip: { text: "Undo" },
+      icon: "i-ph-arrow-u-up-left",
+      tooltip: { text: "Krok späť" },
     },
     {
       kind: "redo",
-      icon: "i-lucide-redo",
-      tooltip: { text: "Redo" },
+      icon: "i-ph-arrow-u-up-right",
+      tooltip: { text: "Krok dopredu" },
     },
   ],
   [
     {
-      icon: "i-lucide-heading",
-      tooltip: { text: "Headings" },
+      icon: "i-ph-text-h",
+      tooltip: { text: "Nadpisy" },
       content: {
         align: "start",
       },
@@ -42,100 +42,95 @@ const fixedToolbarItems = [
         {
           kind: "heading",
           level: 2,
-          icon: "i-lucide-heading-2",
-          label: "Heading 2",
+          icon: "i-ph-text-h-two",
+          label: "Nadpis 2",
         },
         {
           kind: "heading",
           level: 3,
-          icon: "i-lucide-heading-3",
-          label: "Heading 3",
+          icon: "i-ph-text-h-three",
+          label: "Nadpis 3",
         },
         {
           kind: "heading",
           level: 4,
-          icon: "i-lucide-heading-4",
-          label: "Heading 4",
+          icon: "i-ph-text-h-four",
+          label: "Nadpis 4",
         },
       ],
     },
     {
-      icon: "i-lucide-list",
-      tooltip: { text: "Lists" },
+      icon: "i-ph-list-bullets",
+      tooltip: { text: "Zoznamy" },
       content: {
         align: "start",
       },
       items: [
         {
           kind: "bulletList",
-          icon: "i-lucide-list",
-          label: "Bullet List",
+          icon: "i-ph-list-bullets",
+          label: "Bodový zoznam",
         },
         {
           kind: "orderedList",
-          icon: "i-lucide-list-ordered",
-          label: "Ordered List",
+          icon: "i-ph-list-numbers",
+          label: "Číslovaný zoznam",
         },
       ],
     },
     {
       kind: "blockquote",
-      icon: "i-lucide-text-quote",
-      tooltip: { text: "Blockquote" },
-    },
-    {
-      kind: "codeBlock",
-      icon: "i-lucide-square-code",
-      tooltip: { text: "Code Block" },
+      icon: "i-ph-quotes",
+      tooltip: { text: "Citácia" },
     },
   ],
   [
     {
       kind: "mark",
       mark: "bold",
-      icon: "i-lucide-bold",
-      tooltip: { text: "Bold" },
+      icon: "i-ph-text-b",
+      tooltip: { text: "Tučné" },
     },
     {
       kind: "mark",
       mark: "italic",
-      icon: "i-lucide-italic",
-      tooltip: { text: "Italic" },
+      icon: "i-ph-text-italic",
+      tooltip: { text: "Kurzíva" },
     },
     {
       kind: "mark",
       mark: "underline",
-      icon: "i-lucide-underline",
-      tooltip: { text: "Underline" },
+      icon: "i-ph-text-underline",
+      tooltip: { text: "Podčiarknuté" },
     },
     {
       kind: "mark",
       mark: "strike",
-      icon: "i-lucide-strikethrough",
-      tooltip: { text: "Strikethrough" },
+      icon: "i-ph-text-strikethrough",
+      tooltip: { text: "Prečiarknuté" },
     },
     {
       kind: "mark",
       mark: "code",
-      icon: "i-lucide-code",
-      tooltip: { text: "Code" },
+      icon: "i-ph-code",
+      tooltip: { text: "Kód" },
     },
   ],
   [
     {
       slot: "link" as const,
-      icon: "i-lucide-link",
+      icon: "i-ph-link",
     },
     {
       kind: "imageUpload",
-      icon: "i-lucide-image",
-      tooltip: { text: "Image" },
+      icon: "i-ph-image",
+      tooltip: { text: "Obrázok" },
     },
   ],
   [
     {
-      icon: "i-lucide-align-justify",
-      tooltip: { text: "Text Align" },
+      icon: "i-ph-text-align-justify",
+      tooltip: { text: "Zarovnanie" },
       content: {
         align: "end",
       },
@@ -143,26 +138,26 @@ const fixedToolbarItems = [
         {
           kind: "textAlign",
           align: "left",
-          icon: "i-lucide-align-left",
-          label: "Align Left",
+          icon: "i-ph-text-align-left",
+          label: "Vľavo",
         },
         {
           kind: "textAlign",
           align: "center",
-          icon: "i-lucide-align-center",
-          label: "Align Center",
+          icon: "i-ph-text-align-center",
+          label: "Na stred",
         },
         {
           kind: "textAlign",
           align: "right",
-          icon: "i-lucide-align-right",
-          label: "Align Right",
+          icon: "i-ph-text-align-right",
+          label: "Vpravo",
         },
         {
           kind: "textAlign",
           align: "justify",
-          icon: "i-lucide-align-justify",
-          label: "Align Justify",
+          icon: "i-ph-text-align-justify",
+          label: "Do bloku",
         },
       ],
     },
@@ -175,14 +170,14 @@ const imageToolbarItems = (editor: Editor): EditorToolbarItem[][] => {
   return [
     [
       {
-        icon: "i-lucide-download",
+        icon: "i-ph-download-simple",
         to: node?.attrs?.src,
         download: true,
-        tooltip: { text: "Download" },
+        tooltip: { text: "Stiahnuť" },
       },
       {
-        icon: "i-lucide-refresh-cw",
-        tooltip: { text: "Replace" },
+        icon: "i-ph-arrows-clockwise",
+        tooltip: { text: "Nahradiť" },
         onClick: () => {
           const { state } = editor;
           const { selection } = state;
@@ -203,8 +198,8 @@ const imageToolbarItems = (editor: Editor): EditorToolbarItem[][] => {
     ],
     [
       {
-        icon: "i-lucide-trash",
-        tooltip: { text: "Delete" },
+        icon: "i-ph-trash",
+        tooltip: { text: "Vymazať" },
         onClick: () => {
           const { state } = editor;
           const { selection } = state;
@@ -265,11 +260,3 @@ const imageToolbarItems = (editor: Editor): EditorToolbarItem[][] => {
       " />
   </UEditor>
 </template>
-
-<style>
-html.dark .tiptap .shiki,
-html.dark .tiptap .shiki span {
-  color: var(--shiki-dark) !important;
-  background-color: var(--ui-bg-muted) !important;
-}
-</style>

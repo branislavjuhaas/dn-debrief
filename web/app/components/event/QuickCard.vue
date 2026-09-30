@@ -10,7 +10,8 @@ const formatter = new Intl.DateTimeFormat("sk-SK", {
 </script>
 
 <template>
-  <UCard :ui="{ body: 'p-0 sm:p-0 grid lg:grid-cols-[auto_1fr] h-41 items-center' }">
+  <UCard
+    :ui="{ body: 'p-0 sm:p-0 grid lg:grid-cols-[auto_1fr] h-41 items-center' }">
     <div class="aspect-7/3 overflow-hidden h-full max-h-full!">
       <NuxtImg
         :src="

@@ -1,10 +1,15 @@
 <script setup lang="ts">
-import { header, user } from "#build/ui";
 import type { Event } from "#shared/types/event";
+import type { UserRole } from "#shared/types/user";
 import security from "@comark/nuxt/plugins/security";
 import type { ButtonProps } from "@nuxt/ui";
+import {
+  isExternalRegistration,
+  isPlatformRegistration,
+} from "#shared/utils/events";
+
 const route = useRoute();
-const slug = route.params.slug as NonEmptyString;
+const slug = route.params.slug as string;
 
 // Event details data fetching
 const { data: eventData } = await useFetch<{ event: Event }>(
@@ -28,14 +33,15 @@ const { data: userData } = await useFetch(`/api/users/me`, {
   key: `users-me`,
 });
 
-const headerLinks: ButtonProps[] = [
+const headerLinks = computed<ButtonProps[]>(() => [
   {
-    label: "Upraviť",
+    label: "Upraviť podujatie",
+    to: `/manage/events/${slug}/edit`,
     color: "primary",
-    variant: "solid",
-    icon: "i-ph-magic-wand",
+    variant: "subtle",
+    icon: "i-ph-pencil-simple",
   },
-];
+]);
 
 const plugins = [
   security({
@@ -44,6 +50,19 @@ const plugins = [
   }),
 ];
 
+const isExternal = computed(() =>
+  isExternalRegistration(event.value?.registrationConfig),
+);
+
+const registrationTarget = computed(() => {
+  const config = event.value?.registrationConfig;
+  if (!config) return undefined;
+  if (isExternalRegistration(config)) {
+    return config.href;
+  }
+  return `/events/${slug}/register`;
+});
+
 const registrationError = computed<string | null>(() => {
   const config = event.value?.registrationConfig;
   if (!config) {
@@ -51,20 +70,23 @@ const registrationError = computed<string | null>(() => {
   }
 
   // 1. Check deadline
-  if (config.deadline) {
+  if (isExternalRegistration(config) && config.deadline) {
     const deadlineTime = new Date(config.deadline).getTime();
-
     if (Number.isNaN(deadlineTime) || Date.now() > deadlineTime) {
       return "Registrácia na podujatie je už po stanovenom deadline.";
     }
-  } // <-- Added missing closing brace here
+  } else if (isPlatformRegistration(config) && config.softDeadline) {
+    const deadlineTime = new Date(config.softDeadline).getTime();
+    if (Number.isNaN(deadlineTime) || Date.now() > deadlineTime) {
+      return "Registrácia na podujatie je už po stanovenom termíne.";
+    }
+  }
 
   // 2. Check active membership for current season
   if (config.requireMembership) {
     const currentYear = new Date().getFullYear();
-
     const hasActiveMembership = userData.value?.user?.clubMemberships?.some(
-      (m) => Number(m.season) === currentYear && m.confirmed === true,
+      (m: any) => Number(m.season) === currentYear && m.confirmed === true,
     );
 
     if (!hasActiveMembership) {
@@ -72,7 +94,7 @@ const registrationError = computed<string | null>(() => {
     }
   }
 
-  return null; // Null means no error (can register)
+  return null;
 });
 </script>
 
@@ -113,7 +135,7 @@ const registrationError = computed<string | null>(() => {
           :key="organizer.id"
           :name="`${organizer.name} ${organizer.surname}`"
           :description="
-            organizer.phone.replace(
+            organizer.phone?.replace(
               /^(\+421)(\d{3})(\d{3})(\d{3})$/,
               '$1 $2 $3 $4',
             ) ?? undefined
@@ -164,8 +186,9 @@ const registrationError = computed<string | null>(() => {
           </template>
         </UModal>
         <UButton
-          :to="event!.registrationConfig.href"
-          :disabled="!!registrationError"
+          :to="registrationTarget"
+          :target="isExternal ? '_blank' : undefined"
+          :disabled="!!registrationError || !registrationTarget"
           label="Registrovať sa na podujatie"
           icon="i-ph-ticket" />
       </div>

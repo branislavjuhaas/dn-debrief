@@ -2,8 +2,26 @@
 import type { Event } from "#shared/types/event";
 import { LazyModalThumbnailCropper } from "#components";
 import z from "zod";
-import { leagueEnum, regionEnum } from "#server/db/schema/clubs";
-import { eventTypeEnum } from "#server/db/schema/events";
+import {
+  EVENT_TYPES,
+  EVENT_TYPE_OPTIONS,
+  LEAGUES,
+  LEAGUE_OPTIONS,
+  REGIONS,
+  REGION_OPTIONS,
+  getScheduleBounds,
+  formatScheduleBounds,
+  slugify,
+} from "#shared/utils/events";
+
+const props = withDefaults(
+  defineProps<{
+    mode?: "create" | "edit";
+  }>(),
+  {
+    mode: "create",
+  },
+);
 
 const toast = useToast();
 const overlay = useOverlay();
@@ -14,6 +32,19 @@ const model = defineModel<Partial<Event>>({
 
 const sideForm = useTemplateRef("sideForm");
 const mainForm = useTemplateRef("mainForm");
+
+// Auto-generate slug when name changes, unless user manually touched slug
+const isSlugManuallyEdited = ref(props.mode === "edit");
+
+const onNameInput = () => {
+  if (!isSlugManuallyEdited.value && props.mode === "create") {
+    model.value.slug = slugify(model.value.name ?? "");
+  }
+};
+
+const onSlugInput = () => {
+  isSlugManuallyEdited.value = true;
+};
 
 const validate = async () => {
   if (!sideForm.value || !mainForm.value) return false;
@@ -30,7 +61,11 @@ defineExpose({
 const mainSchema = z.object({
   slug: z
     .string("ID podujatia je povinný údaj")
-    .min(3, "ID podujatia musí mať aspoň 3 znaky"),
+    .min(3, "ID podujatia musí mať aspoň 3 znaky")
+    .regex(
+      /^[a-z0-9-]+$/,
+      "ID podujatia môže obsahovať iba malé písmená, čísla a pomlčky",
+    ),
   name: z
     .string("Názov podujatia je povinný údaj")
     .min(1, "Názov podujatia je povinný údaj"),
@@ -49,15 +84,15 @@ const mainSchema = z.object({
 const sideSchema = z.object({
   thumbnailUrl: z.url("Náhľadová snímka podujatia musí byť URL").nullish(),
   type: z
-    .enum(eventTypeEnum.enumValues, {
+    .enum(EVENT_TYPES, {
       message: "Neplatný typ podujatia",
     })
     .optional(),
   place: z
     .string("Miesto konania podujatia je povinný údaj")
     .min(1, "Miesto konania podujatia je povinný údaj"),
-  targetRegion: z.enum(regionEnum.enumValues).nullish(),
-  targetLeague: z.enum(leagueEnum.enumValues).nullish(),
+  targetRegion: z.enum(REGIONS).nullish(),
+  targetLeague: z.enum(LEAGUES).nullish(),
 });
 
 // Computed properties for safe binding to nested motion object
@@ -99,7 +134,6 @@ const uploadThumbnail = async (file: File | null | undefined) => {
 
     if (!data?.uploadUrl) return;
 
-    // 2. Upload cropped image blob directly to storage bucket (R2/S3)
     await fetch(data.uploadUrl, {
       method: "PUT",
       headers: {
@@ -109,19 +143,23 @@ const uploadThumbnail = async (file: File | null | undefined) => {
     });
 
     model.value.thumbnailUrl = data.publicUrl;
-  } catch (error) {
+  } catch {
     toast.add({
       title: "Nastala chyba",
-      description: "Nepodarilo sa nahrát náhľadovú snímku",
+      description: "Nepodarilo sa nahrať náhľadovú snímku",
       color: "error",
     });
   }
 };
+
+const removeThumbnail = () => {
+  model.value.thumbnailUrl = undefined;
+};
 </script>
 
 <template>
-  <div class="flex flex-col gap-4 xl:flex-row w-full">
-    <div class="flex flex-col gap-4 w-full">
+  <div class="flex flex-col gap-6 xl:flex-row w-full">
+    <div class="flex flex-col gap-5 w-full flex-1 min-w-0">
       <UForm
         ref="mainForm"
         :schema="mainSchema"
@@ -136,18 +174,22 @@ const uploadThumbnail = async (file: File | null | undefined) => {
             <UInput
               v-model="model.name"
               placeholder="Zadajte názov podujatia"
-              class="w-full" />
+              class="w-full"
+              @input="onNameInput" />
           </UFormField>
 
           <UFormField
             label="ID podujatia"
             name="slug"
             required
+            :hint="mode === 'edit' ? 'Nemenné' : 'Unikátna adresa'"
             class="w-full md:w-64">
             <UInput
               v-model="model.slug"
-              placeholder="napr. sc271"
-              class="w-full" />
+              :disabled="mode === 'edit'"
+              placeholder="napr. dnju-open-2026"
+              class="w-full font-mono text-sm"
+              @input="onSlugInput" />
           </UFormField>
         </div>
 
@@ -182,7 +224,7 @@ const uploadThumbnail = async (file: File | null | undefined) => {
 
       <EventDescriptionEditor v-model="model.description" />
 
-      <USeparator class="my-2" label="Časový harmonogram" />
+      <USeparator class="flex-1" label="Časový harmonogram" />
 
       <EventScheduleEditor v-model="model.schedule" />
     </div>
@@ -191,20 +233,45 @@ const uploadThumbnail = async (file: File | null | undefined) => {
       ref="sideForm"
       :schema="sideSchema"
       :state="model"
-      class="flex flex-col gap-4 border-l border-default pl-4 min-w-104">
-      <UFormField label="Náhľadová snímka podujatia" class="row-span-3">
-        <UCard
-          v-if="model.thumbnailUrl"
-          class="aspect-21/9 flex"
-          :ui="{
-            body: 'flex h-full w-full p-0 sm:p-0 items-center justify-center',
-          }">
-          <NuxtImg
-            :src="model.thumbnailUrl"
-            alt="Náhľadová snímka podujatia"
-            width="645"
-            class="w-full h-full object-cover" />
-        </UCard>
+      class="flex flex-col gap-4 border-default xl:border-l xl:pl-6 xl:w-96 w-full shrink-0">
+      <UFormField label="Náhľadová snímka podujatia">
+        <div v-if="model.thumbnailUrl" class="space-y-2">
+          <UCard
+            class="aspect-21/9 overflow-hidden relative group"
+            :ui="{
+              body: 'flex h-full w-full p-0 sm:p-0 items-center justify-center',
+            }">
+            <NuxtImg
+              :src="model.thumbnailUrl"
+              alt="Náhľadová snímka podujatia"
+              width="645"
+              class="w-full h-full object-cover" />
+          </UCard>
+          <div class="flex gap-2">
+            <UFileUpload
+              v-slot="{ open }"
+              :preview="false"
+              label="Zmeniť"
+              accept="image/*"
+              class="´flex-1 w-full"
+              @update:modelValue="uploadThumbnail">
+              <UButton
+                color="neutral"
+                variant="subtle"
+                icon="i-ph-upload"
+                label="Zmeniť"
+                class="w-full"
+                block
+                @click="() => open()" />
+            </UFileUpload>
+            <UButton
+              color="error"
+              variant="subtle"
+              icon="i-ph-trash"
+              label="Odstrániť"
+              @click="removeThumbnail" />
+          </div>
+        </div>
         <UFileUpload
           v-else
           :preview="false"
@@ -219,20 +286,7 @@ const uploadThumbnail = async (file: File | null | undefined) => {
           v-model="model.type"
           placeholder="Vyberte typ podujatia"
           class="w-full"
-          :items="[
-            {
-              label: 'Turnaj',
-              value: 'tournament',
-            },
-            {
-              label: 'Seminár',
-              value: 'workshop',
-            },
-            {
-              label: 'Iný typ podujatia',
-              value: 'other',
-            },
-          ]" />
+          :items="EVENT_TYPE_OPTIONS" />
       </UFormField>
 
       <UFormField label="Miesto konania podujatia" name="place" required>
@@ -244,23 +298,10 @@ const uploadThumbnail = async (file: File | null | undefined) => {
       <template v-if="model.type === 'tournament'">
         <UFormField label="Debatný program" name="targetLeague" required>
           <USelect
-            v-model="model.targetLeague as string | undefined"
+            v-model="model.targetLeague as any"
             placeholder="Vyberte debatný program"
             class="w-full"
-            :items="[
-              {
-                label: 'Základoškolský debatný program',
-                value: 'junior',
-              },
-              {
-                label: 'Stredoškolský debatný program',
-                value: 'senior',
-              },
-              {
-                label: 'Vysokoškolský debatný program',
-                value: 'university',
-              },
-            ]" />
+            :items="LEAGUE_OPTIONS" />
         </UFormField>
 
         <UFormField label="Cieľový región" name="targetRegion" required>
@@ -268,24 +309,7 @@ const uploadThumbnail = async (file: File | null | undefined) => {
             v-model="model.targetRegion"
             placeholder="Vyberte cieľový región"
             class="w-full"
-            :items="[
-              {
-                label: 'Západoslovenský región',
-                value: 'western',
-              },
-              {
-                label: 'Stredoslovenský región',
-                value: 'central',
-              },
-              {
-                label: 'Východoslovenský región',
-                value: 'eastern',
-              },
-              {
-                label: 'Celoslovenské podujatie',
-                value: null,
-              },
-            ]" />
+            :items="REGION_OPTIONS" />
         </UFormField>
       </template>
     </UForm>

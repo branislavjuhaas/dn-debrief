@@ -9,8 +9,6 @@ const model = defineModel<Partial<Event>>({
 const organizers = computed<string[]>({
   get: () => model.value?.organizers?.map((o) => String(o.id)) ?? [],
   set: (value) => {
-    if (value.length < 1) return;
-
     model.value = {
       ...model.value,
       organizers: value.map((id) => ({ id: Number(id) })),
@@ -37,18 +35,29 @@ const items = computed<CheckboxGroupItem[]>(
 </script>
 
 <template>
-  <UCheckboxGroup
-    v-if="status === 'success'"
-    v-model="organizers"
-    color="primary"
-    variant="card"
-    :items="items"
-    :ui="{
-      fieldset: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
-    }" />
-  <div
-    v-else
-    class="gap-x-2 gap-y-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-    <USkeleton v-for="i in 11" :key="i" class="h-17.5" />
+  <div class="flex flex-col gap-4">
+    <UAlert
+      v-if="organizers.length === 0"
+      color="warning"
+      variant="subtle"
+      icon="i-ph-warning-circle"
+      title="Žiadni organizátori"
+      description="Podujatie zatiaľ nemá priradeného žiadneho organizátora. Odporúčame vybrať aspoň jednu kontaktnú osobu." />
+
+    <UCheckboxGroup
+      v-if="status === 'success'"
+      v-model="organizers"
+      color="primary"
+      variant="card"
+      :items="items"
+      :ui="{
+        fieldset:
+          'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3',
+      }" />
+    <div
+      v-else
+      class="gap-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <USkeleton v-for="i in 8" :key="i" class="h-18 rounded-lg" />
+    </div>
   </div>
 </template>
