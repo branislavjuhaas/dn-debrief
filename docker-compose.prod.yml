@@ -92,7 +92,7 @@ services:
 
   # --- RustFS Provisioner & Permissions Sidecar ---
   rustfs-init:
-    image: rustfs/rc:latest
+    image: rustfs/cli:latest
     container_name: debrief-rustfs-init
     networks:
       - dokploy-network
@@ -109,6 +109,8 @@ services:
       rc mb --ignore-existing myrustfs/debrief;
       rc anonymous set download myrustfs/debrief/events;
       rc anonymous set download myrustfs/debrief/avatars;
+      echo '{\"CORSRules\":[{\"AllowedOrigins\":[\"*\"],\"AllowedMethods\":[\"GET\",\"PUT\",\"POST\",\"DELETE\",\"HEAD\"],\"AllowedHeaders\":[\"*\"],\"ExposeHeaders\":[\"ETag\"]}]}' > /tmp/cors.json;
+      rc cors set myrustfs/debrief /tmp/cors.json;
       exit 0;
       "
 
