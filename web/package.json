@@ -53,13 +53,14 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@golar/vue": "^0.1.10",
     "@nuxt/docs": "^4.5.2",
     "@types/node": "^26.6.3",
     "drizzle-kit": "1.0.0-rc.4",
-    "typescript": "npm:typescript-native-bridge@6.0.3-bridge.11.tsgo.7.0.2",
+    "golar": "^0.1.10",
+    "typescript": "^7.0.2",
     "vite": "npm:@voidzero-dev/vite-plus-core@0.2.8",
-    "vite-plus": "catalog:",
-    "vue-tsc": "^3.3.11"
+    "vite-plus": "catalog:"
   },
   "devEngines": {
     "packageManager": {
