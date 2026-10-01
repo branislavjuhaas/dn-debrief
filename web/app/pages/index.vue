@@ -29,7 +29,7 @@ const greet = (user: User | null) => {
 };
 
 const feed = useFeed();
-const events = useFeaturedEvents();
+const events = useUpcomingEvents();
 
 const NuxtLink = resolveComponent("NuxtLink");
 </script>
