@@ -216,6 +216,17 @@ GUIDE|.nuxt-docs/3.guide/6.going-further/index.md|guide,going further,index
 - **API & Docs**: Nitro engine with auto-generated OpenAPI endpoints (`/_docs/openapi.json`, Scalar UI at `/api/docs`)
 - **Linter & Tooling**: Vite+ (`vp check`), `vue-tsc`, `pnpm`
 
+## Toolchain & CLI Rules (Vite+)
+
+This repository uses **Vite+ (`vp`)** as the unified toolchain CLI. Always prefer `vp` commands over traditional package managers (`npm`, `pnpm`, `yarn`, `bun`) or standalone runners (`npx`, `eslint`, `vitest`).
+
+### Command Preferences
+
+- **Dependencies:** Use `vp add <pkg>` or `vp remove <pkg>` instead of `npm i` or `pnpm add`.
+- **Installations:** Run `vp install` when setting up dependencies.
+- **Task Execution:** Use `vp run <script>` to execute `package.json` scripts.
+- **Binary Execution:** Use `vp dlx <cmd>` instead of `npx` or `pnpm dlx`.
+
 ## Directory Map
 
 ```text
@@ -271,13 +282,20 @@ web/
    - The user-facing application interface is primarily in **Slovak (`sk`)**.
    - Code, variable names, database column names, commit messages, and documentation should remain in **English**.
 
+## Code Quality & Verification Rules
+
+- **Mandatory Pre-Completion Step:** Before considering any code task complete, you must run the repository linting and formatting check:
+  ```bash
+  vp run check:fix
+  ```
+
 ## Key Commands
 
 ```sh
-pnpm dev             # Start local development server
-pnpm check           # Run Vite+ linter and Nuxt/Vue typecheck (vp check && nuxt typecheck)
-pnpm check:fix       # Automatically fix linting and formatting issues
-pnpm db:generate     # Generate new Drizzle migration files after editing schemas
-pnpm db:migrate      # Apply pending migrations to the database
-pnpm build           # Build for production
+vp run dev             # Start local development server
+vp run check           # Run Vite+ linter and Nuxt/Vue typecheck (vp check && nuxt typecheck)
+vp run check:fix       # Automatically fix linting and formatting issues
+vp run db:generate     # Generate new Drizzle migration files after editing schemas
+vp run db:migrate      # Apply pending migrations to the database
+vp run build           # Build for production
 ```
