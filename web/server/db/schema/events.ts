@@ -92,7 +92,7 @@ export type RegistrationRole = {
   cost: number;
   credentialRequirements: "none" | "adjudicator" | "non-adjudicator";
   roleType: "contestant" | "adjudicator" | "other";
-  hardDeadline?: string; // YYYY-MM-DD
+  hardDeadline?: string; // ISO Date
   deleted?: boolean;
 };
 
@@ -107,7 +107,7 @@ export type RegistrationsConfig =
       roles: RegistrationRole[];
       requireAccount: boolean;
       requireMembership: boolean;
-      softDeadline?: string; // YYYY-MM-DD
+      softDeadline?: string; // ISO Date
       collectedDetails: (
         | "name"
         | "surname"

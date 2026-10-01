@@ -40,6 +40,9 @@ export const COLLECTED_DETAILS_OPTIONS = [
   { label: "Mesto / Obec", value: "town" },
 ];
 
+export const ROLE_CONDITION_QUESTION_UUID =
+  "00000000-0000-0000-0000-000000000000";
+
 export const motionSchema = z.object({
   text: z.string().min(1),
   href: z.url().optional(),
@@ -109,7 +112,7 @@ export const registrationRoleSchema = z.object({
   cost: z.number().min(0),
   credentialRequirements: z.enum(["none", "adjudicator", "non-adjudicator"]),
   roleType: z.enum(["contestant", "adjudicator", "other"]),
-  hardDeadline: z.iso.date().optional(),
+  hardDeadline: z.union([z.iso.datetime(), z.iso.date()]).optional(),
   deleted: z.boolean().optional(),
 });
 
@@ -124,7 +127,7 @@ export const platformRegistrationConfigSchema = z.object({
   roles: z.array(registrationRoleSchema),
   requireAccount: z.boolean(),
   requireMembership: z.boolean(),
-  softDeadline: z.iso.date().optional(),
+  softDeadline: z.union([z.iso.datetime(), z.iso.date()]).optional(),
   collectedDetails: z.array(
     z.enum([
       "name",
