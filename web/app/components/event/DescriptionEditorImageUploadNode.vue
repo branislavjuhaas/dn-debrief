@@ -6,40 +6,6 @@ const props = defineProps(nodeViewProps);
 const file = ref<File | null>(null);
 const loading = ref(false);
 
-// watch(file, async (newFile) => {
-//   if (!newFile) return;
-
-//   loading.value = true;
-
-//   const reader = new FileReader();
-//   reader.onload = async (e) => {
-//     const dataUrl = e.target?.result as string;
-//     if (!dataUrl) {
-//       loading.value = false;
-//       return;
-//     }
-
-//     // Simulate upload delay
-//     await new Promise((resolve) => setTimeout(resolve, 1000));
-
-//     const pos = props.getPos();
-//     if (typeof pos !== "number") {
-//       loading.value = false;
-//       return;
-//     }
-
-//     props.editor
-//       .chain()
-//       .focus()
-//       .deleteRange({ from: pos, to: pos + 1 })
-//       .setImage({ src: dataUrl })
-//       .run();
-
-//     loading.value = false;
-//   };
-//   reader.readAsDataURL(newFile);
-// });
-
 const toast = useToast();
 
 watch(file, async (newFile) => {
@@ -62,6 +28,8 @@ watch(file, async (newFile) => {
     return;
   }
 
+  loading.value = true;
+
   const data = await $fetch("/api/events/files/upload", {
     method: "POST",
     body: {
@@ -69,6 +37,31 @@ watch(file, async (newFile) => {
       fileExtension: newFile.name.split(".").pop(),
     },
   });
+
+  if (!data?.uploadUrl) return;
+
+  await fetch(data.uploadUrl, {
+    method: "PUT",
+    headers: {
+      "Content-Type": newFile.type,
+    },
+    body: newFile,
+  });
+
+  const pos = props.getPos();
+  if (typeof pos !== "number") {
+    loading.value = false;
+    return;
+  }
+
+  props.editor
+    .chain()
+    .focus()
+    .deleteRange({ from: pos, to: pos + 1 })
+    .setImage({ src: data.publicUrl })
+    .run();
+
+  loading.value = false;
 });
 </script>
 

@@ -107,7 +107,8 @@ services:
       sleep 2;
       rc alias set myrustfs http://debrief-rustfs:9000 $$RUSTFS_ROOT_USER $$RUSTFS_ROOT_PASSWORD;
       rc mb --ignore-existing myrustfs/debrief;
-      rc anonymous set download myrustfs/debrief;
+      echo '{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"PublicReadPublicFoldersOnly\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":[\"s3:GetObject\"],\"Resource\":[\"arn:aws:s3:::debrief/events/*\",\"arn:aws:s3:::debrief/avatars/*\"]}]}' > /tmp/policy.json;
+      rc policy set myrustfs/debrief /tmp/policy.json;
       echo '{\"rules\":[{\"allowedOrigins\":[\"*\"],\"allowedMethods\":[\"GET\",\"PUT\",\"POST\",\"DELETE\",\"HEAD\"],\"allowedHeaders\":[\"*\"],\"exposeHeaders\":[\"ETag\"]}]}' > /tmp/cors.json;
       rc cors set myrustfs/debrief /tmp/cors.json;
       exit 0;

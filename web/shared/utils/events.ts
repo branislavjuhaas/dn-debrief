@@ -157,7 +157,7 @@ export const eventSchema = z.object({
   name: z.string().min(1),
   type: z.enum(EVENT_TYPES),
   description: z.string(),
-  thumbnailUrl: z.url().optional(),
+  thumbnailUrl: z.url().optional().nullable(),
   beginning: z.iso.datetime().transform((val) => new Date(val)),
   end: z.iso.datetime().transform((val) => new Date(val)),
   targetLeague: z.enum(LEAGUES).optional(),

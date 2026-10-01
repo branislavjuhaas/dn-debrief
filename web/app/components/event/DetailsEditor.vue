@@ -196,7 +196,9 @@ const removeThumbnail = () => {
 
       <USeparator class="my-2" label="Popis podujatia" />
 
-      <EventDescriptionEditor v-model="model.description" />
+      <ClientOnly>
+        <EventDescriptionEditor v-model="model.description" />
+      </ClientOnly>
 
       <USeparator class="flex-1" label="Časový harmonogram" />
 
