@@ -780,15 +780,17 @@ const questionTypeOptions = [
     <div class="space-y-4">
       <h3 class="text-base font-semibold">Všeobecné pravidlá registrácie</h3>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <USwitch
+        <UCheckbox
           v-model="model.requireAccount"
           label="Vyžadovať účet v systéme"
-          description="Každý účastník musí byť prihlásený" />
+          description="Každý účastník musí byť prihlásený"
+          variant="card" />
 
-        <USwitch
+        <UCheckbox
           v-model="model.requireMembership"
           label="Vyžadovať členstvo v SDA"
-          description="Podmienka aktívneho členstva pre aktuálnu sezónu" />
+          description="Podmienka aktívneho členstva pre aktuálnu sezónu"
+          variant="card" />
 
         <UFormField
           label="Deadline registrácie"
@@ -882,7 +884,7 @@ const questionTypeOptions = [
             </UFormField>
 
             <UFormField
-              label="Uzávierka role (hard deadline)"
+              label="Deadline na registráciu"
               description="Špecifický termín uzávierky pre túto rolu (nepovinné)">
               <UInputDate
                 :model-value="toCalendarDateTimeValue(role.hardDeadline)"
@@ -893,12 +895,11 @@ const questionTypeOptions = [
                 " />
             </UFormField>
 
-            <div class="flex items-center pt-2 md:pt-6">
-              <USwitch
-                v-model="role.hasTeamVariant"
-                label="Tímová rola"
-                description="Umožňuje registráciu v tíme" />
-            </div>
+            <UCheckbox
+              v-model="role.hasTeamVariant"
+              label="Tímová rola"
+              description="Umožňuje registráciu v tíme"
+              variant="card" />
           </div>
         </UCard>
       </div>
@@ -966,6 +967,8 @@ const questionTypeOptions = [
               <UInput
                 v-model="section.title"
                 placeholder="Názov sekcie"
+                variant="ghost"
+                size="xl"
                 class="font-semibold flex-1 max-w-sm" />
             </div>
             <div class="flex items-center gap-1 self-end sm:self-auto">
@@ -1056,10 +1059,10 @@ const questionTypeOptions = [
               <!-- Question Description / Hint -->
               <UInput
                 v-model="q.description"
-                placeholder="Nápoveda / vysvetlenie k otázke (nepovinné)"
-                size="xs"
+                placeholder="Popis k otázke (nepovinné)"
+                size="sm"
                 variant="subtle"
-                class="w-full text-xs text-muted" />
+                class="w-full text-muted" />
 
               <!-- Options for 'select' and 'multiselect' -->
               <div
@@ -1100,7 +1103,7 @@ const questionTypeOptions = [
                     :model-value="opt"
                     placeholder="Zadajte názov možnosti"
                     class="flex-1"
-                    size="xs"
+                    size="sm"
                     @update:model-value="
                       (val) => updateQuestionOption(q, optIdx, val as string)
                     " />
@@ -1135,7 +1138,6 @@ const questionTypeOptions = [
                 </span>
                 <UBadge
                   v-if="section.visibleWhen && section.visibleWhen.length > 0"
-                  size="xs"
                   color="primary"
                   variant="subtle">
                   {{ section.visibleWhen.length }}
@@ -1169,8 +1171,7 @@ const questionTypeOptions = [
                 <USelect
                   :model-value="rule.questionUuid"
                   :items="getConditionSourcesForSection(section.uuid)"
-                  class="w-full sm:w-60"
-                  size="xs"
+                  class="w-full md:w-sm xl:w-lg"
                   @update:model-value="
                     (val) => onRuleSourceChange(rule, val as string)
                   " />
@@ -1180,7 +1181,6 @@ const questionTypeOptions = [
                   :model-value="rule.operator"
                   :items="getOperatorOptions(rule.questionUuid)"
                   class="w-full sm:w-36"
-                  size="xs"
                   @update:model-value="
                     (val) => onRuleOperatorChange(rule, val as any)
                   " />
@@ -1199,7 +1199,6 @@ const questionTypeOptions = [
                       :model-value="(rule as any).value"
                       :items="roleConditionOptions"
                       class="w-full"
-                      size="xs"
                       @update:model-value="
                         (val) => ((rule as any).value = val)
                       " />
@@ -1246,7 +1245,6 @@ const questionTypeOptions = [
                         "
                         :items="booleanConditionOptions"
                         class="w-full"
-                        size="xs"
                         @update:model-value="
                           (val) => ((rule as any).value = val === 'true')
                         " />
@@ -1267,7 +1265,6 @@ const questionTypeOptions = [
                         :model-value="(rule as any).value"
                         :items="getQuestionSelectOptions(rule.questionUuid)"
                         class="w-full"
-                        size="xs"
                         @update:model-value="
                           (val) => ((rule as any).value = val)
                         " />
@@ -1317,7 +1314,6 @@ const questionTypeOptions = [
                             : 0
                         "
                         class="w-full"
-                        size="xs"
                         @update:model-value="
                           (val) => ((rule as any).value = Number(val))
                         " />
@@ -1326,7 +1322,6 @@ const questionTypeOptions = [
                         :model-value="getArrayRuleValue(rule)"
                         placeholder="Zadajte čísla a stlačte Enter..."
                         class="w-full sm:min-w-48"
-                        size="xs"
                         @update:model-value="
                           (val) =>
                             ((rule as any).value = val.map((v) => Number(v)))
@@ -1346,7 +1341,6 @@ const questionTypeOptions = [
                         type="date"
                         :model-value="String(rule.value ?? '')"
                         class="w-full"
-                        size="xs"
                         @update:model-value="
                           (val) => ((rule as any).value = val)
                         " />
@@ -1355,7 +1349,6 @@ const questionTypeOptions = [
                         :model-value="getArrayRuleValue(rule)"
                         placeholder="Zadajte dátumy a stlačte Enter..."
                         class="w-full sm:min-w-48"
-                        size="xs"
                         @update:model-value="
                           (val) => setArrayRuleValue(rule, val)
                         " />
@@ -1371,7 +1364,6 @@ const questionTypeOptions = [
                         :model-value="String(rule.value ?? '')"
                         placeholder="Hodnota"
                         class="w-full"
-                        size="xs"
                         @update:model-value="
                           (val) => ((rule as any).value = val)
                         " />
@@ -1380,7 +1372,6 @@ const questionTypeOptions = [
                         :model-value="getArrayRuleValue(rule)"
                         placeholder="Zadajte hodnoty a stlačte Enter..."
                         class="w-full sm:min-w-48"
-                        size="xs"
                         @update:model-value="
                           (val) => setArrayRuleValue(rule, val)
                         " />
