@@ -15,7 +15,7 @@ const { data: userData } = useNuxtData<typeof userFetch.value>("users-me");
 const logout = async () => {
   await navigateTo("/");
   await authClient.signOut();
-  await clearNuxtData("users-me");
+  clearNuxtData("users-me");
 };
 
 const navItems = computed<DropdownMenuItem[][]>(() => {

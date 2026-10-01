@@ -68,11 +68,7 @@ defineRouteMeta({
                 type: "string",
                 enum: ["tournament", "workshop", "other"],
               },
-              description: { type: "object" },
-              fileUrls: {
-                type: "array",
-                items: { type: "string", format: "uri" },
-              },
+              description: { type: "string" },
               thumbnailUrl: { type: "string", format: "uri", nullable: true },
               beginning: { type: "string", format: "date-time" },
               end: { type: "string", format: "date-time" },
@@ -86,8 +82,9 @@ defineRouteMeta({
                 nullable: true,
                 enum: ["western", "central", "eastern"],
               },
-              place: { type: "string", nullable: true },
-              featuredProperties: { type: "array", items: { type: "object" } },
+              place: { type: "string" },
+              address: { type: "string" },
+              motion: { type: "object" },
               schedule: { type: "object" },
               registrationConfig: { type: "object" },
               organizers: {
@@ -101,9 +98,10 @@ defineRouteMeta({
               "name",
               "type",
               "description",
-              "fileUrls",
               "beginning",
               "end",
+              "place",
+              "address",
               "schedule",
               "registrationConfig",
             ],
@@ -118,11 +116,7 @@ defineRouteMeta({
                 type: "string",
                 enum: ["tournament", "workshop", "other"],
               },
-              description: { type: "object" },
-              fileUrls: {
-                type: "array",
-                items: { type: "string", format: "uri" },
-              },
+              description: { type: "string" },
               thumbnailUrl: { type: "string", format: "uri", nullable: true },
               beginning: { type: "string", format: "date-time" },
               end: { type: "string", format: "date-time" },
@@ -136,8 +130,9 @@ defineRouteMeta({
                 nullable: true,
                 enum: ["western", "central", "eastern"],
               },
-              place: { type: "string", nullable: true },
-              featuredProperties: { type: "array", items: { type: "object" } },
+              place: { type: "string" },
+              address: { type: "string", nullable: true },
+              motion: { type: "object" },
               schedule: { type: "object" },
               registrationConfig: { type: "object" },
               createdAt: { type: "string", format: "date-time" },
@@ -163,7 +158,6 @@ defineRouteMeta({
               "name",
               "type",
               "description",
-              "fileUrls",
               "beginning",
               "end",
               "schedule",
@@ -199,12 +193,14 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    await tx.insert(eventOrganizers).values(
-      organizers.map((id) => ({
-        eventId: newEvent[0]!.id,
-        userId: id,
-      })),
-    );
+    if (organizers.length > 0) {
+      await tx.insert(eventOrganizers).values(
+        organizers.map((id) => ({
+          eventId: newEvent[0]!.id,
+          userId: id,
+        })),
+      );
+    }
 
     return newEvent[0];
   });

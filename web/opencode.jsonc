@@ -1,0 +1,22 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  // Automatically format files after tool edits (write/edit/patch)
+  "formatter": true,
+  // Ignore build caches and artifacts from filesystem watcher
+  "watcher": {
+    "ignore": [".nuxt/**", ".output/**", "dist/**", "node_modules/**"],
+  },
+  // Safeguards for sensitive operations
+  "permissions": [
+    {
+      "action": "shell",
+      "resource": "git push *",
+      "effect": "ask",
+    },
+    {
+      "action": "shell",
+      "resource": "*db:migrate*",
+      "effect": "ask",
+    },
+  ],
+}

@@ -41,7 +41,7 @@ defineRouteMeta({
     $global: {
       components: {
         schemas: {
-          UserProfile: {
+          UserProfile: defineSchema({
             type: "object",
             properties: {
               id: { type: "integer", readOnly: true, example: 1 },
@@ -63,7 +63,7 @@ defineRouteMeta({
               accounts: { type: "array", items: { type: "object" } },
             },
             required: ["id", "name", "surname", "role"],
-          },
+          }),
         },
       },
     },

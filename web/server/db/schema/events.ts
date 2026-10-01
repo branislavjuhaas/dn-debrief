@@ -28,16 +28,6 @@ export const eventTypeEnum = pgEnum("event_type", [
 
 export type UUID = string;
 
-export type FeaturedProperty = {
-  icon: string;
-  label: string;
-  value: string;
-  badge?: {
-    text: string;
-    href: string;
-  };
-};
-
 export type SchedulePart = {
   // Beginning time in minutes from the start of the day (e.g. 540 for 9:00 AM)
   beginning: number;
@@ -102,20 +92,22 @@ export type RegistrationRole = {
   cost: number;
   credentialRequirements: "none" | "adjudicator" | "non-adjudicator";
   roleType: "contestant" | "adjudicator" | "other";
-  hardDeadline?: string; // YYYY-MM-DD
+  hardDeadline?: string; // ISO Date
   deleted?: boolean;
 };
 
 export type RegistrationsConfig =
   | {
-      deadline: string; // YYYY-MM-DD
+      deadline: string; // ISO Date
       href: string;
+      cost: number;
+      requireMembership: boolean;
     }
   | {
       roles: RegistrationRole[];
       requireAccount: boolean;
       requireMembership: boolean;
-      softDeadline?: string; // YYYY-MM-DD
+      softDeadline?: string; // ISO Date
       collectedDetails: (
         | "name"
         | "surname"
@@ -150,6 +142,11 @@ export type CollectedDetails = {
   town?: string;
 };
 
+export type Motion = {
+  text: string;
+  href?: string;
+};
+
 export const events = pgTable(
   "events",
   {
@@ -169,11 +166,9 @@ export const events = pgTable(
     end: timestamp("end").notNull(),
     targetLeague: leagueEnum("target_league"),
     targetRegion: regionEnum("target_region"),
-    place: text("place"),
-    featuredProperties: jsonb("featured_properties")
-      .$type<FeaturedProperty[]>()
-      .notNull()
-      .default([]),
+    place: text("place").notNull(),
+    address: text("address"),
+    motion: jsonb("motion").$type<Motion>(),
     schedule: jsonb("schedule")
       .$type<Schedule>()
       .notNull()

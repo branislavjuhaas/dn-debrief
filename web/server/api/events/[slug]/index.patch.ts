@@ -1,12 +1,13 @@
 import { db } from "#server/db";
-import { events } from "#server/db/schema/events";
+import { eventOrganizers, events } from "#server/db/schema/events";
 import { eq } from "drizzle-orm";
+import { updateEventSchema } from "#shared/utils/events";
 
 defineRouteMeta({
   openAPI: {
     tags: ["Events"],
     summary: "Update event",
-    description: "Update an existing event without modifying organizers.",
+    description: "Update an existing event including details and organizers.",
     parameters: [
       {
         name: "slug",
@@ -86,11 +87,7 @@ defineRouteMeta({
                 type: "string",
                 enum: ["tournament", "workshop", "other"],
               },
-              description: { type: "object" },
-              fileUrls: {
-                type: "array",
-                items: { type: "string", format: "uri" },
-              },
+              description: { type: "string" },
               thumbnailUrl: { type: "string", format: "uri", nullable: true },
               beginning: { type: "string", format: "date-time" },
               end: { type: "string", format: "date-time" },
@@ -104,11 +101,9 @@ defineRouteMeta({
                 nullable: true,
                 enum: ["western", "central", "eastern"],
               },
-              place: { type: "string", nullable: true },
-              featuredProperties: {
-                type: "array",
-                items: { type: "object", additionalProperties: true },
-              },
+              place: { type: "string" },
+              address: { type: "string" },
+              motion: { type: "object" },
               schedule: {
                 type: "object",
                 additionalProperties: true,
@@ -116,6 +111,10 @@ defineRouteMeta({
               registrationConfig: {
                 type: "object",
                 additionalProperties: true,
+              },
+              organizers: {
+                type: "array",
+                items: { type: "integer" },
               },
             },
           },
@@ -126,18 +125,15 @@ defineRouteMeta({
               slug: { type: "string" },
               name: { type: "string" },
               type: { type: "string" },
-              description: { type: "object" },
-              fileUrls: {
-                type: "array",
-                items: { type: "string", format: "uri" },
-              },
+              description: { type: "string" },
               thumbnailUrl: { type: "string", format: "uri", nullable: true },
               beginning: { type: "string", format: "date-time" },
               end: { type: "string", format: "date-time" },
               targetLeague: { type: "string", nullable: true },
               targetRegion: { type: "string", nullable: true },
-              place: { type: "string", nullable: true },
-              featuredProperties: { type: "array", items: { type: "object" } },
+              place: { type: "string" },
+              address: { type: "string", nullable: true },
+              motion: { type: "object" },
               schedule: { type: "object" },
               registrationConfig: { type: "object" },
             },
@@ -158,7 +154,10 @@ export default defineEventHandler(async (event) => {
   ]);
 
   const slug = getRouterParam(event, "slug") ?? "";
-  const body = await readValidatedBody(event, updateEventSchema.parse);
+
+  const body = await readValidatedBody(event, (b) =>
+    updateEventSchema.parse(b),
+  );
 
   const existingEvent = await db.query.events.findFirst({
     where: { slug },
@@ -173,11 +172,40 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const [updatedEvent] = await db
-    .update(events)
-    .set(body)
-    .where(eq(events.id, existingEvent.id))
-    .returning();
+  const { organizers, ...eventData } = body;
+
+  const updatedEvent = await db.transaction(async (tx) => {
+    let updated;
+    if (Object.keys(eventData).length > 0) {
+      const [res] = await tx
+        .update(events)
+        .set(eventData)
+        .where(eq(events.id, existingEvent.id))
+        .returning();
+      updated = res;
+    } else {
+      updated = await tx.query.events.findFirst({
+        where: { id: existingEvent.id },
+      });
+    }
+
+    if (organizers !== undefined) {
+      await tx
+        .delete(eventOrganizers)
+        .where(eq(eventOrganizers.eventId, existingEvent.id));
+
+      if (organizers.length > 0) {
+        await tx.insert(eventOrganizers).values(
+          organizers.map((userId) => ({
+            eventId: existingEvent.id,
+            userId,
+          })),
+        );
+      }
+    }
+
+    return updated;
+  });
 
   return { event: updatedEvent };
 });

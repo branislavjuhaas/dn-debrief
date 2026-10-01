@@ -59,7 +59,7 @@ defineRouteMeta({
     },
     $global: {
       components: {
-        schemas: {
+        schemas: defineSchema({
           ManagerSummary: {
             type: "object",
             properties: {
@@ -136,7 +136,7 @@ defineRouteMeta({
             },
             required: ["clubId", "userId", "createdAt", "updatedAt"],
           },
-        },
+        }),
       },
     },
   },

@@ -31,7 +31,7 @@ const formattedValue = computed(() => {
   <span
     v-if="!hideIfMissing || formattedValue"
     class="space-x-2 text-sm items-center flex text-pretty">
-    <UIcon :name="icon" class="size-5" />
+    <UIcon :name="icon" class="size-5 flex-none" />
     <span class="max-sm:flex flex-col">
       {{ label }}:&nbsp;
       <b v-if="formattedValue">{{ formattedValue }}</b>

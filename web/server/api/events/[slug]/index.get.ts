@@ -60,11 +60,7 @@ defineRouteMeta({
                 type: "string",
                 enum: ["tournament", "workshop", "other"],
               },
-              description: { type: "object" },
-              fileUrls: {
-                type: "array",
-                items: { type: "string", format: "uri" },
-              },
+              description: { type: "string" },
               thumbnailUrl: { type: "string", format: "uri", nullable: true },
               beginning: { type: "string", format: "date-time" },
               end: { type: "string", format: "date-time" },
@@ -78,25 +74,9 @@ defineRouteMeta({
                 nullable: true,
                 enum: ["western", "central", "eastern"],
               },
-              place: { type: "string", nullable: true },
-              featuredProperties: {
-                type: "array",
-                items: {
-                  type: "object",
-                  properties: {
-                    icon: { type: "string" },
-                    text: { type: "string" },
-                    badge: {
-                      type: "object",
-                      properties: {
-                        text: { type: "string" },
-                        href: { type: "string", format: "uri" },
-                      },
-                    },
-                  },
-                  required: ["icon", "text"],
-                },
-              },
+              place: { type: "string" },
+              address: { type: "string", nullable: true },
+              motion: { type: "object" },
               schedule: {
                 type: "object",
                 properties: {
@@ -142,6 +122,7 @@ defineRouteMeta({
                     role: { type: "string" },
                     email: { type: "string", format: "email" },
                     phone: { type: "string", nullable: true },
+                    image: { type: "string", nullable: true },
                   },
                 },
               },
@@ -152,7 +133,6 @@ defineRouteMeta({
               "name",
               "type",
               "description",
-              "fileUrls",
               "beginning",
               "end",
               "schedule",
@@ -181,6 +161,7 @@ export default defineEventHandler(async (event) => {
           role: true,
           email: true,
           phone: true,
+          image: true,
         },
       },
     },

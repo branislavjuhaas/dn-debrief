@@ -23,7 +23,7 @@ defineRouteMeta({
           "The requested user (schema varies based on viewer permissions)",
         content: {
           "application/json": {
-            schema: {
+            schema: defineSchema({
               type: "object",
               properties: {
                 user: {
@@ -256,7 +256,7 @@ defineRouteMeta({
                 },
               },
               required: ["user"],
-            },
+            }),
           },
         },
       },
