@@ -416,9 +416,7 @@ useSeoMeta({
 
 <template>
   <UPage>
-    <UPageHeader
-      :title="`Registrácia na ${event.name}`"
-      :description="event.place ? `Miesto konania: ${event.place}` : undefined">
+    <UPageHeader :title="`Registrácia na ${event.name}`">
       <template #links>
         <UButton
           :to="`/events/${slug}`"
@@ -479,11 +477,7 @@ useSeoMeta({
                   {{ currentStep?.description }}
                 </p>
               </div>
-              <UBadge
-                v-if="selectedRole"
-                color="primary"
-                variant="subtle"
-                size="sm">
+              <UBadge v-if="selectedRole" color="primary" variant="subtle">
                 {{ selectedRole.name }}
                 <span v-if="selectedRole.cost > 0" class="ml-1 font-semibold">
                   ({{ selectedRole.cost }}€)
@@ -789,7 +783,8 @@ useSeoMeta({
                 <div class="pt-1">
                   <UCheckbox
                     v-model="answers[q.uuid]"
-                    :label="q.title"
+                    label="Áno"
+                    variant="card"
                     @change="delete fieldErrors[q.uuid]" />
                 </div>
               </UFormField>
@@ -806,6 +801,7 @@ useSeoMeta({
                   :items="q.options"
                   color="primary"
                   class="space-y-2 pt-1"
+                  variant="card"
                   @update:model-value="delete fieldErrors[q.uuid]" />
               </UFormField>
 
@@ -821,6 +817,7 @@ useSeoMeta({
                   :items="q.options"
                   color="primary"
                   class="space-y-2 pt-1"
+                  variant="card"
                   @update:model-value="delete fieldErrors[q.uuid]" />
               </UFormField>
             </div>
