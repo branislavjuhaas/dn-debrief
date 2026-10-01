@@ -36,12 +36,12 @@ const user = computed(() => userFetch.value?.user);
 const isLoggedIn = computed(() => Boolean(user.value));
 
 // Check if current user is already registered for this event
-const { data: userRegistrationsData } = await useFetch<{
-  registrations: any[];
-}>(`/api/users/me/registrations`, {
-  key: `my-registrations-check-${slug}`,
-  enabled: computed(() => Boolean(user.value)),
-});
+const { data: userRegistrationsData } = await useFetch(
+  `/api/users/${user.value?.id}/registrations`,
+  {
+    key: `my-registrations-check-${slug}`,
+  },
+);
 
 const alreadyRegistered = computed(() => {
   if (!user.value) return false;
@@ -54,6 +54,9 @@ const alreadyRegistered = computed(() => {
 const activeRoles = computed<RegistrationRole[]>(() =>
   (config.value?.roles ?? []).filter((r) => !r.deleted),
 );
+
+const isRoleDisabled = (role: RegistrationRole) =>
+  !isLoggedIn.value && (role.cost ?? 0) > 0;
 
 const activeSections = computed(() =>
   (config.value?.sections ?? []).filter((s) => !s.deleted),
@@ -78,12 +81,21 @@ const answers = ref<Record<string, any>>({});
 const fieldErrors = ref<Record<string, string>>({});
 const submitting = ref(false);
 
-// Auto-select role if only 1 exists
+// Auto-select role if only 1 exists and is not disabled
 watch(
-  activeRoles,
-  (roles) => {
-    if (roles.length === 1 && !selectedRoleUuid.value) {
+  [activeRoles, isLoggedIn],
+  ([roles]) => {
+    if (
+      roles.length === 1 &&
+      !isRoleDisabled(roles[0]!) &&
+      !selectedRoleUuid.value
+    ) {
       selectedRoleUuid.value = roles[0]!.uuid;
+    } else if (
+      selectedRoleUuid.value &&
+      roles.some((r) => r.uuid === selectedRoleUuid.value && isRoleDisabled(r))
+    ) {
+      selectedRoleUuid.value = "";
     }
   },
   { immediate: true },
@@ -101,7 +113,11 @@ const hasTeamStep = computed(() => Boolean(selectedRole.value?.hasTeamVariant));
 const hasGuestStep = computed(() => !isLoggedIn.value);
 
 // Check if role step is needed
-const hasRoleStep = computed(() => activeRoles.value.length > 1);
+const hasRoleStep = computed(
+  () =>
+    activeRoles.value.length > 1 ||
+    activeRoles.value.some((r) => isRoleDisabled(r)),
+);
 
 // Filter visible sections dynamically based on role and prior answers
 const visibleDynamicSections = computed(() => {
@@ -251,7 +267,10 @@ const validateCurrentStep = (): boolean => {
   if (!step) return false;
 
   if (step.type === "role") {
-    if (!selectedRoleUuid.value) {
+    if (
+      !selectedRoleUuid.value ||
+      (selectedRole.value && isRoleDisabled(selectedRole.value))
+    ) {
       fieldErrors.value.role = "Prosím, vyberte si jednu z dostupných rolí.";
     }
   } else if (step.type === "team") {
@@ -349,6 +368,15 @@ const isLastStep = computed(
 // Submit registration
 const submitRegistration = async () => {
   if (!validateCurrentStep()) return;
+  if (!selectedRole.value || isRoleDisabled(selectedRole.value)) {
+    toast.add({
+      title: "Neplatná rola",
+      description: "Zvolená rola vyžaduje prihlásenie.",
+      color: "error",
+      icon: "i-ph-warning-circle",
+    });
+    return;
+  }
 
   submitting.value = true;
   try {
@@ -434,9 +462,8 @@ useSeoMeta({
           color="info"
           variant="subtle"
           icon="i-ph-check-circle"
-          title="Už ste zaregistrovaný na toto podujatie"
-          description="Na toto podujatie už máte vytvorenú platnú registráciu. Opakovaná registrácia nie je možná."
-          class="max-w-2xl mx-auto">
+          title="Vašu registráciu sme už zaznamenali"
+          description="Na toto podujatie už máte vytvorenú platnú registráciu. Opakovaná registrácia nie je možná.">
           <template #actions>
             <UButton
               :to="`/events/${slug}`"
@@ -488,6 +515,23 @@ useSeoMeta({
 
           <!-- Step 1: Role Selection -->
           <div v-if="currentStep?.type === 'role'" class="space-y-4">
+            <UAlert
+              v-if="!isLoggedIn && activeRoles.some((r) => isRoleDisabled(r))"
+              color="neutral"
+              variant="subtle"
+              icon="i-ph-info"
+              title="Spoplatnené role vyžadujú prihlásenie"
+              description="Registrácia do spoplatnených účastníckych rolí je dostupná len pre prihlásených používateľov.">
+              <template #actions>
+                <UButton
+                  :to="`/auth?redirect=/events/${slug}/register`"
+                  size="xs"
+                  color="primary"
+                  variant="subtle"
+                  label="Prihlásiť sa" />
+              </template>
+            </UAlert>
+
             <UFormField
               label="Vyberte účastnícku rolu"
               required
@@ -496,32 +540,49 @@ useSeoMeta({
                 <div
                   v-for="r in activeRoles"
                   :key="r.uuid"
-                  class="border rounded-lg p-4 cursor-pointer transition-colors"
-                  :class="
-                    selectedRoleUuid === r.uuid
-                      ? 'border-primary bg-primary/5 ring-2 ring-primary/30'
-                      : 'border-default/60 hover:border-default hover:bg-elevated/40'
-                  "
+                  class="border rounded-lg p-4 transition-colors"
+                  :class="[
+                    isRoleDisabled(r)
+                      ? 'border-default/40 bg-muted/10 opacity-60 cursor-not-allowed'
+                      : selectedRoleUuid === r.uuid
+                        ? 'border-primary bg-primary/5 ring-2 ring-primary/30 cursor-pointer'
+                        : 'border-default/60 hover:border-default hover:bg-elevated/40 cursor-pointer',
+                  ]"
+                  :aria-disabled="isRoleDisabled(r)"
                   @click="
-                    selectedRoleUuid = r.uuid;
-                    delete fieldErrors.role;
+                    if (!isRoleDisabled(r)) {
+                      selectedRoleUuid = r.uuid;
+                      delete fieldErrors.role;
+                    }
                   ">
-                  <div class="flex items-center justify-between">
+                  <div class="flex items-start justify-between">
                     <div class="flex items-center gap-3">
                       <div
                         class="size-5 rounded-full border flex items-center justify-center"
                         :class="
-                          selectedRoleUuid === r.uuid
-                            ? 'border-primary bg-primary text-white'
-                            : 'border-muted'
+                          isRoleDisabled(r)
+                            ? 'border-muted/40 bg-muted/20 text-muted'
+                            : selectedRoleUuid === r.uuid
+                              ? 'border-primary bg-primary text-white'
+                              : 'border-muted'
                         ">
                         <UIcon
                           v-if="selectedRoleUuid === r.uuid"
                           name="i-ph-check"
                           class="size-3" />
+                        <UIcon
+                          v-else-if="isRoleDisabled(r)"
+                          name="i-ph-lock"
+                          class="size-2.5 text-muted" />
                       </div>
                       <div>
-                        <h4 class="font-semibold text-highlighted">
+                        <h4
+                          class="font-semibold"
+                          :class="
+                            isRoleDisabled(r)
+                              ? 'text-muted'
+                              : 'text-highlighted'
+                          ">
                           {{ r.name }}
                         </h4>
                         <p class="text-xs text-muted">
@@ -535,15 +596,28 @@ useSeoMeta({
                         </p>
                       </div>
                     </div>
-                    <div class="text-right">
-                      <span class="text-sm font-bold text-highlighted">
+                    <div class="text-right space-y-0.5">
+                      <span
+                        class="text-sm font-bold"
+                        :class="
+                          isRoleDisabled(r) ? 'text-muted' : 'text-highlighted'
+                        ">
                         {{ r.cost > 0 ? `${r.cost} €` : "Bez poplatku" }}
                       </span>
                       <p
                         v-if="r.hasTeamVariant"
-                        class="text-xs text-primary flex items-center gap-1 justify-end mt-0.5">
+                        class="text-xs flex items-center gap-1 justify-end"
+                        :class="
+                          isRoleDisabled(r) ? 'text-muted' : 'text-primary'
+                        ">
                         <UIcon name="i-ph-users-three" class="size-3.5" />
                         Tímová účasť
+                      </p>
+                      <p
+                        v-if="isRoleDisabled(r)"
+                        class="text-xs text-warning flex items-center gap-1 justify-end">
+                        <UIcon name="i-ph-lock-key" class="size-3.5" />
+                        Vyžaduje prihlásenie
                       </p>
                     </div>
                   </div>

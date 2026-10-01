@@ -76,11 +76,7 @@ const columns: TableColumn<any>[] = [
     header: "Rola",
     cell: ({ row }) => {
       const roleName = getRoleName(row.original);
-      return h(
-        UBadge,
-        { color: "info", variant: "subtle", size: "sm" },
-        () => roleName,
-      );
+      return h(UBadge, { color: "info", variant: "subtle" }, () => roleName);
     },
   },
   {
@@ -103,19 +99,19 @@ const columns: TableColumn<any>[] = [
         if (reg.payment.status === "paid") {
           return h(
             UBadge,
-            { color: "success", variant: "subtle", size: "sm" },
+            { color: "success", variant: "subtle" },
             () => `Uhradené (${reg.payment.amount / 100} €)`,
           );
         }
         return h(
           UBadge,
-          { color: "warning", variant: "subtle", size: "sm" },
+          { color: "warning", variant: "subtle" },
           () => `Čaká na úhradu (${reg.payment.amount / 100} €)`,
         );
       }
       return h(
         UBadge,
-        { color: "neutral", variant: "subtle", size: "sm" },
+        { color: "neutral", variant: "subtle" },
         () => "Bez poplatku",
       );
     },
@@ -132,35 +128,6 @@ const columns: TableColumn<any>[] = [
             year: "numeric",
           })
         : "—";
-    },
-  },
-  {
-    id: "actions",
-    header: "Akcie",
-    cell: ({ row }) => {
-      const reg = row.original;
-      const slug = reg.event?.slug;
-      if (!slug) return null;
-
-      return h("div", { class: "flex items-center gap-1.5" }, [
-        reg.payment && reg.payment.status !== "paid"
-          ? h(UButton, {
-              to: `/events/${slug}/finished?pay=${reg.payment.id}`,
-              size: "xs",
-              color: "primary",
-              label: "Zaplatiť",
-              icon: "i-ph-credit-card",
-            })
-          : null,
-        h(UButton, {
-          to: `/events/${slug}`,
-          size: "xs",
-          color: "neutral",
-          variant: "subtle",
-          label: "Detail",
-          icon: "i-ph-arrow-square-out",
-        }),
-      ]);
     },
   },
 ];

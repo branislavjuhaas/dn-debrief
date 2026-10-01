@@ -33,12 +33,13 @@ const { data: userData } = await useFetch(`/api/users/me`, {
   key: `users-me`,
 });
 
-const { data: userRegistrationsData } = await useFetch<{
-  registrations: any[];
-}>(`/api/users/me/registrations`, {
-  key: `my-registrations-${slug}`,
-  enabled: computed(() => Boolean(userData.value?.user)),
-});
+const { data: userRegistrationsData } = await useFetch(
+  `/api/users/${userData.value?.user?.id}/registrations`,
+  {
+    key: `my-registrations-${slug}`,
+    enabled: computed(() => Boolean(userData.value?.user)),
+  },
+);
 
 const existingRegistration = computed(() => {
   if (!userData.value?.user) return null;
