@@ -56,7 +56,7 @@ services:
 
   # --- MinIO Provisioner & Permissions Sidecar ---
   minio-init:
-    image: minio/mc:latest
+    image: bitnami/minio-client:latest
     container_name: debrief-minio-init
     environment:
       MINIO_ROOT_USER: debrief_user
