@@ -108,7 +108,7 @@ defineRouteMeta({
 });
 
 const updateRegistrationSchema = z.object({
-  roleUuid: z.string().uuid().optional(),
+  roleUuid: z.uuid().optional(),
   teamName: z.string().trim().max(100).nullable().optional(),
   confirmed: z.boolean().optional(),
   collectedDetails: z
@@ -126,7 +126,7 @@ const updateRegistrationSchema = z.object({
   answers: z
     .array(
       z.object({
-        questionUuid: z.string().uuid(),
+        questionUuid: z.uuid(),
         answer: z.union([
           z.string(),
           z.array(z.string()),
@@ -192,7 +192,7 @@ export default defineEventHandler(async (event) => {
     ...existingRegistration.registrationData,
     ...(body.roleUuid !== undefined ? { roleUuid: body.roleUuid } : {}),
     ...(body.teamName !== undefined
-      ? { teamName: body.teamName || undefined }
+      ? { teamName: normalizeTeamName(body.teamName) || undefined }
       : {}),
     ...(body.answers !== undefined ? { questions: body.answers } : {}),
   };

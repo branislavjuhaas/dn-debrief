@@ -31,6 +31,7 @@ const overlay = useOverlay();
 
 const UBadge = resolveComponent("UBadge");
 const UButton = resolveComponent("UButton");
+const UUser = resolveComponent("UButton");
 
 // Fetch registrations and event
 const { data, refresh, status } = await useFetch<{
@@ -329,30 +330,19 @@ const columns = computed<TableColumn<any>[]>(() => {
         const name = reg.user?.name || reg.collectedDetails?.name || "Neznáme";
         const surname =
           reg.user?.surname || reg.collectedDetails?.surname || "";
-        const email = reg.user?.email || reg.collectedDetails?.email || "—";
-        const isUser = Boolean(reg.userId);
 
-        return h("div", { class: "flex items-center gap-2" }, [
-          h("div", { class: "flex flex-col" }, [
-            h("div", { class: "flex items-center gap-1.5" }, [
-              h(
-                "span",
-                { class: "font-semibold text-highlighted" },
-                `${name} ${surname}`,
-              ),
-              h(
-                UBadge,
-                {
-                  size: "xs",
-                  variant: "subtle",
-                  color: isUser ? "primary" : "neutral",
-                },
-                () => (isUser ? "Používateľ" : "Hosť"),
-              ),
-            ]),
-            h("span", { class: "text-xs text-muted" }, email),
-          ]),
-        ]);
+        return h(UUser, {
+          name: `${name} ${surname}`,
+          avatar: {
+            src: reg.image ?? undefined,
+            alt: `${name} ${surname}`,
+          },
+          ui: {
+            name: `font-medium text-sm ${reg.user?.id ? "text-primary" : "text-muted"}`,
+          },
+          to: reg.user?.id ? `/users/${row.original.user.id}` : undefined,
+          size: "xs",
+        });
       },
     },
     {
@@ -366,7 +356,6 @@ const columns = computed<TableColumn<any>[]>(() => {
           {
             color: "info",
             variant: "subtle",
-            size: "sm",
           },
           () => role?.name || "Neznáma",
         );
@@ -379,13 +368,9 @@ const columns = computed<TableColumn<any>[]>(() => {
         const reg = row.original;
         const team = reg.registrationData?.teamName;
         if (!team) {
-          return h("span", { class: "text-muted text-xs" }, "—");
+          return h("span", { class: "text-muted" }, "—");
         }
-        return h(
-          "span",
-          { class: "font-medium text-highlighted text-xs" },
-          team,
-        );
+        return h("span", { class: "font-medium text-highlighted" }, team);
       },
     },
   ];
@@ -403,16 +388,15 @@ const columns = computed<TableColumn<any>[]>(() => {
         found.answer === undefined ||
         found.answer === ""
       ) {
-        return h("span", { class: "text-muted text-xs italic" }, "—");
+        return h("span", { class: "text-muted italic" }, "—");
       }
       if (Array.isArray(found.answer)) {
-        return h("span", { class: "text-xs" }, found.answer.join(", "));
+        return h("span", found.answer.join(", "));
       }
       if (typeof found.answer === "boolean") {
         return h(
           UBadge,
           {
-            size: "xs",
             variant: "subtle",
             color: found.answer ? "success" : "neutral",
           },
@@ -421,7 +405,7 @@ const columns = computed<TableColumn<any>[]>(() => {
       }
       return h(
         "span",
-        { class: "text-xs max-w-xs truncate block" },
+        { class: "max-w-xs truncate block" },
         String(found.answer),
       );
     },
@@ -436,7 +420,6 @@ const columns = computed<TableColumn<any>[]>(() => {
         return h(
           UBadge,
           {
-            size: "sm",
             variant: "subtle",
             color: conf ? "success" : "warning",
           },
@@ -456,13 +439,13 @@ const columns = computed<TableColumn<any>[]>(() => {
           if (reg.payment.status === "paid") {
             return h(
               UBadge,
-              { color: "success", variant: "subtle", size: "sm" },
+              { color: "success", variant: "subtle" },
               () => `Zaplatené (${reg.payment.amount / 100} €)`,
             );
           }
           return h(
             UBadge,
-            { color: "warning", variant: "subtle", size: "sm" },
+            { color: "warning", variant: "subtle" },
             () => `Čaká na úhradu (${reg.payment.amount / 100} €)`,
           );
         }
@@ -470,14 +453,14 @@ const columns = computed<TableColumn<any>[]>(() => {
         if (fee > 0) {
           return h(
             UBadge,
-            { color: "warning", variant: "subtle", size: "sm" },
+            { color: "warning", variant: "subtle" },
             () => `Nezaplatené (${fee} €)`,
           );
         }
 
         return h(
           UBadge,
-          { color: "neutral", variant: "subtle", size: "sm" },
+          { color: "neutral", variant: "subtle" },
           () => "Bez poplatku",
         );
       },
@@ -532,7 +515,7 @@ const columns = computed<TableColumn<any>[]>(() => {
 
         <UDashboardToolbar
           class="flex flex-col sm:flex-row items-center justify-between gap-4 max-sm:py-4">
-          <div class="flex items-center gap-4 text-sm text-muted">
+          <div class="flex items-center gap-4 text-muted">
             <UButton
               :to="`/manage/events/${slug}/edit`"
               icon="i-ph-arrow-left"
@@ -601,8 +584,7 @@ const columns = computed<TableColumn<any>[]>(() => {
         <div v-if="activeRegistration" class="space-y-6">
           <!-- Role, Team & Confirmation -->
           <div class="space-y-4">
-            <h4
-              class="text-xs font-semibold uppercase text-muted tracking-wider">
+            <h4 class="font-semibold uppercase text-muted tracking-wider">
               Základné nastavenie registrácie
             </h4>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -635,8 +617,7 @@ const columns = computed<TableColumn<any>[]>(() => {
 
           <!-- Participant Info Edit Fields -->
           <div class="space-y-4">
-            <h4
-              class="text-xs font-semibold uppercase text-muted tracking-wider">
+            <h4 class="font-semibold uppercase text-muted tracking-wider">
               Osobné a kontaktné údaje účastníka
             </h4>
 
@@ -714,8 +695,7 @@ const columns = computed<TableColumn<any>[]>(() => {
 
           <!-- Dynamic Question Answers Edit Fields -->
           <div class="space-y-4">
-            <h4
-              class="text-xs font-semibold uppercase text-muted tracking-wider">
+            <h4 class="font-semibold uppercase text-muted tracking-wider">
               Odpovede na otázky z formulára
             </h4>
 

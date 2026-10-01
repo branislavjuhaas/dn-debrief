@@ -117,7 +117,7 @@ defineRouteMeta({
 });
 
 const bodySchema = z.object({
-  roleUuid: z.string().uuid(),
+  roleUuid: z.uuid(),
   teamName: z.string().trim().max(100).optional(),
   guestDetails: z
     .object({
@@ -134,7 +134,7 @@ const bodySchema = z.object({
   answers: z
     .array(
       z.object({
-        questionUuid: z.string().uuid(),
+        questionUuid: z.uuid(),
         answer: z.union([
           z.string(),
           z.array(z.string()),
@@ -368,7 +368,7 @@ export default defineEventHandler(async (event) => {
       userId: user ? user.id : null,
       registrationData: {
         roleUuid: role.uuid,
-        teamName: body.teamName,
+        teamName: normalizeTeamName(body.teamName),
         questions: body.answers,
       },
       collectedDetails,
