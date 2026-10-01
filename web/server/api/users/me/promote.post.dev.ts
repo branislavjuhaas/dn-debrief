@@ -39,7 +39,7 @@ defineRouteMeta({
         description: "The updated user",
         content: {
           "application/json": {
-            schema: {
+            schema: defineSchema({
               type: "object",
               properties: {
                 user: {
@@ -50,7 +50,7 @@ defineRouteMeta({
                   },
                 },
               },
-            },
+            }),
           },
         },
       },

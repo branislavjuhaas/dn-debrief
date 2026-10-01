@@ -46,7 +46,7 @@ defineRouteMeta({
         description: "Search results",
         content: {
           "application/json": {
-            schema: {
+            schema: defineSchema({
               type: "object",
               properties: {
                 users: {
@@ -92,7 +92,7 @@ defineRouteMeta({
                   },
                 },
               },
-            },
+            }),
           },
         },
       },

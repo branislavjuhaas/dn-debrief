@@ -19,7 +19,7 @@ defineRouteMeta({
         description: "The user's club memberships",
         content: {
           "application/json": {
-            schema: {
+            schema: defineSchema({
               type: "object",
               properties: {
                 memberships: {
@@ -46,7 +46,7 @@ defineRouteMeta({
                 },
               },
               required: ["memberships"],
-            },
+            }),
           },
         },
       },

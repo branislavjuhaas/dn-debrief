@@ -12,7 +12,7 @@ defineRouteMeta({
         description: "Payments with statistics",
         content: {
           "application/json": {
-            schema: {
+            schema: defineSchema({
               type: "object",
               properties: {
                 stats: {
@@ -46,8 +46,8 @@ defineRouteMeta({
                   },
                 },
               },
-              required: ["stats", ""],
-            },
+              required: ["stats", "payments"],
+            }),
           },
         },
       },

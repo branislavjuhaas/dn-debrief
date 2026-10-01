@@ -19,7 +19,7 @@ defineRouteMeta({
         description: "The requested payment",
         content: {
           "application/json": {
-            schema: {
+            schema: defineSchema({
               type: "object",
               properties: {
                 payment: {
@@ -50,7 +50,7 @@ defineRouteMeta({
                 },
               },
               required: ["payment"],
-            },
+            }),
           },
         },
       },
