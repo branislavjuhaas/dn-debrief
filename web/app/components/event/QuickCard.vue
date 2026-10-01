@@ -38,7 +38,13 @@ const formatter = new Intl.DateTimeFormat("sk-SK", {
         icon="i-ph-warning-octagon-fill"
         label="Deadline"
         :value="
-          formatter.format(new Date(event.registrationConfig.deadline))
+          formatter.format(
+            new Date(
+              event.registrationConfig.deadline ??
+                event.registrationConfig.softDeadline ??
+                event.beginning,
+            ),
+          )
         " />
       <span class="flex flex-row gap-2">
         <ProfileDetail
