@@ -77,6 +77,14 @@ const formState = computed(() => ({
 
 <template>
   <UForm ref="formRef" :schema="schema" :state="formState" class="space-y-4">
+    <UAlert
+      icon="i-ph-warning"
+      color="warning"
+      title="Externý zber registračných údajov"
+      description="Prevádzkovanie registrácie mimo platformy je vhodné len pre špeciálne prípady a neumožňuje prístup k integráciám a platbám."
+      variant="subtle"
+      class="mb-4" />
+
     <UFormField
       name="href"
       label="Registračný formulár"
@@ -87,7 +95,7 @@ const formState = computed(() => ({
         v-model="model.href"
         type="url"
         placeholder="https://forms.gle/..."
-        class="w-full lg:max-w-xl font-mono text-sm" />
+        class="w-full lg:min-w-xl font-mono text-sm" />
     </UFormField>
 
     <UFormField
@@ -104,8 +112,7 @@ const formState = computed(() => ({
 
     <UFormField
       name="cost"
-      label="Registračný poplatok"
-      hint="(v EUR)"
+      label="Registračný poplatok (€)"
       description="Základný účastnícky poplatok za osobu alebo tím"
       orientation="horizontal"
       required>
