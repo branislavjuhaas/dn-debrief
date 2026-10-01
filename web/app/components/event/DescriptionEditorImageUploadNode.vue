@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import type { NodeViewProps } from "@tiptap/vue-3";
-import { NodeViewWrapper } from "@tiptap/vue-3";
+import { NodeViewWrapper, nodeViewProps } from "@tiptap/vue-3";
 
-const props = defineProps<NodeViewProps>();
+const props = defineProps(nodeViewProps);
 
 const file = ref<File | null>(null);
 const loading = ref(false);
