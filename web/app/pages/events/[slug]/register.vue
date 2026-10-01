@@ -656,7 +656,7 @@ useSeoMeta({
               variant="subtle"
               icon="i-ph-user"
               title="Registrácia bez prihlásenia"
-              description="Pre dokončenie registrácie, prosím, uveďte požadované osobné a kontaktné údaje.">
+              description="Na toto podujatie sa môžete registrovať aj bez vytvoreného účtu. Odporúčame však prihlásenie, aby ste mali prístup k vašim registráciám a platbám.">
               <template #actions>
                 <UButton
                   :to="`/auth?redirect=/events/${slug}/register`"

@@ -138,25 +138,16 @@ const registrationError = computed<string | null>(() => {
     <UPageBody>
       <UAlert
         v-if="existingRegistration"
-        color="info"
+        color="success"
         variant="subtle"
         icon="i-ph-check-circle"
-        title="Už ste zaregistrovaný na toto podujatie"
+        title="Tešíme sa na vašu účasť!"
         :description="`Vaša registrácia bola zaznamenaná (${
           existingRegistration.registrationData?.teamName
             ? 'Tím: ' + existingRegistration.registrationData.teamName
             : 'Individuálna účasť'
         }).`"
-        class="mb-6">
-        <template #actions>
-          <UButton
-            to="/profile"
-            size="xs"
-            color="neutral"
-            variant="subtle"
-            label="Zobraziť v profile" />
-        </template>
-      </UAlert>
+        class="mb-4" />
 
       <EventQuickCard :event="event!" />
       <Markdown :value="event!.description" :plugins="plugins" />

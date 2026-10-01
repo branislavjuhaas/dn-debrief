@@ -293,13 +293,15 @@ export default defineEventHandler(async (event) => {
 
   const buffer = await workbook.xlsx.writeBuffer();
 
-  const safeSlug = eventRecord.slug.replace(/[^a-zA-Z0-9-_]/g, "_");
+  const safeSlug = eventRecord.slug
+    .replace(/[^a-zA-Z0-9-_]/g, "_")
+    .toUpperCase();
   const dateStr = new Date().toISOString().slice(0, 10);
 
   setHeader(
     event,
     "Content-Disposition",
-    `attachment; filename="Export_Registracie_${safeSlug}_${dateStr}.xlsx"`,
+    `attachment; filename="Export_DN_DebRIEF_${safeSlug}_${dateStr}.xlsx"`,
   );
   setHeader(
     event,
