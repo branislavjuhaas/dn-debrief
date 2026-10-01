@@ -2,17 +2,6 @@
 import type { Event } from "#shared/types/event";
 import { LazyModalThumbnailCropper } from "#components";
 import z from "zod";
-import {
-  EVENT_TYPES,
-  EVENT_TYPE_OPTIONS,
-  LEAGUES,
-  LEAGUE_OPTIONS,
-  REGIONS,
-  REGION_OPTIONS,
-  getScheduleBounds,
-  formatScheduleBounds,
-  slugify,
-} from "#shared/utils/events";
 
 const props = withDefaults(
   defineProps<{
@@ -32,19 +21,6 @@ const model = defineModel<Partial<Event>>({
 
 const sideForm = useTemplateRef("sideForm");
 const mainForm = useTemplateRef("mainForm");
-
-// Auto-generate slug when name changes, unless user manually touched slug
-const isSlugManuallyEdited = ref(props.mode === "edit");
-
-const onNameInput = () => {
-  if (!isSlugManuallyEdited.value && props.mode === "create") {
-    model.value.slug = slugify(model.value.name ?? "");
-  }
-};
-
-const onSlugInput = () => {
-  isSlugManuallyEdited.value = true;
-};
 
 const validate = async () => {
   if (!sideForm.value || !mainForm.value) return false;
@@ -174,8 +150,7 @@ const removeThumbnail = () => {
             <UInput
               v-model="model.name"
               placeholder="Zadajte názov podujatia"
-              class="w-full"
-              @input="onNameInput" />
+              class="w-full" />
           </UFormField>
 
           <UFormField
@@ -188,8 +163,7 @@ const removeThumbnail = () => {
               v-model="model.slug"
               :disabled="mode === 'edit'"
               placeholder="napr. dnju-open-2026"
-              class="w-full font-mono text-sm"
-              @input="onSlugInput" />
+              class="w-full font-mono text-sm" />
           </UFormField>
         </div>
 

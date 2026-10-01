@@ -304,19 +304,6 @@ export const formatScheduleBounds = (bounds: ScheduleBounds): string | null => {
 };
 
 /**
- * Generates an URL-friendly slug from text.
- */
-export const slugify = (text: string): string => {
-  return text
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-};
-
-/**
  * Factory for creating fresh default event state.
  */
 export const createDefaultEvent = (currentUserId?: number): Partial<Event> => {
