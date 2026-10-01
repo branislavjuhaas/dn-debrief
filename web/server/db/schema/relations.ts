@@ -163,6 +163,7 @@ export const relations = defineRelations(
       user: r.one.users({
         from: r.eventRegistrations.userId,
         to: r.users.id,
+        optional: true,
       }),
       payment: r.one.payments({
         from: r.eventRegistrations.paymentId,

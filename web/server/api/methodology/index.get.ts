@@ -40,7 +40,7 @@ defineRouteMeta({
                   },
                 },
               },
-            },
+            } as const,
           },
         },
       },

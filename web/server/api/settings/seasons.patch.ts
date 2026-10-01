@@ -33,12 +33,12 @@ defineRouteMeta({
               properties: {
                 seasons: {
                   type: "array",
-                  items: { type: "number" },
+                  items: { type: "integer" },
                   example: [2026, 2027],
                 },
               },
               required: ["seasons"],
-            },
+            } as const,
           },
         },
       },

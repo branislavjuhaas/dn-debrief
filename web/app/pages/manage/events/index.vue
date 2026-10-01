@@ -114,14 +114,24 @@ const columns: TableColumn<EventItem>[] = [
     header: "Akcie",
     cell: ({ row }) => {
       const slug = row.original.slug;
-      return h(UButton, {
-        to: `/manage/events/${slug}/edit`,
-        icon: "i-ph-pencil-simple",
-        color: "primary",
-        variant: "subtle",
-        size: "xs",
-        label: "Upraviť",
-      });
+      return h("div", { class: "flex items-center gap-1.5" }, [
+        h(UButton, {
+          to: `/manage/events/${slug}/registrations`,
+          icon: "i-ph-users",
+          color: "neutral",
+          variant: "subtle",
+          size: "xs",
+          label: "Registrácie",
+        }),
+        h(UButton, {
+          to: `/manage/events/${slug}/edit`,
+          icon: "i-ph-pencil-simple",
+          color: "primary",
+          variant: "subtle",
+          size: "xs",
+          label: "Upraviť",
+        }),
+      ]);
     },
   },
 ];

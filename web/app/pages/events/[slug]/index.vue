@@ -33,7 +33,28 @@ const { data: userData } = await useFetch(`/api/users/me`, {
   key: `users-me`,
 });
 
+const { data: userRegistrationsData } = await useFetch<{
+  registrations: any[];
+}>(`/api/users/me/registrations`, {
+  key: `my-registrations-${slug}`,
+  enabled: computed(() => Boolean(userData.value?.user)),
+});
+
+const existingRegistration = computed(() => {
+  if (!userData.value?.user) return null;
+  return userRegistrationsData.value?.registrations?.find(
+    (r: any) => r.eventId === event.value?.id,
+  );
+});
+
 const headerLinks = computed<ButtonProps[]>(() => [
+  {
+    label: "Registrácie",
+    to: `/manage/events/${slug}/registrations`,
+    color: "neutral",
+    variant: "subtle",
+    icon: "i-ph-users-four",
+  },
   {
     label: "Upraviť podujatie",
     to: `/manage/events/${slug}/edit`,
@@ -114,6 +135,28 @@ const registrationError = computed<string | null>(() => {
           : []
       " />
     <UPageBody>
+      <UAlert
+        v-if="existingRegistration"
+        color="info"
+        variant="subtle"
+        icon="i-ph-check-circle"
+        title="Už ste zaregistrovaný na toto podujatie"
+        :description="`Vaša registrácia bola zaznamenaná (${
+          existingRegistration.registrationData?.teamName
+            ? 'Tím: ' + existingRegistration.registrationData.teamName
+            : 'Individuálna účasť'
+        }).`"
+        class="mb-6">
+        <template #actions>
+          <UButton
+            to="/profile"
+            size="xs"
+            color="neutral"
+            variant="subtle"
+            label="Zobraziť v profile" />
+        </template>
+      </UAlert>
+
       <EventQuickCard :event="event!" />
       <Markdown :value="event!.description" :plugins="plugins" />
       <USeparator />
@@ -186,10 +229,16 @@ const registrationError = computed<string | null>(() => {
           </template>
         </UModal>
         <UButton
-          :to="registrationTarget"
+          :to="existingRegistration ? undefined : registrationTarget"
           :target="isExternal ? '_blank' : undefined"
-          :disabled="!!registrationError || !registrationTarget"
-          label="Registrovať sa na podujatie"
+          :disabled="
+            !!registrationError || !registrationTarget || !!existingRegistration
+          "
+          :label="
+            existingRegistration
+              ? 'Už ste zaregistrovaný'
+              : 'Registrovať sa na podujatie'
+          "
           icon="i-ph-ticket" />
       </div>
     </UPageBody>

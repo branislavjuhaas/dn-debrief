@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import type { Event } from "#shared/types/event";
+import type {
+  Event,
+  ExternalRegistrationConfig,
+  PlatformRegistrationConfig,
+} from "#shared/types/event";
 import {
   isPlatformRegistration,
   isExternalRegistration,
-  type ExternalRegistrationConfig,
-  type PlatformRegistrationConfig,
 } from "#shared/utils/events";
 
 const model = defineModel<Partial<Event>>({

@@ -6,7 +6,7 @@ import {
   parseAbsoluteToLocal,
   toCalendarDateTime,
 } from "@internationalized/date";
-import type { ExternalRegistrationConfig } from "#shared/utils/events";
+import type { ExternalRegistrationConfig } from "#shared/types/event";
 
 const model = defineModel<ExternalRegistrationConfig>({
   default: () => ({

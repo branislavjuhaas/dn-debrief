@@ -11,11 +11,11 @@ import type {
   RegistrationSection,
   RegistrationQuestion,
   RegistrationRule,
+  PlatformRegistrationConfig,
 } from "#shared/types/event";
 import {
   COLLECTED_DETAILS_OPTIONS,
   ROLE_CONDITION_QUESTION_UUID,
-  type PlatformRegistrationConfig,
 } from "#shared/utils/events";
 
 const model = defineModel<PlatformRegistrationConfig>({
@@ -31,6 +31,7 @@ const model = defineModel<PlatformRegistrationConfig>({
           cost: 0,
           roleType: "contestant",
           credentialRequirements: "none",
+          hasTeamVariant: false,
         },
         {
           uuid: adjudicatorRoleUuid,
@@ -38,6 +39,7 @@ const model = defineModel<PlatformRegistrationConfig>({
           cost: 0,
           roleType: "adjudicator",
           credentialRequirements: "adjudicator",
+          hasTeamVariant: false,
         },
       ],
       requireAccount: true,
@@ -146,6 +148,7 @@ const addRole = () => {
     cost: 0,
     roleType: "other",
     credentialRequirements: "none",
+    hasTeamVariant: false,
   });
 
   const firstSection = activeSections.value[0];
@@ -495,7 +498,7 @@ const getConditionSourcesForSection = (sectionUuid: string) => {
   ];
 
   for (const [idx, s] of activeSections.value.entries()) {
-    if (s.uuid === sectionUuid) continue;
+    if (s.uuid === sectionUuid) break;
     const activeQuestions = s.questions.filter((q) => !q.deleted);
     for (const q of activeQuestions) {
       sources.push({
@@ -666,6 +669,7 @@ const validate = async () => {
   }
 
   // Validate questions and cleanup options
+  const seenQuestionUuids = new Set<string>();
   for (const s of sections) {
     const activeQuestions = s.questions.filter((q) => !q.deleted);
     for (const q of activeQuestions) {
@@ -689,14 +693,13 @@ const validate = async () => {
       }
     }
 
-    // Validate section conditions
+    // Validate section conditions (must strictly depend on prior questions or role)
     if (s.visibleWhen) {
       s.visibleWhen = s.visibleWhen.filter((rule) => {
         if (rule.questionUuid === ROLE_CONDITION_QUESTION_UUID) {
           return roles.length > 0;
         }
-        const q = findQuestion(rule.questionUuid);
-        return q && !q.deleted;
+        return seenQuestionUuids.has(rule.questionUuid);
       });
 
       for (const rule of s.visibleWhen) {
@@ -713,6 +716,10 @@ const validate = async () => {
       if (s.visibleWhen.length === 0) {
         delete s.visibleWhen;
       }
+    }
+
+    for (const q of activeQuestions) {
+      seenQuestionUuids.add(q.uuid);
     }
   }
 
@@ -859,9 +866,9 @@ const questionTypeOptions = [
             </div>
           </div>
 
-          <!-- Starting Section per Role & Hard Deadline -->
+          <!-- Starting Section per Role & Hard Deadline & Team Variant -->
           <div
-            class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-3 border-t border-default/40">
+            class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-3 border-t border-default/40">
             <UFormField
               label="Počiatočná sekcia"
               description="Sekcia, od ktorej účastník s touto rolou začne registračný formulár">
@@ -885,6 +892,13 @@ const questionTypeOptions = [
                   (val) => (role.hardDeadline = fromCalendarDateTimeValue(val))
                 " />
             </UFormField>
+
+            <div class="flex items-center pt-2 md:pt-6">
+              <USwitch
+                v-model="role.hasTeamVariant"
+                label="Tímová rola"
+                description="Umožňuje registráciu v tíme" />
+            </div>
           </div>
         </UCard>
       </div>
