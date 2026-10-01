@@ -517,14 +517,13 @@ const columns = computed<TableColumn<any>[]>(() => {
           class="flex flex-col sm:flex-row items-center justify-between gap-4 max-sm:py-4">
           <div class="flex items-center gap-4 text-muted">
             <UButton
-              :to="`/manage/events/${slug}/edit`"
-              icon="i-ph-arrow-left"
+              :to="`/events/${slug}`"
+              icon="i-ph-ticket"
               color="neutral"
               variant="subtle"
-              size="xs"
-              label="Späť na úpravu podujatia" />
+              label="Detail podujatia" />
             <span>
-              Celkovo registrácií:
+              Počet registrácií:
               <span class="font-bold text-highlighted">
                 {{ registrations.length }}
               </span>
@@ -533,7 +532,7 @@ const columns = computed<TableColumn<any>[]>(() => {
 
           <div class="flex items-center gap-2">
             <UButton
-              label="Exportovať do Excelu"
+              label="Exportovať registrácie"
               :to="`/api/events/${slug}/registrations/export`"
               download
               target="_blank"

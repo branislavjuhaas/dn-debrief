@@ -228,7 +228,7 @@ const registrationError = computed<string | null>(() => {
           "
           :label="
             existingRegistration
-              ? 'Už ste zaregistrovaný'
+              ? 'Už ste zaregistrovaný/-á'
               : 'Registrovať sa na podujatie'
           "
           icon="i-ph-ticket" />
