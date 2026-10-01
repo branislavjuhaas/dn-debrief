@@ -162,7 +162,7 @@ const removeThumbnail = () => {
             <UInput
               v-model="model.slug"
               :disabled="mode === 'edit'"
-              placeholder="napr. dnju-open-2026"
+              placeholder="napr. sc271"
               class="w-full font-mono text-sm" />
           </UFormField>
         </div>
