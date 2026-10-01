@@ -92,7 +92,7 @@ services:
 
   # --- RustFS Provisioner & Permissions Sidecar ---
   rustfs-init:
-    image: rustfs/cli:latest
+    image: rustfs/rc:latest
     container_name: debrief-rustfs-init
     networks:
       - dokploy-network
