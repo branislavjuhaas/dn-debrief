@@ -82,7 +82,7 @@ const tabItems = computed<TabsItem[]>(() => [
   },
   {
     label: "Registrácie na podujatia",
-    disabled: true,
+    slot: "registrations",
   },
   {
     label: "Platby",
@@ -420,6 +420,9 @@ watch(
           <div v-else class="text-center text-sm text-muted">
             Používateľ/-ka nemá žiadne historické ani aktuálne členstvá v SDA.
           </div>
+        </template>
+        <template #registrations>
+          <ProfileRegistrations :user-id="userId" />
         </template>
         <template #payments>
           <ProfilePayments

@@ -53,7 +53,7 @@ const tabItems = ref<TabsItem[]>([
   },
   {
     label: "Registrácie na podujatia",
-    disabled: true,
+    slot: "registrations",
   },
   {
     label: "Platby",
@@ -315,6 +315,11 @@ const paymentColumns: TableColumn<Payment>[] = [
               item: 'flex-1 max-w-46 w-full',
             }"
             class="px-6 md:px-4" />
+        </template>
+        <template #registrations>
+          <ProfileRegistrations
+            v-if="userData?.user?.id"
+            :user-id="userData.user.id.toString()" />
         </template>
         <!-- TODO: Enable payments -->
         <template #payments>

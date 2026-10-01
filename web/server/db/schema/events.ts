@@ -92,6 +92,7 @@ export type RegistrationRole = {
   cost: number;
   credentialRequirements: "none" | "adjudicator" | "non-adjudicator";
   roleType: "contestant" | "adjudicator" | "other";
+  hasTeamVariant?: boolean;
   hardDeadline?: string; // ISO Date
   deleted?: boolean;
 };
@@ -125,6 +126,7 @@ export type RegistrationsConfig =
 
 export type RegistrationData = {
   roleUuid: UUID;
+  teamName?: string;
   questions: {
     questionUuid: UUID;
     answer: string | string[] | number | boolean | null;

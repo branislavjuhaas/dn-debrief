@@ -1,10 +1,14 @@
 import { z } from "zod";
 import type {
   Schedule,
-  RegistrationRole,
   RegistrationSection,
-} from "#server/db/schema/events";
-import type { Event, EventType, League, Region } from "#shared/types/event";
+  Event,
+  EventType,
+  League,
+  Region,
+  ExternalRegistrationConfig,
+  PlatformRegistrationConfig,
+} from "#shared/types/event";
 
 export const EVENT_TYPES = ["tournament", "workshop", "other"] as const;
 export const LEAGUES = ["junior", "senior", "university"] as const;
@@ -112,6 +116,7 @@ export const registrationRoleSchema = z.object({
   cost: z.number().min(0),
   credentialRequirements: z.enum(["none", "adjudicator", "non-adjudicator"]),
   roleType: z.enum(["contestant", "adjudicator", "other"]),
+  hasTeamVariant: z.boolean().default(false),
   hardDeadline: z.union([z.iso.datetime(), z.iso.date()]).optional(),
   deleted: z.boolean().optional(),
 });
@@ -123,29 +128,57 @@ export const externalRegistrationConfigSchema = z.object({
   requireMembership: z.boolean(),
 });
 
-export const platformRegistrationConfigSchema = z.object({
-  roles: z.array(registrationRoleSchema),
-  requireAccount: z.boolean(),
-  requireMembership: z.boolean(),
-  softDeadline: z.union([z.iso.datetime(), z.iso.date()]).optional(),
-  collectedDetails: z.array(
-    z.enum([
-      "name",
-      "surname",
-      "email",
-      "phone",
-      "birthDate",
-      "street",
-      "postalCode",
-      "town",
-    ]),
-  ),
-  sections: z.array(registrationSectionSchema),
-  conditionalStartSections: z
-    .array(z.object({ roleUuid: z.uuid(), sectionUuid: z.uuid() }))
-    .optional(),
-  fallbackStartSection: z.uuid(),
-});
+export const platformRegistrationConfigSchema = z
+  .object({
+    roles: z.array(registrationRoleSchema),
+    requireAccount: z.boolean(),
+    requireMembership: z.boolean(),
+    softDeadline: z.union([z.iso.datetime(), z.iso.date()]).optional(),
+    collectedDetails: z.array(
+      z.enum([
+        "name",
+        "surname",
+        "email",
+        "phone",
+        "birthDate",
+        "street",
+        "postalCode",
+        "town",
+      ]),
+    ),
+    sections: z.array(registrationSectionSchema),
+    conditionalStartSections: z
+      .array(z.object({ roleUuid: z.uuid(), sectionUuid: z.uuid() }))
+      .optional(),
+    fallbackStartSection: z.uuid(),
+  })
+  .superRefine((config, ctx) => {
+    const activeSections = config.sections.filter((s) => !s.deleted);
+    const seenQuestionUuids = new Set<string>();
+
+    for (let i = 0; i < activeSections.length; i++) {
+      const section = activeSections[i]!;
+      if (section.visibleWhen && section.visibleWhen.length > 0) {
+        for (const rule of section.visibleWhen) {
+          if (rule.questionUuid === ROLE_CONDITION_QUESTION_UUID) {
+            continue;
+          }
+          if (!seenQuestionUuids.has(rule.questionUuid)) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `Podmienka v sekcii "${section.title}" sa odkazuje na otázku, ktorá sa nenachádza v predchádzajúcich sekciách.`,
+              path: ["sections", i, "visibleWhen"],
+            });
+          }
+        }
+      }
+
+      const activeQuestions = section.questions.filter((q) => !q.deleted);
+      for (const q of activeQuestions) {
+        seenQuestionUuids.add(q.uuid);
+      }
+    }
+  });
 
 export const registrationConfigSchema = z.union([
   externalRegistrationConfigSchema,
@@ -176,30 +209,6 @@ export const insertEventSchema = eventSchema.extend({
 export const updateEventSchema = eventSchema.partial().extend({
   organizers: z.array(z.number()).optional(),
 });
-
-export type ExternalRegistrationConfig = z.infer<
-  typeof externalRegistrationConfigSchema
->;
-
-export type PlatformRegistrationConfig = {
-  roles: RegistrationRole[];
-  requireAccount: boolean;
-  requireMembership: boolean;
-  softDeadline?: string;
-  collectedDetails: (
-    | "name"
-    | "surname"
-    | "email"
-    | "phone"
-    | "birthDate"
-    | "street"
-    | "postalCode"
-    | "town"
-  )[];
-  sections: RegistrationSection[];
-  conditionalStartSections?: { roleUuid: string; sectionUuid: string }[];
-  fallbackStartSection: string;
-};
 
 export const isExternalRegistration = (
   config: unknown,
@@ -346,4 +355,72 @@ export const createDefaultEvent = (currentUserId?: number): Partial<Event> => {
     },
     organizers: currentUserId ? [{ id: currentUserId }] : [],
   };
+};
+
+/**
+ * Dynamically evaluates section visibility rules based on assigned role and answers given in prior steps.
+ */
+export const isSectionVisible = (
+  section: RegistrationSection,
+  roleUuid: string,
+  answers: Record<string, any>,
+): boolean => {
+  if (!section.visibleWhen || section.visibleWhen.length === 0) {
+    return true;
+  }
+
+  return section.visibleWhen.every((rule) => {
+    const rawVal =
+      rule.questionUuid === ROLE_CONDITION_QUESTION_UUID
+        ? roleUuid
+        : answers[rule.questionUuid];
+
+    if (rawVal === undefined || rawVal === null) {
+      if (rule.operator === "not_equals") {
+        return (
+          rule.value !== null && rule.value !== undefined && rule.value !== ""
+        );
+      }
+      if (rule.operator === "not_in") {
+        return true;
+      }
+      return false;
+    }
+
+    switch (rule.operator) {
+      case "equals":
+        return String(rawVal) === String(rule.value);
+      case "not_equals":
+        return String(rawVal) !== String(rule.value);
+      case "in": {
+        const allowed = Array.isArray(rule.value)
+          ? rule.value.map(String)
+          : [String(rule.value)];
+        if (Array.isArray(rawVal)) {
+          return rawVal.some((v) => allowed.includes(String(v)));
+        }
+        return allowed.includes(String(rawVal));
+      }
+      case "not_in": {
+        const disallowed = Array.isArray(rule.value)
+          ? rule.value.map(String)
+          : [String(rule.value)];
+        if (Array.isArray(rawVal)) {
+          return !rawVal.some((v) => disallowed.includes(String(v)));
+        }
+        return !disallowed.includes(String(rawVal));
+      }
+      default:
+        return true;
+    }
+  });
+};
+
+export const normalizeTeamName = (rawString?: string | null): string => {
+  if (!rawString) return "";
+  return rawString
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9]/g, "")
+    .toUpperCase();
 };

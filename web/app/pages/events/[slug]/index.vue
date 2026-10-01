@@ -33,7 +33,29 @@ const { data: userData } = await useFetch(`/api/users/me`, {
   key: `users-me`,
 });
 
+const { data: userRegistrationsData } = await useFetch(
+  `/api/users/${userData.value?.user?.id}/registrations`,
+  {
+    key: `my-registrations-${slug}`,
+    enabled: computed(() => Boolean(userData.value?.user)),
+  },
+);
+
+const existingRegistration = computed(() => {
+  if (!userData.value?.user) return null;
+  return userRegistrationsData.value?.registrations?.find(
+    (r: any) => r.eventId === event.value?.id,
+  );
+});
+
 const headerLinks = computed<ButtonProps[]>(() => [
+  {
+    label: "Registrácie",
+    to: `/manage/events/${slug}/registrations`,
+    color: "neutral",
+    variant: "subtle",
+    icon: "i-ph-users-four",
+  },
   {
     label: "Upraviť podujatie",
     to: `/manage/events/${slug}/edit`,
@@ -114,6 +136,19 @@ const registrationError = computed<string | null>(() => {
           : []
       " />
     <UPageBody>
+      <UAlert
+        v-if="existingRegistration"
+        color="success"
+        variant="subtle"
+        icon="i-ph-check-circle"
+        title="Tešíme sa na vašu účasť!"
+        :description="`Vaša registrácia bola zaznamenaná (${
+          existingRegistration.registrationData?.teamName
+            ? 'Tím: ' + existingRegistration.registrationData.teamName
+            : 'Individuálna účasť'
+        }).`"
+        class="mb-4" />
+
       <EventQuickCard :event="event!" />
       <Markdown :value="event!.description" :plugins="plugins" />
       <USeparator />
@@ -186,10 +221,16 @@ const registrationError = computed<string | null>(() => {
           </template>
         </UModal>
         <UButton
-          :to="registrationTarget"
+          :to="existingRegistration ? undefined : registrationTarget"
           :target="isExternal ? '_blank' : undefined"
-          :disabled="!!registrationError || !registrationTarget"
-          label="Registrovať sa na podujatie"
+          :disabled="
+            !!registrationError || !registrationTarget || !!existingRegistration
+          "
+          :label="
+            existingRegistration
+              ? 'Už ste zaregistrovaný/-á'
+              : 'Registrovať sa na podujatie'
+          "
           icon="i-ph-ticket" />
       </div>
     </UPageBody>
