@@ -123,7 +123,7 @@ const columns: TableColumn<MethodologyRow>[] = [
               "NuxtLink",
               {
                 to: `/users/${author.id}`,
-                class: "font-medium text-default hover:text-highlighted",
+                class: "font-medium text-primary",
               },
               fullName,
             ),
