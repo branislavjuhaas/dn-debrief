@@ -1,10 +1,11 @@
+import path from "node:path";
 import { z } from "zod";
 
 defineRouteMeta({
   openAPI: {
     tags: ["Events"],
     summary: "Upload event file",
-    description: "Generate a presigned upload URL for an event image file.",
+    description: "Generate a presigned upload URL for an event file.",
     requestBody: {
       content: {
         "application/json": {
@@ -18,6 +19,10 @@ defineRouteMeta({
               fileExtension: {
                 type: "string",
                 example: "jpg",
+              },
+              filename: {
+                type: "string",
+                example: "document.pdf",
               },
             },
           },
@@ -86,6 +91,7 @@ defineRouteMeta({
 const bodySchema = z.object({
   contentType: z.string(),
   fileExtension: z.string(),
+  filename: z.string().optional(),
 });
 
 export default defineEventHandler(async (event) => {
@@ -100,7 +106,27 @@ export default defineEventHandler(async (event) => {
   const body = await readValidatedBody(event, bodySchema.parse);
 
   const guid = crypto.randomUUID();
-  const objectKey = `events/files/${user.id}-${guid}.${body.fileExtension}`;
+  let objectKey: string;
+
+  if (body.filename) {
+    const baseName = path.basename(body.filename);
+    const parsed = path.parse(baseName);
+    const safeBase =
+      parsed.name
+        .normalize("NFKD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-zA-Z0-9_-]+/g, "-")
+        .replace(/-+/g, "-")
+        .replace(/^-|-$/g, "") || "file";
+    const ext = (parsed.ext.replace(/^\./, "") || body.fileExtension).replace(
+      /^\./,
+      "",
+    );
+    objectKey = `events/files/${user.id}-${guid}-${safeBase}.${ext}`;
+  } else {
+    const ext = body.fileExtension.replace(/^\./, "");
+    objectKey = `events/files/${user.id}-${guid}.${ext}`;
+  }
 
   const uploadUrl = await getPresignedUploadUrl(objectKey, body.contentType);
 

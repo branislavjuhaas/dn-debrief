@@ -2,6 +2,7 @@
 import type { EditorCustomHandlers, EditorToolbarItem } from "@nuxt/ui";
 import type { Editor, JSONContent } from "@tiptap/vue-3";
 import { TextAlign } from "@tiptap/extension-text-align";
+import { FileUpload } from "./DescriptionEditorFileUploadExtension";
 import { ImageUpload } from "./DescriptionEditorImageUploadExtension";
 import EditorLinkPopover from "./DescriptionEditorLinkPopover.vue";
 
@@ -14,6 +15,14 @@ const customHandlers = {
     execute: (editor: Editor) =>
       editor.chain().focus().insertContent({ type: "imageUpload" }),
     isActive: (editor: Editor) => editor.isActive("imageUpload"),
+    isDisabled: undefined,
+  },
+  fileUpload: {
+    canExecute: (editor: Editor) =>
+      editor.can().insertContent({ type: "fileUpload" }),
+    execute: (editor: Editor) =>
+      editor.chain().focus().insertContent({ type: "fileUpload" }),
+    isActive: (editor: Editor) => editor.isActive("fileUpload"),
     isDisabled: undefined,
   },
 } satisfies EditorCustomHandlers;
@@ -126,6 +135,11 @@ const fixedToolbarItems = [
       icon: "i-ph-image",
       tooltip: { text: "Obrázok" },
     },
+    {
+      kind: "fileUpload",
+      icon: "i-ph-file",
+      tooltip: { text: "Súbor" },
+    },
   ],
   [
     {
@@ -235,6 +249,7 @@ const imageToolbarItems = (editor: Editor): EditorToolbarItem[][] => {
     :extensions="[
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
       ImageUpload,
+      FileUpload,
     ]"
     :handlers="customHandlers"
     placeholder="Začnite písať popis podujatia"
