@@ -20,18 +20,24 @@ const aws = new AwsClient({
 export const getPresignedUploadUrl = async (
   key: string,
   contentType: string = "application/octet-stream",
+  contentLength?: number,
 ) => {
   if (import.meta.dev || import.meta.test) {
     return `${process.env.BETTER_AUTH_URL}/api/storage/upload?key=${encodeURIComponent(key)}&contentType=${encodeURIComponent(contentType)}`;
   }
 
   const objectUrl = `${process.env.S3_PUBLIC_ENDPOINT}/debrief/${key}?X-Amz-Expires=3600`;
+  const headers: Record<string, string> = {
+    "Content-Type": contentType,
+  };
+  if (contentLength !== undefined) {
+    headers["Content-Length"] = String(contentLength);
+  }
+
   const signedRequest = await aws.sign(
     new Request(objectUrl, {
       method: "PUT",
-      headers: {
-        "Content-Type": contentType,
-      },
+      headers,
     }),
     { aws: { signQuery: true } },
   );

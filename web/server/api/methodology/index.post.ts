@@ -1,7 +1,10 @@
+import path from "node:path";
 import { db } from "#server/db";
 import { methodologyFiles } from "#server/db/schema/methodology";
 import { getPresignedUploadUrl } from "#server/utils/storage";
 import * as z from "zod";
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
 defineRouteMeta({
   openAPI: {
@@ -24,6 +27,16 @@ defineRouteMeta({
                 type: "string",
                 description: "Content type of the file to upload",
                 example: "application/pdf",
+              },
+              size: {
+                type: "integer",
+                description: "File size in bytes (max 10MB)",
+                maximum: 10485760,
+              },
+              filename: {
+                type: "string",
+                description: "Original filename",
+                example: "document.pdf",
               },
             },
             required: ["name"],
@@ -55,6 +68,14 @@ defineRouteMeta({
           },
         },
       },
+      400: {
+        description: "Validation error",
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/Error" },
+          },
+        },
+      },
       401: {
         description: "Unauthorized",
         content: {
@@ -76,13 +97,20 @@ defineRouteMeta({
 });
 
 const bodySchema = z.object({
-  name: z.string().trim().min(1, "Name is required").max(255),
+  name: z.string().trim().min(1, "Názov je povinný").max(255),
   contentType: z.string().optional().default("application/octet-stream"),
+  size: z
+    .number()
+    .int("Veľkosť súboru musí byť celé číslo")
+    .positive("Veľkosť súboru musí byť kladné číslo")
+    .max(MAX_FILE_SIZE, "Súbor nesmie presiahnuť 10MB")
+    .optional(),
+  filename: z.string().optional(),
 });
 
 export default defineEventHandler(async (event) => {
   const user = await requireUser(event, ["developer", "admin"]);
-  const { name, contentType } = await readValidatedBody(
+  const { name, contentType, size, filename } = await readValidatedBody(
     event,
     bodySchema.parse,
   );
@@ -95,12 +123,21 @@ export default defineEventHandler(async (event) => {
       .replace(/-+/g, "-")
       .replace(/^-|-$/g, "") || "file";
 
-  const extension =
-    contentType
-      .split("/")
-      .pop()
-      ?.replace(/[^a-zA-Z0-9]+/g, "") || null;
-  const objectKey = `methodology/${Date.now()}-${safeName}${extension ? `.${extension}` : ""}`;
+  let extension = "";
+  if (filename) {
+    const parsed = path.parse(filename);
+    extension = parsed.ext.replace(/^\./, "");
+  }
+  if (!extension && contentType && contentType !== "application/octet-stream") {
+    extension =
+      contentType
+        .split("/")
+        .pop()
+        ?.replace(/[^a-zA-Z0-9]+/g, "") || "";
+  }
+
+  const guid = crypto.randomUUID().slice(0, 8);
+  const objectKey = `methodology/${Date.now()}-${guid}-${safeName}${extension ? `.${extension}` : ""}`;
 
   const createdFiles = await db
     .insert(methodologyFiles)
@@ -114,7 +151,7 @@ export default defineEventHandler(async (event) => {
 
   const createdFile = createdFiles[0];
 
-  const uploadUrl = await getPresignedUploadUrl(objectKey, contentType);
+  const uploadUrl = await getPresignedUploadUrl(objectKey, contentType, size);
 
   return {
     uploadUrl,
