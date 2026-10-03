@@ -76,7 +76,7 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
-    "/manage/**": { appLayout: "manage" },
+    "/manage/**": { appLayout: "manage", ssr: false },
   },
 
   motionV: {

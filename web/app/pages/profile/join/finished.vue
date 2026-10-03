@@ -1,4 +1,8 @@
 <script setup lang="ts">
+definePageMeta({
+  middleware: ["auth"],
+});
+
 const route = useRoute();
 const pending = route.query.pending === "true";
 const verified = route.query.verified === "true";

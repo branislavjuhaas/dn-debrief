@@ -25,6 +25,12 @@ defineRouteMeta({
                   type: "string",
                   example: "avatars/1.jpg",
                 },
+                publicUrl: {
+                  type: "string",
+                  format: "uri",
+                  example:
+                    "http://localhost:3000/api/storage/files/avatars/1.jpg",
+                },
               },
             },
           },
@@ -67,5 +73,6 @@ export default defineEventHandler(async (event) => {
   return {
     uploadUrl,
     key: objectKey,
+    publicUrl: avatarUrl,
   };
 });

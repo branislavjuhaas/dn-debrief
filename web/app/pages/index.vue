@@ -2,6 +2,12 @@
 import { motion } from "motion-v";
 import type { User } from "#shared/types/user";
 
+useSeoMeta({
+  title: "Domov",
+  description:
+    "Prehľad najblížsich podujatí, noviniek a informácií z prostredia Slovenskej debatnej asociácie.",
+});
+
 const { data: userFetch } = await useFetch("/api/users/me", {
   key: "users-me",
 });

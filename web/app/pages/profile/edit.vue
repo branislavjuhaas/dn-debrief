@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { CalendarDate, parseDate } from "@internationalized/date";
 import type { ButtonProps, FormSubmitEvent } from "@nuxt/ui";
+import { LazyModalAvatarCropper } from "#components";
 import { differenceInYears } from "date-fns";
 import { motion } from "motion-v";
 import type { User } from "#shared/types/user";
@@ -32,6 +33,65 @@ const currentPasswordInput = useTemplateRef("currentPasswordInput");
 
 // PROFILE FEATURE
 const updatingProfile = ref(false);
+const toast = useToast();
+const overlay = useOverlay();
+const uploadingAvatar = ref(false);
+const avatarTimestamp = ref(Date.now());
+
+const userAvatarUrl = computed(() => {
+  const img = userData.value?.user?.image;
+  if (!img) return null;
+  const separator = img.includes("?") ? "&" : "?";
+  return `${img}${separator}t=${avatarTimestamp.value}`;
+});
+
+const uploadAvatar = async (file: File | null | undefined) => {
+  if (!file) return;
+
+  const modal = overlay.create(LazyModalAvatarCropper);
+  const instance = modal.open({
+    file,
+  });
+
+  const result = await instance.result;
+  if (!result) return;
+
+  uploadingAvatar.value = true;
+  try {
+    const data = await $fetch("/api/users/me/avatar/upload", {
+      method: "POST",
+    });
+
+    if (!data?.uploadUrl) return;
+
+    await fetch(data.uploadUrl, {
+      method: "PUT",
+      headers: {
+        "Content-Type": result.type,
+      },
+      body: result,
+    });
+
+    if (userData.value?.user && data.publicUrl) {
+      userData.value.user.image = data.publicUrl;
+    }
+    avatarTimestamp.value = Date.now();
+    await refreshNuxtData("users-me");
+
+    toast.add({
+      title: "Profilová fotka bola úspešne zmenená",
+      color: "success",
+    });
+  } catch {
+    toast.add({
+      title: "Nastala chyba",
+      description: "Nepodarilo sa nahrať profilovú fotku",
+      color: "error",
+    });
+  } finally {
+    uploadingAvatar.value = false;
+  }
+};
 
 const profileState = reactive({
   firstName: userData?.value?.user?.name ?? "",
@@ -375,32 +435,40 @@ onMounted(() => {
         </div>
       </div>
 
-      <span
-        class="relative mx-auto inline-flex items-center justify-center shrink-0 select-none rounded-full align-middle bg-elevated size-40 text-6xl"
-        aria-hidden="true">
+      <div
+        class="relative mx-auto inline-flex items-center justify-center shrink-0 rounded-full align-middle bg-elevated size-40 text-6xl">
         <NuxtImg
-          v-if="userData?.user?.image"
-          :src="userData?.user?.image ?? undefined"
-          alt=""
+          v-if="userAvatarUrl"
+          :src="userAvatarUrl"
+          alt="Profilová fotka"
           width="160"
           height="160"
           class="h-full w-full rounded-[inherit] object-cover" />
 
-        <span v-else class="font-medium truncate">
+        <span v-else class="font-medium truncate select-none">
           {{
             (userData?.user?.name?.charAt(0) ?? "") +
             (userData?.user?.surname?.charAt(0) ?? "")
           }}
         </span>
 
-        <UButton
-          label="Zmeniť"
-          size="xs"
-          color="info"
-          icon="i-ph-pencil-simple-line"
-          disabled
-          class="absolute bottom-4 right-0 text-white font-medium ring-2 ring-bg overflow-hidden hover:bg-info-400 active:bg-info-400 dark:hover:bg-info-500 dark:active:bg-info-500" />
-      </span>
+        <UFileUpload
+          v-slot="{ open }"
+          :preview="false"
+          :reset="true"
+          accept="image/*"
+          class="absolute bottom-4 right-0"
+          @update:model-value="uploadAvatar">
+          <UButton
+            label="Zmeniť"
+            size="xs"
+            color="info"
+            icon="i-ph-pencil-simple-line"
+            :loading="uploadingAvatar"
+            class="text-white font-medium ring-2 ring-bg overflow-hidden hover:bg-info-400 active:bg-info-400 dark:hover:bg-info-500 dark:active:bg-info-500"
+            @click="open()" />
+        </UFileUpload>
+      </div>
     </UPageBody>
   </UPage>
 </template>
