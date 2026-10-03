@@ -20,6 +20,10 @@ const footerLinks: FooterColumn[] = [
     label: "Užitočné odkazy",
     children: [
       {
+        label: "Metodika a materiály",
+        to: "/methodology",
+      },
+      {
         label: "Slovenská debatná asociácia",
         to: "https://sda.sk/",
         target: "_blank",

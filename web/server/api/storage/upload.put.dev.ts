@@ -78,8 +78,22 @@ const querySchema = z.object({
   key: z.string().nonempty("Missing key"),
 });
 
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
 export default defineEventHandler(async (event) => {
   const { key } = await getValidatedQuery(event, querySchema.parse);
+
+  const contentLengthHeader = getHeader(event, "content-length");
+  if (contentLengthHeader) {
+    const contentLength = Number.parseInt(contentLengthHeader, 10);
+    if (!Number.isNaN(contentLength) && contentLength > MAX_FILE_SIZE) {
+      throw createError({
+        statusCode: 413,
+        statusMessage: "Payload Too Large",
+        message: "Súbor nesmie presiahnuť 10MB",
+      });
+    }
+  }
 
   const body = await readRawBody(event, false);
   if (!body)
@@ -88,6 +102,14 @@ export default defineEventHandler(async (event) => {
       statusMessage: "No File Body",
       message: "Missing file body",
     });
+
+  if (body.length > MAX_FILE_SIZE) {
+    throw createError({
+      statusCode: 413,
+      statusMessage: "Payload Too Large",
+      message: "Súbor nesmie presiahnuť 10MB",
+    });
+  }
 
   // Compute local disk path
   const filePath = path.join(process.cwd(), ".data/uploads", key);

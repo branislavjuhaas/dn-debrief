@@ -67,7 +67,7 @@ const managementViews: (PageCardProps & { roles: UserRole[] })[] = [
     icon: "i-ph-newspaper-clipping-bold",
     to: "/manage/content",
     description:
-      "Knižnica dynamicky zadaného obsahu zobrazeného na domovskej stránke platformy DebRIEF.",
+      "Prehľad a správa metodických materiálov, pravidiel a dokumentov pre používateľov platformy DebRIEF.",
     roles: ["developer", "admin"],
   },
   {

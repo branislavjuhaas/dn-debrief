@@ -35,6 +35,7 @@ watch(file, async (newFile) => {
     body: {
       contentType: newFile.type,
       fileExtension: newFile.name.split(".").pop(),
+      filename: newFile.name,
     },
   });
 

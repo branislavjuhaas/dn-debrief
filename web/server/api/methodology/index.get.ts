@@ -68,6 +68,7 @@ export default defineEventHandler(async (event) => {
   await requireUser(event);
 
   const filesData = await db.query.methodologyFiles.findMany({
+    orderBy: (files, { desc }) => [desc(files.createdAt)],
     with: {
       author: {
         columns: {
@@ -80,13 +81,11 @@ export default defineEventHandler(async (event) => {
     },
   });
 
-  // Bind public URL to each file for non-external files
   const filesWithPublicUrl = filesData.map((file) => {
-    if (!file.isExternal) {
-      const publicUrl = getPublicFileUrl(file.fileUrl);
-      return { ...file, publicUrl };
-    }
-    return file;
+    const publicUrl = file.isExternal
+      ? file.fileUrl
+      : getPublicFileUrl(file.fileUrl);
+    return { ...file, publicUrl };
   });
 
   return { files: filesWithPublicUrl };
