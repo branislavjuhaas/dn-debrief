@@ -6,17 +6,17 @@ The Nuxt web platform for [DN DebRIEF](../README.md) — a debate platform for t
 
 ## Tech Stack
 
-| Layer | Technology |
-| --- | --- |
-| Framework | [Nuxt 4](https://nuxt.com) + Vue 3 (`<script setup lang="ts">`) |
-| UI | [Nuxt UI v4](https://ui.nuxt.com), Tailwind CSS v4, Motion V, Phosphor icons |
-| Backend | [Nitro](https://nitro.build) server routes with runtime OpenAPI generation |
-| Database | PostgreSQL 18 via [Drizzle ORM](https://orm.drizzle.team); embedded [PGlite](https://pglite.dev) in development |
-| Auth | [Better-Auth](https://better-auth.com) — email/password, Google, GitHub, admin plugin |
-| Storage | S3-compatible object storage ([RustFS](https://rustfs.com)) with presigned URLs; local files in development |
-| Email | AWS SES; logged to the console in development |
-| Payments | [Stripe](https://stripe.com) Checkout and webhooks |
-| Toolchain | [Vite+](https://viteplus.dev) (`vp`), TypeScript, Golar, pnpm |
+| Layer     | Technology                                                                                                      |
+| --------- | --------------------------------------------------------------------------------------------------------------- |
+| Framework | [Nuxt 4](https://nuxt.com) + Vue 3 (`<script setup lang="ts">`)                                                 |
+| UI        | [Nuxt UI v4](https://ui.nuxt.com), Tailwind CSS v4, Motion V, Phosphor icons                                    |
+| Backend   | [Nitro](https://nitro.build) server routes with runtime OpenAPI generation                                      |
+| Database  | PostgreSQL 18 via [Drizzle ORM](https://orm.drizzle.team); embedded [PGlite](https://pglite.dev) in development |
+| Auth      | [Better-Auth](https://better-auth.com) — email/password, Google, GitHub, admin plugin                           |
+| Storage   | S3-compatible object storage ([RustFS](https://rustfs.com)) with presigned URLs; local files in development     |
+| Email     | AWS SES; logged to the console in development                                                                   |
+| Payments  | [Stripe](https://stripe.com) Checkout and webhooks                                                              |
+| Toolchain | [Vite+](https://viteplus.dev) (`vp`), TypeScript, Golar, pnpm                                                   |
 
 ## Features
 
@@ -74,18 +74,18 @@ Useful dev-only endpoints:
 
 Create a `.env` file (gitignored). Only some variables are needed locally:
 
-| Variable | Needed in | Notes |
-| --- | --- | --- |
-| `BETTER_AUTH_SECRET` | Production | Session signing secret. Generate with `openssl rand -hex 32`. |
-| `BETTER_AUTH_URL` | Development | Public base URL, e.g. `http://localhost:3000`. Used for auth callbacks, email links, and local storage URLs. |
-| `DATABASE_URL` | Production | PostgreSQL connection string. Ignored in development, which uses embedded PGlite. |
-| `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET` | Optional | GitHub OAuth provider. |
-| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Optional | Google OAuth provider. |
-| `S3_PUBLIC_ENDPOINT` | Production | Public S3 endpoint used to build presigned upload/download URLs and public file links. |
-| `S3_ACCESS_KEY_ID` / `S3_SECRET_ACCESS_KEY` | Production | S3 credentials. |
-| `AWS_REGION`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_FROM_EMAIL`, `AWS_FROM_NAME` | Production | AWS SES sender configuration. In development emails are logged to the console. |
-| `STRIPE_SECRET_KEY` | Payments | Stripe API key. |
-| `STRIPE_WEBHOOK_SECRET` | Payments | Stripe webhook signature secret. |
+| Variable                                                                                      | Needed in   | Notes                                                                                                        |
+| --------------------------------------------------------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------ |
+| `BETTER_AUTH_SECRET`                                                                          | Production  | Session signing secret. Generate with `openssl rand -hex 32`.                                                |
+| `BETTER_AUTH_URL`                                                                             | Development | Public base URL, e.g. `http://localhost:3000`. Used for auth callbacks, email links, and local storage URLs. |
+| `DATABASE_URL`                                                                                | Production  | PostgreSQL connection string. Ignored in development, which uses embedded PGlite.                            |
+| `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET`                                                   | Optional    | GitHub OAuth provider.                                                                                       |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET`                                                   | Optional    | Google OAuth provider.                                                                                       |
+| `S3_PUBLIC_ENDPOINT`                                                                          | Production  | Public S3 endpoint used to build presigned upload/download URLs and public file links.                       |
+| `S3_ACCESS_KEY_ID` / `S3_SECRET_ACCESS_KEY`                                                   | Production  | S3 credentials.                                                                                              |
+| `AWS_REGION`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_FROM_EMAIL`, `AWS_FROM_NAME` | Production  | AWS SES sender configuration. In development emails are logged to the console.                               |
+| `STRIPE_SECRET_KEY`                                                                           | Payments    | Stripe API key.                                                                                              |
+| `STRIPE_WEBHOOK_SECRET`                                                                       | Payments    | Stripe webhook signature secret.                                                                             |
 
 ### Database Changes
 
@@ -95,15 +95,15 @@ Create a `.env` file (gitignored). Only some variables are needed locally:
 
 ### Scripts
 
-| Command | Description |
-| --- | --- |
-| `vp run dev` | Start the Nuxt development server |
-| `vp run build` | Build for production (output in `.output/`) |
-| `vp run preview` | Preview the production build |
-| `vp run check` | Run Vite+ lint/format checks and the Nuxt type check |
-| `vp run check:fix` | Auto-fix linting and formatting, then type-check |
-| `vp run db:generate` | Generate a Drizzle migration from schema changes |
-| `vp run db:migrate` | Apply pending database migrations |
+| Command              | Description                                          |
+| -------------------- | ---------------------------------------------------- |
+| `vp run dev`         | Start the Nuxt development server                    |
+| `vp run build`       | Build for production (output in `.output/`)          |
+| `vp run preview`     | Preview the production build                         |
+| `vp run check`       | Run Vite+ lint/format checks and the Nuxt type check |
+| `vp run check:fix`   | Auto-fix linting and formatting, then type-check     |
+| `vp run db:generate` | Generate a Drizzle migration from schema changes     |
+| `vp run db:migrate`  | Apply pending database migrations                    |
 
 ## Project Structure
 
@@ -140,14 +140,14 @@ Conventions:
 
 ## Roles
 
-| Role | Scope |
-| --- | --- |
-| `user` | Default member account. |
-| `organizer` / `junior_organizer` | Create and manage events. |
-| `motion_committee_member` | Event management. |
-| `chief_adjudicator` | Event and user management. |
-| `admin` | Platform administration: users, clubs, events, content, and payments. |
-| `developer` | Full access, including managing admins and impersonation. |
+| Role                             | Scope                                                                 |
+| -------------------------------- | --------------------------------------------------------------------- |
+| `user`                           | Default member account.                                               |
+| `organizer` / `junior_organizer` | Create and manage events.                                             |
+| `motion_committee_member`        | Event management.                                                     |
+| `chief_adjudicator`              | Event and user management.                                            |
+| `admin`                          | Platform administration: users, clubs, events, content, and payments. |
+| `developer`                      | Full access, including managing admins and impersonation.             |
 
 ## API Documentation
 
