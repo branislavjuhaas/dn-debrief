@@ -29,6 +29,19 @@ if (!eventData.value?.event) {
 
 const event = computed(() => eventData.value?.event);
 
+useSeoMeta({
+  title: () => event.value?.name ?? "Podujatie",
+  description: () => {
+    const plain = event.value?.description
+      ?.replace(/[#*_>`[\]()]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+    return plain
+      ? plain.slice(0, 160)
+      : "Podrobnosti a informácie o podujatí Slovenskej debatnej asociácie.";
+  },
+});
+
 const { data: userData } = await useFetch(`/api/users/me`, {
   key: `users-me`,
 });

@@ -1,4 +1,10 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+useSeoMeta({
+  title: "Podmienky používania",
+  description:
+    "Podmienky používania platformy DebRIEF Slovenskej debatnej asociácie.",
+});
+</script>
 
 <template>
   <UPage>

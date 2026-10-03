@@ -6,6 +6,12 @@ definePageMeta({
   layout: "content",
 });
 
+useSeoMeta({
+  title: "O platforme",
+  description:
+    "Zoznámte sa s platformou DebRIEF II – modernou debatnou platformou pre správu komunity Slovenskej debatnej asociácie.",
+});
+
 // Hero
 
 const heroLinks = ref<ButtonProps[]>([
