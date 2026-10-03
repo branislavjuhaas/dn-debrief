@@ -29,19 +29,9 @@ const navItems = computed<DropdownMenuItem[][]>(() => {
         to: "/profile",
       },
       {
-        label: "Moje platby",
-        icon: "i-ph-coins",
-        disabled: true,
-      },
-      {
-        label: "Moje registrácie",
-        icon: "i-ph-books",
-        disabled: true,
-      },
-      {
-        label: "Moje výsledky",
-        icon: "i-ph-scroll",
-        disabled: true,
+        label: "Metodika",
+        icon: "i-ph-newspaper",
+        to: "/methodology",
       },
     ],
     ...(user && (user.role !== "user" || (user.managedClubs?.length ?? 0) > 0)
