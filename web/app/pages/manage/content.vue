@@ -25,6 +25,7 @@ const { data: methodologyData } =
 const UButton = resolveComponent("UButton");
 const UUser = resolveComponent("UUser");
 const UIcon = resolveComponent("UIcon");
+const UBadge = resolveComponent("UBadge");
 const overlay = useOverlay();
 const toast = useToast();
 
@@ -37,7 +38,9 @@ const deleteMethodologyFile = async (file: MethodologyFile) => {
   const modal = overlay.create(LazyModalConfirm);
   const instance = modal.open({
     title: "Vymazať metodický materiál",
-    description: `Naozaj chcete vymazať súbor "${file.name}"? Táto akcia je nevratná.`,
+    description: file.isExternal
+      ? `Naozaj chcete vymazať odkaz na materiál "${file.name}"?`
+      : `Naozaj chcete vymazať súbor "${file.name}"? Táto akcia je nevratná.`,
     color: "error",
   });
 
@@ -56,7 +59,7 @@ const deleteMethodologyFile = async (file: MethodologyFile) => {
       async onResponse({ response }) {
         if (response.ok) {
           toast.add({
-            title: `Súbor "${file.name}" bol úspešne vymazaný`,
+            title: `Materiál "${file.name}" bol úspešne vymazaný`,
             color: "success",
           });
           await refreshNuxtData("methodology-files");
@@ -111,6 +114,7 @@ const columns: TableColumn<MethodologyRow>[] = [
     },
     cell: ({ row }) => {
       const url = row.original.publicUrl || row.original.fileUrl;
+      const isExternal = row.original.isExternal;
       return h(
         "a",
         {
@@ -118,11 +122,11 @@ const columns: TableColumn<MethodologyRow>[] = [
           target: "_blank",
           rel: "noopener noreferrer",
           class:
-            "font-medium text-primary hover:underline flex items-center gap-1.5",
+            "font-medium text-primary hover:underline flex items-center gap-1.5 flex-wrap",
         },
         [
           h(UIcon, {
-            name: "i-ph-file-text",
+            name: isExternal ? "i-ph-link" : "i-ph-file-text",
             class: "size-4 text-muted shrink-0",
           }),
           h(
@@ -130,6 +134,13 @@ const columns: TableColumn<MethodologyRow>[] = [
             { class: "truncate max-w-xs md:max-w-md" },
             row.original.name,
           ),
+          isExternal
+            ? h(
+                UBadge,
+                { variant: "subtle", color: "info", size: "xs" },
+                () => "Odkaz",
+              )
+            : null,
         ],
       );
     },

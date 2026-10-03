@@ -49,6 +49,7 @@ const filteredFiles = computed(() => {
 const UButton = resolveComponent("UButton");
 const UUser = resolveComponent("UUser");
 const UIcon = resolveComponent("UIcon");
+const UBadge = resolveComponent("UBadge");
 type MethodologyRow = NonNullable<
   typeof methodologyData.value
 >["files"][number];
@@ -74,6 +75,7 @@ const columns: TableColumn<MethodologyRow>[] = [
     },
     cell: ({ row }) => {
       const url = row.original.publicUrl || row.original.fileUrl;
+      const isExternal = row.original.isExternal;
       return h(
         "a",
         {
@@ -81,14 +83,21 @@ const columns: TableColumn<MethodologyRow>[] = [
           target: "_blank",
           rel: "noopener noreferrer",
           class:
-            "font-medium text-primary hover:underline flex items-center gap-2",
+            "font-medium text-primary hover:underline flex items-center gap-2 flex-wrap",
         },
         [
           h(UIcon, {
-            name: "i-ph-file-text",
+            name: isExternal ? "i-ph-link" : "i-ph-file-text",
             class: "size-5 text-muted shrink-0",
           }),
           h("span", { class: "font-semibold" }, row.original.name),
+          isExternal
+            ? h(
+                UBadge,
+                { variant: "subtle", color: "info", size: "xs" },
+                () => "Externý odkaz",
+              )
+            : null,
         ],
       );
     },
@@ -161,15 +170,16 @@ const columns: TableColumn<MethodologyRow>[] = [
     },
     cell: ({ row }) => {
       const url = row.original.publicUrl || row.original.fileUrl;
+      const isExternal = row.original.isExternal;
       return h(UButton, {
-        icon: "i-ph-download-simple",
-        label: "Stiahnuť",
+        icon: isExternal ? "i-ph-arrow-square-out" : "i-ph-download-simple",
+        label: isExternal ? "Otvoriť" : "Stiahnuť",
         color: "neutral",
         variant: "subtle",
         size: "xs",
         to: url,
         target: "_blank",
-        download: true,
+        download: !isExternal,
       });
     },
   },
