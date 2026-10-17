@@ -321,7 +321,6 @@ const paymentColumns: TableColumn<Payment>[] = [
             v-if="userData?.user?.id"
             :user-id="userData.user.id.toString()" />
         </template>
-        <!-- TODO: Enable payments -->
         <template #payments>
           <UAlert
             v-if="debt && debt > 0"
@@ -339,21 +338,13 @@ const paymentColumns: TableColumn<Payment>[] = [
                 trailingIcon: 'i-ph-credit-card',
                 loading: paying,
                 onClick: payDebt,
-                disabled: true,
-                class: 'hidden',
               },
             ]"
             class="mb-4">
-            <!-- <template #description>
-              Momentálne máte nezaplatené platby vo výške
-              <b>{{ formatCurrency(debt) }}</b
-              >. Prosím, uhradiť ich čo najskôr.
-            </template> -->
             <template #description>
               Momentálne máte nezaplatené platby vo výške
               <b>{{ formatCurrency(debt) }}</b
-              >. O možnosti ich úhrady vás budeme informovať po spustení
-              platobnej brány.
+              >. Prosím, uhradiť ich čo najskôr.
             </template>
           </UAlert>
           <UTable

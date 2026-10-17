@@ -18,7 +18,7 @@ defineRouteMeta({
       required: true,
       content: {
         "application/json": {
-          schema: {
+          schema: defineSchema({
             type: "object",
             properties: {
               paymentIds: {
@@ -31,7 +31,7 @@ defineRouteMeta({
               },
             },
             required: ["paymentIds"],
-          },
+          }),
         },
       },
     },
