@@ -148,14 +148,9 @@ const pay = async () => {
           icon="i-ph-info"
           variant="subtle"
           title="Požadovaná platba registračného poplatku">
-          <!-- TODO: Enable payments -->
-          <!-- <template #description>
-            Pre úspešné dokončenie registrácie je potrebné uhradiť poplatok vo výške <b>{{ payment.amount / 100 }} €</b>.
-          </template> -->
           <template #description>
-            Za registráciu vám bol účtovaný poplatok vo výške
-            <b>{{ payment.amount / 100 }} €</b>. O možnosti jeho úhrady vás
-            budeme informovať po spustení platobnej brány.
+            Pre úspešné dokončenie registrácie je potrebné uhradiť poplatok vo
+            výške <b>{{ payment.amount / 100 }} €</b>.
           </template>
         </UAlert>
 
@@ -171,9 +166,7 @@ const pay = async () => {
         <!-- Action buttons -->
         <div class="flex flex-col sm:flex-row items-stretch gap-3 mt-4">
           <template v-if="payment && payment.status !== 'paid' && !paid">
-            <!-- TODO: Enable payments -->
             <UButton
-              v-if="false"
               color="primary"
               :loading="paying"
               icon="i-ph-credit-card"

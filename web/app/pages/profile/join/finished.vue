@@ -105,22 +105,15 @@ const pay = async () => {
           icon="i-ph-info"
           variant="subtle"
           title="Požadovaná platba členského poplatku">
-          <!-- TODO: Enable payments -->
-          <!-- <template #description>
+          <template #description>
             Pre úspešné dokončenie registrácie je potrebné uhradiť členský
             poplatok vo výške <b>{{ paymentData.payment.amount / 100 }}€</b>.
-          </template> -->
-          <template #description>
-            Za registráciu vám bol účtovaný poplatok vo výške
-            <b>{{ paymentData.payment.amount / 100 }}€</b>. O možnosti jeho
-            úhrady vás budeme informovať po spustení platobnej brány.
           </template>
         </UAlert>
         <div class="flex flex-row items-stretch gap-4">
           <template v-if="verified || pending || route.query.pay">
-            <!-- TODO: Enable payments -->
             <UButton
-              v-if="paymentData?.payment && false"
+              v-if="paymentData?.payment"
               @click="pay"
               color="primary"
               :loading="paying"
