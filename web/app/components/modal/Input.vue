@@ -27,6 +27,10 @@ const stringModel = computed({
     model.value = val as T;
   },
 });
+
+const handleConfirm = () => {
+  emit("close", model.value);
+};
 </script>
 
 <template>
@@ -60,7 +64,7 @@ const stringModel = computed({
           :label="confirmLabel"
           color="success"
           block
-          @click="emit('close', model.value)" />
+          @click="handleConfirm" />
       </div>
     </template>
   </UModal>
