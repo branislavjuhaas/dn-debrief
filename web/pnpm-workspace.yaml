@@ -13,10 +13,10 @@ minimumReleaseAgeExclude:
   - nuxt@4.6.2
 overrides:
   vite: "catalog:"
-  "@tiptap/core": "3.30.2"
-  "@tiptap/vue-3": "3.30.2"
-  "@tiptap/pm": "3.30.2"
-  "@nuxt/cli": alpha
+  "@tiptap/core": "3.32.0"
+  "@tiptap/extension-text-align": "3.32.0"
+  "@tiptap/vue-3": "3.32.0"
+  "@tiptap/pm": "3.32.0"
 peerDependencyRules:
   allowAny:
     - vite
