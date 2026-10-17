@@ -42,7 +42,7 @@
     "date-fns": "^4.4.0",
     "drizzle-orm": "1.0.0-rc.4",
     "motion-v": "^2.8.0",
-    "nuxt": "^4.6.1",
+    "nuxt": "^4.6.2",
     "postgres": "^3.4.9",
     "stripe": "^22.6.2",
     "tailwindcss": "^4.3.3",

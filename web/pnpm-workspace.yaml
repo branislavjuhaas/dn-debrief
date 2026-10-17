@@ -4,6 +4,13 @@ allowBuilds:
 catalog:
   vite: npm:@voidzero-dev/vite-plus-core@0.2.8
   vite-plus: 0.2.8
+minimumReleaseAgeExclude:
+  - '@nuxt/kit@4.6.2'
+  - '@nuxt/nitro-server@4.6.2'
+  - '@nuxt/schema@4.6.2'
+  - '@nuxt/vite-builder@4.6.2'
+  - '@nuxt/vite-server@4.6.2'
+  - nuxt@4.6.2
 overrides:
   vite: "catalog:"
   "@tiptap/core": "3.30.2"
