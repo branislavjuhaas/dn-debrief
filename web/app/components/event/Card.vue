@@ -12,7 +12,7 @@ const props = defineProps<{
     class="min-w-[calc(33.33%-0.66rem)] w-96 shrink-0 flex">
     <UCard
       class="event-card w-full shadow hover:bg-muted"
-      :ui="{ body: 'sm:p-0' }">
+      :ui="{ body: 'p-0 sm:p-0' }">
       <div class="aspect-7/3 w-full overflow-hidden">
         <NuxtImg
           :src="
