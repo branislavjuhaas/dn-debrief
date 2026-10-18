@@ -124,9 +124,8 @@ const columns: TableColumn<EventItem>[] = [
           variant: "subtle",
           size: "xs",
           label: "Registrácie",
-          disabled: !(
-            registrationConfig?.cost && registrationConfig?.softDeadline
-          ),
+          disabled:
+            registrationConfig?.cost && registrationConfig?.softDeadline,
         }),
         h(UButton, {
           to: `/manage/events/${slug}/edit`,

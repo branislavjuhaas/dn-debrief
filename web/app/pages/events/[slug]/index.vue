@@ -65,8 +65,10 @@ const headerLinks = computed<ButtonProps[]>(() => {
   const links: ButtonProps[] = [];
 
   if (
-    event.value?.registrationConfig?.cost &&
-    event.value?.registrationConfig?.softDeadline
+    !(
+      event.value?.registrationConfig?.cost &&
+      event.value?.registrationConfig?.softDeadline
+    )
   ) {
     links.push({
       label: "Registrácie",
