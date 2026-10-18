@@ -61,22 +61,32 @@ const existingRegistration = computed(() => {
   );
 });
 
-const headerLinks = computed<ButtonProps[]>(() => [
-  {
-    label: "Registrácie",
-    to: `/manage/events/${slug}/registrations`,
-    color: "neutral",
-    variant: "subtle",
-    icon: "i-ph-users-four",
-  },
-  {
+const headerLinks = computed<ButtonProps[]>(() => {
+  const links: ButtonProps[] = [];
+
+  if (
+    event.value?.registrationConfig?.cost &&
+    event.value?.registrationConfig?.softDeadline
+  ) {
+    links.push({
+      label: "Registrácie",
+      to: `/manage/events/${slug}/registrations`,
+      color: "neutral",
+      variant: "subtle",
+      icon: "i-ph-users-four",
+    });
+  }
+
+  links.push({
     label: "Upraviť podujatie",
     to: `/manage/events/${slug}/edit`,
     color: "primary",
     variant: "subtle",
     icon: "i-ph-pencil-simple",
-  },
-]);
+  });
+
+  return links;
+});
 
 const plugins = [
   security({
