@@ -7,12 +7,17 @@ const formatter = new Intl.DateTimeFormat("sk-SK", {
   dateStyle: "medium",
   timeStyle: "short",
 });
+
+const formatDeadline = (date: Date) => formatter.format(date);
 </script>
 
 <template>
   <UCard
-    :ui="{ body: 'p-0 sm:p-0 grid lg:grid-cols-[auto_1fr] h-41 items-center' }">
-    <div class="aspect-7/3 overflow-hidden h-full max-h-full!">
+    :ui="{
+      body: 'p-0 sm:p-0 grid lg:grid-cols-[auto_1fr] min-h-41 items-center',
+    }">
+    <div
+      class="aspect-7/3 overflow-hidden h-full max-h-42! mb-auto rounded-br-lg">
       <NuxtImg
         :src="
           props.event.thumbnailUrl ||
@@ -30,22 +35,6 @@ const formatter = new Intl.DateTimeFormat("sk-SK", {
         icon="i-ph-watch-fill"
         label="Kedy"
         :value="formatRange(new Date(event.beginning), new Date(event.end))" />
-      <ProfileDetail
-        icon="i-ph-coins-fill"
-        label="Koľko"
-        :value="`${event.registrationConfig.cost ?? 0}€`" />
-      <ProfileDetail
-        icon="i-ph-warning-octagon-fill"
-        label="Deadline"
-        :value="
-          formatter.format(
-            new Date(
-              event.registrationConfig.deadline ??
-                event.registrationConfig.softDeadline ??
-                event.beginning,
-            ),
-          )
-        " />
       <span class="flex flex-row gap-2">
         <ProfileDetail
           icon="i-ph-quotes-fill"
@@ -63,6 +52,56 @@ const formatter = new Intl.DateTimeFormat("sk-SK", {
             size="sm" />
         </NuxtLink>
       </span>
+      <template
+        v-if="
+          event.registrationConfig.cost && event.registrationConfig.softDeadline
+        ">
+        <ProfileDetail
+          icon="i-ph-coins-fill"
+          label="Koľko"
+          :value="`${event.registrationConfig.cost ?? 0}€`" />
+        <ProfileDetail
+          icon="i-ph-warning-octagon-fill"
+          label="Deadline"
+          :value="
+            formatDeadline(
+              new Date(
+                event.registrationConfig.deadline ??
+                  event.registrationConfig.softDeadline ??
+                  event.beginning,
+              ),
+            )
+          " />
+      </template>
+
+      <table v-else class="table-auto text-sm">
+        <tr>
+          <th>
+            <span class="space-x-2 text-sm items-center flex text-pretty">
+              <UIcon name="i-ph-users-fill" class="size-5 flex-none" />
+              <span>Účastnícke role</span>
+            </span>
+          </th>
+          <th class="text-left text-sm">Cena</th>
+          <th class="text-left text-sm">Deadline</th>
+        </tr>
+        <tr v-for="role in event.registrationConfig.roles">
+          <td class="pt-2.5">{{ role.name }}</td>
+          <td class="pt-2.5">{{ role.cost ?? 0 }}€</td>
+          <td class="pt-2.5">
+            {{
+              role.hardDeadline
+                ? formatDeadline(
+                    new Date(
+                      role.hardDeadline ??
+                        event.registrationConfig.softDeadline,
+                    ),
+                  )
+                : "—"
+            }}
+          </td>
+        </tr>
+      </table>
     </div>
   </UCard>
 </template>
