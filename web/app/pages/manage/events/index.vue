@@ -46,6 +46,7 @@ type EventItem = {
   beginning: string;
   end: string;
   thumbnailUrl?: string | null;
+  registrationConfig: any;
 };
 
 const formatDate = (iso: string) => {
@@ -114,6 +115,7 @@ const columns: TableColumn<EventItem>[] = [
     header: "Akcie",
     cell: ({ row }) => {
       const slug = row.original.slug;
+      const registrationConfig = row.original.registrationConfig;
       return h("div", { class: "flex items-center gap-1.5" }, [
         h(UButton, {
           to: `/manage/events/${slug}/registrations`,
@@ -122,6 +124,9 @@ const columns: TableColumn<EventItem>[] = [
           variant: "subtle",
           size: "xs",
           label: "Registrácie",
+          disabled: !(
+            registrationConfig?.cost && registrationConfig?.softDeadline
+          ),
         }),
         h(UButton, {
           to: `/manage/events/${slug}/edit`,
