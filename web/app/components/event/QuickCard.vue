@@ -17,7 +17,14 @@ const formatDeadline = (date: Date) => formatter.format(date);
       body: 'p-0 sm:p-0 grid lg:grid-cols-[auto_1fr] min-h-41 items-center',
     }">
     <div
-      class="aspect-7/3 overflow-hidden h-full max-h-42! mb-auto rounded-br-lg">
+      class="aspect-7/3 overflow-hidden h-full lg:max-h-42! mb-auto"
+      :class="
+        !(
+          event.registrationConfig.cost && event.registrationConfig.softDeadline
+        )
+          ? 'lg:rounded-br-lg'
+          : ''
+      ">
       <NuxtImg
         :src="
           props.event.thumbnailUrl ||
