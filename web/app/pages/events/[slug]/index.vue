@@ -203,7 +203,7 @@ const registrationError = computed<string | null>(() => {
           :description="registrationError"
           icon="i-ph-warning" />
       </template>
-      <div class="flex flex-row justify-end gap-4">
+      <div class="flex flex-col md:flex-row justify-end gap-4">
         <UModal title="Pravidlá registrácie a účasti na podujatiach">
           <UButton
             label="Pravidlá registrácie"
