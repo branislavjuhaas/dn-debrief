@@ -32,6 +32,7 @@ const overlay = useOverlay();
 const UBadge = resolveComponent("UBadge");
 const UButton = resolveComponent("UButton");
 const UUser = resolveComponent("UButton");
+const UTooltip = resolveComponent("UTooltip");
 
 // Fetch registrations and event
 const { data, refresh, status } = await useFetch<{
@@ -378,7 +379,24 @@ const columns = computed<TableColumn<any>[]>(() => {
   // Dynamic question columns for ALL questions in event sections
   const questionCols: TableColumn<any>[] = allQuestions.value.map((q) => ({
     accessorKey: `q_${q.uuid}`,
-    header: q.title || "Otázka",
+    header: () => {
+      const title = q.title || "Otázka";
+      return h(
+        UTooltip,
+        { text: title },
+        {
+          default: () =>
+            h(
+              "span",
+              {
+                class:
+                  "block w-36 max-w-36 line-clamp-2! whitespace-normal break-words cursor-help",
+              },
+              title,
+            ),
+        },
+      );
+    },
     cell: ({ row }) => {
       const qAnswers = row.original.registrationData?.questions ?? [];
       const found = qAnswers.find((a: any) => a.questionUuid === q.uuid);
