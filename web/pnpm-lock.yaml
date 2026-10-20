@@ -283,6 +283,9 @@ importers:
       drizzle-orm:
         specifier: 1.0.0-rc.4
         version: 1.0.0-rc.4(@electric-sql/pglite@0.5.10)(postgres@3.4.9)(zod@4.6.7)
+      h3:
+        specifier: ^1.15.11
+        version: 1.15.11
       motion-v:
         specifier: ^2.8.0
         version: 2.8.0(@vueuse/core@14.4.0(vue@3.5.44(typescript@7.0.2)))(vue@3.5.44(typescript@7.0.2))

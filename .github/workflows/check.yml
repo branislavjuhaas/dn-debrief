@@ -44,5 +44,5 @@ jobs:
       - name: Lint and Type check code (VP & Nuxt)
         run: vp run check
 
-      # - name: Run tests
-      #   run: vp test
+      - name: Run tests
+        run: vp run test
