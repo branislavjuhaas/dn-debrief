@@ -521,7 +521,7 @@ const columns = computed<TableColumn<any>[]>(() => {
 </script>
 
 <template>
-  <div class="w-full h-full">
+  <div class="min-w-0 flex-1 h-full">
     <UDashboardPanel id="registrations-panel">
       <template #header>
         <UDashboardNavbar
