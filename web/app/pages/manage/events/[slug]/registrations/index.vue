@@ -28,6 +28,7 @@ const route = useRoute();
 const slug = route.params.slug as string;
 const toast = useToast();
 const overlay = useOverlay();
+const isTabbycatImportOpen = ref(false);
 
 const UBadge = resolveComponent("UBadge");
 const UButton = resolveComponent("UButton");
@@ -532,15 +533,15 @@ const columns = computed<TableColumn<any>[]>(() => {
         </UDashboardNavbar>
 
         <UDashboardToolbar
-          class="flex flex-col sm:flex-row items-center justify-between gap-4 max-sm:py-4">
-          <div class="flex items-center gap-4 text-muted">
+          class="flex flex-col sm:flex-row flex-wrap items-center justify-between gap-4 py-4">
+          <div class="flex flex-wrap items-center gap-4 text-muted">
             <UButton
               :to="`/events/${slug}`"
               icon="i-ph-ticket"
               color="neutral"
               variant="subtle"
               label="Detail podujatia" />
-            <span>
+            <span class="whitespace-nowrap">
               Počet registrácií:
               <span class="font-bold text-highlighted">
                 {{ registrations.length }}
@@ -548,7 +549,14 @@ const columns = computed<TableColumn<any>[]>(() => {
             </span>
           </div>
 
-          <div class="flex items-center gap-2">
+          <div class="flex flex-wrap items-center gap-2">
+            <UButton
+              v-if="event && isPlatformRegistration(event.registrationConfig)"
+              label="Importovať do Tabbycatu"
+              color="neutral"
+              variant="subtle"
+              icon="i-ph-arrow-square-out"
+              @click="isTabbycatImportOpen = true" />
             <UButton
               label="Exportovať registrácie"
               :to="`/api/events/${slug}/registrations/export`"
@@ -592,6 +600,10 @@ const columns = computed<TableColumn<any>[]>(() => {
     </UDashboardPanel>
 
     <!-- Details and Comprehensive Edit Modal -->
+    <LazyEventTabbycatImport
+      v-if="isTabbycatImportOpen"
+      v-model:open="isTabbycatImportOpen"
+      :slug="slug" />
     <UModal
       v-model:open="isEditModalOpen"
       :title="`Úprava registrácie #${activeRegistration?.id ?? ''}`"
