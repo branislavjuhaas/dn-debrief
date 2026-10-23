@@ -106,6 +106,9 @@ export default defineEventHandler(async (event) => {
           email: true,
           phone: true,
           birthDate: true,
+          street: true,
+          postalCode: true,
+          town: true,
         },
       },
       payment: {
@@ -148,6 +151,9 @@ export default defineEventHandler(async (event) => {
     { name: "Priezvisko", filterButton: true },
     { name: "Email", filterButton: true },
     { name: "Telefónne číslo", filterButton: true },
+    { name: "Ulica TB", filterButton: true },
+    { name: "PSČ TB", filterButton: true },
+    { name: "Obec TB", filterButton: true },
     { name: "Typ účastníka", filterButton: true },
     { name: "Rola", filterButton: true },
     { name: "Tím", filterButton: true },
@@ -189,6 +195,10 @@ export default defineEventHandler(async (event) => {
     const surname = reg.user?.surname || reg.collectedDetails?.surname || "";
     const email = reg.user?.email || reg.collectedDetails?.email || "";
     const phone = reg.user?.phone || reg.collectedDetails?.phone || "";
+    const street = reg.user?.street || reg.collectedDetails?.street || "";
+    const postalCode =
+      reg.user?.postalCode || reg.collectedDetails?.postalCode || "";
+    const town = reg.user?.town || reg.collectedDetails?.town || "";
     const participantType = reg.userId ? "Registrovaný používateľ" : "Hosť";
     const roleName = role?.name || "Neznáma rola";
     const teamName = reg.registrationData?.teamName || "";
@@ -249,6 +259,9 @@ export default defineEventHandler(async (event) => {
       surname,
       email,
       phone,
+      street,
+      postalCode,
+      town,
       participantType,
       roleName,
       teamName,
