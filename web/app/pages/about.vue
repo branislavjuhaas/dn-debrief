@@ -149,7 +149,6 @@ const dedications = [
   "Nine Melicherovej",
   "Branislavovi Erkenovi",
   "Jakubovi Bohušovi",
-  "Eme M. Donátovej",
   "Richardovi Vaškovi",
   "Zuzane Brosinger",
   "Danielovi C. Roe",
