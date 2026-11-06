@@ -92,7 +92,11 @@ const formatDeadline = (date: Date) => formatter.format(date);
           <th class="text-left text-sm">Cena</th>
           <th class="text-left text-sm">Deadline</th>
         </tr>
-        <tr v-for="role in event.registrationConfig.roles">
+        <tr
+          v-for="role in event.registrationConfig.roles?.filter(
+            (r) => !r.deleted,
+          )"
+          :key="role.uuid">
           <td class="pt-2.5">{{ role.name }}</td>
           <td class="pt-2.5">{{ role.cost ?? 0 }}€</td>
           <td class="pt-2.5">
