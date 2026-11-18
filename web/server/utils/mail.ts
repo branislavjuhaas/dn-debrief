@@ -1,5 +1,74 @@
 import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
 
+const escapeHtml = (value: string) =>
+  value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+
+/**
+ * Renders a minimal, transactional e-mail.
+ *
+ * Deliberately avoids images, web fonts, tracking pixels and marketing copy:
+ * those are the main reasons Gmail classifies transactional mail as
+ * promotional. Every e-mail also has a plain-text alternative (see
+ * `sendEmail`).
+ */
+const renderTransactionalEmail = (options: {
+  preheader: string;
+  title: string;
+  text: string;
+  buttonUrl?: string;
+  buttonText?: string;
+}) => {
+  const { preheader, title, text, buttonUrl, buttonText } = options;
+
+  const button =
+    buttonUrl && buttonText
+      ? `
+              <p style="margin: 0 0 24px;">
+                <a href="${escapeHtml(buttonUrl)}" style="display: inline-block; border-radius: 6px; background-color: #15803d; color: #ffffff; font-family: inherit; font-size: 16px; font-weight: 600; line-height: 1.2; padding: 12px 20px; text-decoration: none;">${escapeHtml(buttonText)}</a>
+              </p>
+              <p style="margin: 0; color: #71717a; font-size: 13px; line-height: 1.5;">
+                Ak tlačidlo nefunguje, otvorte tento odkaz:<br>
+                <a href="${escapeHtml(buttonUrl)}" style="color: #15803d; word-break: break-all;">${escapeHtml(buttonUrl)}</a>
+              </p>`
+      : "";
+
+  return `<!DOCTYPE html>
+<html lang="sk">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <meta name="supported-color-schemes" content="light dark">
+    <title>${escapeHtml(title)}</title>
+  </head>
+  <body style="margin: 0; padding: 0; background-color: #f4f4f5;">
+    <div style="display: none; max-height: 0; overflow: hidden; opacity: 0;">${escapeHtml(preheader)}</div>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f4f5;">
+      <tr>
+        <td align="center" style="padding: 24px 12px;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width: 560px; background-color: #ffffff; border: 1px solid #d4d4d8; border-radius: 8px;">
+            <tr>
+              <td style="padding: 24px; color: #27272a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 16px; line-height: 1.5;">
+                <h1 style="margin: 0 0 12px; font-size: 20px; line-height: 1.3;">${escapeHtml(title)}</h1>
+                <p style="margin: 0 0 24px; color: #52525b;">${escapeHtml(text)}</p>${button}
+              </td>
+            </tr>
+          </table>
+          <p style="margin: 16px auto 0; max-width: 560px; color: #71717a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 12px; line-height: 1.5; text-align: center;">
+            DebRIEF · Slovenská debatná asociácia
+          </p>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>`;
+};
+
 export const sendEmail = async (
   to: string | string[],
   subject: string,
@@ -35,7 +104,13 @@ export const sendEmail = async (
       Body: {
         Html: {
           Charset: "UTF-8",
-          Data: html || text,
+          Data:
+            html ||
+            renderTransactionalEmail({
+              preheader: subject,
+              title: subject,
+              text,
+            }),
         },
         Text: {
           Charset: "UTF-8",
@@ -43,6 +118,12 @@ export const sendEmail = async (
         },
       },
     },
+    ...(process.env.AWS_REPLY_TO_EMAIL
+      ? { ReplyToAddresses: [process.env.AWS_REPLY_TO_EMAIL] }
+      : {}),
+    ...(process.env.AWS_SES_CONFIGURATION_SET
+      ? { ConfigurationSetName: process.env.AWS_SES_CONFIGURATION_SET }
+      : {}),
   };
   const command = new SendEmailCommand(params);
   await sesClient.send(command);
@@ -54,240 +135,22 @@ export const generateActionMail = (
   text: string,
   buttonUrl: string,
   buttonText: string,
-) => `<!DOCTYPE html>
-<html lang="en" dir="ltr" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
-  <head>
-    <meta charset="utf-8">
-    <meta name="x-apple-disable-message-reformatting">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="format-detection" content="telephone=no, date=no, address=no, email=no, url=no">
-    <meta name="color-scheme" content="light dark">
-    <meta name="supported-color-schemes" content="light dark">
-    <!--[if mso]>
-      <style>
-        td,th,div,p,a,h1,h2,h3,h4,h5,h6 {font-family: "Segoe UI", sans-serif; mso-line-height-rule: exactly;}
-      </style>
-    <![endif]-->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="screen">
-    <style>
-      @media (max-width: 600px) {
-        .sm-p-6 {
-          padding: 24px !important;
-        }
-      }
-    </style>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400&display=swap" rel="stylesheet" media="screen">
-  </head>
-  <body xml:lang="en" style="margin: 0; width: 100%; height: 100%; padding: 0; word-break: break-word;">
-    <div style="display:none;">
-      ${preheader}&#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847;
-      &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847;
-      &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847;
-      &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847;
-      &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847;
-      &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847;
-      &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847;
-      &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847;
-      &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847;
-      &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847;
-      &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847;
-      &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847;
-      &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847;
-      &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &nbsp;
-    </div>
-    <span style="display:none;">
-      <!--[if mso]>
-        <xml>
-          <o:OfficeDocumentSettings>
-            <o:PixelsPerInch>96</o:PixelsPerInch>
-          </o:OfficeDocumentSettings>
-          <w:WordDocument>
-            <w:DontUseAdvancedTypographyReadingMail />
-          </w:WordDocument>
-        </xml>
-      <![endif]-->
-    </span>
-    <div role="article" aria-roledescription="email" lang="en" dir="ltr" style="font-size: medium; background-color: #e4e4e7; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans', Ubuntu, Cantarell, 'Helvetica Neue', sans-serif; font-size: max(16px, 1rem);">
-      <!--[if mso]><table role="none" cellpadding="0" cellspacing="0" style="width: 576px" align="center"><tr><td style="padding: 40px 0"><![endif]-->
-      <div class="sm-p-6" style="margin: 0 auto; max-width: 576px; padding: 40px 0;">
-        <!--[if mso]><table role="none" cellpadding="0" cellspacing="0" style="width: 100%"><tr><td style="background-color: #fafafa"><![endif]-->
-        <div style="border-top-left-radius: 8px; border-top-right-radius: 8px; border: 1px solid #d4d4d8; background-color: #fafafa; padding: 20px 24px;">
-          <a href="https://debrief.sda.sk" style="text-decoration: none;"><img src="https://v2.debrief.sda.sk/mailing/logo.png" alt="Maizzle" style="height: 20px; width: 72px; max-width: 100%; vertical-align: middle;" width="526" height="20"></a>
-        </div>
-        <!--[if mso]></td></tr></table><![endif]-->
-        <!--[if mso]><table role="none" cellpadding="0" cellspacing="0" style="width: 100%"><tr><td style="background-color: #fafafa"><![endif]-->
-        <div style="border-left: 1px solid #d4d4d8; border-bottom-color: #d4d4d8; border-right: 1px solid #d4d4d8; border-top-color: #d4d4d8; background-color: #fafafa; padding: 24px;">
-          <!--[if mso]><table role="none" cellpadding="0" cellspacing="0" style="width: 100%"><tr><![endif]-->
-          <div style="font-size: 0;">
-            <!--[if mso]><td style="width: 526px"><![endif]-->
-            <div style="width: 526px; max-width: 100%; display: inline-block; text-align: center; font-size: medium"><div role="separator" style="line-height: 32px;">&zwj;</div></div>
-            <!--[if mso]></td><![endif]-->
-          </div>
-          <!--[if mso]></tr></table><![endif]-->
-          <!--[if mso]><table role="none" cellpadding="0" cellspacing="0" style="width: 100%"><tr><![endif]-->
-          <div style="margin-top: 24px; margin-bottom: 8px; text-align: center; font-family: 'DM Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans', Ubuntu, Cantarell, 'Helvetica Neue', sans-serif; color: #27272a;">
-            <!--[if mso]><td style="width: 526px"><![endif]-->
-            <div style="width: 526px; max-width: 100%; display: inline-block; font-size: medium">
-              <h1 style="margin: 0; font-size: 20px; line-height: 28px;">${title}</h1>
-              <p style="margin-left: 40px; margin-right: 40px; margin-top: 4px; font-size: 16px; line-height: 24px; color: #71717a;">${text}</p>
-            </div>
-            <!--[if mso]></td><![endif]-->
-          </div>
-          <!--[if mso]></tr></table><![endif]-->
-          <!--[if mso]><table role="none" cellpadding="0" cellspacing="0" style="width: 100%"><tr><![endif]-->
-          <div style="font-size: 0;">
-            <!--[if mso]><td style="width: 526px"><![endif]-->
-            <div style="width: 526px; max-width: 100%; display: inline-block; font-size: medium">
-              <div>
-                <a
-                  style="display: inline-block; width: calc(100% - 24px); border-radius: 8px; background-color: #19af5a; padding: 12px; text-align: center; font-family: 'DM Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans', Ubuntu, Cantarell, 'Helvetica Neue', sans-serif; font-size: 16px; line-height: 1; color: #fffffe; text-decoration: none;"
-                  href="${buttonUrl}"
-                >
-                  <!--[if mso]><i style="mso-font-width: 150%; mso-text-raise: 31px;" hidden>&emsp;</i><![endif]-->
-                  <span style="mso-text-raise: 16px;">${buttonText}</span>
-                  <!--[if mso]><i style="mso-font-width: 150%;" hidden>&emsp;&#8203;</i><![endif]-->
-                </a>
-              </div>
-            </div>
-            <!--[if mso]></td><![endif]-->
-          </div>
-          <!--[if mso]></tr></table><![endif]-->
-        </div>
-        <!--[if mso]></td></tr></table><![endif]-->
-        <!--[if mso]><table role="none" cellpadding="0" cellspacing="0" style="width: 100%"><tr><td style="background-color: #fafafa"><![endif]-->
-        <div style="border-bottom-right-radius: 8px; border-bottom-left-radius: 8px; border: 1px solid #d4d4d8; background-color: #fafafa; padding: 20px 24px;">
-          <!--[if mso]><table role="none" cellpadding="0" cellspacing="0" style="width: 100%"><tr><![endif]-->
-          <div style="font-size: 0;">
-            <!--[if mso]><td style="width: 506px"><![endif]-->
-            <div style="width: 506px; max-width: 100%; display: inline-block; font-size: medium">
-              <span style="font-family: 'DM Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans', Ubuntu, Cantarell, 'Helvetica Neue', sans-serif; font-size: 14px; line-height: 20px; color: #71717a;">2024 - 2026 | Branislav Juhás & VpVSÚPDND</span>
-            </div>
-            <!--[if mso]></td><![endif]-->
-            <!--[if mso]><td style="width: 20px"><![endif]-->
-            <div style="width: 20px; max-width: 100%; display: inline-block; font-size: medium">
-              <a href="https://github.com/branislavjuhaas/dn-debrief" target="_blank" style="text-decoration: none;"><img src="https://v2.debrief.sda.sk/mailing/github-logo.png" alt="Icon" width="20" style="height: 20px; max-width: 100%; vertical-align: middle;" height="20"></a>
-            </div>
-            <!--[if mso]></td><![endif]-->
-          </div>
-          <!--[if mso]></tr></table><![endif]-->
-        </div>
-        <!--[if mso]></td></tr></table><![endif]-->
-      </div>
-      <!--[if mso]></td></tr></table><![endif]-->
-    </div>
-  </body>
-</html>`;
+) =>
+  renderTransactionalEmail({
+    preheader,
+    title,
+    text,
+    buttonUrl,
+    buttonText,
+  });
 
 export const generateMessageMail = (
   preheader: string,
   title: string,
   text: string,
-) => `<!DOCTYPE html>
-<html lang="en" dir="ltr" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
-  <head>
-    <meta charset="utf-8">
-    <meta name="x-apple-disable-message-reformatting">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="format-detection" content="telephone=no, date=no, address=no, email=no, url=no">
-    <meta name="color-scheme" content="light dark">
-    <meta name="supported-color-schemes" content="light dark">
-    <!--[if mso]>
-      <style>
-        td,th,div,p,a,h1,h2,h3,h4,h5,h6 {font-family: "Segoe UI", sans-serif; mso-line-height-rule: exactly;}
-      </style>
-    <![endif]-->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="screen">
-    <style>
-      @media (max-width: 600px) {
-        .sm-p-6 {
-          padding: 24px !important;
-        }
-      }
-    </style>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400&display=swap" rel="stylesheet" media="screen">
-  </head>
-  <body xml:lang="en" style="margin: 0; width: 100%; height: 100%; padding: 0; word-break: break-word;">
-    <div style="display:none;">
-      ${preheader}&#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847;
-      &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847;
-      &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847;
-      &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847;
-      &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847;
-      &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847;
-      &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847;
-      &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847;
-      &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847;
-      &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847;
-      &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847;
-      &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847;
-      &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847;
-      &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &nbsp;
-    </div>
-    <span style="display:none;">
-      <!--[if mso]>
-        <xml>
-          <o:OfficeDocumentSettings>
-            <o:PixelsPerInch>96</o:PixelsPerInch>
-          </o:OfficeDocumentSettings>
-          <w:WordDocument>
-            <w:DontUseAdvancedTypographyReadingMail />
-          </w:WordDocument>
-        </xml>
-      <![endif]-->
-    </span>
-    <div role="article" aria-roledescription="email" lang="en" dir="ltr" style="font-size: medium; background-color: #e4e4e7; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans', Ubuntu, Cantarell, 'Helvetica Neue', sans-serif; font-size: max(16px, 1rem);">
-      <!--[if mso]><table role="none" cellpadding="0" cellspacing="0" style="width: 576px" align="center"><tr><td style="padding: 40px 0"><![endif]-->
-      <div class="sm-p-6" style="margin: 0 auto; max-width: 576px; padding: 40px 0;">
-        <!--[if mso]><table role="none" cellpadding="0" cellspacing="0" style="width: 100%"><tr><td style="background-color: #fafafa"><![endif]-->
-        <div style="border-top-left-radius: 8px; border-top-right-radius: 8px; border: 1px solid #d4d4d8; background-color: #fafafa; padding: 20px 24px;">
-          <a href="https://debrief.sda.sk" style="text-decoration: none;"><img src="https://v2.debrief.sda.sk/mailing/logo.png" alt="Maizzle" style="height: 20px; width: 72px; max-width: 100%; vertical-align: middle;" width="526" height="20"></a>
-        </div>
-        <!--[if mso]></td></tr></table><![endif]-->
-        <!--[if mso]><table role="none" cellpadding="0" cellspacing="0" style="width: 100%"><tr><td style="background-color: #fafafa"><![endif]-->
-        <div style="border-left: 1px solid #d4d4d8; border-bottom-color: #d4d4d8; border-right: 1px solid #d4d4d8; border-top-color: #d4d4d8; background-color: #fafafa; padding: 24px;">
-          <!--[if mso]><table role="none" cellpadding="0" cellspacing="0" style="width: 100%"><tr><![endif]-->
-          <div style="font-size: 0;">
-            <!--[if mso]><td style="width: 526px"><![endif]-->
-            <div style="width: 526px; max-width: 100%; display: inline-block; text-align: center; font-size: medium"><div role="separator" style="line-height: 32px;">&zwj;</div></div>
-            <!--[if mso]></td><![endif]-->
-          </div>
-          <!--[if mso]></tr></table><![endif]-->
-          <!--[if mso]><table role="none" cellpadding="0" cellspacing="0" style="width: 100%"><tr><![endif]-->
-          <div style="margin-top: 24px; text-align: center; font-family: 'DM Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans', Ubuntu, Cantarell, 'Helvetica Neue', sans-serif; color: #27272a;">
-            <!--[if mso]><td style="width: 526px"><![endif]-->
-            <div style="width: 526px; max-width: 100%; display: inline-block; font-size: medium">
-              <h1 style="margin: 0; font-size: 20px; line-height: 28px;">${title}</h1>
-              <p style="margin-left: 40px; margin-right: 40px; margin-top: 4px; font-size: 16px; line-height: 24px; color: #71717a;">${text}</p>
-            </div>
-            <!--[if mso]></td><![endif]-->
-          </div>
-          <!--[if mso]></tr></table><![endif]-->
-        </div>
-        <!--[if mso]></td></tr></table><![endif]-->
-        <!--[if mso]><table role="none" cellpadding="0" cellspacing="0" style="width: 100%"><tr><td style="background-color: #fafafa"><![endif]-->
-        <div style="border-bottom-right-radius: 8px; border-bottom-left-radius: 8px; border: 1px solid #d4d4d8; background-color: #fafafa; padding: 20px 24px;">
-          <!--[if mso]><table role="none" cellpadding="0" cellspacing="0" style="width: 100%"><tr><![endif]-->
-          <div style="font-size: 0;">
-            <!--[if mso]><td style="width: 506px"><![endif]-->
-            <div style="width: 506px; max-width: 100%; display: inline-block; font-size: medium">
-              <span style="font-family: 'DM Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans', Ubuntu, Cantarell, 'Helvetica Neue', sans-serif; font-size: 14px; line-height: 20px; color: #71717a;">2024 - 2026 | Branislav Juhás & VpVSÚPDND</span>
-            </div>
-            <!--[if mso]></td><![endif]-->
-            <!--[if mso]><td style="width: 20px"><![endif]-->
-            <div style="width: 20px; max-width: 100%; display: inline-block; font-size: medium">
-              <a href="https://github.com/branislavjuhaas/dn-debrief" target="_blank" style="text-decoration: none;"><img src="https://v2.debrief.sda.sk/mailing/github-logo.png" alt="Icon" width="20" style="height: 20px; max-width: 100%; vertical-align: middle;" height="20"></a>
-            </div>
-            <!--[if mso]></td><![endif]-->
-          </div>
-          <!--[if mso]></tr></table><![endif]-->
-        </div>
-        <!--[if mso]></td></tr></table><![endif]-->
-      </div>
-      <!--[if mso]></td></tr></table><![endif]-->
-    </div>
-  </body>
-</html>`;
+) =>
+  renderTransactionalEmail({
+    preheader,
+    title,
+    text,
+  });
