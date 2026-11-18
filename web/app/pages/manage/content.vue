@@ -2,6 +2,8 @@
 import type { TableColumn } from "@nuxt/ui";
 import { LazyModalConfirm, LazyModalUploadMethodology } from "#components";
 import type { MethodologyFile } from "#shared/types/methodology";
+import type { CampaignBanner } from "#shared/types/settings";
+import { EMPTY_CAMPAIGN_BANNER } from "#shared/utils/settings";
 
 definePageMeta({
   layout: "manage",
@@ -21,6 +23,46 @@ const { data: methodologyFetch, status } = await useFetch("/api/methodology", {
 
 const { data: methodologyData } =
   useNuxtData<typeof methodologyFetch.value>("methodology-files");
+
+// Campaign banner settings
+const { data: campaignBannerData } = await useFetch<{
+  campaignBanner: CampaignBanner;
+}>("/api/settings/campaign-banner", {
+  key: "campaign-banner",
+});
+
+const campaignBanner = reactive<CampaignBanner>({
+  ...EMPTY_CAMPAIGN_BANNER,
+  ...campaignBannerData.value?.campaignBanner,
+});
+
+const savingCampaignBanner = ref(false);
+
+const saveCampaignBanner = async () => {
+  savingCampaignBanner.value = true;
+
+  try {
+    await $fetch("/api/settings/campaign-banner", {
+      method: "PATCH",
+      body: campaignBanner,
+    });
+
+    toast.add({
+      title: "Kampaňový banner bol uložený",
+      color: "success",
+    });
+
+    await refreshNuxtData("campaign-banner");
+  } catch {
+    toast.add({
+      title: "Nepodarilo sa uložiť kampaňový banner",
+      description: "Skontrolujte, prosím, vyplnené údaje a skúste to znova.",
+      color: "error",
+    });
+  } finally {
+    savingCampaignBanner.value = false;
+  }
+};
 
 const UButton = resolveComponent("UButton");
 const UUser = resolveComponent("UUser");
@@ -266,6 +308,76 @@ const columns: TableColumn<MethodologyRow>[] = [
       </template>
 
       <template #body>
+        <UCard class="mb-4">
+          <template #header>
+            <div
+              class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <h2 class="text-base font-semibold text-highlighted">
+                  Kampaňový banner
+                </h2>
+                <p class="text-sm text-muted">
+                  Zobrazí sa nad hlavičkou na všetkých stránkach. Návštevníci si
+                  ho môžu skryť na zvyšok relácie.
+                </p>
+              </div>
+              <USwitch
+                v-model="campaignBanner.enabled"
+                label="Zobraziť banner" />
+            </div>
+          </template>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <UFormField label="Nadpis" name="title" required>
+              <UInput
+                v-model="campaignBanner.title"
+                maxlength="120"
+                placeholder="Podporte kampaň SDA"
+                class="w-full" />
+            </UFormField>
+            <UFormField label="Text odkazu" name="linkLabel" required>
+              <UInput
+                v-model="campaignBanner.linkLabel"
+                maxlength="60"
+                placeholder="Prispieť na Donio"
+                class="w-full" />
+            </UFormField>
+            <UFormField
+              label="Text banneru"
+              name="text"
+              required
+              class="md:col-span-2">
+              <UInput
+                v-model="campaignBanner.text"
+                maxlength="300"
+                placeholder="Pomôžte nám dostať debatu na viac škôl."
+                class="w-full" />
+            </UFormField>
+            <UFormField
+              label="Odkaz"
+              name="url"
+              description="Musí začínať https://"
+              required
+              class="md:col-span-2">
+              <UInput
+                v-model="campaignBanner.url"
+                type="url"
+                placeholder="https://donio.sk/"
+                class="w-full" />
+            </UFormField>
+          </div>
+
+          <template #footer>
+            <div class="flex justify-end">
+              <UButton
+                label="Uložiť banner"
+                icon="i-ph-checks"
+                :loading="savingCampaignBanner"
+                @click="saveCampaignBanner" />
+            </div>
+          </template>
+        </UCard>
+
         <UTable
           :data="methodologyData?.files ?? []"
           :columns="columns"
