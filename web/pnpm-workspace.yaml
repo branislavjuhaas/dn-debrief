@@ -13,6 +13,22 @@ minimumReleaseAgeExclude:
   - nuxt@4.6.2
 overrides:
   vite: "catalog:"
+  # Security patches that the tarball of vite-plus 0.2.8 pins below the fixed
+  # versions. Remove them once vite-plus ships vitest >= 4.1.12.
+  vitest: 4.1.12
+  "@vitest/browser": 4.1.12
+  "@vitest/browser-preview": 4.1.12
+  "@vitest/expect": 4.1.12
+  "@vitest/mocker": 4.1.12
+  "@vitest/pretty-format": 4.1.12
+  "@vitest/runner": 4.1.12
+  "@vitest/snapshot": 4.1.12
+  "@vitest/spy": 4.1.12
+  "@vitest/utils": 4.1.12
+  tinypool: 2.1.2
+  node-forge: 1.4.3
+  serialize-javascript: 7.1.3
+  source-map-js: 1.2.2
   "@tiptap/core": "3.32.0"
   "@tiptap/extension-text-align": "3.32.0"
   "@tiptap/vue-3": "3.32.0"

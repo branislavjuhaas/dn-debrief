@@ -5,6 +5,20 @@ catalog:
   vite-plus: 0.2.9
 overrides:
   vite: "catalog:"
+  # Security patches for versions pinned by the vite-plus / maizzle tarballs.
+  vitest: 4.1.12
+  "@vitest/browser": 4.1.12
+  "@vitest/browser-preview": 4.1.12
+  "@vitest/expect": 4.1.12
+  "@vitest/mocker": 4.1.12
+  "@vitest/pretty-format": 4.1.12
+  "@vitest/runner": 4.1.12
+  "@vitest/snapshot": 4.1.12
+  "@vitest/spy": 4.1.12
+  "@vitest/utils": 4.1.12
+  tinypool: 2.1.2
+  vue: 3.5.45
+  source-map-js: 1.2.2
 peerDependencyRules:
   allowAny:
     - vite
