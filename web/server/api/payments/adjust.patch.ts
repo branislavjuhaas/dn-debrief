@@ -19,7 +19,7 @@ defineRouteMeta({
               paymentIds: {
                 type: "array",
                 items: {
-                  type: "string",
+                  type: "string" as const,
                   format: "uuid",
                 },
               },
