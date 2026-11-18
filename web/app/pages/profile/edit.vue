@@ -103,7 +103,10 @@ const profileState = reactive({
   street: userData?.value?.user?.street ?? "",
   postalCode: userData?.value?.user?.postalCode ?? "",
   town: userData?.value?.user?.town ?? "",
-  legalGuardian: userData?.value?.user?.legalGuardian ?? undefined,
+  legalGuardian: {
+    name: userData?.value?.user?.legalGuardian?.name ?? "",
+    email: userData?.value?.user?.legalGuardian?.email ?? "",
+  },
 });
 
 const age = computed(() => {
@@ -304,6 +307,33 @@ onMounted(() => {
               v-model="profileState.town"
               placeholder="Zadejte obec trvalého pobytu" />
           </UFormField>
+
+          <template v-if="age < 18">
+            <div class="md:col-span-2 pt-2">
+              <h2 class="text-base font-semibold text-highlighted">
+                Zákonný/-á zástupca/-kyňa
+              </h2>
+              <p class="text-sm text-muted">
+                Údaje zákonného/-ej zástupcu/-kne sa používajú na potvrdenie
+                registrácií a členstva. Pri zmene e-mailu znova odošleme
+                potvrdenia čakajúcich registrácií.
+              </p>
+            </div>
+            <UFormField
+              label="Meno a priezvisko"
+              name="legalGuardian.name"
+              required>
+              <UInput
+                v-model="profileState.legalGuardian.name"
+                placeholder="Zadajte meno zákonného/-ej zástupcu/-kne" />
+            </UFormField>
+            <UFormField label="E-mail" name="legalGuardian.email" required>
+              <UInput
+                v-model="profileState.legalGuardian.email"
+                type="email"
+                placeholder="Zadajte e-mail zákonného/-ej zástupcu/-kne" />
+            </UFormField>
+          </template>
         </UForm>
 
         <USeparator />

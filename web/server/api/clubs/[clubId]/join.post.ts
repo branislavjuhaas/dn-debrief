@@ -250,15 +250,18 @@ export default defineEventHandler(async (event) => {
     .returning();
 
   if (age < 18) {
+    const confirmUrl = `${process.env.BETTER_AUTH_URL}/profile/join/confirm?token=${obfuscateId(user.id)}`;
+    const greeting = `Dobrý deň, ${legalGuardian!.name.split(" ")[0]}.`;
+
     await sendEmail(
       legalGuardian!.email,
       "Potvrdenie registrácie do SDA",
-      `Dobrý deň, ${legalGuardian!.name.split(" ")[0]}. Registrácia vášho dieťaťa bola zaznamenaná v systéme. Pre jej potvrdenie, prosím, kliknite na nasledujúci odkaz: ${process.env.BETTER_AUTH_URL}/profile/join/verify?token=${obfuscateId(user.id)}`,
+      `${greeting} Registrácia vášho dieťaťa bola zaznamenaná v systéme. Pre jej potvrdenie, prosím, kliknite na nasledujúci odkaz: ${confirmUrl}`,
       generateActionMail(
         "Overte registráciu vášho dieťaťa",
         "Potvrdenie registrácie",
-        `Dobrý deň, ${legalGuardian!.name.split(" ")[0]}.`,
-        `${process.env.BETTER_AUTH_URL}/profile/join/confirm?token=${obfuscateId(user.id)}`,
+        greeting,
+        confirmUrl,
         "Potvrdiť registráciu",
       ),
     );

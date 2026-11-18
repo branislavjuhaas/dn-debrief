@@ -15,6 +15,7 @@ import {
 } from "#server/auth/permissions";
 import { APIError, createAuthMiddleware } from "better-auth/api";
 import { legalGuardians, users } from "#server/db/schema/auth";
+import { resendPendingGuardianConfirmations } from "#server/lib/guardian";
 import { adminRoleRank } from "#shared/utils/user";
 import type { UserRole } from "#shared/types/user";
 import { eq } from "drizzle-orm";
@@ -190,6 +191,80 @@ export const auth = betterAuth({
           });
         }
       }
+
+      // Legal guardian details may only be set for minors, and the guardian's
+      // e-mail must never be the same address as the account's own e-mail.
+      if (ctx.path === "/sign-up/email" || ctx.path === "/update-user") {
+        const body = ctx.body as
+          | {
+              email?: string;
+              birthDate?: string;
+              legalGuardian?: { name?: string; email?: string };
+            }
+          | undefined;
+
+        if (body?.legalGuardian) {
+          const name = body.legalGuardian.name?.trim() ?? "";
+          const email = body.legalGuardian.email?.trim().toLowerCase() ?? "";
+
+          if (!name) {
+            throw new APIError("BAD_REQUEST", {
+              statusCode: 400,
+              message: "Legal guardian's name is required",
+            });
+          }
+
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            throw new APIError("BAD_REQUEST", {
+              statusCode: 400,
+              message: "Legal guardian's e-mail address is not valid",
+            });
+          }
+
+          const session =
+            ctx.path === "/update-user"
+              ? await auth.api.getSession({
+                  headers: ctx.headers!,
+                })
+              : null;
+
+          const accountEmail = (
+            ctx.path === "/sign-up/email" ? body.email : session?.user.email
+          )
+            ?.trim()
+            .toLowerCase();
+
+          if (accountEmail && email === accountEmail) {
+            throw new APIError("BAD_REQUEST", {
+              statusCode: 400,
+              message:
+                "Legal guardian's e-mail address must differ from the account e-mail",
+            });
+          }
+
+          const birthDate = body.birthDate ?? session?.user.birthDate;
+          const birth = birthDate ? new Date(birthDate) : null;
+          const age = birth
+            ? new Date().getFullYear() -
+              birth.getFullYear() -
+              (new Date().getMonth() < birth.getMonth() ||
+              (new Date().getMonth() === birth.getMonth() &&
+                new Date().getDate() < birth.getDate())
+                ? 1
+                : 0)
+            : null;
+
+          if (age !== null && age >= 18) {
+            throw new APIError("BAD_REQUEST", {
+              statusCode: 400,
+              message: "Adult users cannot change their legal guardian",
+            });
+          }
+
+          body.legalGuardian.name = name;
+          body.legalGuardian.email = email;
+        }
+      }
     }),
     after: createAuthMiddleware(async (ctx) => {
       if (ctx.path === "/sign-up/email") {
@@ -212,19 +287,36 @@ export const auth = betterAuth({
       }
       if (ctx.path === "/update-user") {
         const body = ctx.body as any;
-        if (body && "legalGuardian" in body) {
+        if (body && body.legalGuardian) {
           const userId = (ctx.context.session as any).user.id;
+          const nextGuardian = {
+            name: String(body.legalGuardian.name).trim(),
+            email: String(body.legalGuardian.email).trim().toLowerCase(),
+          };
+
+          const previousGuardian = await db.query.legalGuardians.findFirst({
+            columns: { email: true },
+            where: { userId },
+          });
 
           await db
             .insert(legalGuardians)
             .values({
               userId: userId,
-              ...body.legalGuardian,
+              ...nextGuardian,
             })
             .onConflictDoUpdate({
               target: [legalGuardians.userId],
-              set: { ...body.legalGuardian },
+              set: nextGuardian,
             });
+
+          // A corrected guardian address would otherwise leave pending
+          // registrations waiting for a confirmation that never arrives.
+          if (
+            previousGuardian?.email?.trim().toLowerCase() !== nextGuardian.email
+          ) {
+            await resendPendingGuardianConfirmations(userId, nextGuardian);
+          }
         }
       }
     }),

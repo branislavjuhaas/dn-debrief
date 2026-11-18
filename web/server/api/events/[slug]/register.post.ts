@@ -391,14 +391,16 @@ export default defineEventHandler(async (event) => {
 
     if (legalGuardian && legalGuardian.email) {
       const confirmUrl = `${process.env.BETTER_AUTH_URL || ""}/events/${slug}/confirm?token=${obfuscateId(user.id)}&reg=${registration.id}`;
+      const greeting = `Dobrý deň, ${legalGuardian.name.split(" ")[0]}.`;
+
       await sendEmail(
         legalGuardian.email,
         `Potvrdenie registrácie na podujatie ${eventRecord.name}`,
-        `Dobrý deň, ${legalGuardian.name.split(" ")[0]}. Registrácia vášho dieťaťa na podujatie ${eventRecord.name} bola zaznamenaná v systéme. Pre jej potvrdenie, prosím, kliknite na nasledujúci odkaz: ${confirmUrl}`,
+        `${greeting} Registrácia vášho dieťaťa na podujatie ${eventRecord.name} bola zaznamenaná v systéme. Pre jej potvrdenie, prosím, kliknite na nasledujúci odkaz: ${confirmUrl}`,
         generateActionMail(
           `Overte registráciu dieťaťa na ${eventRecord.name}`,
           "Potvrdenie registrácie",
-          `Dobrý deň, ${legalGuardian.name.split(" ")[0]}.`,
+          greeting,
           confirmUrl,
           "Potvrdiť registráciu",
         ),
