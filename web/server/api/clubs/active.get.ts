@@ -11,15 +11,15 @@ defineRouteMeta({
         content: {
           "application/json": {
             schema: {
-              type: "object",
+              type: "object" as const,
               properties: {
                 clubs: {
-                  type: "array",
+                  type: "array" as const,
                   items: {
-                    type: "object",
+                    type: "object" as const,
                     properties: {
-                      id: { type: "number" },
-                      name: { type: "string", example: "Sučany" },
+                      id: { type: "number" as const },
+                      name: { type: "string" as const, example: "Sučany" },
                     },
                     required: ["id", "name"],
                   },
