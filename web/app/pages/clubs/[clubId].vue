@@ -5,7 +5,6 @@ import {
   LazyModalEditClub,
 } from "#components";
 import type { TableColumn, TabsItem } from "@nuxt/ui";
-import type { MembershipRenewalStatus } from "#shared/types/club";
 import type { RowSelectionState } from "@tanstack/vue-table";
 
 // Page metadata & route parameters
@@ -78,6 +77,7 @@ const { data: clubMembers, status: membersStatus } = await useFetch(
   {
     key: `clubs-${clubId}-memberships`,
     enabled: canManageClub,
+    watch: [selectedSeason],
   },
 );
 
@@ -91,7 +91,7 @@ const seasonOptions = computed(() =>
 const selectedSeasonModel = computed({
   get: () => selectedSeason.value ?? clubMembers.value?.season,
   set: (value: number | undefined) => {
-    selectedSeason.value = value;
+    selectedSeason.value = value == null ? undefined : Number(value);
   },
 });
 
@@ -235,32 +235,12 @@ type ClubMemberRow = {
     role: UserRole;
     image: string | null;
   };
-  status: MembershipRenewalStatus;
   registrationType:
     | "junior_student"
     | "senior_student"
     | "graduate"
     | "teacher"
     | null;
-  confirmed: boolean | null;
-  paymentStatus:
-    | "pending"
-    | "processing"
-    | "paid"
-    | "cancelled"
-    | "forgiven"
-    | "failed"
-    | null;
-};
-
-const membershipStatusColors: Record<
-  MembershipRenewalStatus,
-  "success" | "warning" | "info" | "neutral"
-> = {
-  renewed: "success",
-  pending_payment: "warning",
-  pending_confirmation: "info",
-  not_renewed: "neutral",
 };
 
 const membersColumns: TableColumn<ClubMemberRow>[] = [
@@ -336,44 +316,6 @@ const membersColumns: TableColumn<ClubMemberRow>[] = [
     id: "email",
     header: "Email",
     cell: ({ row }) => row.original.user?.email ?? "N/A",
-  },
-  {
-    id: "status",
-    header: ({ column }) => {
-      const isSorted = column.getIsSorted();
-
-      return h(UButton, {
-        color: "neutral",
-        variant: "ghost",
-        label: "Stav členstva",
-        icon: isSorted
-          ? isSorted === "asc"
-            ? "i-ph-sort-ascending"
-            : "i-ph-sort-descending"
-          : "i-ph-funnel-simple",
-        class: "-mx-2.5 font-bold text-highlighted",
-        onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
-      });
-    },
-    accessorFn: (row) => row.status,
-    cell: ({ row }) =>
-      h("div", { class: "flex flex-col items-start gap-1" }, [
-        h(
-          UBadge,
-          {
-            variant: "subtle",
-            color: membershipStatusColors[row.original.status],
-          },
-          () => translateMembershipRenewalStatus(row.original.status),
-        ),
-        row.original.paymentStatus
-          ? h(
-              "span",
-              { class: "text-xs text-muted" },
-              `Platba: ${translatePaymentStatus(row.original.paymentStatus)}`,
-            )
-          : null,
-      ]),
   },
   {
     id: "registrationType",
