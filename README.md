@@ -44,7 +44,7 @@ Full setup instructions, environment variables, scripts, and project structure a
 
 ## Deployment
 
-The platform ships as a Docker image (`ghcr.io/branislavjuhaas/dn-debrief-web`). A `docker-compose.yml` runs the full local stack (PostgreSQL + RustFS storage), and `docker-compose.prod.yml` targets Dokploy. Publishing a release builds the image and deploys it automatically through GitHub Actions.
+The platform ships as a Docker image (`ghcr.io/slovakdebate/dn-debrief-web`). A `docker-compose.yml` runs the full local stack (PostgreSQL + RustFS storage), and `docker-compose.prod.yml` targets Dokploy. Publishing a release builds the image and deploys it automatically through GitHub Actions.
 
 ## Links
 
