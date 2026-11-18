@@ -5,6 +5,7 @@ import {
   LazyModalEditClub,
 } from "#components";
 import type { TableColumn, TabsItem } from "@nuxt/ui";
+import type { MembershipRenewalStatus } from "#shared/types/club";
 import type { RowSelectionState } from "@tanstack/vue-table";
 
 // Page metadata & route parameters
@@ -67,13 +68,32 @@ const canManageClub = computed(
 );
 
 // Club members & unpaid payments data
-const { data: clubMembers } = await useFetch(
-  `/api/clubs/${clubId}/memberships`,
+const selectedSeason = ref<number | undefined>();
+
+const { data: clubMembers, status: membersStatus } = await useFetch(
+  () =>
+    `/api/clubs/${clubId}/memberships${
+      selectedSeason.value ? `?season=${selectedSeason.value}` : ""
+    }`,
   {
     key: `clubs-${clubId}-memberships`,
     enabled: canManageClub,
   },
 );
+
+const seasonOptions = computed(() =>
+  (clubMembers.value?.seasons ?? []).map((season) => ({
+    label: String(season),
+    value: season,
+  })),
+);
+
+const selectedSeasonModel = computed({
+  get: () => selectedSeason.value ?? clubMembers.value?.season,
+  set: (value: number | undefined) => {
+    selectedSeason.value = value;
+  },
+});
 
 const {
   data: clubPayments,
@@ -206,22 +226,44 @@ const deleteClubManager = async (managerId: number) => {
 };
 
 // Members table configuration
-const membersColumns: TableColumn<{
-  confirmed: boolean;
+type ClubMemberRow = {
+  user: {
+    id: number;
+    name: string;
+    surname: string;
+    email: string;
+    role: UserRole;
+    image: string | null;
+  };
+  status: MembershipRenewalStatus;
   registrationType:
     | "junior_student"
     | "senior_student"
     | "graduate"
-    | "teacher";
-  user?: {
-    id: number;
-    name: string;
-    surname: string;
-    image: string | null;
-    email: string;
-    role: UserRole;
-  };
-}>[] = [
+    | "teacher"
+    | null;
+  confirmed: boolean | null;
+  paymentStatus:
+    | "pending"
+    | "processing"
+    | "paid"
+    | "cancelled"
+    | "forgiven"
+    | "failed"
+    | null;
+};
+
+const membershipStatusColors: Record<
+  MembershipRenewalStatus,
+  "success" | "warning" | "info" | "neutral"
+> = {
+  renewed: "success",
+  pending_payment: "warning",
+  pending_confirmation: "info",
+  not_renewed: "neutral",
+};
+
+const membersColumns: TableColumn<ClubMemberRow>[] = [
   {
     accessorKey: "id",
     header: ({ column }) => {
@@ -296,6 +338,44 @@ const membersColumns: TableColumn<{
     cell: ({ row }) => row.original.user?.email ?? "N/A",
   },
   {
+    id: "status",
+    header: ({ column }) => {
+      const isSorted = column.getIsSorted();
+
+      return h(UButton, {
+        color: "neutral",
+        variant: "ghost",
+        label: "Stav členstva",
+        icon: isSorted
+          ? isSorted === "asc"
+            ? "i-ph-sort-ascending"
+            : "i-ph-sort-descending"
+          : "i-ph-funnel-simple",
+        class: "-mx-2.5 font-bold text-highlighted",
+        onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+      });
+    },
+    accessorFn: (row) => row.status,
+    cell: ({ row }) =>
+      h("div", { class: "flex flex-col items-start gap-1" }, [
+        h(
+          UBadge,
+          {
+            variant: "subtle",
+            color: membershipStatusColors[row.original.status],
+          },
+          () => translateMembershipRenewalStatus(row.original.status),
+        ),
+        row.original.paymentStatus
+          ? h(
+              "span",
+              { class: "text-xs text-muted" },
+              `Platba: ${translatePaymentStatus(row.original.paymentStatus)}`,
+            )
+          : null,
+      ]),
+  },
+  {
     id: "registrationType",
     header: ({ column }) => {
       const isSorted = column.getIsSorted();
@@ -313,16 +393,22 @@ const membersColumns: TableColumn<{
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
       });
     },
+    accessorFn: (row) => row.registrationType ?? "",
     cell: ({ row }) => {
-      const color = {
-        junior_student: "info" as const,
-        senior_student: "olive" as const,
-        graduate: "rose" as const,
-        teacher: "purple" as const,
-      }[row.original.registrationType];
+      if (!row.original.registrationType) {
+        return h("span", { class: "text-muted" }, "—");
+      }
+
+      const color =
+        {
+          junior_student: "info",
+          senior_student: "olive",
+          graduate: "rose",
+          teacher: "purple",
+        }[row.original.registrationType] ?? "neutral";
 
       return h(UBadge, { variant: "subtle", color }, () =>
-        translateRegistrationType(row.original.registrationType),
+        translateRegistrationType(row.original.registrationType ?? undefined),
       );
     },
   },
@@ -607,10 +693,24 @@ const paymentsColumns: TableColumn<ClubPaymentRow>[] = [
           content: 'overflow-x-auto scrollbar-none',
         }">
         <template #members>
-          <UTable
-            :data="clubMembers?.memberships ?? []"
-            :columns="membersColumns as any"
-            class="flex-1" />
+          <div class="flex flex-col gap-4">
+            <div class="flex justify-end">
+              <UFormField
+                label="Sezóna"
+                orientation="horizontal"
+                class="w-full sm:w-64">
+                <USelect
+                  v-model="selectedSeasonModel"
+                  :items="seasonOptions"
+                  class="w-32" />
+              </UFormField>
+            </div>
+            <UTable
+              :data="clubMembers?.members ?? []"
+              :columns="membersColumns as any"
+              :loading="membersStatus === 'pending'"
+              class="flex-1" />
+          </div>
         </template>
         <template #payments>
           <UTable

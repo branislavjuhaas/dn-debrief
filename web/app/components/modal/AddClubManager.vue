@@ -48,20 +48,20 @@ const { data: clubMemberships } = await useFetch(
 );
 
 const clubMembers = clubMemberships.value
-  ? clubMemberships.value?.memberships
-      ?.filter(
-        (membership) =>
+  ? clubMemberships.value.members
+      .filter(
+        (member) =>
           !clubManagers.value?.managers.some(
-            (manager) => manager.id === membership.user?.id,
+            (manager) => manager.id === member.user.id,
           ),
       )
-      .map((membership) => ({
-        label: `${membership.user?.name} ${membership.user?.surname}`,
-        value: String(membership.user?.id),
+      .map((member) => ({
+        label: `${member.user.name} ${member.user.surname}`,
+        value: String(member.user.id),
         description: undefined as string | undefined,
         avatar: {
-          src: membership.user?.image ?? undefined,
-          alt: `${membership.user?.name} ${membership.user?.surname}`,
+          src: member.user.image ?? undefined,
+          alt: `${member.user.name} ${member.user.surname}`,
           loading: "lazy" as const,
         },
       }))

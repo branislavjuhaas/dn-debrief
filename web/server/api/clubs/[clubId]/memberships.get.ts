@@ -1,10 +1,15 @@
 import { db } from "#server/db";
+import { clubMemberships } from "#server/db/schema/clubs";
+import type { MembershipRenewalStatus } from "#shared/types/club";
+import { desc, eq } from "drizzle-orm";
+import * as z from "zod";
 
 defineRouteMeta({
   openAPI: {
     tags: ["Clubs"],
-    summary: "List club members",
-    description: "Get members of a specific club for the current season.",
+    summary: "List club members and their renewal status",
+    description:
+      "Get all members of a specific club with their membership renewal status for the selected season.",
     parameters: [
       {
         name: "clubId",
@@ -15,60 +20,20 @@ defineRouteMeta({
           type: "integer",
         },
       },
+      {
+        name: "season",
+        in: "query",
+        required: false,
+        description:
+          "Season to evaluate. Defaults to the current season when omitted.",
+        schema: {
+          type: "integer",
+        },
+      },
     ],
     responses: {
       200: {
-        description: "List of club members for the current season",
-        content: {
-          "application/json": {
-            schema: {
-              type: "object",
-              properties: {
-                memberships: {
-                  type: "array",
-                  items: {
-                    type: "object",
-                    properties: {
-                      user: {
-                        type: "object",
-                        properties: {
-                          id: { type: "integer" },
-                          name: { type: "string" },
-                          surname: { type: "string" },
-                          email: { type: "string" },
-                          role: {
-                            type: "string",
-                            enum: [
-                              "user",
-                              "organizer",
-                              "junior_organizer",
-                              "chief_adjudicator",
-                              "motion_committee_member",
-                              "admin",
-                              "developer",
-                            ],
-                          },
-                          image: { type: ["string", "null"] },
-                        },
-                      },
-                      confirmed: { type: "boolean" },
-                      registrationType: {
-                        type: "string",
-                        enum: [
-                          "junior_student",
-                          "senior_student",
-                          "graduate",
-                          "teacher",
-                        ],
-                      },
-                    },
-                  },
-                },
-              },
-              required: ["memberships"],
-            },
-          },
-        },
+        description: "Club members with renewal status for the selected season",
       },
       401: {
         description: "Unauthorized",
@@ -104,6 +69,12 @@ defineRouteMeta({
   },
 });
 
+const querySchema = z.object({
+  season: z.coerce.number().int().optional(),
+});
+
+const UNPAID_STATUSES = ["pending", "processing", "failed", "cancelled"];
+
 export default defineEventHandler(async (event) => {
   const user = await requireUser(event);
   const clubId = Number.parseInt(getRouterParam(event, "clubId") ?? "", 10);
@@ -126,30 +97,114 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  const currentSeason = new Date().getFullYear();
+  const { season: requestedSeason } = await getValidatedQuery(
+    event,
+    querySchema.parse,
+  );
 
-  const memberships = await db.query.clubMemberships.findMany({
-    columns: {
-      confirmed: true,
-      registrationType: true,
-    },
-    with: {
-      user: {
-        columns: {
-          id: true,
-          name: true,
-          surname: true,
-          email: true,
-          role: true,
-          image: true,
+  // The club roster is everyone who has ever been a member of this club, so
+  // members who have not renewed this season are still visible.
+  const roster = await db
+    .selectDistinct({ userId: clubMemberships.userId })
+    .from(clubMemberships)
+    .where(eq(clubMemberships.clubId, clubId));
+
+  const seasonRows = await db
+    .selectDistinct({ season: clubMemberships.season })
+    .from(clubMemberships)
+    .where(eq(clubMemberships.clubId, clubId))
+    .orderBy(desc(clubMemberships.season));
+
+  const currentSeasons = (await getSetting("current-seasons")) ?? [];
+  const seasons = [
+    ...new Set([...currentSeasons, ...seasonRows.map((row) => row.season)]),
+  ].sort((a, b) => b - a);
+
+  const season =
+    requestedSeason && seasons.includes(requestedSeason)
+      ? requestedSeason
+      : (currentSeasons[0] ??
+        seasonRows[0]?.season ??
+        new Date().getFullYear());
+
+  const userIds = roster.map((row) => row.userId);
+
+  if (userIds.length === 0) {
+    return {
+      season,
+      seasons,
+      members: [],
+    };
+  }
+
+  const [users, seasonMemberships] = await Promise.all([
+    db.query.users.findMany({
+      columns: {
+        id: true,
+        name: true,
+        surname: true,
+        email: true,
+        role: true,
+        image: true,
+      },
+      where: {
+        id: { in: userIds },
+      },
+    }),
+    db.query.clubMemberships.findMany({
+      columns: {
+        userId: true,
+        confirmed: true,
+        registrationType: true,
+      },
+      with: {
+        payment: {
+          columns: {
+            status: true,
+          },
         },
       },
-    },
-    where: {
-      clubId: clubId,
-      season: currentSeason,
-    },
-  });
+      where: {
+        clubId,
+        season,
+      },
+    }),
+  ]);
 
-  return { memberships };
+  const membershipsByUserId = new Map(
+    seasonMemberships.map((membership) => [membership.userId, membership]),
+  );
+
+  const members = users
+    .map((member) => {
+      const membership = membershipsByUserId.get(member.id);
+      const paymentStatus = membership?.payment?.status ?? null;
+
+      let status: MembershipRenewalStatus;
+
+      if (!membership) {
+        status = "not_renewed";
+      } else if (paymentStatus && UNPAID_STATUSES.includes(paymentStatus)) {
+        status = "pending_payment";
+      } else if (!membership.confirmed) {
+        status = "pending_confirmation";
+      } else {
+        status = "renewed";
+      }
+
+      return {
+        user: member,
+        status,
+        registrationType: membership?.registrationType ?? null,
+        confirmed: membership?.confirmed ?? null,
+        paymentStatus,
+      };
+    })
+    .sort((a, b) => {
+      const aName = `${a.user.surname} ${a.user.name}`.toLowerCase();
+      const bName = `${b.user.surname} ${b.user.name}`.toLowerCase();
+      return aName.localeCompare(bName, "sk");
+    });
+
+  return { season, seasons, members };
 });
