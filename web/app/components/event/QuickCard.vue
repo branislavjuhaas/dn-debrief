@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import type { Event } from "#shared/types/event";
+import type { Event, RegistrationRole } from "#shared/types/event";
+import {
+  getRoleRegistrationDeadline,
+  isPlatformRegistration,
+} from "#shared/utils/events";
 
 const props = defineProps<{ event: Event }>();
 
@@ -9,6 +13,16 @@ const formatter = new Intl.DateTimeFormat("sk-SK", {
 });
 
 const formatDeadline = (date: Date) => formatter.format(date);
+
+const roleDeadline = (role: RegistrationRole) => {
+  const config = props.event.registrationConfig;
+
+  if (!isPlatformRegistration(config)) {
+    return null;
+  }
+
+  return getRoleRegistrationDeadline(role, config);
+};
 </script>
 
 <template>
@@ -101,13 +115,8 @@ const formatDeadline = (date: Date) => formatter.format(date);
           <td class="pt-2.5">{{ role.cost ?? 0 }}€</td>
           <td class="pt-2.5">
             {{
-              role.hardDeadline
-                ? formatDeadline(
-                    new Date(
-                      role.hardDeadline ??
-                        event.registrationConfig.softDeadline,
-                    ),
-                  )
+              roleDeadline(role)
+                ? formatDeadline(new Date(roleDeadline(role)!))
                 : "—"
             }}
           </td>

@@ -8,6 +8,7 @@ import type {
   Region,
   ExternalRegistrationConfig,
   PlatformRegistrationConfig,
+  RegistrationRole,
 } from "#shared/types/event";
 
 export const EVENT_TYPES = ["tournament", "workshop", "other"] as const;
@@ -220,6 +221,39 @@ export const isPlatformRegistration = (
   config: unknown,
 ): config is PlatformRegistrationConfig => {
   return typeof config === "object" && config !== null && "sections" in config;
+};
+
+/**
+ * Returns the deadline that actually closes registration for a role.
+ *
+ * A role-specific deadline is authoritative. Only roles without their own
+ * deadline fall back to the event-wide (soft) deadline.
+ */
+export const getRoleRegistrationDeadline = (
+  role: RegistrationRole,
+  config: PlatformRegistrationConfig,
+): string | null => role.hardDeadline ?? config.softDeadline ?? null;
+
+/**
+ * Whether registration for a single role has already closed.
+ *
+ * Other roles' deadlines never affect the result: a role is closed only by
+ * its own deadline, or by the event-wide deadline when it has none.
+ */
+export const isRoleRegistrationClosed = (
+  role: RegistrationRole,
+  config: PlatformRegistrationConfig,
+  now: number = Date.now(),
+): boolean => {
+  const deadline = getRoleRegistrationDeadline(role, config);
+
+  if (!deadline) {
+    return false;
+  }
+
+  const deadlineTime = new Date(deadline).getTime();
+
+  return !Number.isNaN(deadlineTime) && now > deadlineTime;
 };
 
 export type ScheduleBounds = {

@@ -4,7 +4,10 @@ import { payments } from "#server/db/schema/payments";
 import { getUser } from "#server/utils/auth";
 import { generateActionMail, sendEmail } from "#server/utils/mail";
 import { obfuscateId } from "#server/utils/obfuscate";
-import { isPlatformRegistration } from "#shared/utils/events";
+import {
+  isPlatformRegistration,
+  isRoleRegistrationClosed,
+} from "#shared/utils/events";
 import { differenceInYears } from "date-fns";
 import * as z from "zod";
 
@@ -186,27 +189,15 @@ export default defineEventHandler(async (event) => {
   }
 
   // 4. Validate deadlines
-  const now = Date.now();
-  if (role.hardDeadline) {
-    const hardTime = new Date(role.hardDeadline).getTime();
-    if (!Number.isNaN(hardTime) && now > hardTime) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: "Bad Request",
-        message: "Registration for this role has ended",
-      });
-    }
-  }
-
-  if (config.softDeadline) {
-    const softTime = new Date(config.softDeadline).getTime();
-    if (!Number.isNaN(softTime) && now > softTime) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: "Bad Request",
-        message: "Registration for this event has ended",
-      });
-    }
+  // The role deadline is authoritative. The event-wide deadline only applies
+  // to roles that do not define their own deadline, so closing one role (or
+  // extending the event-wide deadline) never changes another role's window.
+  if (isRoleRegistrationClosed(role, config)) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Bad Request",
+      message: "Registration for this role has ended",
+    });
   }
 
   // 5. Auth & membership validation

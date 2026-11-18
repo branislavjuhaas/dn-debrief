@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import type { Event, RegistrationRole } from "#shared/types/event";
-import { isPlatformRegistration, isSectionVisible } from "#shared/utils/events";
+import {
+  getRoleRegistrationDeadline,
+  isPlatformRegistration,
+  isRoleRegistrationClosed,
+  isSectionVisible,
+} from "#shared/utils/events";
 import { CalendarDate, parseDate } from "@internationalized/date";
 
 const route = useRoute();
@@ -58,6 +63,15 @@ const activeRoles = computed<RegistrationRole[]>(() =>
 const isRoleDisabled = (role: RegistrationRole) =>
   !isLoggedIn.value && (role.cost ?? 0) > 0;
 
+const isRoleClosed = (role: RegistrationRole) =>
+  config.value ? isRoleRegistrationClosed(role, config.value) : false;
+
+const effectiveRoleDeadline = (role: RegistrationRole) =>
+  config.value ? getRoleRegistrationDeadline(role, config.value) : null;
+
+const isRoleUnavailable = (role: RegistrationRole) =>
+  isRoleDisabled(role) || isRoleClosed(role);
+
 const activeSections = computed(() =>
   (config.value?.sections ?? []).filter((s) => !s.deleted),
 );
@@ -87,13 +101,15 @@ watch(
   ([roles]) => {
     if (
       roles.length === 1 &&
-      !isRoleDisabled(roles[0]!) &&
+      !isRoleUnavailable(roles[0]!) &&
       !selectedRoleUuid.value
     ) {
       selectedRoleUuid.value = roles[0]!.uuid;
     } else if (
       selectedRoleUuid.value &&
-      roles.some((r) => r.uuid === selectedRoleUuid.value && isRoleDisabled(r))
+      roles.some(
+        (r) => r.uuid === selectedRoleUuid.value && isRoleUnavailable(r),
+      )
     ) {
       selectedRoleUuid.value = "";
     }
@@ -116,7 +132,7 @@ const hasGuestStep = computed(() => !isLoggedIn.value);
 const hasRoleStep = computed(
   () =>
     activeRoles.value.length > 1 ||
-    activeRoles.value.some((r) => isRoleDisabled(r)),
+    activeRoles.value.some((r) => isRoleUnavailable(r)),
 );
 
 // Filter visible sections dynamically based on role and prior answers
@@ -516,6 +532,16 @@ useSeoMeta({
           <!-- Step 1: Role Selection -->
           <div v-if="currentStep?.type === 'role'" class="space-y-4">
             <UAlert
+              v-if="
+                activeRoles.length > 0 &&
+                activeRoles.every((r) => isRoleClosed(r))
+              "
+              color="error"
+              variant="subtle"
+              icon="i-ph-clock-countdown"
+              title="Registrácia je uzavretá"
+              description="Deadline už uplynul pre všetky účastnícke role tohto podujatia." />
+            <UAlert
               v-if="!isLoggedIn && activeRoles.some((r) => isRoleDisabled(r))"
               color="neutral"
               variant="subtle"
@@ -542,15 +568,15 @@ useSeoMeta({
                   :key="r.uuid"
                   class="border rounded-lg p-4 transition-colors"
                   :class="[
-                    isRoleDisabled(r)
+                    isRoleUnavailable(r)
                       ? 'border-default/40 bg-muted/10 opacity-60 cursor-not-allowed'
                       : selectedRoleUuid === r.uuid
                         ? 'border-primary bg-primary/5 ring-2 ring-primary/30 cursor-pointer'
                         : 'border-default/60 hover:border-default hover:bg-elevated/40 cursor-pointer',
                   ]"
-                  :aria-disabled="isRoleDisabled(r)"
+                  :aria-disabled="isRoleUnavailable(r)"
                   @click="
-                    if (!isRoleDisabled(r)) {
+                    if (!isRoleUnavailable(r)) {
                       selectedRoleUuid = r.uuid;
                       delete fieldErrors.role;
                     }
@@ -560,7 +586,7 @@ useSeoMeta({
                       <div
                         class="size-5 rounded-full border flex items-center justify-center"
                         :class="
-                          isRoleDisabled(r)
+                          isRoleUnavailable(r)
                             ? 'border-muted/40 bg-muted/20 text-muted'
                             : selectedRoleUuid === r.uuid
                               ? 'border-primary bg-primary text-white'
@@ -571,15 +597,19 @@ useSeoMeta({
                           name="i-ph-check"
                           class="size-3" />
                         <UIcon
-                          v-else-if="isRoleDisabled(r)"
-                          name="i-ph-lock"
+                          v-else-if="isRoleUnavailable(r)"
+                          :name="
+                            isRoleClosed(r)
+                              ? 'i-ph-clock-countdown'
+                              : 'i-ph-lock'
+                          "
                           class="size-2.5 text-muted" />
                       </div>
                       <div>
                         <h4
                           class="font-semibold"
                           :class="
-                            isRoleDisabled(r)
+                            isRoleUnavailable(r)
                               ? 'text-muted'
                               : 'text-highlighted'
                           ">
@@ -594,13 +624,21 @@ useSeoMeta({
                                 : "Iná účasť"
                           }}
                         </p>
+                        <p
+                          v-if="effectiveRoleDeadline(r)"
+                          class="text-xs text-muted mt-0.5">
+                          Deadline:
+                          {{ formatDate(effectiveRoleDeadline(r)) }}
+                        </p>
                       </div>
                     </div>
                     <div class="text-right space-y-0.5">
                       <span
                         class="text-sm font-bold"
                         :class="
-                          isRoleDisabled(r) ? 'text-muted' : 'text-highlighted'
+                          isRoleUnavailable(r)
+                            ? 'text-muted'
+                            : 'text-highlighted'
                         ">
                         {{ r.cost > 0 ? `${r.cost} €` : "Bez poplatku" }}
                       </span>
@@ -608,13 +646,19 @@ useSeoMeta({
                         v-if="r.hasTeamVariant"
                         class="text-xs flex items-center gap-1 justify-end"
                         :class="
-                          isRoleDisabled(r) ? 'text-muted' : 'text-primary'
+                          isRoleUnavailable(r) ? 'text-muted' : 'text-primary'
                         ">
                         <UIcon name="i-ph-users-three" class="size-3.5" />
                         Tímová účasť
                       </p>
                       <p
-                        v-if="isRoleDisabled(r)"
+                        v-if="isRoleClosed(r)"
+                        class="text-xs text-error flex items-center gap-1 justify-end">
+                        <UIcon name="i-ph-clock-countdown" class="size-3.5" />
+                        Deadline uplynul
+                      </p>
+                      <p
+                        v-else-if="isRoleDisabled(r)"
                         class="text-xs text-warning flex items-center gap-1 justify-end">
                         <UIcon name="i-ph-lock-key" class="size-3.5" />
                         Vyžaduje prihlásenie
