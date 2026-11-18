@@ -12,23 +12,23 @@ defineRouteMeta({
         content: {
           "application/json": {
             schema: {
-              type: "object",
+              type: "object" as const,
               properties: {
                 organizers: {
-                  type: "array",
+                  type: "array" as const,
                   items: {
-                    type: "object",
+                    type: "object" as const,
                     properties: {
-                      id: { type: "integer", example: 12 },
-                      name: { type: "string", example: "Marek" },
-                      surname: { type: "string", example: "Novotny" },
+                      id: { type: "integer" as const, example: 12 },
+                      name: { type: "string" as const, example: "Marek" },
+                      surname: { type: "string" as const, example: "Novotny" },
                       email: {
-                        type: "string",
+                        type: "string" as const,
                         format: "email",
                         example: "marek@example.com",
                       },
                       phone: {
-                        type: "string",
+                        type: "string" as const,
                         nullable: true,
                         example: "+421900000000",
                       },
