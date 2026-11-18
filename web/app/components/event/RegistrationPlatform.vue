@@ -799,8 +799,8 @@ const questionTypeOptions = [
           variant="card" />
 
         <UFormField
-          label="Predvolená uzávierka registrácie"
-          description="Použije sa pre všetky role, ktoré nemajú vlastnú uzávierku">
+          label="Predvolený deadline registrácie"
+          description="Použije sa pre všetky role, ktoré nemajú vlastný deadline">
           <UInputDate
             v-model="softDeadline"
             granularity="minute"
@@ -890,8 +890,8 @@ const questionTypeOptions = [
             </UFormField>
 
             <UFormField
-              label="Vlastná uzávierka role"
-              description="Nepovinné. Ak necháte prázdne, použije sa predvolená uzávierka podujatia.">
+              label="Vlastný deadline role"
+              description="Nepovinné. Ak necháte prázdne, použije sa predvolený deadline podujatia.">
               <UInputDate
                 :model-value="toCalendarDateTimeValue(role.hardDeadline)"
                 granularity="minute"
@@ -900,12 +900,12 @@ const questionTypeOptions = [
                   (val) => (role.hardDeadline = fromCalendarDateTimeValue(val))
                 " />
               <p class="mt-1.5 text-xs text-muted">
-                Efektívna uzávierka:
+                Efektívny deadline:
                 <span class="font-medium text-default">
                   {{
                     effectiveDeadline(role)
                       ? formatDate(effectiveDeadline(role))
-                      : "bez uzávierky"
+                      : "bez deadlinu"
                   }}
                 </span>
               </p>

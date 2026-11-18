@@ -540,7 +540,7 @@ useSeoMeta({
               variant="subtle"
               icon="i-ph-clock-countdown"
               title="Registrácia je uzavretá"
-              description="Uzávierka už uplynula pre všetky účastnícke role tohto podujatia." />
+              description="Deadline už uplynul pre všetky účastnícke role tohto podujatia." />
             <UAlert
               v-if="!isLoggedIn && activeRoles.some((r) => isRoleDisabled(r))"
               color="neutral"
@@ -627,7 +627,7 @@ useSeoMeta({
                         <p
                           v-if="effectiveRoleDeadline(r)"
                           class="text-xs text-muted mt-0.5">
-                          Uzávierka:
+                          Deadline:
                           {{ formatDate(effectiveRoleDeadline(r)) }}
                         </p>
                       </div>
@@ -655,7 +655,7 @@ useSeoMeta({
                         v-if="isRoleClosed(r)"
                         class="text-xs text-error flex items-center gap-1 justify-end">
                         <UIcon name="i-ph-clock-countdown" class="size-3.5" />
-                        Uzávierka uplynula
+                        Deadline uplynul
                       </p>
                       <p
                         v-else-if="isRoleDisabled(r)"
