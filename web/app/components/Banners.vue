@@ -62,6 +62,8 @@ const stopImpersonatingUser = async () => {
       v-if="showCampaignBanner && campaignBanner"
       color="primary"
       icon="i-ph-megaphone-fill"
+      close
+      @close="dismissCampaign"
       :ui="{
         container:
           'flex items-start sm:items-center justify-between gap-3 min-h-12 h-auto py-2 lg:h-12 lg:py-0',
@@ -86,15 +88,6 @@ const stopImpersonatingUser = async () => {
             {{ campaignBanner.linkLabel }}
           </UButton>
         </span>
-      </template>
-      <template #close>
-        <UButton
-          icon="i-ph-x"
-          color="neutral"
-          variant="ghost"
-          size="sm"
-          aria-label="Skryť oznámenie"
-          @click="dismissCampaign" />
       </template>
     </UBanner>
   </div>
