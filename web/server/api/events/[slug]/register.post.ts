@@ -22,7 +22,7 @@ defineRouteMeta({
         name: "slug",
         in: "path",
         required: true,
-        schema: { type: "string" },
+        schema: { type: "string" as const },
         description: "The slug of the event to register for",
       },
     ],
@@ -31,30 +31,30 @@ defineRouteMeta({
       content: {
         "application/json": {
           schema: {
-            type: "object",
+            type: "object" as const,
             properties: {
-              roleUuid: { type: "string", format: "uuid" },
-              teamName: { type: "string" },
+              roleUuid: { type: "string" as const, format: "uuid" },
+              teamName: { type: "string" as const },
               guestDetails: {
-                type: "object",
+                type: "object" as const,
                 properties: {
-                  name: { type: "string" },
-                  surname: { type: "string" },
-                  email: { type: "string", format: "email" },
-                  phone: { type: "string" },
-                  birthDate: { type: "string" },
-                  street: { type: "string" },
-                  postalCode: { type: "string" },
-                  town: { type: "string" },
+                  name: { type: "string" as const },
+                  surname: { type: "string" as const },
+                  email: { type: "string" as const, format: "email" },
+                  phone: { type: "string" as const },
+                  birthDate: { type: "string" as const },
+                  street: { type: "string" as const },
+                  postalCode: { type: "string" as const },
+                  town: { type: "string" as const },
                 },
               },
               answers: {
-                type: "array",
+                type: "array" as const,
                 items: {
-                  type: "object",
+                  type: "object" as const,
                   properties: {
-                    questionUuid: { type: "string", format: "uuid" },
-                    answer: { type: "string", nullable: true },
+                    questionUuid: { type: "string" as const, format: "uuid" },
+                    answer: { type: "string" as const, nullable: true },
                   },
                   required: ["questionUuid"],
                 },
@@ -71,12 +71,16 @@ defineRouteMeta({
         content: {
           "application/json": {
             schema: {
-              type: "object",
+              type: "object" as const,
               properties: {
-                success: { type: "boolean" },
-                registrationId: { type: "integer" },
-                paymentId: { type: "string", format: "uuid", nullable: true },
-                confirmed: { type: "boolean" },
+                success: { type: "boolean" as const },
+                registrationId: { type: "integer" as const },
+                paymentId: {
+                  type: "string" as const,
+                  format: "uuid",
+                  nullable: true,
+                },
+                confirmed: { type: "boolean" as const },
               },
               required: ["success", "registrationId", "confirmed"],
             },
