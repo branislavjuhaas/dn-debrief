@@ -8,19 +8,16 @@ on:
       - "!web/**/*.md"
       - "!web/LICENSE"
       - "!web/.gitignore"
+  # No path filter here: this workflow is the required status check for `main`,
+  # so it must report on every pull request, including docs-only ones.
   pull_request:
-    paths:
-      - "web/**"
-      - "!web/**/*.md"
-      - "!web/LICENSE"
-      - "!web/.gitignore"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  test:
+  check:
     runs-on: ubuntu-latest
 
     defaults:
