@@ -61,9 +61,18 @@ const stopImpersonatingUser = async () => {
     <UBanner
       v-if="showCampaignBanner && campaignBanner"
       color="primary"
-      icon="i-ph-megaphone-fill">
+      icon="i-ph-megaphone-fill"
+      :ui="{
+        container:
+          'flex items-start sm:items-center justify-between gap-3 min-h-12 h-auto py-2 lg:h-12 lg:py-0',
+        center: 'flex items-center gap-1.5 min-w-0 flex-1 lg:flex-none',
+        title:
+          'text-sm text-inverted font-medium whitespace-normal lg:whitespace-nowrap',
+        actions: 'flex gap-1.5 shrink-0 isolate self-center',
+      }">
       <template #title>
-        <span class="inline-flex flex-wrap items-center gap-x-3 gap-y-2">
+        <span
+          class="inline-flex flex-wrap items-center gap-x-3 gap-y-2 lg:flex-nowrap">
           <b>{{ campaignBanner.title }}&nbsp;&nbsp;|</b>
           <span>{{ campaignBanner.text }}</span>
           <UButton
