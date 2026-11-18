@@ -4,7 +4,7 @@
   "private": true,
   "repository": {
     "type": "git",
-    "url": "https://github.com/branislavjuhaas/dn-debrief",
+    "url": "https://github.com/slovakdebate/dn-debrief",
     "directory": "web"
   },
   "type": "module",

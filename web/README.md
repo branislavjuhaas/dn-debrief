@@ -159,7 +159,7 @@ Conventions:
 ## Deployment
 
 - `../docker-compose.yml` — full local stack: PostgreSQL 18, RustFS object storage, database migration job, and the web app (`http://localhost:3000`, S3 API on `:9000`, console on `:9001`).
-- `../docker-compose.prod.yml` — production stack for [Dokploy](https://dokploy.com) using the published image `ghcr.io/branislavjuhaas/dn-debrief-web`.
+- `../docker-compose.prod.yml` — production stack for [Dokploy](https://dokploy.com) using the published image `ghcr.io/slovakdebate/dn-debrief-web`.
 - `Dockerfile` — multi-stage build: Vite+ build stage, minimal Node runtime serving `.output/`, and a separate `db-migrate` job for migrations.
 - GitHub Actions — checks on `web/**` changes (`check.yml`), a production build check on pull requests (`build-check.yml`), and release builds that push to GHCR and trigger Dokploy (`deploy.yml`).
 
