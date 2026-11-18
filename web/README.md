@@ -83,7 +83,8 @@ Create a `.env` file (gitignored). Only some variables are needed locally:
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET`                                                   | Optional    | Google OAuth provider.                                                                                       |
 | `S3_PUBLIC_ENDPOINT`                                                                          | Production  | Public S3 endpoint used to build presigned upload/download URLs and public file links.                       |
 | `S3_ACCESS_KEY_ID` / `S3_SECRET_ACCESS_KEY`                                                   | Production  | S3 credentials.                                                                                              |
-| `AWS_REGION`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_FROM_EMAIL`, `AWS_FROM_NAME` | Production  | AWS SES sender configuration. In development emails are logged to the console.                               |
+| `AWS_REGION`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_FROM_EMAIL`, `AWS_FROM_NAME` | Production  | AWS SES sender configuration. In development emails are logged to the console. See [Transactional e-mail deliverability](./docs/email-deliverability.md). |
+| `AWS_REPLY_TO_EMAIL`, `AWS_SES_CONFIGURATION_SET`                                             | Optional    | Reply-To address and SES configuration set for transactional mail.                                                                                            |
 | `STRIPE_SECRET_KEY`                                                                           | Payments    | Stripe API key.                                                                                              |
 | `STRIPE_WEBHOOK_SECRET`                                                                       | Payments    | Stripe webhook signature secret.                                                                             |
 
