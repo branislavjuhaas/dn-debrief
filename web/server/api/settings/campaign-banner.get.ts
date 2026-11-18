@@ -12,16 +12,16 @@ defineRouteMeta({
         content: {
           "application/json": {
             schema: {
-              type: "object",
+              type: "object" as const,
               properties: {
                 campaignBanner: {
-                  type: "object",
+                  type: "object" as const,
                   properties: {
-                    enabled: { type: "boolean" },
-                    title: { type: "string" },
-                    text: { type: "string" },
-                    url: { type: "string" },
-                    linkLabel: { type: "string" },
+                    enabled: { type: "boolean" as const },
+                    title: { type: "string" as const },
+                    text: { type: "string" as const },
+                    url: { type: "string" as const },
+                    linkLabel: { type: "string" as const },
                   },
                   required: ["enabled", "title", "text", "url", "linkLabel"],
                 },
