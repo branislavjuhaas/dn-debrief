@@ -327,11 +327,7 @@ onMounted(() => {
                 v-model="profileState.legalGuardian.name"
                 placeholder="Zadajte meno zákonného/-ej zástupcu/-kne" />
             </UFormField>
-            <UFormField
-              label="E-mail"
-              name="legalGuardian.email"
-              required
-              description="Musí sa líšiť od e-mailu vášho účtu.">
+            <UFormField label="E-mail" name="legalGuardian.email" required>
               <UInput
                 v-model="profileState.legalGuardian.email"
                 type="email"
