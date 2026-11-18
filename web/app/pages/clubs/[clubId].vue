@@ -95,44 +95,6 @@ const selectedSeasonModel = computed({
   },
 });
 
-const renewalSummary = computed(
-  () =>
-    clubMembers.value?.summary ?? {
-      total: 0,
-      renewed: 0,
-      pendingPayment: 0,
-      pendingConfirmation: 0,
-      notRenewed: 0,
-    },
-);
-
-const renewalStats = computed(() => [
-  {
-    label: "Obnovené členstvo",
-    value: renewalSummary.value.renewed,
-    icon: "i-ph-seal-check-fill",
-    class: "text-success",
-  },
-  {
-    label: "Čaká na platbu",
-    value: renewalSummary.value.pendingPayment,
-    icon: "i-ph-coins-fill",
-    class: "text-warning",
-  },
-  {
-    label: "Čaká na potvrdenie",
-    value: renewalSummary.value.pendingConfirmation,
-    icon: "i-ph-seal-question-fill",
-    class: "text-info",
-  },
-  {
-    label: "Neobnovené",
-    value: renewalSummary.value.notRenewed,
-    icon: "i-ph-seal-warning-fill",
-    class: "text-muted",
-  },
-]);
-
 const {
   data: clubPayments,
   execute: fetchPayments,
@@ -732,41 +694,16 @@ const paymentsColumns: TableColumn<ClubPaymentRow>[] = [
         }">
         <template #members>
           <div class="flex flex-col gap-4">
-            <div
-              class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-              <UFormField label="Sezóna" class="w-full sm:w-40">
+            <div class="flex justify-end">
+              <UFormField
+                label="Sezóna"
+                orientation="horizontal"
+                class="w-full sm:w-64">
                 <USelect
                   v-model="selectedSeasonModel"
                   :items="seasonOptions"
-                  class="w-full" />
+                  class="w-32" />
               </UFormField>
-              <p class="text-sm text-muted">
-                Obnovených
-                <span class="font-bold text-highlighted">
-                  {{ renewalSummary.renewed }}
-                </span>
-                z
-                <span class="font-bold text-highlighted">
-                  {{ renewalSummary.total }}
-                </span>
-                členov/-iek
-              </p>
-            </div>
-            <div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
-              <UCard
-                v-for="stat in renewalStats"
-                :key="stat.label"
-                :ui="{ body: 'p-4 flex items-center gap-3' }">
-                <UIcon
-                  :name="stat.icon"
-                  :class="['size-6 shrink-0', stat.class]" />
-                <div>
-                  <p class="text-xs text-muted">{{ stat.label }}</p>
-                  <p class="text-xl font-bold text-highlighted">
-                    {{ stat.value }}
-                  </p>
-                </div>
-              </UCard>
             </div>
             <UTable
               :data="clubMembers?.members ?? []"

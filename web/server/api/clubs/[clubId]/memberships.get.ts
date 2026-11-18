@@ -34,100 +34,6 @@ defineRouteMeta({
     responses: {
       200: {
         description: "Club members with renewal status for the selected season",
-        content: {
-          "application/json": {
-            schema: {
-              type: "object",
-              properties: {
-                season: { type: "integer" },
-                seasons: {
-                  type: "array",
-                  items: { type: "integer" },
-                },
-                summary: {
-                  type: "object",
-                  properties: {
-                    total: { type: "integer" },
-                    renewed: { type: "integer" },
-                    pendingPayment: { type: "integer" },
-                    pendingConfirmation: { type: "integer" },
-                    notRenewed: { type: "integer" },
-                  },
-                  required: [
-                    "total",
-                    "renewed",
-                    "pendingPayment",
-                    "pendingConfirmation",
-                    "notRenewed",
-                  ],
-                },
-                members: {
-                  type: "array",
-                  items: {
-                    type: "object",
-                    properties: {
-                      user: {
-                        type: "object",
-                        properties: {
-                          id: { type: "integer" },
-                          name: { type: "string" },
-                          surname: { type: "string" },
-                          email: { type: "string" },
-                          role: {
-                            type: "string",
-                            enum: [
-                              "user",
-                              "organizer",
-                              "junior_organizer",
-                              "chief_adjudicator",
-                              "motion_committee_member",
-                              "admin",
-                              "developer",
-                            ],
-                          },
-                          image: { type: ["string", "null"] },
-                        },
-                      },
-                      status: {
-                        type: "string",
-                        enum: [
-                          "renewed",
-                          "pending_payment",
-                          "pending_confirmation",
-                          "not_renewed",
-                        ],
-                      },
-                      registrationType: {
-                        type: ["string", "null"],
-                        enum: [
-                          "junior_student",
-                          "senior_student",
-                          "graduate",
-                          "teacher",
-                          null,
-                        ],
-                      },
-                      confirmed: { type: ["boolean", "null"] },
-                      paymentStatus: {
-                        type: ["string", "null"],
-                        enum: [
-                          "pending",
-                          "processing",
-                          "paid",
-                          "cancelled",
-                          "forgiven",
-                          "failed",
-                          null,
-                        ],
-                      },
-                    },
-                  },
-                },
-              },
-              required: ["season", "seasons", "summary", "members"],
-            },
-          },
-        },
       },
       401: {
         description: "Unauthorized",
@@ -227,13 +133,6 @@ export default defineEventHandler(async (event) => {
     return {
       season,
       seasons,
-      summary: {
-        total: 0,
-        renewed: 0,
-        pendingPayment: 0,
-        pendingConfirmation: 0,
-        notRenewed: 0,
-      },
       members: [],
     };
   }
@@ -307,18 +206,5 @@ export default defineEventHandler(async (event) => {
       return aName.localeCompare(bName, "sk");
     });
 
-  const summary = {
-    total: members.length,
-    renewed: members.filter((member) => member.status === "renewed").length,
-    pendingPayment: members.filter(
-      (member) => member.status === "pending_payment",
-    ).length,
-    pendingConfirmation: members.filter(
-      (member) => member.status === "pending_confirmation",
-    ).length,
-    notRenewed: members.filter((member) => member.status === "not_renewed")
-      .length,
-  };
-
-  return { season, seasons, summary, members };
+  return { season, seasons, members };
 });
