@@ -104,11 +104,13 @@ export const sendEmail = async (
       Body: {
         Html: {
           Charset: "UTF-8",
-          Data: html || renderTransactionalEmail({
-            preheader: subject,
-            title: subject,
-            text,
-          }),
+          Data:
+            html ||
+            renderTransactionalEmail({
+              preheader: subject,
+              title: subject,
+              text,
+            }),
         },
         Text: {
           Charset: "UTF-8",
