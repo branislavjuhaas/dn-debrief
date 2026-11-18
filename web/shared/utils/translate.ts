@@ -1,3 +1,4 @@
+import type { MembershipRenewalStatus } from "#shared/types/club";
 import type { UserRole } from "#shared/types/user";
 
 export const translateAuthError = (errorCode: string) => {
@@ -193,5 +194,22 @@ export const translatePaymentResolution = (
       return "Odpustené";
     default:
       return resolution || "";
+  }
+};
+
+export const translateMembershipRenewalStatus = (
+  status: MembershipRenewalStatus,
+) => {
+  switch (status) {
+    case "renewed":
+      return "Obnovené";
+    case "pending_payment":
+      return "Čaká na platbu";
+    case "pending_confirmation":
+      return "Čaká na potvrdenie";
+    case "not_renewed":
+      return "Neobnovené";
+    default:
+      return "Neznámy stav";
   }
 };
