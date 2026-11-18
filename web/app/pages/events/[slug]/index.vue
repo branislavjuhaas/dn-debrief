@@ -6,6 +6,7 @@ import type { ButtonProps } from "@nuxt/ui";
 import {
   isExternalRegistration,
   isPlatformRegistration,
+  isRoleRegistrationClosed,
 } from "#shared/utils/events";
 
 const route = useRoute();
@@ -116,15 +117,20 @@ const registrationError = computed<string | null>(() => {
     return "Chýba konfigurácia podujatia a nemožno sa naň preto zaregistrovať.";
   }
 
-  // 1. Check deadline
+  // 1. Check deadline. For platform registrations only close the event once
+  // every active role has passed its own (or the event-wide) deadline.
   if (isExternalRegistration(config) && config.deadline) {
     const deadlineTime = new Date(config.deadline).getTime();
     if (Number.isNaN(deadlineTime) || Date.now() > deadlineTime) {
       return "Registrácia na podujatie je už po stanovenom deadline.";
     }
-  } else if (isPlatformRegistration(config) && config.softDeadline) {
-    const deadlineTime = new Date(config.softDeadline).getTime();
-    if (Number.isNaN(deadlineTime) || Date.now() > deadlineTime) {
+  } else if (isPlatformRegistration(config)) {
+    const activeRoles = config.roles.filter((role) => !role.deleted);
+    const allRolesClosed =
+      activeRoles.length > 0 &&
+      activeRoles.every((role) => isRoleRegistrationClosed(role, config));
+
+    if (allRolesClosed) {
       return "Registrácia na podujatie je už po stanovenom termíne.";
     }
   }

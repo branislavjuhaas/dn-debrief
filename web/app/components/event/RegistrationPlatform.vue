@@ -104,6 +104,12 @@ const activeSections = computed(() =>
   model.value.sections.filter((s: RegistrationSection) => !s.deleted),
 );
 
+/**
+ * Deadline that will actually close registration for a role.
+ */
+const effectiveDeadline = (role: RegistrationRole) =>
+  role.hardDeadline ?? model.value.softDeadline;
+
 // Keep fallbackStartSection always synced to first active section
 watch(
   activeSections,
@@ -793,8 +799,8 @@ const questionTypeOptions = [
           variant="card" />
 
         <UFormField
-          label="Deadline registrácie"
-          description="Dátum a čas, po ktorom sa registrácia pre účastníkov uzavrie">
+          label="Predvolená uzávierka registrácie"
+          description="Použije sa pre všetky role, ktoré nemajú vlastnú uzávierku">
           <UInputDate
             v-model="softDeadline"
             granularity="minute"
@@ -884,8 +890,8 @@ const questionTypeOptions = [
             </UFormField>
 
             <UFormField
-              label="Deadline na registráciu"
-              description="Špecifický termín uzávierky pre túto rolu (nepovinné)">
+              label="Vlastná uzávierka role"
+              description="Nepovinné. Ak necháte prázdne, použije sa predvolená uzávierka podujatia.">
               <UInputDate
                 :model-value="toCalendarDateTimeValue(role.hardDeadline)"
                 granularity="minute"
@@ -893,6 +899,16 @@ const questionTypeOptions = [
                 @update:model-value="
                   (val) => (role.hardDeadline = fromCalendarDateTimeValue(val))
                 " />
+              <p class="mt-1.5 text-xs text-muted">
+                Efektívna uzávierka:
+                <span class="font-medium text-default">
+                  {{
+                    effectiveDeadline(role)
+                      ? formatDate(effectiveDeadline(role))
+                      : "bez uzávierky"
+                  }}
+                </span>
+              </p>
             </UFormField>
 
             <UCheckbox
