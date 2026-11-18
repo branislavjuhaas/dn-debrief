@@ -62,7 +62,7 @@ const stopImpersonatingUser = async () => {
       v-if="showCampaignBanner && campaignBanner"
       color="primary"
       icon="i-ph-megaphone-fill"
-      :close="{ 'aria-label': 'Skryť oznámenie' }"
+      close
       @close="dismissCampaign"
       :ui="{
         container:
