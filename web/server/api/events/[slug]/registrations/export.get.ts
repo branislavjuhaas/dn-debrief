@@ -1,6 +1,9 @@
 import { db } from "#server/db";
 import { requireUser } from "#server/utils/auth";
-import { isPlatformRegistration } from "#shared/utils/events";
+import {
+  formatRoundAbsenceAnswer,
+  isPlatformRegistration,
+} from "#shared/utils/events";
 import type {
   RegistrationQuestion,
   RegistrationRole,
@@ -167,7 +170,7 @@ export default defineEventHandler(async (event) => {
     if (count > 0) {
       colName = `${colName} (${count + 1})`;
     }
-    return { name: colName, filterButton: true, questionUuid: q.uuid };
+    return { name: colName, filterButton: true, question: q };
   });
 
   const paymentColumns = [
@@ -210,8 +213,10 @@ export default defineEventHandler(async (event) => {
     }
 
     const questionValues = questionColumns.map((col) => {
-      const val = answerMap.get(col.questionUuid);
+      const val = answerMap.get(col.question.uuid);
       if (val === null || val === undefined) return "";
+      if (col.question.type === "round_absence")
+        return formatRoundAbsenceAnswer(col.question, val);
       if (Array.isArray(val)) return val.join(", ");
       if (typeof val === "boolean") return val ? "Áno" : "Nie";
       if (typeof val === "string" || typeof val === "number") {

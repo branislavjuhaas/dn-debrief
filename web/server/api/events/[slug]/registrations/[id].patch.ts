@@ -3,6 +3,11 @@ import { eventRegistrations } from "#server/db/schema/events";
 import { requireUser } from "#server/utils/auth";
 import { eq } from "drizzle-orm";
 import * as z from "zod";
+import {
+  hasValidRoundAbsenceAnswers,
+  isPlatformRegistration,
+  registrationAnswerSchema,
+} from "#shared/utils/events";
 
 defineRouteMeta({
   openAPI: {
@@ -51,10 +56,10 @@ defineRouteMeta({
               answers: {
                 type: "array",
                 items: {
-                  type: "object",
+                  type: "object" as const,
                   properties: {
-                    questionUuid: { type: "string", format: "uuid" },
-                    answer: { type: "string", nullable: true },
+                    questionUuid: { type: "string" as const, format: "uuid" },
+                    answer: { type: "string" as const, nullable: true },
                   },
                 },
               },
@@ -127,13 +132,7 @@ const updateRegistrationSchema = z.object({
     .array(
       z.object({
         questionUuid: z.uuid(),
-        answer: z.union([
-          z.string(),
-          z.array(z.string()),
-          z.number(),
-          z.boolean(),
-          z.null(),
-        ]),
+        answer: registrationAnswerSchema,
       }),
     )
     .optional(),
@@ -187,6 +186,23 @@ export default defineEventHandler(async (event) => {
   }
 
   const body = await readValidatedBody(event, updateRegistrationSchema.parse);
+
+  if (
+    body.answers !== undefined &&
+    isPlatformRegistration(eventRecord.registrationConfig) &&
+    !hasValidRoundAbsenceAnswers(
+      eventRecord.registrationConfig,
+      body.answers,
+      false,
+      existingRegistration.registrationData.questions,
+    )
+  ) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Bad Request",
+      message: "Invalid answer to the round absence question",
+    });
+  }
 
   const updatedRegistrationData = {
     ...existingRegistration.registrationData,

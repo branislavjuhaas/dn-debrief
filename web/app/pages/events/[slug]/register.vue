@@ -938,6 +938,19 @@ useSeoMeta({
                   variant="card"
                   @update:model-value="delete fieldErrors[q.uuid]" />
               </UFormField>
+
+              <!-- Round absence question -->
+              <UFormField
+                v-else-if="q.type === 'round_absence'"
+                :label="q.title"
+                :required="q.required"
+                :description="q.description"
+                :error="fieldErrors[q.uuid]">
+                <EventRoundAbsenceInput
+                  v-model="answers[q.uuid]"
+                  :rounds="q.rounds"
+                  @change="delete fieldErrors[q.uuid]" />
+              </UFormField>
             </div>
           </div>
 

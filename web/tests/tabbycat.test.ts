@@ -4,6 +4,7 @@ import {
   canonical,
   classifyRole,
   resolveRefs,
+  suggestRounds,
   type SourceParticipant,
 } from "../server/integrations/tabbycat/plan";
 import {
@@ -20,6 +21,8 @@ const empty = (): RemoteState => ({
   teams: [],
   speakers: [],
   adjudicators: [],
+  rounds: [],
+  availability: {},
 });
 const person = (
   id: number,
@@ -35,12 +38,26 @@ const person = (
   credential: 0,
   teamName: "BIL1",
   club: { id: 8, name: "Bilingválne gymnázium" },
+  availability: null,
   ...extra,
 });
 
 function apply(plan: ReturnType<typeof buildPlan>, state: RemoteState) {
   const links = { ...plan.links };
   for (const operation of plan.operations) {
+    if (operation.entity === "availability") {
+      const seq = Number(/rounds\/(\d+)\//.exec(operation.path)![1]);
+      const listed = resolveRefs(
+        operation.body.participants,
+        links,
+      ) as string[];
+      const current = new Set(state.availability[seq] ?? []);
+      for (const item of listed)
+        if (operation.method === "PUT") current.add(item);
+        else current.delete(item);
+      state.availability[seq] = [...current];
+      continue;
+    }
     const list = state[collections[operation.entity]];
     const body = resolveRefs(operation.body, links) as Record<string, unknown>;
     const current = list.find((item) => item.url === operation.path);
@@ -211,6 +228,316 @@ describe("registration mapping", () => {
         "/api/v1/institutions/2",
       ]),
     ).toBe(canonical(["/api/v1/institutions/2", "/api/v1/institutions/1"]));
+  });
+});
+
+describe("round availability", () => {
+  const [r1, r2, r3] = [
+    "11111111-1111-4111-8111-111111111111",
+    "22222222-2222-4222-8222-222222222222",
+    "33333333-3333-4333-8333-333333333333",
+  ];
+  const source = [
+    { id: r1, label: "1. kolo" },
+    { id: r2, label: "2. kolo" },
+    { id: r3, label: "3. kolo" },
+  ];
+  const remoteRounds = [1, 2, 3].map((seq) => ({
+    seq,
+    name: `Round ${seq}`,
+    abbreviation: `R${seq}`,
+  }));
+  const judge = (id: number, availability: SourceParticipant["availability"]) =>
+    person(id, {
+      role: "adjudicator",
+      name: `Judge${id}`,
+      credential: 2,
+      availability,
+    });
+  const path = (seq: number) =>
+    `/api/v1/tournaments/test/rounds/${seq}/availabilities?adjudicators=true`;
+
+  it("suggests only unambiguous one-to-one round pairs", () => {
+    expect(suggestRounds(source, remoteRounds)).toEqual({
+      [r1]: 1,
+      [r2]: 2,
+      [r3]: 3,
+    });
+    expect(
+      suggestRounds(
+        [
+          { id: r1, label: "R2" },
+          { id: r2, label: "Druhé 2" },
+          { id: r3, label: "Finále" },
+        ],
+        [...remoteRounds, { seq: 4, name: "Grand Final", abbreviation: "GF" }],
+      ),
+    ).toEqual({});
+  });
+
+  it("writes only answered, mapped rounds and keeps other Tabbycat availability", () => {
+    const state = empty();
+    state.rounds = remoteRounds;
+    const people = [
+      judge(1, { absent: [r2], rounds: [r1, r2] }),
+      judge(2, null),
+      judge(3, { absent: [], rounds: [r1, r2, r3] }),
+    ];
+    const rounds = { source, mapping: { [r1]: 1, [r2]: 2 } };
+    const links = apply(buildPlan(people, state, "test"), state);
+    const [one, , three] = [1, 2, 3].map((id) => links[`adjudicator:${id}`]!);
+    // Manual Tabbycat state: judge 1 and an unrelated adjudicator in round 2, judge 2 in round 1.
+    state.availability = {
+      1: [links["adjudicator:2"]!, "/api/v1/tournaments/test/adjudicators/99"],
+      2: [one!, "/api/v1/tournaments/test/adjudicators/99"],
+    };
+    const plan = buildPlan(people, state, "test", rounds);
+    expect(plan.errors).toEqual([]);
+    expect(
+      plan.operations.map(({ method, path, body, details }) => ({
+        method,
+        path,
+        body,
+        details,
+      })),
+    ).toEqual([
+      {
+        method: "PUT",
+        path: path(1),
+        body: { participants: [one, three] },
+        details: ["Judge1 Priezvisko1", "Judge3 Priezvisko3"],
+      },
+      {
+        method: "PUT",
+        path: path(2),
+        body: { participants: [three] },
+        details: ["Judge3 Priezvisko3"],
+      },
+      {
+        method: "POST",
+        path: path(2),
+        body: { participants: [one] },
+        details: ["Judge1 Priezvisko1"],
+      },
+    ]);
+    apply(plan, state);
+    expect(state.availability[1]).toContain(links["adjudicator:2"]);
+    expect(state.availability[2]).toContain(
+      "/api/v1/tournaments/test/adjudicators/99",
+    );
+    expect(buildPlan(people, state, "test", rounds).operations).toEqual([]);
+    // Round 3 was added after judge 1 answered, so it stays unknown for them.
+    const later = buildPlan(people, state, "test", {
+      source,
+      mapping: { ...rounds.mapping, [r3]: 3 },
+    });
+    expect(later.operations.map((item) => item.details)).toEqual([
+      ["Judge3 Priezvisko3"],
+    ]);
+  });
+
+  it("marks new adjudicators available by reference and blocks duplicate pairing", () => {
+    const state = empty();
+    state.rounds = remoteRounds;
+    const people = [judge(1, { absent: [r2], rounds: [r1, r2] })];
+    const plan = buildPlan(people, state, "test", {
+      source,
+      mapping: { [r1]: 1, [r2]: 2 },
+    });
+    expect(plan.operations.map((item) => item.entity)).toEqual([
+      "institution",
+      "adjudicator",
+      "availability",
+    ]);
+    expect(plan.operations.at(-1)!.body).toEqual({
+      participants: [{ $ref: "adjudicator:1" }],
+    });
+    expect(
+      buildPlan(people, state, "test", {
+        source,
+        mapping: { [r1]: 1, [r2]: 1 },
+      }).errors,
+    ).toEqual([
+      "Round 1: v Tabbycate je spárované s viacerými kolami z prihlášky.",
+    ]);
+  });
+});
+
+describe("round availability edge cases", () => {
+  const ids = Array.from(
+    { length: 4 },
+    (_, i) =>
+      `${i + 1}${i + 1}${i + 1}${i + 1}aaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa`,
+  );
+  const remote = [1, 2, 3].map((seq) => ({
+    seq,
+    name: `Round ${seq}`,
+    abbreviation: `R${seq}`,
+  }));
+  const rounds = ids
+    .slice(0, 3)
+    .map((id, i) => ({ id, label: `${i + 1}. kolo` }));
+  const judge = (
+    id: number,
+    availability: SourceParticipant["availability"],
+    extra: Partial<SourceParticipant> = {},
+  ) =>
+    person(id, {
+      role: "adjudicator",
+      name: `Judge${id}`,
+      credential: 2,
+      availability,
+      ...extra,
+    });
+  const all = (absent: string[] = []) => ({
+    absent,
+    rounds: rounds.map((round) => round.id),
+  });
+  const existing = (people: SourceParticipant[]) => {
+    const state = empty();
+    state.rounds = remote;
+    const links = apply(buildPlan(people, state, "test"), state);
+    return { state, links };
+  };
+  const pairs = (mapping: Record<string, number>) => ({
+    source: rounds,
+    mapping,
+  });
+
+  it("suggests by exact name or abbreviation regardless of case and spacing", () => {
+    expect(
+      suggestRounds(
+        [
+          { id: ids[0]!, label: "  round   1 " },
+          { id: ids[1]!, label: "r2" },
+        ],
+        remote,
+      ),
+    ).toEqual({ [ids[0]!]: 1, [ids[1]!]: 2 });
+  });
+
+  it("leaves ambiguous, multi-number and duplicate suggestions unpaired", () => {
+    const novice = [
+      ...remote,
+      { seq: 4, name: "Novice Round 1", abbreviation: "N1" },
+    ];
+    expect(suggestRounds([{ id: ids[0]!, label: "1. kolo" }], novice)).toEqual(
+      {},
+    );
+    expect(
+      suggestRounds([{ id: ids[0]!, label: "1. kolo, 2. deň" }], remote),
+    ).toEqual({});
+    expect(
+      suggestRounds(
+        [
+          { id: ids[0]!, label: "1. kolo" },
+          { id: ids[1]!, label: "Kolo 1" },
+        ],
+        remote,
+      ),
+    ).toEqual({});
+    expect(suggestRounds(rounds, [])).toEqual({});
+  });
+
+  it("does nothing without a pairing or for unpaired rounds", () => {
+    const people = [judge(1, all([ids[1]!]))];
+    const { state } = existing(people);
+    expect(buildPlan(people, state, "test").operations).toEqual([]);
+    expect(buildPlan(people, state, "test", pairs({})).operations).toEqual([]);
+    // A pairing to a round missing in Tabbycat is never written.
+    expect(
+      buildPlan(people, state, "test", pairs({ [ids[0]!]: 9 })).operations,
+    ).toEqual([]);
+  });
+
+  it("ignores speakers, excluded roles and absences in deleted rounds", () => {
+    const people = [
+      person(1, { availability: all([ids[0]!]) }),
+      person(2, { role: null, roleName: "Pozorovateľ", availability: all() }),
+      judge(3, { absent: [ids[3]!], rounds: [ids[0]!, ids[3]!] }),
+    ];
+    const { state, links } = existing(people);
+    const plan = buildPlan(people, state, "test", pairs({ [ids[0]!]: 1 }));
+    expect(plan.operations).toMatchObject([
+      {
+        method: "PUT",
+        body: { participants: [links["adjudicator:3"]] },
+      },
+    ]);
+  });
+
+  it("marks several absences and keeps rounds out of scope unchanged", () => {
+    const people = [
+      judge(1, all([ids[0]!, ids[2]!])),
+      judge(2, { absent: [], rounds: [ids[0]!] }),
+    ];
+    const { state, links } = existing(people);
+    state.availability = {
+      1: [links["adjudicator:1"]!],
+      3: [links["adjudicator:1"]!, links["adjudicator:2"]!],
+    };
+    const plan = buildPlan(
+      people,
+      state,
+      "test",
+      pairs({ [ids[0]!]: 1, [ids[1]!]: 2, [ids[2]!]: 3 }),
+    );
+    expect(
+      plan.operations.map((item) => [
+        item.method,
+        item.path.match(/rounds\/(\d)/)![1],
+        item.details,
+      ]),
+    ).toEqual([
+      ["PUT", "1", ["Judge2 Priezvisko2"]],
+      ["POST", "1", ["Judge1 Priezvisko1"]],
+      ["PUT", "2", ["Judge1 Priezvisko1"]],
+      ["POST", "3", ["Judge1 Priezvisko1"]],
+    ]);
+    // Judge 2 answered before rounds 2 and 3 existed in the form: round 3 stays available.
+    apply(plan, state);
+    expect(state.availability[3]).toEqual([links["adjudicator:2"]]);
+  });
+
+  it("follows a changed pairing without touching the previously paired round", () => {
+    const people = [judge(1, all([ids[0]!]))];
+    const { state, links } = existing(people);
+    state.availability = { 1: [links["adjudicator:1"]!], 2: [] };
+    const plan = buildPlan(people, state, "test", pairs({ [ids[0]!]: 2 }));
+    expect(plan.operations).toEqual([]);
+    const swapped = buildPlan(
+      people,
+      state,
+      "test",
+      pairs({ [ids[0]!]: 2, [ids[1]!]: 1 }),
+    );
+    expect(swapped.operations.map((item) => item.method)).toEqual([]);
+    expect(state.availability[1]).toEqual([links["adjudicator:1"]]);
+  });
+
+  it("does not plan availability for adjudicators that cannot be matched unambiguously", () => {
+    const people = [judge(1, all())];
+    const state = empty();
+    state.rounds = remote;
+    state.institutions.push({
+      url: "/api/v1/institutions/1",
+      name: "Bilingválne gymnázium",
+      code: "SDA8",
+    });
+    for (const n of [1, 2])
+      state.adjudicators.push({
+        url: `/api/v1/tournaments/test/adjudicators/${n}`,
+        name: "Judge1 Priezvisko1",
+        institution: "/api/v1/institutions/1",
+        institution_conflicts: [],
+        base_score: 2,
+        email: null,
+        phone: null,
+      });
+    const plan = buildPlan(people, state, "test", pairs({ [ids[0]!]: 1 }));
+    expect(plan.errors).toContain(
+      "Judge1 Priezvisko1: viac zhodných záznamov v Tabbycate. Opravte duplicity pred importom.",
+    );
   });
 });
 

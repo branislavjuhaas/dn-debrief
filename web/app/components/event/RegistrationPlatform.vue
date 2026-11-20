@@ -14,8 +14,10 @@ import type {
   PlatformRegistrationConfig,
 } from "#shared/types/event";
 import {
+  ALL_ROUNDS_LABEL,
   COLLECTED_DETAILS_OPTIONS,
   ROLE_CONDITION_QUESTION_UUID,
+  type RoundAbsenceQuestion,
 } from "#shared/utils/events";
 
 const model = defineModel<PlatformRegistrationConfig>({
@@ -343,6 +345,18 @@ const onQuestionTypeChange = (
   newType: string,
 ) => {
   (question as any).type = newType;
+  // Rounds stay on the question while its type changes in the editor, so
+  // switching back keeps their ids; saving another type drops the unknown key.
+  if (newType === "round_absence") {
+    delete (question as any).options;
+    if (!Array.isArray((question as any).rounds)) {
+      (question as any).rounds = [1, 2, 3].map((n) => ({
+        id: crypto.randomUUID(),
+        label: `${n}. kolo`,
+      }));
+    }
+    return;
+  }
   if (newType === "select" || newType === "multiselect") {
     if (
       !("options" in question) ||
@@ -403,6 +417,41 @@ const moveQuestionOption = (
     options.splice(targetIndex, 0, item);
   }
 };
+
+// Round ids are generated here and never derived from labels or positions.
+const addRound = (question: RoundAbsenceQuestion) => {
+  question.rounds.push({
+    id: crypto.randomUUID(),
+    label: `${question.rounds.length + 1}. kolo`,
+  });
+};
+
+const moveRound = (
+  question: RoundAbsenceQuestion,
+  index: number,
+  direction: "up" | "down",
+) => {
+  const target = direction === "up" ? index - 1 : index + 1;
+  if (target < 0 || target >= question.rounds.length) return;
+  const [round] = question.rounds.splice(index, 1);
+  if (round) question.rounds.splice(target, 0, round);
+};
+
+const hasOtherRoundAbsenceQuestion = (question: RegistrationQuestion) =>
+  activeSections.value.some((section) =>
+    section.questions.some(
+      (q) =>
+        !q.deleted && q.type === "round_absence" && q.uuid !== question.uuid,
+    ),
+  );
+
+const questionTypeItems = (question: RegistrationQuestion) =>
+  questionTypeOptions.map((option) => ({
+    ...option,
+    disabled:
+      option.value === "round_absence" &&
+      hasOtherRoundAbsenceQuestion(question),
+  }));
 
 // Section conditions (visibleWhen)
 const roleConditionOptions = computed(() =>
@@ -505,7 +554,9 @@ const getConditionSourcesForSection = (sectionUuid: string) => {
 
   for (const [idx, s] of activeSections.value.entries()) {
     if (s.uuid === sectionUuid) break;
-    const activeQuestions = s.questions.filter((q) => !q.deleted);
+    const activeQuestions = s.questions.filter(
+      (q) => !q.deleted && q.type !== "round_absence",
+    );
     for (const q of activeQuestions) {
       sources.push({
         label: `[${idx + 1}. ${s.title || "Sekcia"}] ${q.title || "Bez názvu"}`,
@@ -694,6 +745,15 @@ const validate = async () => {
           choiceQ.options = ["Možnosť 1"];
         }
       }
+      if (q.type === "round_absence") {
+        for (const round of q.rounds) round.label = round.label.trim();
+        if (!q.rounds.length || q.rounds.some((round) => !round.label)) {
+          return false;
+        }
+        if (hasOtherRoundAbsenceQuestion(q)) {
+          return false;
+        }
+      }
       if (q.description && !q.description.trim()) {
         delete q.description;
       }
@@ -724,8 +784,9 @@ const validate = async () => {
       }
     }
 
+    // Round absence answers are not condition sources; rules on them are dropped.
     for (const q of activeQuestions) {
-      seenQuestionUuids.add(q.uuid);
+      if (q.type !== "round_absence") seenQuestionUuids.add(q.uuid);
     }
   }
 
@@ -777,6 +838,7 @@ const questionTypeOptions = [
   { label: "Áno / Nie (zaškrtávacie pole)", value: "boolean" },
   { label: "Výber jednej možnosti", value: "select" },
   { label: "Výber viacerých možností", value: "multiselect" },
+  { label: "Neúčasť v kolách", value: "round_absence" },
 ];
 </script>
 
@@ -1056,7 +1118,7 @@ const questionTypeOptions = [
                   class="flex-1 w-full" />
                 <USelect
                   :model-value="q.type"
-                  :items="questionTypeOptions"
+                  :items="questionTypeItems(q)"
                   class="w-full sm:w-56"
                   @update:model-value="
                     (val) => onQuestionTypeChange(q, val as string)
@@ -1131,6 +1193,60 @@ const questionTypeOptions = [
                     :disabled="q.options.length <= 1"
                     @click="removeQuestionOption(q, optIdx)" />
                 </div>
+              </div>
+
+              <!-- Rounds for 'round_absence' -->
+              <div
+                v-else-if="q.type === 'round_absence'"
+                class="mt-2 pl-4 sm:pl-6 border-l-2 border-primary/30 space-y-2">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="text-xs font-semibold text-muted">
+                    Kolá, v ktorých možno označiť neúčasť:
+                  </span>
+                  <UButton
+                    icon="i-ph-plus"
+                    label="Pridať kolo"
+                    size="xs"
+                    variant="ghost"
+                    color="primary"
+                    @click="addRound(q)" />
+                </div>
+                <div
+                  v-for="(round, roundIdx) in q.rounds"
+                  :key="round.id"
+                  class="flex items-center gap-1.5">
+                  <UButton
+                    icon="i-ph-arrow-up"
+                    size="xs"
+                    variant="ghost"
+                    color="neutral"
+                    :disabled="roundIdx === 0"
+                    @click="moveRound(q, roundIdx, 'up')" />
+                  <UButton
+                    icon="i-ph-arrow-down"
+                    size="xs"
+                    variant="ghost"
+                    color="neutral"
+                    :disabled="roundIdx === q.rounds.length - 1"
+                    @click="moveRound(q, roundIdx, 'down')" />
+                  <UInput
+                    v-model="round.label"
+                    placeholder="Názov kola"
+                    class="flex-1"
+                    size="sm" />
+                  <UButton
+                    icon="i-ph-trash-simple"
+                    size="xs"
+                    color="error"
+                    variant="ghost"
+                    :disabled="q.rounds.length <= 1"
+                    @click="q.rounds.splice(roundIdx, 1)" />
+                </div>
+                <p class="text-xs text-muted">
+                  Účastníkom sa automaticky zobrazí aj možnosť „{{
+                    ALL_ROUNDS_LABEL
+                  }}“.
+                </p>
               </div>
             </div>
 

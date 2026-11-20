@@ -1,13 +1,20 @@
-export type ImportEntity = "institution" | "team" | "speaker" | "adjudicator";
+export type ImportEntity =
+  | "institution"
+  | "team"
+  | "speaker"
+  | "adjudicator"
+  | "availability";
 
 export interface ImportOperation {
   key: string;
   entity: ImportEntity;
   label: string;
-  method: "POST" | "PATCH";
+  /** Availability uses PUT to mark available and POST to mark unavailable. */
+  method: "POST" | "PATCH" | "PUT";
   path: string;
   body: Record<string, unknown>;
   before: Record<string, unknown>;
+  details?: string[];
 }
 
 export interface ImportPlan {
@@ -26,11 +33,22 @@ export interface ImportPlan {
   };
 }
 
+/** Debrief round id → Tabbycat round sequence number. */
+export type RoundMapping = Record<string, number>;
+
+export interface ImportRounds {
+  source: { id: string; label: string }[];
+  remote: { seq: number; name: string }[];
+  mapping: RoundMapping;
+}
+
 export interface ImportPreview {
   origin: string;
   tournament: string;
   tournamentName: string;
   plan: ImportPlan;
+  /** Present only when the form has a round-absence question. */
+  rounds: ImportRounds | null;
   fingerprint: string;
 }
 

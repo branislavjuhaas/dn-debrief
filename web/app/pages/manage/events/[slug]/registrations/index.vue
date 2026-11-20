@@ -6,6 +6,7 @@ import type {
   RegistrationRole,
 } from "#shared/types/event";
 import {
+  formatRoundAbsenceAnswer,
   isPlatformRegistration,
   normalizeTeamName,
 } from "#shared/utils/events";
@@ -412,6 +413,9 @@ const columns = computed<TableColumn<any>[]>(() => {
       if (Array.isArray(found.answer)) {
         return h("span", found.answer.join(", "));
       }
+      if (q.type === "round_absence") {
+        return h("span", formatRoundAbsenceAnswer(q, found.answer));
+      }
       if (typeof found.answer === "boolean") {
         return h(
           UBadge,
@@ -807,6 +811,16 @@ const columns = computed<TableColumn<any>[]>(() => {
                     :items="q.options"
                     color="primary"
                     class="space-y-2 pt-1" />
+                </UFormField>
+
+                <!-- Round absence -->
+                <UFormField
+                  v-else-if="q.type === 'round_absence'"
+                  :label="q.title"
+                  :description="q.description">
+                  <EventRoundAbsenceInput
+                    v-model="editAnswers[q.uuid]"
+                    :rounds="q.rounds" />
                 </UFormField>
               </div>
             </div>

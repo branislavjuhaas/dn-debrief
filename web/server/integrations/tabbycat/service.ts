@@ -13,11 +13,19 @@ import {
 import { z } from "zod";
 import { db } from "#server/db";
 import { requireUser } from "#server/utils/auth";
-import { isPlatformRegistration } from "#shared/utils/events";
+import {
+  findRoundAbsenceQuestion,
+  isPlatformRegistration,
+  isSectionVisible,
+  parseRoundAbsenceAnswer,
+  type RoundAbsenceQuestion,
+} from "#shared/utils/events";
 import type {
   ImportOperation,
   ImportPlan,
   ImportPreview,
+  ImportRounds,
+  RoundMapping,
 } from "#shared/types/tabbycat";
 import {
   TabbycatClient,
@@ -25,12 +33,14 @@ import {
   normalizeOrigin,
   collections,
   collectionPath,
+  availabilityPath,
 } from "./client";
 import {
   buildPlan,
   canonical,
   classifyRole,
   resolveRefs,
+  suggestRounds,
   type SourceParticipant,
 } from "./plan";
 
@@ -44,6 +54,10 @@ const previewSchema = connectionSchema.extend({
     .min(1)
     .max(200)
     .regex(/^[a-zA-Z0-9_-]+$/),
+  rounds: z
+    .record(z.uuid(), z.number().int().positive())
+    .refine((mapping) => Object.keys(mapping).length <= 50)
+    .optional(),
 });
 const importSchema = previewSchema.extend({
   fingerprint: z.string().regex(/^[a-f0-9]{64}$/),
@@ -110,6 +124,10 @@ export async function loadSource(
   const roles = new Map(
     record.registrationConfig.roles.map((role) => [role.uuid, role]),
   );
+  const question = findRoundAbsenceQuestion(record.registrationConfig);
+  const section = record.registrationConfig.sections.find((item) =>
+    item.questions.some((q) => q.uuid === question?.uuid),
+  );
   const registrations = await db.query.eventRegistrations.findMany({
     where: { eventId: record.id },
     with: {
@@ -132,6 +150,18 @@ export async function loadSource(
     },
     orderBy: (reg, { asc }) => [asc(reg.id)],
   });
+  // Answers left in a section the registration no longer shows are ignored.
+  const availabilityAnswer = (
+    data: (typeof registrations)[number]["registrationData"],
+  ) => {
+    if (!question || !section) return null;
+    const answers = Object.fromEntries(
+      (data.questions ?? []).map((item) => [item.questionUuid, item.answer]),
+    );
+    return isSectionVisible(section, data.roleUuid, answers)
+      ? parseRoundAbsenceAnswer(answers[question.uuid])
+      : null;
+  };
   return registrations.map((registration) => {
     const role = roles.get(registration.registrationData.roleUuid);
     if (!role)
@@ -158,9 +188,15 @@ export async function loadSource(
       credential,
       teamName: registration.registrationData.teamName?.trim() ?? "",
       club: club ? { id: club.id, name: club.name } : null,
+      availability: availabilityAnswer(registration.registrationData),
     };
   });
 }
+
+const roundQuestion = (record: Awaited<ReturnType<typeof importContext>>) =>
+  isPlatformRegistration(record.registrationConfig)
+    ? findRoundAbsenceQuestion(record.registrationConfig)
+    : undefined;
 
 async function verifyCapabilities(
   client: TabbycatClient,
@@ -169,6 +205,8 @@ async function verifyCapabilities(
 ) {
   const paths = new Map<string, ImportOperation[]>();
   for (const op of plan.operations) {
+    // Availability endpoints publish no field metadata; Tabbycat checks permissions on write.
+    if (op.entity === "availability") continue;
     const path = collectionPath(op.entity, slug);
     paths.set(path, [...(paths.get(path) ?? []), op]);
   }
@@ -196,21 +234,53 @@ async function prepare(
   client: TabbycatClient,
   source: SourceParticipant[],
   slug: string,
+  question: RoundAbsenceQuestion | undefined,
+  mapping: RoundMapping | undefined,
 ) {
-  const [tournament, remote] = await Promise.all([
+  const [tournament, remote, remoteRounds] = await Promise.all([
     client.request("GET", `/api/v1/tournaments/${encodeURIComponent(slug)}`),
     client.state(slug),
+    question ? client.rounds(slug) : [],
   ]);
   const name = (tournament as { name?: string })?.name;
   if (typeof name !== "string")
     throw new TabbycatError("Cieľový turnaj neexistuje.");
-  const plan = buildPlan(source, remote, slug);
+  remote.rounds = remoteRounds;
+  let rounds: ImportRounds | null = null;
+  if (question) {
+    const sourceRounds = question.rounds.map(({ id, label }) => ({
+      id,
+      label,
+    }));
+    // Without an explicit pairing, only unambiguous suggestions are proposed for review.
+    const pairs = mapping ?? suggestRounds(sourceRounds, remote.rounds);
+    for (const [id, seq] of Object.entries(pairs))
+      if (
+        !sourceRounds.some((round) => round.id === id) ||
+        !remote.rounds.some((round) => round.seq === seq)
+      )
+        throw new TabbycatError(
+          "Párovanie kôl už nezodpovedá prihláške alebo turnaju. Začnite nový import.",
+        );
+    await Promise.all(
+      [...new Set(Object.values(pairs))].map(async (seq) => {
+        remote.availability[seq] = await client.availability(slug, seq);
+      }),
+    );
+    rounds = {
+      source: sourceRounds,
+      remote: remote.rounds.map(({ seq, name }) => ({ seq, name })),
+      mapping: pairs,
+    };
+  }
+  const plan = buildPlan(source, remote, slug, rounds);
   const preview: ImportPreview = {
     origin: client.origin,
     tournament: slug,
     tournamentName: name,
-    fingerprint: fingerprint(client.origin, slug, source, plan),
+    fingerprint: fingerprint(client.origin, slug, source, plan, rounds),
     plan,
+    rounds,
   };
   return { preview, remote };
 }
@@ -220,11 +290,13 @@ function fingerprint(
   slug: string,
   source: SourceParticipant[],
   plan: ImportPlan,
+  rounds: ImportRounds | null,
 ) {
   return hash({
     origin,
     slug,
     source,
+    rounds,
     operations: plan.operations,
     errors: plan.errors,
   });
@@ -239,6 +311,8 @@ export async function preview(event: H3Event) {
     client,
     await loadSource(record),
     input.tournament,
+    roundQuestion(record),
+    input.rounds,
   );
   if (!result.plan.errors.length && result.plan.operations.length)
     await verifyCapabilities(client, input.tournament, result.plan);
@@ -272,6 +346,8 @@ export async function execute(event: H3Event) {
       client,
       source,
       input.tournament,
+      roundQuestion(record),
+      input.rounds,
     );
     if (current.fingerprint !== input.fingerprint)
       throw createError({
@@ -293,6 +369,36 @@ export async function execute(event: H3Event) {
     try {
       // Keep requests short for large tournaments; each batch validates the remaining preview.
       for (const operation of plan.operations.slice(0, 5)) {
+        if (operation.entity === "availability") {
+          // PUT/POST add or remove only the listed adjudicators; others keep their availability.
+          const round = remote.rounds.find(
+            (item) =>
+              availabilityPath(input.tournament, item.seq) === operation.path,
+          );
+          if (!round) throw new TabbycatError("Kolo v Tabbycate sa zmenilo.");
+          const participants = (
+            resolveRefs(operation.body.participants, plan.links) as string[]
+          ).map((item) => client.path(item));
+          const saved = client.availabilityList(
+            input.tournament,
+            await client.request(
+              operation.method,
+              operation.path,
+              participants,
+            ),
+          );
+          if (
+            participants.some(
+              (item) => saved.includes(item) !== (operation.method === "PUT"),
+            )
+          )
+            throw new TabbycatError(
+              "Tabbycat nepotvrdil uloženie dostupnosti.",
+            );
+          remote.availability[round.seq] = saved;
+          completed++;
+          continue;
+        }
         const desired = resolveRefs(operation.body, plan.links) as Record<
           string,
           unknown
@@ -348,7 +454,12 @@ export async function execute(event: H3Event) {
       });
     }
     // Derive the next fingerprint from confirmed responses, without accepting unrelated changes.
-    const remainingPlan = buildPlan(source, remote, input.tournament);
+    const remainingPlan = buildPlan(
+      source,
+      remote,
+      input.tournament,
+      current.rounds,
+    );
     return {
       completed,
       remaining: remainingPlan.operations.length,
@@ -357,6 +468,7 @@ export async function execute(event: H3Event) {
         input.tournament,
         source,
         remainingPlan,
+        current.rounds,
       ),
     };
   });

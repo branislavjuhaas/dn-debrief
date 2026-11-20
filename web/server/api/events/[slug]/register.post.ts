@@ -5,8 +5,10 @@ import { getUser } from "#server/utils/auth";
 import { generateActionMail, sendEmail } from "#server/utils/mail";
 import { obfuscateId } from "#server/utils/obfuscate";
 import {
+  hasValidRoundAbsenceAnswers,
   isPlatformRegistration,
   isRoleRegistrationClosed,
+  registrationAnswerSchema,
 } from "#shared/utils/events";
 import { differenceInYears } from "date-fns";
 import * as z from "zod";
@@ -142,13 +144,7 @@ const bodySchema = z.object({
     .array(
       z.object({
         questionUuid: z.uuid(),
-        answer: z.union([
-          z.string(),
-          z.array(z.string()),
-          z.number(),
-          z.boolean(),
-          z.null(),
-        ]),
+        answer: registrationAnswerSchema,
       }),
     )
     .default([]),
@@ -189,6 +185,14 @@ export default defineEventHandler(async (event) => {
       statusCode: 400,
       statusMessage: "Bad Request",
       message: "The selected registration role is not valid",
+    });
+  }
+
+  if (!hasValidRoundAbsenceAnswers(config, body.answers, true)) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Bad Request",
+      message: "Invalid answer to the round absence question",
     });
   }
 
