@@ -62,6 +62,16 @@ export type RegistrationQuestion =
       type: "select" | "multiselect";
       options: string[];
       deleted?: boolean;
+    }
+  | {
+      uuid: UUID;
+      title: string;
+      description?: string;
+      required: boolean;
+      type: "round_absence";
+      /** Stable ids identify rounds; labels can be renamed or reordered. */
+      rounds: { id: UUID; label: string }[];
+      deleted?: boolean;
     };
 
 export type RegistrationRule =
@@ -124,12 +134,19 @@ export type RegistrationsConfig =
       fallbackStartSection: UUID;
     };
 
+/**
+ * Answer to a "round_absence" question. `rounds` is the scope the person saw;
+ * every round in it but not in `absent` is attended. An empty `absent` list
+ * means "attends all rounds"; a missing answer means unknown availability.
+ */
+export type RoundAbsenceAnswer = { absent: UUID[]; rounds: UUID[] };
+
 export type RegistrationData = {
   roleUuid: UUID;
   teamName?: string;
   questions: {
     questionUuid: UUID;
-    answer: string | string[] | number | boolean | null;
+    answer: string | string[] | number | boolean | RoundAbsenceAnswer | null;
   }[];
 };
 

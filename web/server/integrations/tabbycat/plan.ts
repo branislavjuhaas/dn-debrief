@@ -1,6 +1,17 @@
 import normalizeString from "../../../shared/utils/normalize-string";
-import type { ImportEntity, ImportPlan } from "../../../shared/types/tabbycat";
-import { collectionPath, type RemoteObject, type RemoteState } from "./client";
+import type { RoundAbsenceAnswer } from "../../../shared/types/event";
+import type {
+  ImportPlan,
+  ImportRounds,
+  RoundMapping,
+} from "../../../shared/types/tabbycat";
+import {
+  availabilityPath,
+  collectionPath,
+  type RecordEntity,
+  type RemoteObject,
+  type RemoteState,
+} from "./client";
 
 export interface SourceParticipant {
   id: number;
@@ -13,6 +24,39 @@ export interface SourceParticipant {
   credential: number;
   teamName: string;
   club: { id: number; name: string } | null;
+  availability: RoundAbsenceAnswer | null;
+}
+
+/**
+ * Proposes only one-to-one pairs: an exact name/abbreviation match, or a label
+ * whose single number matches the single number of exactly one round name.
+ */
+export function suggestRounds(
+  source: ImportRounds["source"],
+  remote: RemoteState["rounds"],
+): RoundMapping {
+  const number = (value: string) => {
+    const found = value.match(/\d+/g);
+    return found?.length === 1 ? Number(found[0]) : null;
+  };
+  const proposals = source.flatMap((round) => {
+    let candidates = remote.filter(
+      (item) =>
+        fold(item.name) === fold(round.label) ||
+        fold(item.abbreviation) === fold(round.label),
+    );
+    const value = number(round.label);
+    if (!candidates.length && value !== null)
+      candidates = remote.filter((item) => number(item.name) === value);
+    return candidates.length === 1
+      ? [[round.id, candidates[0]!.seq] as const]
+      : [];
+  });
+  return Object.fromEntries(
+    proposals.filter(
+      ([, seq]) => proposals.filter((item) => item[1] === seq).length === 1,
+    ),
+  );
 }
 
 export function classifyRole(
@@ -82,6 +126,7 @@ export function buildPlan(
   source: SourceParticipant[],
   remote: RemoteState,
   slug: string,
+  rounds: Pick<ImportRounds, "source" | "mapping"> | null = null,
 ): ImportPlan {
   const plan: ImportPlan = {
     operations: [],
@@ -114,7 +159,7 @@ export function buildPlan(
   };
   const add = (
     key: string,
-    entity: ImportEntity,
+    entity: RecordEntity,
     label: string,
     desired: Record<string, unknown>,
     existing?: RemoteObject,
@@ -362,6 +407,60 @@ export function buildPlan(
           adjudicator_conflicts: [],
         },
       );
+    }
+  }
+
+  // Availability changes only for answered, mapped rounds; others stay untouched.
+  const adjudicators = included.filter(
+    (person) => person.role === "adjudicator",
+  );
+  const mapped = rounds
+    ? remote.rounds.flatMap((round) => {
+        const ids = rounds.source.filter(
+          (item) => rounds.mapping[item.id] === round.seq,
+        );
+        if (ids.length > 1)
+          addError(
+            `${round.name}: v Tabbycate je spárované s viacerými kolami z prihlášky.`,
+          );
+        return ids.length === 1 ? [{ round, id: ids[0]!.id }] : [];
+      })
+    : [];
+  for (const { round, id } of mapped) {
+    const current = new Set(remote.availability[round.seq] ?? []);
+    const changes = {
+      available: [] as SourceParticipant[],
+      absent: [] as SourceParticipant[],
+    };
+    for (const person of adjudicators) {
+      const answer = person.availability;
+      if (!answer?.rounds.includes(id)) continue;
+      const desired = !answer.absent.includes(id);
+      const url = plan.links[`adjudicator:${person.id}`];
+      if (desired !== (!!url && current.has(url)))
+        changes[desired ? "available" : "absent"].push(person);
+    }
+    for (const [state, people] of Object.entries(changes)) {
+      if (!people.length) continue;
+      const available = state === "available";
+      plan.operations.push({
+        key: `availability:${round.seq}:${state}`,
+        entity: "availability",
+        label: `${round.name}: ${available ? "dostupní" : "nedostupní"} (${people.length})`,
+        method: available ? "PUT" : "POST",
+        path: availabilityPath(slug, round.seq),
+        body: {
+          participants: people.map(
+            (person) =>
+              plan.links[`adjudicator:${person.id}`] ??
+              ref(`adjudicator:${person.id}`),
+          ),
+        },
+        before: {},
+        details: people.map((person) =>
+          `${person.name} ${person.surname}`.trim(),
+        ),
+      });
     }
   }
   return plan;

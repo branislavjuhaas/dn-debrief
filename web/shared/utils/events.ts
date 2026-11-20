@@ -9,6 +9,8 @@ import type {
   ExternalRegistrationConfig,
   PlatformRegistrationConfig,
   RegistrationRole,
+  RegistrationQuestion,
+  RoundAbsenceAnswer,
 } from "#shared/types/event";
 
 export const EVENT_TYPES = ["tournament", "workshop", "other"] as const;
@@ -86,7 +88,120 @@ export const registrationQuestionSchema = z.discriminatedUnion("type", [
     options: z.array(z.string().min(1)).min(1),
     deleted: z.boolean().optional(),
   }),
+  z.object({
+    uuid: z.uuid(),
+    title: z.string().min(1),
+    description: z.string().optional(),
+    required: z.boolean(),
+    type: z.literal("round_absence"),
+    rounds: z
+      .array(z.object({ id: z.uuid(), label: z.string().trim().min(1) }))
+      .min(1)
+      .refine(
+        (rounds) =>
+          new Set(rounds.map((round) => round.id)).size === rounds.length,
+        "Kolá musia mať jedinečné identifikátory.",
+      ),
+    deleted: z.boolean().optional(),
+  }),
 ]);
+
+export const ALL_ROUNDS_LABEL = "Zúčastním sa všetkých kôl";
+
+export const roundAbsenceAnswerSchema = z
+  .object({
+    absent: z.array(z.uuid()),
+    rounds: z.array(z.uuid()).min(1),
+  })
+  .refine(
+    (answer) =>
+      new Set(answer.rounds).size === answer.rounds.length &&
+      new Set(answer.absent).size === answer.absent.length &&
+      answer.absent.every((id) => answer.rounds.includes(id)),
+  );
+
+export type RoundAbsenceQuestion = Extract<
+  RegistrationQuestion,
+  { type: "round_absence" }
+>;
+
+export const registrationAnswerSchema = z.union([
+  z.string(),
+  z.array(z.string()),
+  z.number(),
+  z.boolean(),
+  roundAbsenceAnswerSchema,
+  z.null(),
+]);
+
+/** The single active round-absence question, identified by type, not by its text. */
+export const findRoundAbsenceQuestion = (
+  config: PlatformRegistrationConfig,
+): RoundAbsenceQuestion | undefined => {
+  for (const section of config.sections) {
+    if (section.deleted) continue;
+    for (const question of section.questions)
+      if (!question.deleted && question.type === "round_absence")
+        return question;
+  }
+  return undefined;
+};
+
+export const parseRoundAbsenceAnswer = (
+  value: unknown,
+): RoundAbsenceAnswer | null => {
+  const parsed = roundAbsenceAnswerSchema.safeParse(value);
+  return parsed.success ? parsed.data : null;
+};
+
+/**
+ * Object answers are accepted only for the round-absence question. With
+ * `current`, the answer scope must also consist of rounds the form offers now.
+ * Answers identical to `stored` ones are kept as they are, so registrations
+ * answered before a question changed its type stay editable.
+ */
+export const hasValidRoundAbsenceAnswers = (
+  config: PlatformRegistrationConfig,
+  answers: { questionUuid: string; answer: unknown }[],
+  current: boolean,
+  stored: { questionUuid: string; answer: unknown }[] = [],
+): boolean => {
+  const question = findRoundAbsenceQuestion(config);
+  return answers.every(({ questionUuid, answer }) => {
+    const previous = stored.find((item) => item.questionUuid === questionUuid);
+    if (previous && JSON.stringify(previous.answer) === JSON.stringify(answer))
+      return true;
+    if (questionUuid !== question?.uuid)
+      return (
+        answer === null || typeof answer !== "object" || Array.isArray(answer)
+      );
+    if (answer === null) return true;
+    const parsed = parseRoundAbsenceAnswer(answer);
+    return (
+      !!parsed &&
+      (!current ||
+        parsed.rounds.every((id) =>
+          question.rounds.some((round) => round.id === id),
+        ))
+    );
+  });
+};
+
+export const formatRoundAbsenceAnswer = (
+  question: Pick<RoundAbsenceQuestion, "rounds">,
+  value: unknown,
+): string => {
+  const answer = parseRoundAbsenceAnswer(value);
+  if (!answer) return "";
+  if (!answer.absent.length) return ALL_ROUNDS_LABEL;
+  return `Neúčasť: ${answer.absent
+    .map(
+      (id) =>
+        question.rounds.find((round) => round.id === id)?.label ??
+        "odstránené kolo",
+    )
+    .join(", ")}`;
+};
 
 export const registrationRuleSchema = z.union([
   z.object({
@@ -174,10 +289,24 @@ export const platformRegistrationConfigSchema = z
         }
       }
 
-      const activeQuestions = section.questions.filter((q) => !q.deleted);
+      const activeQuestions = section.questions.filter(
+        (q) => !q.deleted && q.type !== "round_absence",
+      );
       for (const q of activeQuestions) {
         seenQuestionUuids.add(q.uuid);
       }
+    }
+
+    const roundQuestions = activeSections.flatMap((section) =>
+      section.questions.filter((q) => !q.deleted && q.type === "round_absence"),
+    );
+    if (roundQuestions.length > 1) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          "Prihláška môže obsahovať najviac jednu otázku na neúčasť v kolách.",
+        path: ["sections"],
+      });
     }
   });
 

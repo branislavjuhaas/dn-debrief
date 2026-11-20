@@ -52,6 +52,12 @@ const writes: {
   body: Record<string, unknown>;
 }[] = [];
 let loseWriteResponse = false;
+const availability = new Map<number, string[]>();
+const tabbycat = { dropAvailabilityWrites: false, extraAvailability: "" };
+const [round1, round2] = [
+  "11111111-1111-4111-8111-111111111111",
+  "22222222-2222-4222-8222-222222222222",
+];
 
 async function call(
   handler: (event: H3Event) => Promise<unknown>,
@@ -91,11 +97,15 @@ beforeEach(async () => {
   loseWriteResponse = false;
   writes.length = 0;
   collections.clear();
+  availability.clear();
+  tabbycat.dropAvailabilityWrites = false;
+  tabbycat.extraAvailability = "";
   for (const path of [
     "/api/v1/institutions",
     "/api/v1/tournaments/destination/teams",
     "/api/v1/tournaments/destination/speakers",
     "/api/v1/tournaments/destination/adjudicators",
+    "/api/v1/tournaments/destination/rounds",
   ])
     collections.set(path, []);
   vi.spyOn(TabbycatClient.prototype, "request").mockImplementation(
@@ -104,6 +114,24 @@ beforeEach(async () => {
         return { username: "tester" };
       if (method === "GET" && path === "/api/v1/tournaments/destination")
         return { name: "Test tournament" };
+      const round = /\/rounds\/(\d+)\/availabilities\?adjudicators=true$/.exec(
+        path,
+      );
+      if (round) {
+        const seq = Number(round[1]);
+        const current = new Set(availability.get(seq) ?? []);
+        if (method !== "GET" && !tabbycat.dropAvailabilityWrites) {
+          writes.push({ method, path, body: { participants: payload } });
+          for (const item of payload as string[])
+            if (method === "PUT") current.add(item);
+            else current.delete(item);
+          availability.set(seq, [...current]);
+        }
+        return [
+          ...[...current].map((item) => `https://tabbycat.example${item}`),
+          ...(tabbycat.extraAvailability ? [tabbycat.extraAvailability] : []),
+        ];
+      }
       if (method === "OPTIONS")
         return {
           actions: {
@@ -224,7 +252,24 @@ beforeEach(async () => {
       requireAccount: true,
       requireMembership: true,
       collectedDetails: [],
-      sections: [],
+      sections: [
+        {
+          uuid: "start",
+          title: "Dostupnosť",
+          questions: [
+            {
+              uuid: "rounds",
+              title: "V ktorých kolách sa nezúčastníte?",
+              required: false,
+              type: "round_absence",
+              rounds: [
+                { id: round1, label: "1. kolo" },
+                { id: round2, label: "2. kolo" },
+              ],
+            },
+          ],
+        },
+      ],
       fallbackStartSection: "start",
     },
   });
@@ -240,6 +285,21 @@ beforeEach(async () => {
         ...(roleUuid === "speaker" ? { teamName: "TEAM1" } : {}),
         questions: [
           { questionUuid: "private", answer: "Never transfer this ID number" },
+          ...(roleUuid === "shadow"
+            ? [
+                {
+                  questionUuid: "rounds",
+                  answer: { absent: [], rounds: [round1, round2] },
+                },
+              ]
+            : roleUuid === "judge"
+              ? [
+                  {
+                    questionUuid: "rounds",
+                    answer: { absent: [round2], rounds: [round1, round2] },
+                  },
+                ]
+              : []),
         ],
       },
     })),
@@ -252,9 +312,20 @@ afterAll(async () => {
 
 const importBody = (result: ImportPreview) => ({
   ...previewBody,
+  rounds: result.rounds?.mapping,
   fingerprint: result.fingerprint,
   acknowledgeMixedTeams: true,
 });
+const addRounds = () =>
+  collections.set(
+    "/api/v1/tournaments/destination/rounds",
+    [1, 2].map((seq) => ({
+      url: `/api/v1/tournaments/destination/rounds/${seq}`,
+      seq,
+      name: `Round ${seq}`,
+      abbreviation: `R${seq}`,
+    })),
+  );
 
 describe("Tabbycat import", () => {
   it("imports all registrations, omits custom answers, preserves edited scores and repeats without writes", async () => {
@@ -361,6 +432,280 @@ describe("Tabbycat import", () => {
     }
     expect(writes).toHaveLength(first.plan.operations.length);
     expect((await createPreview()).plan.operations).toEqual([]);
+  });
+
+  it("imports reviewed round availability and shows later manual differences", async () => {
+    addRounds();
+    const other = "/api/v1/tournaments/destination/adjudicators/99";
+    availability.set(2, [other]);
+    const first = await createPreview();
+    expect(first.rounds).toMatchObject({
+      source: [
+        { id: round1, label: "1. kolo" },
+        { id: round2, label: "2. kolo" },
+      ],
+      mapping: { [round1]: 1, [round2]: 2 },
+    });
+    expect(
+      first.plan.operations
+        .filter((item) => item.entity === "availability")
+        .map((item) => [item.method, item.details]),
+    ).toEqual([
+      ["PUT", ["Shadow Test", "Rozhodca Test"]],
+      ["PUT", ["Shadow Test"]],
+    ]);
+    // A pairing different from the reviewed preview is rejected before writing.
+    const tampered = { ...importBody(first), rounds: { [round1]: 2 } };
+    expect((await call(execute, tampered)).status).toBe(409);
+    expect(writes).toEqual([]);
+
+    let input = importBody(first);
+    let remaining = first.plan.operations.length;
+    while (remaining) {
+      const result = await call(execute, input);
+      expect(result.status).toBe(200);
+      remaining = result.body.remaining;
+      input = { ...input, fingerprint: result.body.fingerprint };
+    }
+    const [shadow, judge] = collections
+      .get("/api/v1/tournaments/destination/adjudicators")!
+      .map((item) => item.url);
+    expect(availability.get(1)).toEqual([shadow, judge]);
+    expect(availability.get(2)).toEqual([other, shadow]);
+    expect((await createPreview()).plan.operations).toEqual([]);
+
+    availability.get(2)!.push(judge!);
+    const fresh = await createPreview();
+    expect(fresh.plan.operations).toMatchObject([
+      { method: "POST", details: ["Rozhodca Test"] },
+    ]);
+    // Unpaired rounds are never written.
+    const unpaired = await call(preview, { ...previewBody, rounds: {} });
+    expect((unpaired.body as ImportPreview).plan.operations).toEqual([]);
+  });
+
+  it("imports participants without availability while the tournament has no rounds", async () => {
+    const first = await createPreview();
+    expect(first.rounds).toMatchObject({ remote: [], mapping: {} });
+    expect(
+      first.plan.operations.some((item) => item.entity === "availability"),
+    ).toBe(false);
+    expect((await call(execute, importBody(first))).status).toBe(200);
+  });
+
+  it("resolves availability for adjudicators created in earlier batches", async () => {
+    addRounds();
+    await testDb.insert(eventRegistrations).values(
+      Array.from({ length: 6 }, (_, i) => ({
+        id: 20 + i,
+        eventId: 1,
+        collectedDetails: {
+          name: `Guest judge ${i}`,
+          email: `judge${i}@example.invalid`,
+        },
+        registrationData: {
+          roleUuid: "judge",
+          questions: [
+            {
+              questionUuid: "rounds",
+              answer: { absent: [], rounds: [round1, round2] },
+            },
+          ],
+        },
+      })),
+    );
+    const first = await createPreview();
+    expect(first.plan.operations.length).toBeGreaterThan(5);
+    let input = importBody(first);
+    let remaining = first.plan.operations.length;
+    let batches = 0;
+    while (remaining) {
+      const result = await call(execute, input);
+      expect(result.status).toBe(200);
+      remaining = result.body.remaining;
+      input = { ...input, fingerprint: result.body.fingerprint };
+      batches++;
+    }
+    expect(batches).toBeGreaterThan(1);
+    const judges = collections.get(
+      "/api/v1/tournaments/destination/adjudicators",
+    )!;
+    expect(judges).toHaveLength(8);
+    // Everyone except the judge absent in round 2 is available in both rounds.
+    expect(availability.get(1)).toHaveLength(8);
+    expect(availability.get(2)).toHaveLength(7);
+    expect((await createPreview()).plan.operations).toEqual([]);
+  });
+
+  it("rejects stale availability, answers and rounds before writing", async () => {
+    addRounds();
+    const other = "/api/v1/tournaments/destination/adjudicators/99";
+    // A change for an adjudicator outside Debrief does not alter the plan and stays untouched.
+    const unrelated = await createPreview();
+    availability.set(1, [other]);
+    let input = importBody(unrelated);
+    for (let remaining = 1; remaining;) {
+      const result = await call(execute, input);
+      expect(result.status).toBe(200);
+      remaining = result.body.remaining;
+      input = { ...input, fingerprint: result.body.fingerprint };
+    }
+    expect(availability.get(1)).toContain(other);
+    const judge = collections
+      .get("/api/v1/tournaments/destination/adjudicators")!
+      .find((item) => item.name === "Rozhodca Test")!.url;
+    await testDb.execute(
+      sql`UPDATE event_registrations SET registration_data = jsonb_set(registration_data, '{questions,1,answer,absent}', '[]') WHERE id = 3`,
+    );
+    const count = writes.length;
+    const stale = async (change: () => Promise<void> | void) => {
+      const result = await createPreview();
+      await change();
+      expect((await call(execute, importBody(result))).status).toBe(409);
+      expect(writes).toHaveLength(count);
+    };
+    // Manual Tabbycat edit of a Debrief adjudicator after the preview.
+    await stale(() => {
+      availability.get(2)!.push(judge);
+    });
+    availability.set(
+      2,
+      availability.get(2)!.filter((item) => item !== judge),
+    );
+    await stale(async () => {
+      await testDb.execute(
+        sql`UPDATE event_registrations SET registration_data = jsonb_set(registration_data, '{questions,1,answer,absent}', ${JSON.stringify([round2])}::jsonb) WHERE id = 3`,
+      );
+    });
+    await stale(() => {
+      collections.get("/api/v1/tournaments/destination/rounds")![0]!.name =
+        "Opening round";
+    });
+    await stale(async () => {
+      const [record] = await testDb
+        .select({ config: events.registrationConfig })
+        .from(events);
+      const config = structuredClone(record!.config) as {
+        sections: { questions: { rounds: { label: string }[] }[] }[];
+      };
+      config.sections[0]!.questions[0]!.rounds[0]!.label = "Prvé kolo";
+      await testDb.update(events).set({ registrationConfig: config as never });
+    });
+  });
+
+  it("rejects unknown pairings and blocks duplicate ones", async () => {
+    addRounds();
+    for (const rounds of [
+      { "33333333-3333-4333-8333-333333333333": 1 },
+      { [round1]: 7 },
+    ]) {
+      const result = await call(preview, { ...previewBody, rounds });
+      expect(result.status).toBe(400);
+      expect(result.body.data.message).toContain("Párovanie kôl");
+    }
+    const duplicate = await call(preview, {
+      ...previewBody,
+      rounds: { [round1]: 1, [round2]: 1 },
+    });
+    const plan = (duplicate.body as ImportPreview).plan;
+    expect(plan.errors).toEqual([
+      "Round 1: v Tabbycate je spárované s viacerými kolami z prihlášky.",
+    ]);
+    expect(
+      (await call(execute, importBody(duplicate.body as ImportPreview))).status,
+    ).toBe(400);
+    expect(writes).toEqual([]);
+  });
+
+  it("stops when Tabbycat does not confirm an availability write", async () => {
+    addRounds();
+    const first = await createPreview();
+    let input = importBody(first);
+    // Create participants first, then let the availability write be ignored.
+    const result = await call(execute, input);
+    expect(result.status).toBe(200);
+    input = { ...input, fingerprint: result.body.fingerprint };
+    tabbycat.dropAvailabilityWrites = true;
+    const failed = await call(execute, input);
+    expect(failed.status).toBe(502);
+    expect(failed.body.data.message).toContain(
+      "Tabbycat nepotvrdil uloženie dostupnosti.",
+    );
+    tabbycat.dropAvailabilityWrites = false;
+    const fresh = await createPreview();
+    expect(
+      fresh.plan.operations.every((item) => item.entity === "availability"),
+    ).toBe(true);
+    expect((await call(execute, importBody(fresh))).status).toBe(200);
+    expect((await createPreview()).plan.operations).toEqual([]);
+  });
+
+  it("rejects availability lists pointing outside the tournament's adjudicators", async () => {
+    addRounds();
+    for (const url of [
+      "https://tabbycat.example/api/v1/tournaments/destination/teams/1",
+      "https://tabbycat.example/api/v1/tournaments/other/adjudicators/1",
+      "https://attacker.example/api/v1/tournaments/destination/adjudicators/1",
+    ]) {
+      tabbycat.extraAvailability = url;
+      const result = await call(preview, previewBody);
+      expect(result.status).toBe(400);
+    }
+    expect(writes).toEqual([]);
+  });
+
+  it("does not request rounds when the form has no round absence question", async () => {
+    collections.delete("/api/v1/tournaments/destination/rounds");
+    await testDb.update(events).set({
+      registrationConfig: {
+        roles: [
+          {
+            uuid: "judge",
+            name: "Rozhodca/-kyňa",
+            roleType: "adjudicator",
+            credentialRequirements: "none",
+            cost: 0,
+          },
+        ],
+        requireAccount: true,
+        requireMembership: true,
+        collectedDetails: [],
+        sections: [],
+        fallbackStartSection: "start",
+      } as never,
+    });
+    await testDb.execute(sql`DELETE FROM event_registrations WHERE id <> 3`);
+    const result = await createPreview();
+    expect(result.rounds).toBeNull();
+    expect(
+      result.plan.operations.some((item) => item.entity === "availability"),
+    ).toBe(false);
+  });
+
+  it("ignores round answers left in a section hidden for the registration", async () => {
+    addRounds();
+    const [record] = await testDb
+      .select({ config: events.registrationConfig })
+      .from(events);
+    const config = structuredClone(record!.config) as {
+      sections: Record<string, unknown>[];
+    };
+    // Only adjudicators see the section; the Shadow's stored answer is stale.
+    config.sections[0]!.visibleWhen = [
+      {
+        questionUuid: "00000000-0000-0000-0000-000000000000",
+        operator: "in",
+        value: ["judge"],
+        thenUuid: "start",
+      },
+    ];
+    await testDb.update(events).set({ registrationConfig: config as never });
+    const result = await createPreview();
+    expect(
+      result.plan.operations
+        .filter((item) => item.entity === "availability")
+        .map((item) => item.details),
+    ).toEqual([["Rozhodca Test"]]);
   });
 
   it("requires authorization and same-origin requests", async () => {

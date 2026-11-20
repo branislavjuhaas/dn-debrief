@@ -82,7 +82,12 @@ export interface RemoteState {
   teams: RemoteObject[];
   speakers: RemoteObject[];
   adjudicators: RemoteObject[];
+  rounds: { seq: number; name: string; abbreviation: string }[];
+  /** Round seq → paths of adjudicators marked available; only mapped rounds are loaded. */
+  availability: Record<number, string[]>;
 }
+
+export type RecordEntity = Exclude<ImportEntity, "availability">;
 
 export const collections = {
   institution: "institutions",
@@ -91,10 +96,13 @@ export const collections = {
   adjudicator: "adjudicators",
 } as const;
 
-export const collectionPath = (entity: ImportEntity, slug: string) =>
+export const collectionPath = (entity: RecordEntity, slug: string) =>
   entity === "institution"
     ? "/api/v1/institutions"
     : `/api/v1/tournaments/${encodeURIComponent(slug)}/${collections[entity]}`;
+
+export const availabilityPath = (slug: string, seq: number) =>
+  `/api/v1/tournaments/${encodeURIComponent(slug)}/rounds/${seq}/availabilities?adjudicators=true`;
 
 export class TabbycatClient {
   constructor(
@@ -326,7 +334,54 @@ export class TabbycatClient {
           "Token nemá prístup k skóre a konfliktom rozhodcov.",
         );
     }
-    return { institutions, teams, speakers, adjudicators };
+    return {
+      institutions,
+      teams,
+      speakers,
+      adjudicators,
+      rounds: [],
+      availability: {},
+    };
+  }
+
+  async rounds(slug: string): Promise<RemoteState["rounds"]> {
+    const rounds = await this.list(
+      `/api/v1/tournaments/${encodeURIComponent(slug)}/rounds`,
+    );
+    return rounds.map((round) => {
+      if (
+        !Number.isInteger(round.seq) ||
+        typeof round.name !== "string" ||
+        typeof round.abbreviation !== "string"
+      )
+        throw new TabbycatError("Tabbycat vrátil neplatné kolo.");
+      return {
+        seq: round.seq as number,
+        name: round.name,
+        abbreviation: round.abbreviation,
+      };
+    });
+  }
+
+  /** Validates an availability list response and returns adjudicator paths. */
+  availabilityList(slug: string, response: unknown): string[] {
+    const collection = collectionPath("adjudicator", slug);
+    if (!Array.isArray(response))
+      throw new TabbycatError("Tabbycat vrátil neplatnú dostupnosť.");
+    return response.map((item) => {
+      const path = typeof item === "string" ? this.path(item) : "";
+      const suffix = path.slice(collection.length + 1);
+      if (!path.startsWith(`${collection}/`) || !/^\d+$/.test(suffix))
+        throw new TabbycatError("Tabbycat vrátil neplatnú dostupnosť.");
+      return path;
+    });
+  }
+
+  async availability(slug: string, seq: number): Promise<string[]> {
+    return this.availabilityList(
+      slug,
+      await this.request("GET", availabilityPath(slug, seq)),
+    );
   }
 
   async capabilities(

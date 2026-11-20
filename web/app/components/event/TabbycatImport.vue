@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import type { ImportPreview, ImportTournament } from "#shared/types/tabbycat";
+import type {
+  ImportPreview,
+  ImportTournament,
+  RoundMapping,
+} from "#shared/types/tabbycat";
 
 const props = defineProps<{ slug: string }>();
 const open = defineModel<boolean>("open", { default: false });
@@ -21,22 +25,38 @@ const endpoint = computed(
   () => `/api/events/${encodeURIComponent(props.slug)}/registrations/tabbycat`,
 );
 const finished = computed(() => completed.value !== null);
-const creates = computed(
-  () =>
-    previewData.value?.plan.operations.filter((item) => item.method === "POST")
-      .length ?? 0,
+const count = (
+  match: (item: ImportPreview["plan"]["operations"][number]) => boolean,
+) => previewData.value?.plan.operations.filter(match).length ?? 0;
+const creates = computed(() =>
+  count((item) => item.entity !== "availability" && item.method === "POST"),
 );
-const updates = computed(
-  () =>
-    previewData.value?.plan.operations.filter((item) => item.method === "PATCH")
-      .length ?? 0,
+const updates = computed(() => count((item) => item.method === "PATCH"));
+const availabilityChanges = computed(() =>
+  count((item) => item.entity === "availability"),
 );
 const labels = {
   institution: "Inštitúcia",
   team: "Tím",
   speaker: "Rečník/čka",
   adjudicator: "Rozhodca/kyňa",
+  availability: "Dostupnosť rozhodcov",
 };
+const actionLabel = (operation: ImportPreview["plan"]["operations"][number]) =>
+  operation.entity === "availability"
+    ? operation.method === "PUT"
+      ? "Dostupní"
+      : "Nedostupní"
+    : operation.method === "POST"
+      ? "Vytvoriť"
+      : "Upraviť";
+const roundItems = computed(() => [
+  { label: "Nepárovať", value: 0 },
+  ...(previewData.value?.rounds?.remote ?? []).map((round) => ({
+    label: round.name,
+    value: round.seq,
+  })),
+]);
 const countLabels = {
   registrations: "Registrácie",
   teams: "Tímy",
@@ -93,17 +113,32 @@ function connect() {
   });
 }
 
-function preview() {
+// The last reviewed pairing survives failed imports; without one the server
+// proposes only unambiguous round pairs for review.
+const pairing = ref<RoundMapping>();
+watch(tournament, () => {
+  pairing.value = undefined;
+});
+
+function preview(rounds = pairing.value) {
   return request(async () => {
     mixedAcknowledged.value = false;
     previewData.value = await $fetch<ImportPreview>(
       `${endpoint.value}/preview`,
       {
         method: "POST",
-        body: { ...requestBody(), tournament: tournament.value },
+        body: { ...requestBody(), tournament: tournament.value, rounds },
       },
     );
+    pairing.value = previewData.value.rounds?.mapping;
   });
+}
+
+function pairRound(id: string, seq: number) {
+  const mapping = { ...previewData.value?.rounds?.mapping };
+  if (seq) mapping[id] = seq;
+  else delete mapping[id];
+  return preview(mapping);
 }
 
 function execute() {
@@ -123,6 +158,7 @@ function execute() {
         body: {
           ...requestBody(),
           tournament: tournament.value,
+          rounds: initial.rounds?.mapping,
           fingerprint,
           acknowledgeMixedTeams: mixedAcknowledged.value,
         },
@@ -137,6 +173,7 @@ function execute() {
 
 function reset() {
   previewData.value = null;
+  pairing.value = undefined;
   completed.value = null;
   mixedAcknowledged.value = false;
   error.value = "";
@@ -239,7 +276,42 @@ function reset() {
           <p class="text-sm text-muted">
             Nové: {{ creates }} · Úpravy: {{ updates }} · Bez zmeny:
             {{ previewData.plan.counts.unchanged }}
+            <template v-if="previewData.rounds">
+              · Zmeny dostupnosti: {{ availabilityChanges }}
+            </template>
           </p>
+
+          <div v-if="previewData.rounds && !finished" class="space-y-3">
+            <p class="font-medium">Párovanie kôl s Tabbycatom</p>
+            <UAlert
+              v-if="!previewData.rounds.remote.length"
+              color="info"
+              variant="subtle"
+              title="Turnaj zatiaľ nemá kolá"
+              description="Účastníkov môžete importovať teraz. Dostupnosť doplníte neskorším importom po vytvorení kôl." />
+            <template v-else>
+              <p class="text-sm text-muted">
+                Skontrolujte navrhnuté párovanie. Dostupnosť rozhodcov sa mení
+                iba v spárovaných kolách a iba podľa vyplnených odpovedí;
+                ostatné údaje v Tabbycate zostanú nezmenené.
+              </p>
+              <div class="grid gap-3 sm:grid-cols-2">
+                <UFormField
+                  v-for="round in previewData.rounds.source"
+                  :key="round.id"
+                  :label="round.label">
+                  <USelect
+                    :model-value="previewData.rounds.mapping[round.id] ?? 0"
+                    :items="roundItems"
+                    :disabled="busy"
+                    class="w-full"
+                    @update:model-value="
+                      (seq) => pairRound(round.id, Number(seq))
+                    " />
+                </UFormField>
+              </div>
+            </template>
+          </div>
 
           <UAlert
             v-for="issue in previewData.plan.errors"
@@ -290,9 +362,12 @@ function reset() {
               <div class="min-w-0">
                 <p class="font-medium break-words">{{ operation.label }}</p>
                 <p class="text-muted">{{ labels[operation.entity] }}</p>
+                <p v-if="operation.details" class="text-muted break-words">
+                  {{ operation.details.join(", ") }}
+                </p>
               </div>
               <UBadge color="neutral" variant="subtle" class="shrink-0">
-                {{ operation.method === "POST" ? "Vytvoriť" : "Upraviť" }}
+                {{ actionLabel(operation) }}
               </UBadge>
             </li>
           </ul>
@@ -323,7 +398,7 @@ function reset() {
         label="Zobraziť náhľad"
         :loading="busy"
         :disabled="!tournament || !token.trim()"
-        @click="preview" />
+        @click="preview()" />
       <UButton
         v-if="previewData && !finished && previewData.plan.operations.length"
         label="Importovať do turnaja"
